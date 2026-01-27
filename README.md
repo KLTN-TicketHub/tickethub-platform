@@ -1,1 +1,1 @@
-# tickethub-platform
+# NỀN TẢNG QUẢN LÝ VÀ PHÂN PHỐI VÉ SỰ KIỆN TRỰC TUYẾN (E-TICKETING PLATFORM)
