@@ -6,4 +6,8 @@
     <Project Path="BuildingBlocks/Common/Common.csproj" />
     <Project Path="BuildingBlocks/Contracts/Contracts.csproj" />
   </Folder>
+  <Folder Name="/Services/" />
+  <Folder Name="/Services/Identity/">
+    <Project Path="Services/Identity/Identity.API/Identity.API.csproj" />
+  </Folder>
 </Solution>
