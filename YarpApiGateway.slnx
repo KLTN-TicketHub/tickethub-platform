@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/backend/" />
+  <Folder Name="/src/backend/ApiGateways/">
+    <Project Path="src/backend/ApiGateways/YarpApiGateway/YarpApiGateway.csproj" />
+  </Folder>
+</Solution>
