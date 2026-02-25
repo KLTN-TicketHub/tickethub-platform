@@ -2,4 +2,8 @@
   <Folder Name="/ApiGateways/">
     <Project Path="ApiGateways/YarpApiGateway/YarpApiGateway.csproj" />
   </Folder>
+  <Folder Name="/BuildingBlocks/">
+    <Project Path="BuildingBlocks/Common/Common.csproj" />
+    <Project Path="BuildingBlocks/Contracts/Contracts.csproj" />
+  </Folder>
 </Solution>
