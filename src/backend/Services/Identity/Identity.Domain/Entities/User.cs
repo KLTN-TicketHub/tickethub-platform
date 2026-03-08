@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Domain.DDD;
+using BuildingBlocks.Infrastructure.Auditing;
 using Microsoft.AspNetCore.Identity;
 
 namespace Identity.Domain.Entities
