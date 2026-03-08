@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Common.Exceptions
+namespace BuildingBlocks.Domain.Exceptions
 {
     public class UnauthorizedAccessException : BaseCustomException
     {

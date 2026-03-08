@@ -1,4 +1,4 @@
-﻿namespace Common.DDD
+﻿namespace BuildingBlocks.Domain.DDD
 {
     public class BaseEntity
     {

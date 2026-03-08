@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Project.Application.Common.Exceptions
+namespace BuildingBlocks.Domain.Exceptions
 {
     public abstract class BaseCustomException : Exception
     {
