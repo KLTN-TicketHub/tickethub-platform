@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace BuildingBlocks.Infrastructure.Data.Repositories
 {
-    public class BaseRepository<T, TContext> 
+    public class BaseRepository<T, TContext>
         where T : class
         where TContext : DbContext
     {

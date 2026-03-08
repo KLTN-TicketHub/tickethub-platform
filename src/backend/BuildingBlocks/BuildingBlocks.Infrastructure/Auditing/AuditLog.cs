@@ -2,12 +2,12 @@
 {
     public class AuditLog
     {
-        public int Id { get; set; }
-        public int? UserId { get; set; }
+        public Guid Id { get; set; }
+        public Guid? UserId { get; set; }
         public string? UserName { get; set; }
         public string Action { get; set; } = string.Empty;
         public string EntityType { get; set; } = string.Empty;
-        public int EntityId { get; set; }
+        public Guid EntityId { get; set; }
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
         public string? IPAddress { get; set; }
