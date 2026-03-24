@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Identity.Common.Options
+﻿namespace Identity.Common.Options
 {
     public class AdminAccount
     {

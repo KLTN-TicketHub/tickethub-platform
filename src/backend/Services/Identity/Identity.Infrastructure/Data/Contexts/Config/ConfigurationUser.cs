@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Project.Domain.Entities.Identity_Auth;
 
 namespace Identity.Infrastructure.Data.Contexts.Config
 {

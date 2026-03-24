@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using BuildingBlocks.Contracts.Options;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using BuildingBlocks.Contracts.Options;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.RateLimiting;
 
