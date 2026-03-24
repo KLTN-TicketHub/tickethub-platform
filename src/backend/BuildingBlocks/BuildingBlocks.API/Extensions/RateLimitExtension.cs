@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using BuildingBlocks.Contracts.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.RateLimiting;
@@ -8,13 +9,10 @@ namespace BuildingBlocks.API.Extensions
 {
     public static class RateLimitExtension
     {
-        public static IServiceCollection AddCustomRateLimit(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddCustomRateLimit(
+            this IServiceCollection services,
+            RateLimitConfig? rateLimitConfig)
         {
-            RateLimitConfig? rateLimitConfig = configuration
-                .GetSection("RateLimitConfig")?
-                .Get<AppSettings>()?
-                .RateLimitConfig;
-
             int authenticatedLimit = rateLimitConfig?.AuthenticatedUser?.PermitLimit ?? 200;
             int authenticatedWindow = rateLimitConfig?.AuthenticatedUser?.WindowMinutes ?? 1;
 
