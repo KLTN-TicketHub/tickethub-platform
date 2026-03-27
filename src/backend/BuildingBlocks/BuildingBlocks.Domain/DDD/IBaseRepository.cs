@@ -1,12 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace BuildingBlocks.Domain.DDD
 {
     public interface IBaseRepository<T, TContext>
-        where T : class
-        where TContext : DbContext,
-        IAggregateRoot
+        where T : class, IAggregateRoot
+        where TContext : DbContext
     {
         Task<IEnumerable<TResult>> GetAllAsync<TResult>(
             Expression<Func<T, bool>>? filter = null,

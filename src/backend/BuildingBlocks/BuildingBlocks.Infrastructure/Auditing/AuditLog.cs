@@ -1,6 +1,8 @@
-﻿namespace BuildingBlocks.Infrastructure.Auditing
+﻿using BuildingBlocks.Domain.DDD;
+
+namespace BuildingBlocks.Infrastructure.Auditing
 {
-    public class AuditLog
+    public class AuditLog : IAggregateRoot
     {
         public Guid Id { get; set; }
         public Guid? UserId { get; set; }

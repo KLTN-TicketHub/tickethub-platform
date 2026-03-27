@@ -11,7 +11,7 @@ namespace Identity.API.Extensions
         {
             services.AddDbContext<IdentityDbContext>(option =>
             {
-                option.UseSqlServer(configuration.GetConnectionString("TicketHub.Identity.Db"));
+                option.UseSqlServer(configuration.GetConnectionString("PrimaryDbConnection"));
             });
 
             return services;

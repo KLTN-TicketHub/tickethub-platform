@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+using BuildingBlocks.Domain.DDD;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace BuildingBlocks.Infrastructure.Data.Repositories
+namespace BuildingBlocks.Infrastructure.Data
 {
-    public class BaseRepository<T, TContext>
-        where T : class
+    public class BaseRepository<T, TContext> : IBaseRepository<T, TContext>
+        where T : class, IAggregateRoot
         where TContext : DbContext
     {
         protected readonly TContext _dbContext;
