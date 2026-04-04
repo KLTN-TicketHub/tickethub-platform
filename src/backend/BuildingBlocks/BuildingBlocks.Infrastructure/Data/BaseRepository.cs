@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace BuildingBlocks.Infrastructure.Data
 {
-    public class BaseRepository<T, TContext> : IBaseRepository<T, TContext>
+    public abstract class BaseRepository<T, TContext> : IBaseRepository<T, TContext>
         where T : class, IAggregateRoot
         where TContext : DbContext
     {

@@ -1,6 +1,8 @@
-﻿namespace Identity.Domain.Interfaces.IBase
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace BuildingBlocks.Domain.DDD
 {
-    public interface IUnitOfWork
+    public interface IBaseUnitOfWork<TContext> where TContext : DbContext
     {
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);

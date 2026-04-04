@@ -13,9 +13,10 @@ namespace Identity.Application.Features.Auth.Commands.Login
         private readonly ICurrentUserService _currentUserService;
         private readonly UserManager<User> _userManager;
 
-        public LoginCommandHandler(ICurrentUserService currentUserService)
+        public LoginCommandHandler(ICurrentUserService currentUserService, UserManager<User> userManager)
         {
             _currentUserService = currentUserService;
+            _userManager = userManager;
         }
 
         public async Task<AuthDto> Handle(

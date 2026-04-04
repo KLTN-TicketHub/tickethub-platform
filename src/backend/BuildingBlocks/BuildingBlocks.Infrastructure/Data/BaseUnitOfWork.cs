@@ -1,14 +1,16 @@
-﻿using Identity.Domain.Interfaces.IBase;
-using Identity.Infrastructure.Data.Contexts;
+﻿using BuildingBlocks.Domain.DDD;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Identity.Infrastructure.Data.Repositories.Base
+namespace BuildingBlocks.Infrastructure.Data
 {
-    public class UnitOfWork : IUnitOfWork
+    public abstract class BaseUnitOfWork<TContext> : IBaseUnitOfWork<TContext>
+        where TContext : DbContext
     {
-        private readonly IdentityDbContext _dbContext;
+        private readonly TContext _dbContext;
         private IDbContextTransaction? _transaction;
-        public UnitOfWork(IdentityDbContext dbContext)
+
+        public BaseUnitOfWork(TContext dbContext)
         {
             _dbContext = dbContext;
         }
