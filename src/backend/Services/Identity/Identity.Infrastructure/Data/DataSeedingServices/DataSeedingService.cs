@@ -2,7 +2,6 @@
 using Identity.Common.Options;
 using Identity.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -10,7 +9,7 @@ namespace Identity.Infrastructure.Data.DataSeedingServices
 {
     public class DataSeedingService : IDataSeedingService
     {
-        private readonly IdentityDbContext _dbContext;
+        private readonly Contexts.IdentityDbContext _dbContext;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly AdminAccount _adminAccount;
@@ -18,7 +17,7 @@ namespace Identity.Infrastructure.Data.DataSeedingServices
             UserManager<User> userManager,
             RoleManager<Role> roleManager,
             IOptions<AdminAccount> adminAccount,
-            IdentityDbContext applicationDbContext)
+            Contexts.IdentityDbContext applicationDbContext)
         {
             _userManager = userManager;
             _roleManager = roleManager;

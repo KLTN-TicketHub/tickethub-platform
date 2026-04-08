@@ -1,8 +1,11 @@
 ﻿using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Domain.Exceptions;
 using Identity.Application.Common.DTOs.Auth;
+using Identity.Application.Common.Interfaces.IExternalServices.ITokenServices;
 using Identity.Application.Features.Auth.Request;
+using Identity.Common.Options;
 using Identity.Domain.Entities;
+using Identity.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -12,18 +15,33 @@ namespace Identity.Application.Features.Auth.Commands.Login
     {
         private readonly ICurrentUserService _currentUserService;
         private readonly UserManager<User> _userManager;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IJwtTokenService _jwtTokenService;
+        private readonly AppSettings _appSettings;
 
-        public LoginCommandHandler(ICurrentUserService currentUserService, UserManager<User> userManager)
+        public LoginCommandHandler(
+            ICurrentUserService currentUserService,
+             UserManager<User> userManager,
+             IUnitOfWork unitOfWork,
+             IJwtTokenService jwtTokenService,
+             AppSettings appSettings)
         {
             _currentUserService = currentUserService;
             _userManager = userManager;
+            _unitOfWork = unitOfWork;
+            _jwtTokenService = jwtTokenService;
+            _appSettings = appSettings;
         }
 
         public async Task<AuthDto> Handle(
             LoginCommand request,
             CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await LoginAsync(
+                request.Request,
+                _currentUserService.DeviceInfo,
+                _currentUserService.IpAddress,
+                cancellationToken);
         }
 
         private async Task<AuthDto> LoginAsync(
@@ -102,6 +120,11 @@ namespace Identity.Application.Features.Auth.Commands.Login
                 AccessToken = accessToken,
                 RefreshToken = newToken.Token
             };
+        }
+
+        private async Task<IList<string>> GetUserRolesAsync(User user)
+        {
+            return await _userManager.GetRolesAsync(user);
         }
     }
 }
