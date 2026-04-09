@@ -8,6 +8,7 @@ using Identity.Domain.Entities;
 using Identity.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 
 namespace Identity.Application.Features.Auth.Commands.Login
 {
@@ -24,13 +25,13 @@ namespace Identity.Application.Features.Auth.Commands.Login
              UserManager<User> userManager,
              IUnitOfWork unitOfWork,
              IJwtTokenService jwtTokenService,
-             AppSettings appSettings)
+             IOptions<AppSettings> appSettings)
         {
             _currentUserService = currentUserService;
             _userManager = userManager;
             _unitOfWork = unitOfWork;
             _jwtTokenService = jwtTokenService;
-            _appSettings = appSettings;
+            _appSettings = appSettings.Value;
         }
 
         public async Task<AuthDto> Handle(
@@ -50,7 +51,7 @@ namespace Identity.Application.Features.Auth.Commands.Login
             string? ipAddress,
             CancellationToken cancellationToken = default)
         {
-            User user = await GetUserAsync(request.UserName, cancellationToken);
+            User user = await GetUserAsync(request.UserName, cancellationToken); 
 
             await CheckLockoutAsync(user);
 
