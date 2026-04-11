@@ -18,4 +18,9 @@
     <Project Path="Services/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj" />
     <Project Path="Services/Identity/Identity.UnitTest/Identity.UnitTest.csproj" />
   </Folder>
+  <Folder Name="/Services/Notification/">
+    <Project Path="Services/Notification/Notification.Common/Notification.Common.csproj" />
+    <Project Path="Services/Notification/Notification.Infrastructure/Notification.Infrastructure.csproj" />
+    <Project Path="Services/Notification/Notification.Worker/Notification.Worker.csproj" />
+  </Folder>
 </Solution>

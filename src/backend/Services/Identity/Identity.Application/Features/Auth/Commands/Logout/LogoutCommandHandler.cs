@@ -16,7 +16,7 @@ namespace Identity.Application.Features.Auth.Commands.Logout
 
         public async Task<bool> Handle(LogoutCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await LogoutAsync(request.RefreshToken, cancellationToken);
         }
 
         public async Task<bool> LogoutAsync(string? refreshToken, CancellationToken cancellationToken = default)

@@ -31,7 +31,7 @@ namespace Identity.Application.Features.Auth.Commands.Refresh
 
         public async Task<AuthDto> Handle(RefreshCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await RefreshAsync(request.RefreshToken, null, null, cancellationToken);
         }
 
         public async Task<AuthDto> RefreshAsync(
