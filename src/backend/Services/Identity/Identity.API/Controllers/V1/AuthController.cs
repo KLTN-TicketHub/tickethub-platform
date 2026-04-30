@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
+using System.Net.WebSockets;
 
 namespace Identity.API.Controllers.V1
 {
@@ -109,6 +110,15 @@ namespace Identity.API.Controllers.V1
                 Message = "Token refreshed successfully",
                 AccessToken = result.AccessToken,
             });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("google-login")]
+        public IActionResult GoogleLogin()
+        {
+            string? redirectUrl = Url.Action("GoogleResponse", "Auth", null, Request.Scheme);
+
+            return Challenge();
         }
     }
 }

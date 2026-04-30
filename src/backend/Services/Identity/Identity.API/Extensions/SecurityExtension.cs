@@ -35,7 +35,15 @@ namespace Identity.API.Extensions
             {
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(jwt =>
+            }).AddCookie()
+            .AddGoogle(options =>
+            {
+                options.ClientId = configuration["GoogleAuthSettings:ClientId"];
+                options.ClientSecret = configuration["GoogleAuthSettings:ClientSecret"];
+
+                options.SignInScheme = IdentityConstants.ExternalScheme;
+            })
+            .AddJwtBearer(jwt =>
             {
                 JwtConfig? jwtConfig = configuration.GetSection("AppSettings:JwtConfig").Get<JwtConfig>();
 

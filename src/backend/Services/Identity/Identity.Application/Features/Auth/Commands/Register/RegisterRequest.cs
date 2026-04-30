@@ -1,0 +1,13 @@
+﻿namespace Identity.Application.Features.Auth.Commands.Register
+{
+    public class RegisterRequest
+    {
+        public string FullName { get; set; }
+        public string Email { get; set; }
+
+        public DateTime DateOfBirth { get; set; }
+
+        public string Password { get; set; }
+        public string ConfirmPassword { get; set; }
+    }
+}

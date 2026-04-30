@@ -23,4 +23,9 @@
     <Project Path="Services/Notification/Notification.Infrastructure/Notification.Infrastructure.csproj" />
     <Project Path="Services/Notification/Notification.Worker/Notification.Worker.csproj" />
   </Folder>
+  <Folder Name="/docker/">
+   <File Path="docker/infra/docker-compose.yml" />
+   <File Path="docker/infra/.env.example" />
+   <File Path="docker/infra/README.md" />
+  </Folder>
 </Solution>

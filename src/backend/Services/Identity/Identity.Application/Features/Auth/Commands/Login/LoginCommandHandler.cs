@@ -51,7 +51,7 @@ namespace Identity.Application.Features.Auth.Commands.Login
             string? ipAddress,
             CancellationToken cancellationToken = default)
         {
-            User user = await GetUserAsync(request.UserName, cancellationToken); 
+            User user = await GetUserAsync(request.UserName, cancellationToken);
 
             await CheckLockoutAsync(user);
 
