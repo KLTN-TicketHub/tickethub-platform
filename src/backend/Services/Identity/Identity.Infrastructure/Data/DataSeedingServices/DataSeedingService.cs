@@ -31,10 +31,14 @@ namespace Identity.Infrastructure.Data.DataSeedingServices
                 List<Role> roles = new List<Role>
                 {
                     new Role {Name = "Admin" },
-                    new Role {Name = "User" }
+                    new Role {Name = "Customer" },
+                    new Role {Name = "Moderator"},
+                    new Role {Name = "Organizer"},
+                    new Role {Name = "Staff"}
                 };
-                for (int i = 0; i < roles.Count; i++)
-                    await _roleManager.CreateAsync(roles[i]);
+
+                foreach (var role in roles)
+                    await _roleManager.CreateAsync(role);
             }
 
             if (!await _dbContext.Users.AnyAsync(cancellationToken))

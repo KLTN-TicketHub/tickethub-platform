@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Domain.Exceptions;
 using Identity.Application.Common.DTOs.Auth;
 using Identity.Application.Common.Interfaces.IExternalServices.ITokenServices;
@@ -10,9 +10,9 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
-namespace Identity.Application.Features.Auth.Commands.Login
+namespace Identity.Application.Features.Auth.Commands.LoginStaff
 {
-    public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthDto>
+    public class LoginStaffCommandHandler : IRequestHandler<LoginStaffCommand, AuthDto>
     {
         private readonly ICurrentUserService _currentUserService;
         private readonly UserManager<User> _userManager;
@@ -20,7 +20,7 @@ namespace Identity.Application.Features.Auth.Commands.Login
         private readonly IJwtTokenService _jwtTokenService;
         private readonly AppSettings _appSettings;
 
-        public LoginCommandHandler(
+        public LoginStaffCommandHandler(
             ICurrentUserService currentUserService,
              UserManager<User> userManager,
              IUnitOfWork unitOfWork,
@@ -35,7 +35,7 @@ namespace Identity.Application.Features.Auth.Commands.Login
         }
 
         public async Task<AuthDto> Handle(
-            LoginCommand request,
+            LoginStaffCommand request,
             CancellationToken cancellationToken)
         {
             return await LoginAsync(
@@ -53,18 +53,22 @@ namespace Identity.Application.Features.Auth.Commands.Login
         {
             User user = await GetUserAsync(request.UserName, cancellationToken);
 
+            IList<string> roles = await GetUserRolesAsync(user);
+
+            if (!roles.Contains("Staff"))
+                throw new NotFoundException($"User with UserName {request.UserName} not found");
+
             await CheckLockoutAsync(user);
 
             await CheckPasswordAsync(user, request.Password);
 
             await CheckEmailConfirmedAsync(user);
 
-            AuthDto authDto = await CreateTokensAsync(user, deviceInfo, ipAddress);
+            AuthDto authDto = await CreateTokensAsync(user, deviceInfo, ipAddress, roles);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return authDto;
-            throw new NotImplementedException();
         }
 
         private async Task<User> GetUserAsync(string userName, CancellationToken cancellationToken)
@@ -104,9 +108,9 @@ namespace Identity.Application.Features.Auth.Commands.Login
         }
 
         private async Task<AuthDto> CreateTokensAsync(
-            User user, string? deviceInfo, string? ipAddress)
+            User user, string? deviceInfo, string? ipAddress, IList<string> roles)
         {
-            string accessToken = _jwtTokenService.GenerateJwtToken(user, await GetUserRolesAsync(user));
+            string accessToken = _jwtTokenService.GenerateJwtToken(user, roles);
 
             RefreshToken newToken = new RefreshToken(
                 user.Id,

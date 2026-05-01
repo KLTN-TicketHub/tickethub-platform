@@ -1,17 +1,20 @@
 ﻿using BuildingBlocks.API.Extensions;
 using BuildingBlocks.Contracts.Models.Responses;
-using Identity.Application.Features.Auth.Commands.Login;
 using Identity.Application.Features.Auth.Commands.Logout;
 using Identity.Application.Features.Auth.Commands.Refresh;
 using Identity.Application.Features.Auth.Request;
 using Identity.Common.Options;
+using Identity.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.Options;
-using System.Net.WebSockets;
+using System.Security.Claims;
 
 namespace Identity.API.Controllers.V1
 {
@@ -23,35 +26,13 @@ namespace Identity.API.Controllers.V1
     {
         private readonly AppSettings _appSettings;
         private readonly ISender _sender;
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
+
         public AuthController(IOptions<AppSettings> appSettings, ISender sender)
         {
             _appSettings = appSettings.Value;
             _sender = sender;
-        }
-
-        [EnableRateLimiting(RateLimitPolicies.Login)]
-        [AllowAnonymous]
-        [HttpPost("login")]
-        public async Task<IActionResult> LoginAsync(
-            [FromBody] LoginRequest loginRequest,
-            CancellationToken cancellationToken = default)
-        {
-            var result = await _sender.Send(new LoginCommand(loginRequest), cancellationToken);
-
-            Response.Cookies.Append("refreshToken", result.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddDays(_appSettings.JwtConfig.RefreshTokenExpirationDays)
-            });
-
-            return Ok(new AuthResult
-            {
-                Success = true,
-                Message = "Login successful",
-                AccessToken = result.AccessToken
-            });
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
@@ -112,13 +93,51 @@ namespace Identity.API.Controllers.V1
             });
         }
 
-        [AllowAnonymous]
-        [HttpGet("google-login")]
-        public IActionResult GoogleLogin()
-        {
-            string? redirectUrl = Url.Action("GoogleResponse", "Auth", null, Request.Scheme);
+        //[AllowAnonymous]
+        //[HttpGet("google-login")]
+        //public IActionResult GoogleLogin()
+        //{
+        //    string? redirectUrl = Url.Action("GoogleResponse", "Auth", new { ReturnUrl = "/" });
 
-            return Challenge();
-        }
+        //    var properties = _signInManager.ConfigureExternalAuthenticationProperties(
+        //        GoogleDefaults.AuthenticationScheme,
+        //        redirectUrl);
+
+        //    return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        //}
+
+        //[HttpGet("google-response")]
+        //public async Task<IActionResult> GoogleResponse()
+        //{
+        //    var info = await _signInManager.GetExternalLoginInfoAsync();
+
+        //    if (info == null)
+        //        return BadRequest("Login failed");
+
+        //    var user = await _userManager.FindByLoginAsync(
+        //        info.LoginProvider,
+        //        info.ProviderKey);
+
+        //    if (user == null)
+        //    {
+        //         🔥 REGISTER nếu chưa có
+        //        var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+
+        //        user = new ApplicationUser
+        //        {
+        //            UserName = email,
+        //            Email = email
+        //        };
+
+        //        await _userManager.CreateAsync(user);
+
+        //        await _userManager.AddLoginAsync(user, info);
+        //    }
+
+        //     🔥 tạo JWT
+        //    var token = _jwtService.GenerateToken(user);
+
+        //    return Redirect($"http://localhost:5173/auth/callback?token={token}");
+        //}
     }
 }

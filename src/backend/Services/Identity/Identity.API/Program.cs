@@ -2,7 +2,7 @@ using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
 using Identity.API.Extensions;
 using Identity.Application.Common.Mappers;
-using Identity.Application.Features.Auth.Commands.Login;
+using Identity.Application.Features.Auth.Commands.LoginAdmin;
 using Identity.Common.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +15,7 @@ builder.Services.AddCustomControllers();
 builder.Services.AddCustomOptions(builder.Configuration);
 
 #region MediatR
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginCommand).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginAdminCommand).Assembly));
 #endregion
 
 builder.Services.AddCustomRateLimit(builder.Configuration
