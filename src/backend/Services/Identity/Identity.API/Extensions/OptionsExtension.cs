@@ -10,6 +10,8 @@ namespace Identity.API.Extensions
 
             services.Configure<AdminAccount>(configuration.GetSection("AdminAccount"));
 
+            services.Configure<GoogleAuthSettings>(configuration.GetSection("GoogleAuthSettings"));
+
             return services;
         }
     }

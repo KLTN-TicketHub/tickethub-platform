@@ -93,51 +93,51 @@ namespace Identity.API.Controllers.V1
             });
         }
 
-        //[AllowAnonymous]
-        //[HttpGet("google-login")]
-        //public IActionResult GoogleLogin()
-        //{
-        //    string? redirectUrl = Url.Action("GoogleResponse", "Auth", new { ReturnUrl = "/" });
+        [AllowAnonymous]
+        [HttpGet("google-login")]
+        public IActionResult GoogleLogin()
+        {
+            string? redirectUrl = Url.Action("GoogleResponse", "Auth", new { ReturnUrl = "/" });
 
-        //    var properties = _signInManager.ConfigureExternalAuthenticationProperties(
-        //        GoogleDefaults.AuthenticationScheme,
-        //        redirectUrl);
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(
+                GoogleDefaults.AuthenticationScheme,
+                redirectUrl);
 
-        //    return Challenge(properties, GoogleDefaults.AuthenticationScheme);
-        //}
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
 
-        //[HttpGet("google-response")]
-        //public async Task<IActionResult> GoogleResponse()
-        //{
-        //    var info = await _signInManager.GetExternalLoginInfoAsync();
+        [HttpGet("google-response")]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
 
-        //    if (info == null)
-        //        return BadRequest("Login failed");
+            if (info == null)
+                return BadRequest("Login failed");
 
-        //    var user = await _userManager.FindByLoginAsync(
-        //        info.LoginProvider,
-        //        info.ProviderKey);
+            var user = await _userManager.FindByLoginAsync(
+                info.LoginProvider,
+                info.ProviderKey);
 
-        //    if (user == null)
-        //    {
-        //         🔥 REGISTER nếu chưa có
-        //        var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            if (user == null)
+            {
+                 🔥 REGISTER nếu chưa có
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
 
-        //        user = new ApplicationUser
-        //        {
-        //            UserName = email,
-        //            Email = email
-        //        };
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email
+                };
 
-        //        await _userManager.CreateAsync(user);
+                await _userManager.CreateAsync(user);
 
-        //        await _userManager.AddLoginAsync(user, info);
-        //    }
+                await _userManager.AddLoginAsync(user, info);
+            }
 
-        //     🔥 tạo JWT
-        //    var token = _jwtService.GenerateToken(user);
+             🔥 tạo JWT
+            var token = _jwtService.GenerateToken(user);
 
-        //    return Redirect($"http://localhost:5173/auth/callback?token={token}");
-        //}
+            return Redirect($"http://localhost:5173/auth/callback?token={token}");
+        }
     }
 }
