@@ -1,4 +1,5 @@
-﻿using Identity.Application.Common.Interfaces.IExternalServices.IGoogleServices;
+﻿using Identity.Application.Common.DTOs.Auth;
+using Identity.Application.Common.Interfaces.IExternalServices.IGoogleServices;
 using Identity.Common.Options;
 using Microsoft.Extensions.Options;
 using System;
@@ -14,6 +15,11 @@ namespace Identity.Infrastructure.ExternalServices.GoogleServices
         public GoogleTokenVerifierService(IOptions<GoogleAuthSettings> googleAuthSettings)
         {
             _googleAuthSettings = googleAuthSettings.Value;
+        }
+
+        public async Task<GoogleTokenPayloadDto> ValidateIdTokenAsync(string idToken, CancellationToken cancellation = default)
+        {
+            throw new NotImplementedException();
         }
     }
 }

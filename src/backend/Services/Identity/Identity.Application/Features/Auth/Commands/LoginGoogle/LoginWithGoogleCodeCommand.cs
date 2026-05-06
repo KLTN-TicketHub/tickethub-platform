@@ -4,5 +4,5 @@ using MediatR;
 
 namespace Identity.Application.Features.Auth.Commands.LoginGoogle
 {
-    public record LoginGoogleCommand(GoogleLoginRequest Request) : IRequest<AuthDto>;
+    public record LoginWithGoogleCodeCommand(LoginWithGoogleCodeRequest Request) : IRequest<AuthDto>;
 }

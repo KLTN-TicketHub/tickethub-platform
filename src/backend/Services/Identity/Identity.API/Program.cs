@@ -13,6 +13,7 @@ builder.Services.AddCustomDb(builder.Configuration);
 builder.Services.AddCustomControllers();
 
 builder.Services.AddCustomOptions(builder.Configuration);
+builder.Services.AddMemoryCache();
 
 #region MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginAdminCommand).Assembly));
