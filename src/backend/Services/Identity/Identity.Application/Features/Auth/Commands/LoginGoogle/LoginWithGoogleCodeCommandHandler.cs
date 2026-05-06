@@ -1,4 +1,7 @@
-﻿using Identity.Application.Common.DTOs.Auth;
+﻿using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Domain.Exceptions;
+using Identity.Application.Common.DTOs.Auth;
+using Identity.Application.Common.Interfaces.IExternalServices.IGoogleServices;
 using Identity.Application.Common.Interfaces.IExternalServices.ITokenServices;
 using Identity.Common.Options;
 using Identity.Domain.Entities;
@@ -6,47 +9,166 @@ using Identity.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Identity.Application.Features.Auth.Commands.LoginGoogle
 {
     public class LoginWithGoogleCodeCommandHandler : IRequestHandler<LoginWithGoogleCodeCommand, AuthDto>
     {
+        private const string GoogleProviderName = "Google";
+        private const string CustomerRoleName = "Customer";
+
+        private readonly IGoogleAuthService _googleAuthService;
         private readonly GoogleAuthSettings _googleSettings;
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly UserManager<User> _userManager;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly RoleManager<Role> _roleManager;
+        private readonly AppSettings _appSettings;
 
         public LoginWithGoogleCodeCommandHandler(
+            IGoogleAuthService googleAuthService,
             IOptions<GoogleAuthSettings> googleSettings,
-            HttpClient httpClient,
+            IHttpClientFactory httpClientFactory,
             UserManager<User> userManager,
             IJwtTokenService jwtTokenService,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            ICurrentUserService currentUserService,
+            RoleManager<Role> roleManager,
+            IOptions<AppSettings> appSettings)
         {
+            _googleAuthService = googleAuthService;
             _googleSettings = googleSettings.Value;
-            _httpClient = httpClient;
+            _httpClientFactory = httpClientFactory;
             _userManager = userManager;
             _jwtTokenService = jwtTokenService;
             _unitOfWork = unitOfWork;
+            _currentUserService = currentUserService;
+            _roleManager = roleManager;
+            _appSettings = appSettings.Value;
         }
 
         public Task<AuthDto> Handle(LoginWithGoogleCodeCommand request, CancellationToken cancellationToken)
         {
-            return LoginWithGoogleAsync(request.Request.Code, cancellationToken);
+            return LoginWithGoogleAsync(request.Request.Code, request.Request.RedirectUri, cancellationToken);
         }
 
-        private async Task<AuthDto> LoginWithGoogleAsync(string code, CancellationToken cancellationToken = default)
+        private async Task<AuthDto> LoginWithGoogleAsync(string code, string redirectUri, CancellationToken cancellationToken = default)
         {
-            // 1. Exchange code for access token
-            // 2. Use access token to get user info from Google
-            // 3. Check if user exists in the database, if not create a new user
-            // 4. Generate JWT token and refresh token for the user
-            // 5. Return AuthDto with tokens
-            throw new NotImplementedException();
+            if (_currentUserService.IsAuthenticated)
+                throw new ValidatorException("User is already authenticated");
+
+            GoogleExchangeResult exchange = await _googleAuthService.ExchangeCodeAsync(code, redirectUri, cancellationToken);
+
+            if (string.IsNullOrWhiteSpace(exchange.TokenPayload.Email))
+                throw new BusinessRuleException("Google account does not contain an email address.");
+
+            if (!exchange.TokenPayload.EmailVerified)
+                throw new BusinessRuleException("Google email is not verified.");
+
+            User user = await GetOrCreateCustomerUserAsync(exchange.TokenPayload, cancellationToken);
+
+            IList<string> roles = await _userManager.GetRolesAsync(user);
+
+            string accessToken = _jwtTokenService.GenerateJwtToken(user, roles);
+
+            int refreshDays = _appSettings.JwtConfig!.RefreshTokenExpirationDays;
+
+            RefreshToken newToken = new RefreshToken(
+                user.Id,
+                DateTime.UtcNow.AddDays(refreshDays),
+                _currentUserService.DeviceInfo ?? string.Empty,
+                _currentUserService.IpAddress ?? string.Empty);
+
+            await _unitOfWork.RefreshTokenRepository.CreateAsync(newToken, cancellationToken);
+
+            return new AuthDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = newToken.Token
+            };
+        }
+
+        private async Task<User> GetOrCreateCustomerUserAsync(GoogleTokenPayloadDto payload, CancellationToken cancellation = default)
+        {
+            User? user = await FindLinkedGoogleUserAsync(payload.Subject);
+
+            if (user != null) return user;
+
+            user = await _userManager.FindByEmailAsync(payload.Email);
+
+            if (user != null)
+            {
+                await EnsureUserIsCustomerAsync(user);
+
+                await LinkGoogleLoginAsync(user, payload.Subject, cancellation);
+                return user;
+            }
+
+            User newUser = new User
+            {
+                UserName = BuildUserName(payload),
+                Email = payload.Email,
+                FullName = string.IsNullOrWhiteSpace(payload.Name) ? payload.Email! : payload.Name,
+                EmailConfirmed = true,
+                ImageUrl = payload.Picture
+            };
+
+            IdentityResult createResult = await _userManager.CreateAsync(newUser);
+
+            if (!createResult.Succeeded)
+                throw new BusinessRuleException($"Failed to create user: {string.Join(", ", createResult.Errors.Select(e => e.Description))}");
+
+            if (!await _roleManager.RoleExistsAsync(CustomerRoleName))
+                throw new BusinessRuleException($"Role {CustomerRoleName} does not exist.");
+
+            IdentityResult addRoleResult = await _userManager.AddToRoleAsync(newUser, CustomerRoleName);
+            if (!addRoleResult.Succeeded)
+                throw new BusinessRuleException($"Failed to assign role: {string.Join(", ", addRoleResult.Errors.Select(e => e.Description))}");
+
+            await LinkGoogleLoginAsync(newUser, payload.Subject, cancellation);
+
+            return newUser;
+        }
+
+        private async Task<User?> FindLinkedGoogleUserAsync(string googleSubject)
+        {
+            User? user = await _userManager.FindByLoginAsync(GoogleProviderName, googleSubject);
+
+            if (user != null)
+                await EnsureUserIsCustomerAsync(user);
+            return user;
+        }
+
+        private async Task EnsureUserIsCustomerAsync(User user)
+        {
+            IList<string> roles = await _userManager.GetRolesAsync(user);
+
+            if (!roles.Contains(CustomerRoleName))
+                throw new BusinessRuleException("Google login is only available for Customer accounts.");
+        }
+
+        private async Task LinkGoogleLoginAsync(User user, string googleSubject, CancellationToken cancellation = default)
+        {
+            IList<UserLoginInfo> logins = await _userManager.GetLoginsAsync(user);
+
+            if (logins.Any(l => l.LoginProvider == GoogleProviderName && l.ProviderKey == googleSubject))
+                return;
+
+            IdentityResult loginResult = await _userManager.AddLoginAsync(
+                user,
+                new UserLoginInfo(GoogleProviderName, googleSubject, GoogleProviderName));
+
+            if (!loginResult.Succeeded)
+                throw new BusinessRuleException($"Failed to link Google account: {string.Join(", ", loginResult.Errors.Select(e => e.Description))}");
+        }
+
+        private static string BuildUserName(GoogleTokenPayloadDto payload)
+        {
+            string local = payload.Email?.Split('@').FirstOrDefault() ?? "googleuser";
+            string subpart = payload.Subject.Length > 8 ? payload.Subject.Substring(0, 8) : payload.Subject;
+            return $"{local}-{subpart}".ToLowerInvariant();
         }
     }
 }

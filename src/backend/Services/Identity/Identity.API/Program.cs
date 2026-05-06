@@ -29,7 +29,7 @@ builder.Services.AddCustomApiVersioning();
 builder.Services.AddCustomSwagger();
 
 builder.Services.Register();
-
+builder.Services.AddHttpClient();
 builder.Services.AddAuthorization();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 

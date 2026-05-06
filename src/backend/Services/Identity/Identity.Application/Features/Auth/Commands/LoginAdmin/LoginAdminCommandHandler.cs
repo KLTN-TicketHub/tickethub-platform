@@ -55,7 +55,7 @@ namespace Identity.Application.Features.Auth.Commands.LoginAdmin
 
             IList<string> roles = await GetUserRolesAsync(user);
 
-            if(!roles.Contains("Admin"))
+            if (!roles.Contains("Admin"))
                 throw new NotFoundException($"User with UserName {request.UserName} not found");
 
             await CheckLockoutAsync(user);

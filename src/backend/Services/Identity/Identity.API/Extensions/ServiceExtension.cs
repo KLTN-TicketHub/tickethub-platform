@@ -1,12 +1,14 @@
 ﻿using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Infrastructure.Services;
 using Identity.Application.Common.Interfaces.IDataSeedingServices;
+using Identity.Application.Common.Interfaces.IExternalServices.IGoogleServices;
 using Identity.Application.Common.Interfaces.IExternalServices.ITokenServices;
 using Identity.Domain.Interfaces;
 using Identity.Domain.Interfaces.IIdentity_AuthRepositories;
 using Identity.Infrastructure.Data.Contexts;
 using Identity.Infrastructure.Data.DataSeedingServices;
 using Identity.Infrastructure.Data.Repositories.Identity_AuthRepositories;
+using Identity.Infrastructure.ExternalServices.GoogleServices;
 using Identity.Infrastructure.ExternalServices.TokenServices;
 
 namespace Identity.API.Extensions
@@ -25,6 +27,7 @@ namespace Identity.API.Extensions
         {
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
+            services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
             return services;
         }

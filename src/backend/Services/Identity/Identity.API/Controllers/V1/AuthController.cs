@@ -1,21 +1,18 @@
 ﻿using BuildingBlocks.API.Extensions;
 using BuildingBlocks.Contracts.Models.Responses;
+using Identity.Application.Features.Auth.Commands.LoginGoogle;
 using Identity.Application.Features.Auth.Commands.Logout;
 using Identity.Application.Features.Auth.Commands.Refresh;
 using Identity.Application.Features.Auth.Request;
 using Identity.Common.Options;
-using Identity.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.Options;
-using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace Identity.API.Controllers.V1
@@ -32,7 +29,7 @@ namespace Identity.API.Controllers.V1
         private readonly GoogleAuthSettings _googleAuthSettings;
 
         public AuthController(
-            IOptions<AppSettings> appSettings, 
+            IOptions<AppSettings> appSettings,
             ISender sender,
             IMemoryCache memoryCache,
             IOptions<GoogleAuthSettings> googleAuthSettings)
@@ -125,22 +122,43 @@ namespace Identity.API.Controllers.V1
             return Redirect(url);
         }
 
-        [HttpGet]
-        public IActionResult GoogleCallBack([FromQuery] string code, [FromQuery] string state)
+        [AllowAnonymous]
+        [HttpGet("google/callback")]
+        public async Task<IActionResult> GoogleCallBack([FromQuery] string code, [FromQuery] string state, CancellationToken cancellationToken = default)
         {
-            //if (!_memoryCache.TryGetValue<string>($"google_oauth_state:{state}", out var returnUrl))
-            //    return BadRequest("Invalid or expired state.");
+            if (string.IsNullOrWhiteSpace(code))
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Google authorization code is required"
+                });
 
-            //_memoryCache.Remove($"google_oauth_state:{state}");
+            if (!_memoryCache.TryGetValue<string>($"google_oauth_state:{state}", out var returnUrl))
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Invalid or expired Google login state"
+                });
 
-            //var result = await _sender.Send(new LoginWithGoogleCodeCommand(code, returnUrl, HttpContext.Request.Scheme + "://" + HttpContext.Request.Host + "/api/v1/auth/google/callback"));
+            _memoryCache.Remove($"google_oauth_state:{state}");
 
-            //// 3) result should contain app access token and refresh token value (or refresh cookie already set)
-            //// We'll redirect to FE returnUrl with access token in fragment to avoid server logs
-            //var redirectUri = $"{returnUrl}#access_token={result.AccessToken}&expires_in={result.ExpiresInSeconds}";
-            //return Redirect(redirectUri);
+            string redirectUri = $"{Request.Scheme}://{Request.Host}/api/v1/auth/google/callback";
 
-            throw new NotImplementedException();
+            var result = await _sender.Send(new LoginWithGoogleCodeCommand(new LoginWithGoogleCodeRequest
+            {
+                Code = code,
+                RedirectUri = redirectUri
+            }), cancellationToken);
+
+            Response.Cookies.Append("refreshToken", result.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(_appSettings.JwtConfig.RefreshTokenExpirationDays)
+            });
+
+            return Redirect(returnUrl!);
         }
     }
 }
