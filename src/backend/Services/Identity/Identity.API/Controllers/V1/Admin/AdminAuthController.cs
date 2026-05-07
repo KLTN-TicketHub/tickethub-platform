@@ -41,7 +41,7 @@ namespace Identity.API.Controllers.V1.Admin
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddDays(_appSettings.JwtConfig.RefreshTokenExpirationDays)
+                Expires = DateTimeOffset.UtcNow.AddDays(_appSettings.JwtConfig!.RefreshTokenExpirationDays)
             });
 
             return Ok(new AuthResult
