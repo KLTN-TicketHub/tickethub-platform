@@ -12,6 +12,8 @@ namespace Identity.API.Extensions
 
             services.Configure<GoogleAuthSettings>(configuration.GetSection("GoogleAuthSettings"));
 
+            services.Configure<RabbitMqOptions>(configuration.GetSection("RabbitMq"));
+
             return services;
         }
     }

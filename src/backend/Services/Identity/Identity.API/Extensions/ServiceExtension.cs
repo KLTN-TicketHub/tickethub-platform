@@ -28,6 +28,8 @@ namespace Identity.API.Extensions
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+            services.AddScoped<ICacheService, RedisCacheService>();
+            services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
 
             return services;
         }

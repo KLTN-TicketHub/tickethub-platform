@@ -13,6 +13,7 @@ builder.Services.AddCustomDb(builder.Configuration);
 builder.Services.AddCustomControllers();
 
 builder.Services.AddCustomOptions(builder.Configuration);
+builder.Services.AddMassTransitWithRabbitMq();
 builder.Services.AddMemoryCache();
 
 #region MediatR
