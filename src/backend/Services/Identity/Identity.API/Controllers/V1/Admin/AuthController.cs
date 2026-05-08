@@ -1,6 +1,7 @@
 ﻿using BuildingBlocks.API.Extensions;
 using BuildingBlocks.Contracts.Models.Responses;
-using Identity.Application.Features.Auth.Commands.LoginAdmin;
+using Identity.Application.Features.Auth.Commands.LoginAdmin.Initiate;
+using Identity.Application.Features.Auth.Commands.LoginAdmin.Confirm;
 using Identity.Application.Features.Auth.Request;
 using Identity.Common.Options;
 using MediatR;
@@ -16,12 +17,12 @@ namespace Identity.API.Controllers.V1.Admin
     [Route("api/v{version:apiVersion}/admin/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class AdminAuthController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly AppSettings _appSettings;
         private readonly ISender _sender;
 
-        public AdminAuthController(IOptions<AppSettings> appSettings, ISender sender)
+        public AuthController(IOptions<AppSettings> appSettings, ISender sender)
         {
             _appSettings = appSettings.Value;
             _sender = sender;
@@ -34,7 +35,23 @@ namespace Identity.API.Controllers.V1.Admin
             [FromBody] LoginRequest loginRequest,
             CancellationToken cancellationToken = default)
         {
-            var result = await _sender.Send(new LoginAdminCommand(loginRequest), cancellationToken);
+            await _sender.Send(new InitiateAdminLoginCommand(loginRequest), cancellationToken);
+
+            return Ok(new
+            {
+                Success = true,
+                Message = "Verification code has been sent to your email"
+            });
+        }
+
+        [EnableRateLimiting(RateLimitPolicies.Login)]
+        [AllowAnonymous]
+        [HttpPost("confirm")]
+        public async Task<IActionResult> ConfirmAsync(
+            [FromBody] ConfirmLoginRequest confirmRequest,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _sender.Send(new ConfirmAdminLoginCommand(confirmRequest), cancellationToken);
 
             Response.Cookies.Append("refreshToken", result.RefreshToken, new CookieOptions
             {

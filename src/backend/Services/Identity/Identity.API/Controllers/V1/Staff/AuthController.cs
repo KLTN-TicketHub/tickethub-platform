@@ -16,12 +16,12 @@ namespace Identity.API.Controllers.V1.Staff
     [Route("api/v{version:apiVersion}/staff/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class StaffAuthController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly AppSettings _appSettings;
         private readonly ISender _sender;
 
-        public StaffAuthController(IOptions<AppSettings> appSettings, ISender sender)
+        public AuthController(IOptions<AppSettings> appSettings, ISender sender)
         {
             _appSettings = appSettings.Value;
             _sender = sender;

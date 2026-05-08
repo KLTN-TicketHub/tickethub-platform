@@ -6,6 +6,6 @@ namespace Identity.Common.Options
     {
         public JwtConfig? JwtConfig { get; set; }
 
-        public RateLimitConfig? RateLimitConfig { get; set; }
+        public RateLimitConfig? RateLimit { get; set; }
     }
 }

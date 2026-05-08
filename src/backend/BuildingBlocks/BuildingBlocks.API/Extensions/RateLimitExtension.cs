@@ -23,7 +23,7 @@ namespace BuildingBlocks.API.Extensions
 
             services.AddRateLimiter(options =>
             {
-                options.AddPolicy("per-ip", httpContext =>
+                options.AddPolicy(RateLimitPolicies.PerIp, httpContext =>
                     RateLimitPartition.GetFixedWindowLimiter(
                         partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
                         factory: partition => new FixedWindowRateLimiterOptions
@@ -34,7 +34,7 @@ namespace BuildingBlocks.API.Extensions
                     )
                 );
 
-                options.AddPolicy("per-user", httpContext =>
+                options.AddPolicy(RateLimitPolicies.PerUser, httpContext =>
                 {
                     string? userId = GetUserIdFromJwt(httpContext);
 
@@ -60,7 +60,7 @@ namespace BuildingBlocks.API.Extensions
                     );
                 });
 
-                options.AddPolicy("login", httpContext =>
+                options.AddPolicy(RateLimitPolicies.Login, httpContext =>
                     RateLimitPartition.GetFixedWindowLimiter(
                         partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
                         factory: partition => new FixedWindowRateLimiterOptions

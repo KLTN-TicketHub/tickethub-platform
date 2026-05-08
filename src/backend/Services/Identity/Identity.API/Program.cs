@@ -1,8 +1,9 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
+using BuildingBlocks.Contracts.Options;
 using Identity.API.Extensions;
 using Identity.Application.Common.Mappers;
-using Identity.Application.Features.Auth.Commands.LoginAdmin;
+using Identity.Application.Features.Auth.Commands.LoginAdmin.Initiate;
 using Identity.Common.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,13 +18,14 @@ builder.Services.AddMassTransitWithRabbitMq();
 builder.Services.AddMemoryCache();
 
 #region MediatR
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginAdminCommand).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(InitiateAdminLoginCommand).Assembly));
 #endregion
 
-builder.Services.AddCustomRateLimit(builder.Configuration
-    .GetSection("RateLimitConfig")?
-    .Get<AppSettings>()?
-    .RateLimitConfig);
+builder.Services.AddCustomRateLimit(
+    builder.Configuration
+        .GetSection("AppSettings")
+        .Get<AppSettings>()!
+        .RateLimit);
 
 builder.Services.RegisterSecurityService(builder.Configuration);
 builder.Services.AddCustomApiVersioning();
@@ -31,6 +33,7 @@ builder.Services.AddCustomSwagger();
 
 builder.Services.Register();
 builder.Services.AddHttpClient();
+builder.Services.AddCustomRedis(builder.Configuration);
 builder.Services.AddAuthorization();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
@@ -49,6 +52,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseRateLimiter();
 
 app.UseAuthorization();
 

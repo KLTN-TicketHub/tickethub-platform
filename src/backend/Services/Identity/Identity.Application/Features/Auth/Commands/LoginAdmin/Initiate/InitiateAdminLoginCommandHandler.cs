@@ -1,54 +1,46 @@
-﻿using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Contracts.Events.Email;
 using BuildingBlocks.Domain.Exceptions;
-using Identity.Application.Common.DTOs.Auth;
-using Identity.Application.Common.Interfaces.IExternalServices.ITokenServices;
 using Identity.Application.Features.Auth.Request;
-using Identity.Common.Options;
 using Identity.Domain.Entities;
-using Identity.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
 
-namespace Identity.Application.Features.Auth.Commands.LoginAdmin
+namespace Identity.Application.Features.Auth.Commands.LoginAdmin.Initiate
 {
-    public class LoginAdminCommandHandler : IRequestHandler<LoginAdminCommand, AuthDto>
+    public class InitiateAdminLoginCommandHandler : IRequestHandler<InitiateAdminLoginCommand, Unit>
     {
         private readonly ICurrentUserService _currentUserService;
         private readonly UserManager<User> _userManager;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IJwtTokenService _jwtTokenService;
-        private readonly AppSettings _appSettings;
+        private readonly ICacheService _cacheService;
+        private readonly IEventPublisher _eventPublisher;
 
-        public LoginAdminCommandHandler(
+        public InitiateAdminLoginCommandHandler(
             ICurrentUserService currentUserService,
-             UserManager<User> userManager,
-             IUnitOfWork unitOfWork,
-             IJwtTokenService jwtTokenService,
-             IOptions<AppSettings> appSettings)
+            UserManager<User> userManager,
+            ICacheService cacheService,
+            IEventPublisher eventPublisher)
         {
             _currentUserService = currentUserService;
             _userManager = userManager;
-            _unitOfWork = unitOfWork;
-            _jwtTokenService = jwtTokenService;
-            _appSettings = appSettings.Value;
+            _cacheService = cacheService;
+            _eventPublisher = eventPublisher;
         }
 
-        public async Task<AuthDto> Handle(
-            LoginAdminCommand request,
+        public async Task<Unit> Handle(
+            InitiateAdminLoginCommand request,
             CancellationToken cancellationToken)
         {
-            return await LoginAsync(
+            await InitiateLoginAsync(
                 request.Request,
-                _currentUserService.DeviceInfo,
-                _currentUserService.IpAddress,
                 cancellationToken);
+
+            return Unit.Value;
         }
 
-        private async Task<AuthDto> LoginAsync(
+        private async Task<bool> InitiateLoginAsync(
             LoginRequest request,
-            string? deviceInfo,
-            string? ipAddress,
             CancellationToken cancellationToken = default)
         {
             User user = await GetUserAsync(request.UserName, cancellationToken);
@@ -64,11 +56,33 @@ namespace Identity.Application.Features.Auth.Commands.LoginAdmin
 
             await CheckEmailConfirmedAsync(user);
 
-            AuthDto authDto = await CreateTokensAsync(user, deviceInfo, ipAddress, roles);
+            int rng = RandomNumberGenerator.GetInt32(100000, 999999);
+            string code = rng.ToString();
 
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            string key = $"auth:verify:admin:{request.UserName}:login";
 
-            return authDto;
+            TimeSpan ttl = TimeSpan.FromMinutes(5);
+
+            await _cacheService.SetAsync(key, code, ttl, cancellationToken);
+
+            SendEmailCodeEvent @event = new SendEmailCodeEvent
+            {
+                Email = user.Email ?? string.Empty,
+                FullName = user.FullName ?? string.Empty,
+                Code = code,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(5)
+            };
+
+            try
+            {
+                await _eventPublisher.PublishAsync(@event, cancellationToken);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Failed to publish email code event", ex);
+            }
+
+            return true;
         }
 
         private async Task<User> GetUserAsync(string userName, CancellationToken cancellationToken)
@@ -105,26 +119,6 @@ namespace Identity.Application.Features.Auth.Commands.LoginAdmin
         {
             if (!await _userManager.IsEmailConfirmedAsync(user))
                 throw new BusinessRuleException("Email not verified!");
-        }
-
-        private async Task<AuthDto> CreateTokensAsync(
-            User user, string? deviceInfo, string? ipAddress, IList<string> roles)
-        {
-            string accessToken = _jwtTokenService.GenerateJwtToken(user, roles);
-
-            RefreshToken newToken = new RefreshToken(
-                user.Id,
-                DateTime.UtcNow.AddDays(_appSettings.JwtConfig.RefreshTokenExpirationDays),
-                deviceInfo,
-                ipAddress);
-
-            _unitOfWork.RefreshTokenRepository.AddEntity(newToken);
-
-            return new AuthDto
-            {
-                AccessToken = accessToken,
-                RefreshToken = newToken.Token
-            };
         }
 
         private async Task<IList<string>> GetUserRolesAsync(User user)

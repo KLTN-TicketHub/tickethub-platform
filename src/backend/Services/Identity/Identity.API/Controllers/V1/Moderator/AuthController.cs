@@ -1,6 +1,6 @@
 ﻿using BuildingBlocks.API.Extensions;
 using BuildingBlocks.Contracts.Models.Responses;
-using Identity.Application.Features.Auth.Commands.LoginOrganizer;
+using Identity.Application.Features.Auth.Commands.LoginModerator;
 using Identity.Application.Features.Auth.Request;
 using Identity.Common.Options;
 using MediatR;
@@ -10,18 +10,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 
-namespace Identity.API.Controllers.V1.Organizer
+namespace Identity.API.Controllers.V1.Moderator
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/organizer/[controller]")]
+    [Route("api/v{version:apiVersion}/moderator/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class OrganizerAuthController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly AppSettings _appSettings;
         private readonly ISender _sender;
 
-        public OrganizerAuthController(IOptions<AppSettings> appSettings, ISender sender)
+        public AuthController(IOptions<AppSettings> appSettings, ISender sender)
         {
             _appSettings = appSettings.Value;
             _sender = sender;
@@ -35,7 +35,7 @@ namespace Identity.API.Controllers.V1.Organizer
             CancellationToken cancellationToken = default)
         {
             var refreshTokenExpirationDays = _appSettings.JwtConfig?.RefreshTokenExpirationDays ?? 7;
-            var result = await _sender.Send(new LoginOrganizerCommand(loginRequest), cancellationToken);
+            var result = await _sender.Send(new LoginModeratorCommand(loginRequest), cancellationToken);
 
             Response.Cookies.Append("refreshToken", result.RefreshToken, new CookieOptions
             {
