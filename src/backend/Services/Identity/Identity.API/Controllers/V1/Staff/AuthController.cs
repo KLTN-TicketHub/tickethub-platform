@@ -48,7 +48,7 @@ namespace Identity.API.Controllers.V1.Staff
             return Ok(new AuthResult
             {
                 Success = true,
-                Message = "Login successful",
+                Message = "Đăng nhập thành công",
                 AccessToken = result.AccessToken
             });
         }

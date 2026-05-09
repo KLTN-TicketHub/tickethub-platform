@@ -81,7 +81,7 @@ namespace BuildingBlocks.API.Extensions
                     await context.HttpContext.Response.WriteAsJsonAsync(new
                     {
                         success = false,
-                        message = "Too many requests. Please try again later.",
+                        message = "Quá nhiều yêu cầu đã được gửi. Vui lòng thử lại sau.",
                         error = new
                         {
                             code = "RATE_LIMIT_EXCEEDED",

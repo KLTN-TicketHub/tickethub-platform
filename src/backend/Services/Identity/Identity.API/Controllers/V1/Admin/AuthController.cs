@@ -40,7 +40,7 @@ namespace Identity.API.Controllers.V1.Admin
             return Ok(new
             {
                 Success = true,
-                Message = "Verification code has been sent to your email"
+                Message = "Mã xác thực đã được gửi tới email của bạn"
             });
         }
 
@@ -64,7 +64,7 @@ namespace Identity.API.Controllers.V1.Admin
             return Ok(new AuthResult
             {
                 Success = true,
-                Message = "Login successful",
+                Message = "Đăng nhập thành công",
                 AccessToken = result.AccessToken
             });
         }

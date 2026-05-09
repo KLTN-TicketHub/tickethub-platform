@@ -49,7 +49,7 @@ namespace Identity.API.Controllers.V1
                 return BadRequest(new ApiResponse
                 {
                     Success = false,
-                    Message = "Refresh token is required for logout"
+                    Message = "Cần refresh token để đăng xuất"
                 });
             }
 
@@ -59,7 +59,7 @@ namespace Identity.API.Controllers.V1
 
             return Ok(new ApiResponse
             {
-                Message = "Logout successful",
+                Message = "Đăng xuất thành công",
                 Success = true
             });
         }
@@ -76,7 +76,7 @@ namespace Identity.API.Controllers.V1
                 return BadRequest(new ApiResponse
                 {
                     Success = false,
-                    Message = "Refresh token is required"
+                    Message = "Cần refresh token"
                 });
             }
 
@@ -93,7 +93,7 @@ namespace Identity.API.Controllers.V1
             return Ok(new AuthResult
             {
                 Success = true,
-                Message = "Token refreshed successfully",
+                Message = "Làm mới token thành công",
                 AccessToken = result.AccessToken,
             });
         }
@@ -130,14 +130,14 @@ namespace Identity.API.Controllers.V1
                 return BadRequest(new ApiResponse
                 {
                     Success = false,
-                    Message = "Google authorization code is required"
+                    Message = "Cần mã ủy quyền từ Google"
                 });
 
             if (!_memoryCache.TryGetValue<string>($"google_oauth_state:{state}", out var returnUrl))
                 return BadRequest(new ApiResponse
                 {
                     Success = false,
-                    Message = "Invalid or expired Google login state"
+                    Message = "Trạng thái đăng nhập Google không hợp lệ hoặc đã hết hạn"
                 });
 
             _memoryCache.Remove($"google_oauth_state:{state}");

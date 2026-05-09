@@ -46,10 +46,10 @@ namespace Identity.Application.Features.Auth.Commands.Refresh
                 RefreshToken? oldToken = await GetRefreshTokenAsync(refreshToken, cancellationToken);
 
                 if (!oldToken.IsActive)
-                    throw new ValidatorException("Refresh token is not active or has expired");
+                    throw new ValidatorException("Refresh token không hoạt động hoặc đã hết hạn");
 
                 User? user = await _userManager.FindByIdAsync(oldToken.UserId.ToString())
-                    ?? throw new NotFoundException("User not found");
+                    ?? throw new NotFoundException("Không tìm thấy người dùng");
 
                 oldToken.Revoke();
 
@@ -71,7 +71,7 @@ namespace Identity.Application.Features.Auth.Commands.Refresh
         {
             return await _unitOfWork.RefreshTokenRepository.GetOneAsync<RefreshToken>(
                 filter: r => r.Token == refreshToken,
-                cancellation: cancellationToken) ?? throw new NotFoundException("Refresh token not found");
+                cancellation: cancellationToken) ?? throw new NotFoundException("Không tìm thấy refresh token");
         }
 
         private async Task<AuthDto> CreateTokensAsync(

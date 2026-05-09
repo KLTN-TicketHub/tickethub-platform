@@ -22,12 +22,12 @@ namespace Identity.Application.Features.Auth.Commands.Logout
         public async Task<bool> LogoutAsync(string? refreshToken, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(refreshToken))
-                throw new ValidatorException("Refresh token is required");
+                throw new ValidatorException("Cần refresh token");
 
             RefreshToken? oldToken = await GetRefreshTokenAsync(refreshToken, cancellationToken);
 
             if (!oldToken.IsActive)
-                throw new ValidatorException("Refresh token is not active or has expired");
+                throw new ValidatorException("Refresh token không hoạt động hoặc đã hết hạn");
 
             oldToken.Revoke();
 
@@ -40,7 +40,7 @@ namespace Identity.Application.Features.Auth.Commands.Logout
         {
             return await _unitOfWork.RefreshTokenRepository.GetOneAsync<RefreshToken>(
                 filter: r => r.Token == refreshToken,
-                cancellation: cancellationToken) ?? throw new NotFoundException("Refresh token not found");
+                cancellation: cancellationToken) ?? throw new NotFoundException("Không tìm thấy refresh token");
         }
     }
 }

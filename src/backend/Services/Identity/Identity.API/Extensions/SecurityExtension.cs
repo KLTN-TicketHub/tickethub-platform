@@ -70,7 +70,7 @@ namespace Identity.API.Extensions
                         var response = new
                         {
                             success = false,
-                            message = "You must be logged in to access this resource.",
+                            message = "Bạn cần đăng nhập để truy cập tài nguyên này.",
                             error = new
                             {
                                 code = "UNAUTHORIZED_ACCESS",
@@ -89,7 +89,7 @@ namespace Identity.API.Extensions
                         var response = new
                         {
                             success = false,
-                            message = "You do not have permission to access this resource.",
+                            message = "Bạn không có quyền truy cập vào tài nguyên này.",
                             error = new
                             {
                                 code = "FORBIDDEN_ACCESS",

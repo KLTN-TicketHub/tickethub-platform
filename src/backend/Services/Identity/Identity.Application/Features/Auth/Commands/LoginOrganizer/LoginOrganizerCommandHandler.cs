@@ -56,7 +56,7 @@ namespace Identity.Application.Features.Auth.Commands.LoginOrganizer
             IList<string> roles = await GetUserRolesAsync(user);
 
             if (!roles.Contains("Organizer"))
-                throw new NotFoundException($"User with UserName {request.UserName} not found");
+                throw new NotFoundException($"Không tìm thấy người dùng với tên {request.UserName}");
 
             await CheckLockoutAsync(user);
 
@@ -74,10 +74,10 @@ namespace Identity.Application.Features.Auth.Commands.LoginOrganizer
         private async Task<User> GetUserAsync(string userName, CancellationToken cancellationToken)
         {
             if (_currentUserService.IsAuthenticated)
-                throw new ValidatorException("User is already authenticated");
+                throw new ValidatorException("Người dùng đã được xác thực");
 
             User user = await _userManager.FindByNameAsync(userName)
-                ?? throw new NotFoundException($"User with UserName {userName} not found");
+                ?? throw new NotFoundException($"Không tìm thấy người dùng với tên {userName}");
 
             return user;
         }
@@ -85,7 +85,7 @@ namespace Identity.Application.Features.Auth.Commands.LoginOrganizer
         private async Task CheckLockoutAsync(User user)
         {
             if (await _userManager.IsLockedOutAsync(user))
-                throw new BusinessRuleException("User account is locked out!");
+                throw new BusinessRuleException("Tài khoản người dùng bị khóa!");
         }
 
         private async Task CheckPasswordAsync(User user, string password)
@@ -93,7 +93,7 @@ namespace Identity.Application.Features.Auth.Commands.LoginOrganizer
             if (!await _userManager.CheckPasswordAsync(user, password))
             {
                 await _userManager.AccessFailedAsync(user);
-                throw new ValidatorException(nameof(LoginRequest.Password), $"Invalid password for user {user.UserName}");
+                throw new ValidatorException(nameof(LoginRequest.Password), $"Mật khẩu không hợp lệ cho người dùng {user.UserName}");
             }
             else
             {
@@ -104,7 +104,7 @@ namespace Identity.Application.Features.Auth.Commands.LoginOrganizer
         private async Task CheckEmailConfirmedAsync(User user)
         {
             if (!await _userManager.IsEmailConfirmedAsync(user))
-                throw new BusinessRuleException("Email not verified!");
+                throw new BusinessRuleException("Email chưa được xác thực!");
         }
 
         private async Task<AuthDto> CreateTokensAsync(

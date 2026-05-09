@@ -22,7 +22,7 @@ namespace BuildingBlocks.API.Extensions
                         var response = new
                         {
                             success = false,
-                            message = "One or more validation errors occurred.",
+                            message = "Một hoặc nhiều lỗi xác thực đã xảy ra.",
                             errors,
                             error = new
                             {

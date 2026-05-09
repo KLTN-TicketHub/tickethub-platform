@@ -57,15 +57,15 @@ namespace Identity.Application.Features.Auth.Commands.LoginGoogle
         private async Task<AuthDto> LoginWithGoogleAsync(string code, string redirectUri, CancellationToken cancellationToken = default)
         {
             if (_currentUserService.IsAuthenticated)
-                throw new ValidatorException("User is already authenticated");
+                throw new ValidatorException("Người dùng đã được xác thực");
 
             GoogleExchangeResult exchange = await _googleAuthService.ExchangeCodeAsync(code, redirectUri, cancellationToken);
 
             if (string.IsNullOrWhiteSpace(exchange.TokenPayload.Email))
-                throw new BusinessRuleException("Google account does not contain an email address.");
+                throw new BusinessRuleException("Tài khoản Google không có địa chỉ email.");
 
             if (!exchange.TokenPayload.EmailVerified)
-                throw new BusinessRuleException("Google email is not verified.");
+                throw new BusinessRuleException("Email Google chưa được xác thực.");
 
             User user = await GetOrCreateCustomerUserAsync(exchange.TokenPayload, cancellationToken);
 
@@ -118,14 +118,14 @@ namespace Identity.Application.Features.Auth.Commands.LoginGoogle
             IdentityResult createResult = await _userManager.CreateAsync(newUser);
 
             if (!createResult.Succeeded)
-                throw new BusinessRuleException($"Failed to create user: {string.Join(", ", createResult.Errors.Select(e => e.Description))}");
+                throw new BusinessRuleException($"Không thể tạo người dùng: {string.Join(", ", createResult.Errors.Select(e => e.Description))}");
 
             if (!await _roleManager.RoleExistsAsync(CustomerRoleName))
-                throw new BusinessRuleException($"Role {CustomerRoleName} does not exist.");
+                throw new BusinessRuleException($"Vai trò {CustomerRoleName} không tồn tại.");
 
             IdentityResult addRoleResult = await _userManager.AddToRoleAsync(newUser, CustomerRoleName);
             if (!addRoleResult.Succeeded)
-                throw new BusinessRuleException($"Failed to assign role: {string.Join(", ", addRoleResult.Errors.Select(e => e.Description))}");
+                throw new BusinessRuleException($"Không thể gán vai trò: {string.Join(", ", addRoleResult.Errors.Select(e => e.Description))}");
 
             await LinkGoogleLoginAsync(newUser, payload.Subject, cancellation);
 
@@ -146,7 +146,7 @@ namespace Identity.Application.Features.Auth.Commands.LoginGoogle
             IList<string> roles = await _userManager.GetRolesAsync(user);
 
             if (!roles.Contains(CustomerRoleName))
-                throw new BusinessRuleException("Google login is only available for Customer accounts.");
+                throw new BusinessRuleException("Đăng nhập Google chỉ có sẵn cho tài khoản Khách hàng.");
         }
 
         private async Task LinkGoogleLoginAsync(User user, string googleSubject, CancellationToken cancellation = default)
@@ -161,7 +161,7 @@ namespace Identity.Application.Features.Auth.Commands.LoginGoogle
                 new UserLoginInfo(GoogleProviderName, googleSubject, GoogleProviderName));
 
             if (!loginResult.Succeeded)
-                throw new BusinessRuleException($"Failed to link Google account: {string.Join(", ", loginResult.Errors.Select(e => e.Description))}");
+                throw new BusinessRuleException($"Không thể liên kết tài khoản Google: {string.Join(", ", loginResult.Errors.Select(e => e.Description))}");
         }
 
         private static string BuildUserName(GoogleTokenPayloadDto payload)

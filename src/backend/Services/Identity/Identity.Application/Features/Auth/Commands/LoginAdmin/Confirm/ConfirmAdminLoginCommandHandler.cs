@@ -55,26 +55,26 @@ namespace Identity.Application.Features.Auth.Commands.LoginAdmin.Confirm
             CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(request.UserName) || string.IsNullOrEmpty(request.Code))
-                throw new ValidatorException("UserName and Code are required");
+                throw new ValidatorException("Tên người dùng và Mã là bắt buộc");
 
             string key = $"auth:verify:admin:{request.UserName}:login";
             string? storedCode = await _cacheService.GetAsync<string>(key, cancellationToken);
 
             if (string.IsNullOrEmpty(storedCode))
-                throw new ValidatorException("Verification code has expired or is invalid");
+                throw new ValidatorException("Mã xác thực đã hết hạn hoặc không hợp lệ");
 
             if (storedCode != request.Code)
-                throw new ValidatorException("Verification code is incorrect");
+                throw new ValidatorException("Mã xác thực không chính xác");
 
             await _cacheService.RemoveAsync(key, cancellationToken);
 
             User user = await _userManager.FindByNameAsync(request.UserName)
-                ?? throw new NotFoundException($"User with UserName {request.UserName} not found");
+                ?? throw new NotFoundException($"Không tìm thấy người dùng với tên {request.UserName}");
 
             IList<string> roles = await GetUserRolesAsync(user);
 
             if (!roles.Contains("Admin"))
-                throw new NotFoundException($"User with UserName {request.UserName} not found");
+                throw new NotFoundException($"Không tìm thấy người dùng với tên {request.UserName}");
 
             AuthDto authDto = await CreateTokensAsync(user, deviceInfo, ipAddress, roles);
 
