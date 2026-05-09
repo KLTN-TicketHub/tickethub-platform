@@ -1,6 +1,5 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
-using BuildingBlocks.Contracts.Options;
 using Identity.API.Extensions;
 using Identity.Application.Common.Mappers;
 using Identity.Application.Features.Auth.Commands.LoginAdmin.Initiate;

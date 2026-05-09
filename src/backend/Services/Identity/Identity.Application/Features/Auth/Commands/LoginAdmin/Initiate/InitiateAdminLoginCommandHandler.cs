@@ -77,7 +77,7 @@ namespace Identity.Application.Features.Auth.Commands.LoginAdmin.Initiate
             {
                 await _eventPublisher.PublishAsync(@event, cancellationToken);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception("Failed to publish email code event", ex);
             }

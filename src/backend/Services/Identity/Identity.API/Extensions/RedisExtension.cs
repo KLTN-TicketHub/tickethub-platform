@@ -1,6 +1,4 @@
-﻿using Identity.Common.Options;
-
-namespace Identity.API.Extensions
+﻿namespace Identity.API.Extensions
 {
     public static class RedisExtension
     {
