@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 namespace Identity.API.Controllers.V1.Moderator
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/moderator/[controller]")]
+    [Route("api/v{version:apiVersion}/moderator")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AuthController : ControllerBase

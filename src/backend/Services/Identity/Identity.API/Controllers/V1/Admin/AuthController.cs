@@ -14,7 +14,7 @@ using Microsoft.Extensions.Options;
 namespace Identity.API.Controllers.V1.Admin
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/admin/[controller]")]
+    [Route("api/v{version:apiVersion}/admin")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AuthController : ControllerBase

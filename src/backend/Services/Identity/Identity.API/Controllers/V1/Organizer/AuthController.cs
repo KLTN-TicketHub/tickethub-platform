@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 namespace Identity.API.Controllers.V1.Organizer
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/organizer/[controller]")]
+    [Route("api/v{version:apiVersion}/organizer")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AuthController : ControllerBase
