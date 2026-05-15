@@ -1,0 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #00C853;
+  --color-primary-dark: #00A040;
+  --color-primary-dim: rgba(0, 200, 83, 0.12);
+  
+  --color-bg: #0A0F0D;
+  --color-surface: #111916;
+  --color-card: #141B16;
+  --color-card-2: #182019;
+  
+  --color-border-main: #1C2B20;
+  --color-border-light: rgba(255, 255, 255, 0.08);
+  
+  --color-main: #E2F0E6;
+  --color-muted: #6A8A72;
+  
+  --color-accent: #B9FF6A;
+  --color-danger: #FF4757;
+  --color-gold: #FFD700;
+  --color-warning: #faad14;
+  --color-warning-dim: rgba(250, 173, 20, 0.12);
+  
+  --font-heading: "Clash Display", sans-serif;
+  --font-sans: "DM Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Custom shadows for depth */
+  --shadow-glow: 0 0 20px rgba(0, 200, 83, 0.15);
+  --shadow-glow-strong: 0 0 30px rgba(0, 200, 83, 0.3);
+}
+
+html { 
+  scroll-behavior: smooth; 
+}
+
+body { 
+  font-family: var(--font-sans); 
+  background: var(--color-bg); 
+  color: var(--color-main); 
+  min-height: 100vh; 
+  overflow-x: hidden; 
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Premium Custom Scrollbar */
+::-webkit-scrollbar { 
+  width: 4px; 
+  height: 4px; 
+}
+
+::-webkit-scrollbar-track { 
+  background: var(--color-bg); 
+}
+
+::-webkit-scrollbar-thumb { 
+  background: var(--color-border-main); 
+  border-radius: 4px; 
+}
+
+::-webkit-scrollbar-thumb:hover { 
+  background: var(--color-primary-dark); 
+}
+
+.hide-scroll { 
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
+}
+
+.hide-scroll::-webkit-scrollbar { 
+  display: none; 
+}
+
+@layer utilities {
+  /* Glassmorphism primitives */
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+  
+  .glass-card {
+    @apply bg-[#141B16]/80 backdrop-blur-xl border border-white/5;
+  }
+
+  /* Reveal animations */
+  .animate-fade-up {
+    animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out forwards;
+  }
+}
+
+@keyframes fade-up {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes bounce-short {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}

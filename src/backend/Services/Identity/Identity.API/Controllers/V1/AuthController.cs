@@ -142,7 +142,7 @@ namespace Identity.API.Controllers.V1
 
             _memoryCache.Remove($"google_oauth_state:{state}");
 
-            string redirectUri = $"{Request.Scheme}://{Request.Host}/api/v1/auth/google/callback";
+            string redirectUri = $"{Request.Scheme}://localhost:7044/api/v1/auth/google/callback";
 
             var result = await _sender.Send(new LoginWithGoogleCodeCommand(new LoginWithGoogleCodeRequest
             {
