@@ -17,6 +17,7 @@
 *.cache
 *.ilk
 *.log
+*.lscache
 [Bb]in
 [Dd]ebug*/
 [Rr]elease*/
@@ -98,7 +99,6 @@ bld/
 
 # Local development settings
 local.settings.json
-launchSettings.json
 
 # Project-specific ignores for MotorbikeRental
 **/wwwroot/lib/
