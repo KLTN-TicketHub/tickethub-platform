@@ -4,7 +4,7 @@ using Identity.Infrastructure.Data.Contexts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using System.Security.Cryptography;
 
 namespace Identity.API.Extensions
 {
@@ -39,22 +39,31 @@ namespace Identity.API.Extensions
             .AddJwtBearer(jwt =>
             {
                 JwtConfig? jwtConfig = configuration.GetSection("AppSettings:JwtConfig").Get<JwtConfig>();
+                string publicKeyRelativePath = jwtConfig?.PublicKeyPath
+                    ?? throw new InvalidOperationException("JWT public key path is not configured.");
+                string issuer = jwtConfig?.ValidIssuer
+                    ?? throw new InvalidOperationException("JWT issuer is not configured.");
+                string audience = jwtConfig?.ValidAudience
+                    ?? throw new InvalidOperationException("JWT audience is not configured.");
 
-                byte[] key = Encoding.UTF8.GetBytes(jwtConfig?.Secret ?? "ngoadsfadfjaewrwrfsdf48sdffoxuanhai");
+                string publicKeyPath = Path.Combine(AppContext.BaseDirectory, publicKeyRelativePath);
+
+                RSA rsa = RSA.Create();
+                rsa.ImportFromPem(File.ReadAllText(publicKeyPath));
 
                 jwt.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = jwtConfig?.ValidIssuer,
+                    ValidIssuer = issuer,
 
                     ValidateAudience = true,
-                    ValidAudience = jwtConfig?.ValidAudience,
+                    ValidAudience = audience,
 
                     ValidateLifetime = true,
                     RequireExpirationTime = true,
 
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    IssuerSigningKey = new RsaSecurityKey(rsa),
 
                     ClockSkew = TimeSpan.Zero
                 };

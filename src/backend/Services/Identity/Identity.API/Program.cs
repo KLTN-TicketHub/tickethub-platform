@@ -1,5 +1,6 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
+using Identity.API.Endpoints;
 using Identity.API.Extensions;
 using Identity.Application.Common.Mappers;
 using Identity.Application.Features.Auth.Commands.LoginAdmin.Initiate;
@@ -43,6 +44,8 @@ var app = builder.Build();
 #region Database Initialization
 await app.UseDatabaseInitialization();
 #endregion
+
+app.MapWellKnownEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
