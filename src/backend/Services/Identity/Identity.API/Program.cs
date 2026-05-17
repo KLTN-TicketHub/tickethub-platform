@@ -38,6 +38,7 @@ builder.Services.Register();
 builder.Services.AddHttpClient();
 builder.Services.AddCustomRedis(builder.Configuration);
 builder.Services.AddAuthorization();
+
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(LoginRequestValidator).Assembly);
 builder.Services.AddCustomFluentValidation();
@@ -63,6 +64,7 @@ app.UseHttpsRedirection();
 
 app.UseRateLimiter();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 #region Custom Middlewares

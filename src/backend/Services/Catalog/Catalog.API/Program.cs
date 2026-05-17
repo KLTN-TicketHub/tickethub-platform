@@ -3,6 +3,8 @@ using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
 using Catalog.API.Extensions;
 using Catalog.Application.Common.Mappers;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCustomControllers();
 
 builder.Services.AddCustomOptions(builder.Configuration);
+
+builder.Services.AddCustomDb(builder.Configuration);
 
 builder.Services.AddCustomRateLimit(
     builder.Configuration.GetSection("AppSettings:RateLimit").Get<RateLimitConfig>());
@@ -33,6 +37,10 @@ builder.Services.AddAuthorization();
 #region AutoMapper
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(CatalogProfile).Assembly));
 #endregion
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+builder.Services.AddCustomFluentValidation();
 
 var app = builder.Build();
 

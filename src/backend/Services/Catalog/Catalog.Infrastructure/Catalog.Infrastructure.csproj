@@ -18,5 +18,17 @@
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.18" />
 		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.7" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Data\Repositories\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+	  <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Contracts\BuildingBlocks.Contracts.csproj" />
+	  <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+	  <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
+	  <ProjectReference Include="..\Catalog.Application\Catalog.Application.csproj" />
+	  <ProjectReference Include="..\Catalog.Common\Catalog.Common.csproj" />
+	  <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
+	</ItemGroup>
 
 </Project>

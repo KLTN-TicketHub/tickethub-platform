@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Infrastructure.Auditing;
 using BuildingBlocks.Infrastructure.Services;
 using Identity.Application.Common.Interfaces.IDataSeedingServices;
 using Identity.Application.Common.Interfaces.IExternalServices.IGoogleServices;
@@ -38,6 +39,8 @@ namespace Identity.API.Extensions
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+            services.AddScoped<AuditInterceptor>();
             return services;
         }
 

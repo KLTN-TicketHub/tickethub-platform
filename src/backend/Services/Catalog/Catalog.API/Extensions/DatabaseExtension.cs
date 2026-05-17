@@ -1,8 +1,8 @@
-﻿using BuildingBlocks.Infrastructure.Auditing;
-using Identity.Infrastructure.Data.Contexts;
+using BuildingBlocks.Infrastructure.Auditing;
+using Catalog.Infrastructure.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 
-namespace Identity.API.Extensions
+namespace Catalog.API.Extensions
 {
     public static class DatabaseExtension
     {
@@ -10,7 +10,7 @@ namespace Identity.API.Extensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddDbContext<IdentityDbContext>((sp, options) =>
+            services.AddDbContext<CatalogDbContext>((sp, options) =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("PrimaryDbConnection"));
 
