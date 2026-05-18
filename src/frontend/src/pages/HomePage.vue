@@ -256,9 +256,9 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { getEvents, selectEvent, fetchStars, fetchDestinations } from '../stores/eventStore'
-import EventCard from '../components/EventCard.vue'
-import BaseButton from '../components/ui/BaseButton.vue'
+import { getEvents, selectEvent, fetchStars, fetchDestinations } from '../features/events/store'
+import EventCard from '../features/events/components/EventCard.vue'
+import BaseButton from '../shared/components/BaseButton.vue'
 
 const router = useRouter()
 const allEvents = getEvents()

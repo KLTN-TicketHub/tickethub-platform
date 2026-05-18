@@ -87,8 +87,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { fetchDestinations } from '../stores/eventStore'
-import BaseButton from '../components/ui/BaseButton.vue'
+import { fetchDestinations } from '../features/events/store'
+import BaseButton from '../shared/components/BaseButton.vue'
 
 const selectedCity = ref('Tất cả')
 const destinations = ref([])

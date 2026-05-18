@@ -89,10 +89,10 @@
 
 <script setup>
 import { computed } from 'vue'
-import { store } from '../stores/eventStore'
-import BaseButton from '../components/ui/BaseButton.vue'
-import BaseTable from '../components/ui/BaseTable.vue'
-import BaseBadge from '../components/ui/BaseBadge.vue'
+import { store } from '../features/events/store'
+import BaseButton from '../shared/components/BaseButton.vue'
+import BaseTable from '../shared/components/BaseTable.vue'
+import BaseBadge from '../shared/components/BaseBadge.vue'
 
 const stats = [
   { label: 'Tổng sự kiện', value: '12', icon: '🎫', trend: '12' },

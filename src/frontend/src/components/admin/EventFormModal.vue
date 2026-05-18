@@ -241,7 +241,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import BaseButton from '../ui/BaseButton.vue'
+import BaseButton from '../../shared/components/BaseButton.vue'
 
 const props = defineProps({
   isOpen: Boolean,

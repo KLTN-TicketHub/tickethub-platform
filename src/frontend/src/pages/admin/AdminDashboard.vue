@@ -113,10 +113,10 @@
 
 <script setup>
 import { computed, h } from 'vue'
-import { getEvents } from '../../stores/eventStore'
+import { getEvents } from '../../features/events/store'
 import { usersData, ordersData } from '../../stores/adminStore'
-import BaseBadge from '../../components/ui/BaseBadge.vue'
-import BaseTable from '../../components/ui/BaseTable.vue'
+import BaseBadge from '../../shared/components/BaseBadge.vue'
+import BaseTable from '../../shared/components/BaseTable.vue'
 
 const allEvents = computed(() => getEvents())
 

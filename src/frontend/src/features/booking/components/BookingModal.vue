@@ -254,7 +254,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import BaseButton from './ui/BaseButton.vue'
+import BaseButton from '../../../shared/components/BaseButton.vue'
 import SeatMap from './SeatMap.vue'
 
 const props = defineProps({ event: Object })

@@ -328,8 +328,8 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getEventById, openBooking } from '../stores/eventStore'
-import BaseButton from '../components/ui/BaseButton.vue'
+import { getEventById, openBooking } from '../features/events/store'
+import BaseButton from '../shared/components/BaseButton.vue'
 
 const route = useRoute()
 const router = useRouter()

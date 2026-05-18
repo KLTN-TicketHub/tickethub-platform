@@ -1,8 +1,8 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router'
+import router from './core/router'
 import './assets/main.css'
-import { initStore } from './stores/eventStore'
+import { initStore } from './features/events/store'
 
 const app = createApp(App)
 app.use(router)

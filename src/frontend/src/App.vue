@@ -15,10 +15,10 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { store, closeBooking, addTicket, clearToast, closeAuth } from './stores/eventStore'
-import AppHeader from './components/layout/AppHeader.vue'
-import AppFooter from './components/layout/AppFooter.vue'
-import BookingModal from './components/BookingModal.vue'
+import { store, closeBooking, addTicket, clearToast, closeAuth } from './features/events/store'
+import AppHeader from './layouts/AppHeader.vue'
+import AppFooter from './layouts/AppFooter.vue'
+import BookingModal from './features/booking/components/BookingModal.vue'
 import AuthModal from './components/AuthModal.vue'
 import ToastNotification from './components/ToastNotification.vue'
 

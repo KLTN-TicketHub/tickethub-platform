@@ -114,8 +114,8 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { store, login, register, isLoading } from '../stores/eventStore'
-import BaseButton from './ui/BaseButton.vue'
+import { store, login, register, isLoading } from '../features/events/store'
+import BaseButton from '../shared/components/BaseButton.vue'
 
 const emit = defineEmits(['close'])
 

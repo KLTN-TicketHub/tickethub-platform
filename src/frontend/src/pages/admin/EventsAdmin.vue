@@ -110,12 +110,12 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { getEvents, addEvent, updateEvent, deleteEvent } from '../../stores/eventStore'
+import { getEvents, addEvent, updateEvent, deleteEvent } from '../../features/events/store'
 import { adminSearch, openConfirm, addToast } from '../../stores/adminStore'
-import BaseButton from '../../components/ui/BaseButton.vue'
-import BaseTable from '../../components/ui/BaseTable.vue'
-import BaseBadge from '../../components/ui/BaseBadge.vue'
-import BaseSelect from '../../components/ui/BaseSelect.vue'
+import BaseButton from '../../shared/components/BaseButton.vue'
+import BaseTable from '../../shared/components/BaseTable.vue'
+import BaseBadge from '../../shared/components/BaseBadge.vue'
+import BaseSelect from '../../shared/components/BaseSelect.vue'
 import EventFormModal from '../../components/admin/EventFormModal.vue'
 
 const allEvents = computed(() => getEvents())

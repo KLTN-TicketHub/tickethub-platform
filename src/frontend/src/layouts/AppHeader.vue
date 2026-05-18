@@ -16,7 +16,7 @@
           </router-link>
 
           <!-- City Selector -->
-          <div class="relative hidden lg:block">
+          <div class="relative hidden lg:block" ref="cityRef">
             <button 
               @click="showCitySelector = !showCitySelector"
               class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:border-primary/50 transition-all text-[12px] font-bold"
@@ -114,7 +114,7 @@
           </button>
 
           <!-- User Profile / Auth -->
-          <div v-if="store.user" class="relative">
+          <div v-if="store.user" class="relative" ref="dropdownRef">
             <button 
               @click.stop="showDropdown = !showDropdown"
               class="flex items-center gap-2 p-1 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group"
@@ -174,22 +174,46 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { store, selectEvent, openAuth, logout } from '../../stores/eventStore'
-import { getEvents } from '../../stores/eventStore'
-import BaseButton from '../ui/BaseButton.vue'
+import { store, selectEvent, openAuth, logout } from '../features/events/store'
+import BaseButton from '../shared/components/BaseButton.vue'
+
+// ─── Composables ────────────────────────────────────────────────────────────
+import { useScroll } from '../shared/composables/useScroll'
+import { useClickOutside } from '../shared/composables/useClickOutside'
+import { useEventSearch } from '../features/events/composables/useEventSearch'
 
 const router = useRouter()
 
-const showDropdown = ref(false)
-const showCitySelector = ref(false)
-const selectedCity = ref('Toàn quốc')
-const searchQuery = ref('')
-const searchResults = ref([])
-const showSearch = ref(false)
+// ─── Scroll behaviour ──────────────────────────────────────────────────────
+const { isScrolled } = useScroll({ threshold: 20 })
+
+// ─── Search (feature composable) ───────────────────────────────────────────
+const { searchQuery, searchResults, showSearch, handleSearch, clearSearch } = useEventSearch()
+
+// ─── Template refs for click-outside targets ───────────────────────────────
 const searchRef = ref(null)
-const isScrolled = ref(false)
+const cityRef = ref(null)
+const dropdownRef = ref(null)
+
+// ─── Click-outside handlers ────────────────────────────────────────────────
+useClickOutside(searchRef, () => {
+  showSearch.value = false
+})
+
+const showCitySelector = ref(false)
+useClickOutside(cityRef, () => {
+  showCitySelector.value = false
+})
+
+const showDropdown = ref(false)
+useClickOutside(dropdownRef, () => {
+  showDropdown.value = false
+})
+
+// ─── Local UI state ────────────────────────────────────────────────────────
+const selectedCity = ref('Toàn quốc')
 
 const CITIES = ['Toàn quốc', 'Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng', 'Đà Lạt']
 
@@ -206,33 +230,16 @@ const dropdownItems = [
   { icon: '👤', label: 'Hồ sơ', path: '/profile' },
 ]
 
+// ─── Actions ───────────────────────────────────────────────────────────────
 const goToEvent = (event) => {
   selectEvent(event)
-  showSearch.value = false
-  searchQuery.value = ''
+  clearSearch()
   router.push('/event/' + event.id)
 }
 
 const handleLogout = () => {
   logout()
   showDropdown.value = false
-}
-
-const handleSearch = () => {
-  const q = searchQuery.value.toLowerCase().trim()
-  if (!q) { 
-    searchResults.value = []; 
-    showSearch.value = false; 
-    return 
-  }
-  
-  const allEvents = getEvents()
-  searchResults.value = allEvents.filter(e =>
-    e.title.toLowerCase().includes(q) ||
-    (e.performers?.some(p => p.name.toLowerCase().includes(q))) ||
-    (e.location?.name?.toLowerCase().includes(q))
-  ).slice(0, 6)
-  showSearch.value = true
 }
 
 const formatDate = (dateStr) => {
@@ -242,29 +249,6 @@ const formatDate = (dateStr) => {
     return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })
   } catch(e) { return dateStr }
 }
-
-const handleClickOutside = (e) => {
-  if (!searchRef.value?.contains(e.target)) showSearch.value = false
-  if (!e.target.closest('button')) {
-    showDropdown.value = false
-    showCitySelector.value = false
-  }
-}
-
-const handleScroll = () => {
-  isScrolled.value = window.scrollY > 20
-}
-
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-  window.addEventListener('scroll', handleScroll, { passive: true })
-  handleScroll()
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-  window.removeEventListener('scroll', handleScroll)
-})
 </script>
 
 <style scoped>

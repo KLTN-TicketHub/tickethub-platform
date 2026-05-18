@@ -112,8 +112,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import BaseButton from '../components/ui/BaseButton.vue'
-import BaseSelect from '../components/ui/BaseSelect.vue'
+import BaseButton from '../shared/components/BaseButton.vue'
+import BaseSelect from '../shared/components/BaseSelect.vue'
 
 const router = useRouter()
 

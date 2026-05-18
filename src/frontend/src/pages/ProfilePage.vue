@@ -66,6 +66,6 @@
 </template>
 
 <script setup>
-import { store } from '../stores/eventStore'
-import BaseButton from '../components/ui/BaseButton.vue'
+import { store } from '../features/events/store'
+import BaseButton from '../shared/components/BaseButton.vue'
 </script>

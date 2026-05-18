@@ -48,7 +48,7 @@
 
 <script setup>
 import { confirmModalState, closeConfirm } from '../../stores/adminStore'
-import BaseButton from '../ui/BaseButton.vue'
+import BaseButton from '../../shared/components/BaseButton.vue'
 
 const close = () => {
   closeConfirm()

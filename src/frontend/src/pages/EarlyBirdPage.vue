@@ -125,7 +125,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import BaseButton from '../components/ui/BaseButton.vue'
+import BaseButton from '../shared/components/BaseButton.vue'
 
 const benefits = [
   { icon: '🔔', title: 'Thông báo sớm', desc: 'Nhận tin nhắn đặt vé trước 24h so với công chúng.' },

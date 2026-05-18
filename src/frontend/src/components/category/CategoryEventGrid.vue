@@ -23,8 +23,8 @@
 </template>
 
 <script setup>
-import EventCard from '../../components/EventCard.vue'
-import BaseButton from '../../components/ui/BaseButton.vue'
+import EventCard from '../../features/events/components/EventCard.vue'
+import BaseButton from '../../shared/components/BaseButton.vue'
 
 defineProps({
   events: {

@@ -113,7 +113,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import BaseSelect from '../ui/BaseSelect.vue'
+import BaseSelect from '../../shared/components/BaseSelect.vue'
 
 const props = defineProps({
   modelValue: { type: String, required: true },

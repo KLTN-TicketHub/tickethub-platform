@@ -88,7 +88,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { selectEvent, store, toggleWishlist as storeToggleWishlist } from '../stores/eventStore'
+import { selectEvent, store, toggleWishlist as storeToggleWishlist } from '../store'
 
 const props = defineProps({ 
   event: { type: Object, required: true },

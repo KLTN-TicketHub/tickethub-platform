@@ -216,10 +216,10 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { store } from '../stores/eventStore'
-import BaseBadge from '../components/ui/BaseBadge.vue'
-import BaseButton from '../components/ui/BaseButton.vue'
-import BaseModal from '../components/ui/BaseModal.vue'
+import { store } from '../features/events/store'
+import BaseBadge from '../shared/components/BaseBadge.vue'
+import BaseButton from '../shared/components/BaseButton.vue'
+import BaseModal from '../shared/components/BaseModal.vue'
 
 const activeTab = ref('upcoming')
 const selectedTicket = ref(null)

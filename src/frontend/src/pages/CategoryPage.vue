@@ -36,7 +36,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { getEvents } from '../stores/eventStore'
+import { getEvents } from '../features/events/store'
 import CategoryHero from '../components/category/CategoryHero.vue'
 import CategoryFilter from '../components/category/CategoryFilter.vue'
 import CategoryEventGrid from '../components/category/CategoryEventGrid.vue'

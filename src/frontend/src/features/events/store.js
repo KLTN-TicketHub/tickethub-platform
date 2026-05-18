@@ -6,7 +6,7 @@ import {
   removeEvent,
   fetchStars,
   fetchDestinations
-} from '../services/eventService'
+} from './api'
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
 

@@ -101,4 +101,3 @@ defineProps({
   opacity: 0.5;
 }
 </style>
-

@@ -79,8 +79,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { fetchStars } from '../stores/eventStore'
-import BaseButton from '../components/ui/BaseButton.vue'
+import { fetchStars } from '../features/events/store'
+import BaseButton from '../shared/components/BaseButton.vue'
 
 const searchQuery = ref('')
 const stars = ref([])

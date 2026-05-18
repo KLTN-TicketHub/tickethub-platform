@@ -3,7 +3,7 @@
 // When a real backend is available, replace the body of each method
 // with actual fetch/axios calls. The function signatures stay the same.
 
-import { MOCK_EVENTS } from '../mocks/eventMock'
+import { MOCK_EVENTS } from './mock'
 
 // In-memory store that simulates a database
 let events = [...MOCK_EVENTS]
