@@ -1,9 +1,11 @@
 ﻿using BuildingBlocks.API.Extensions;
 using BuildingBlocks.Contracts.Models.Responses;
+using Identity.Application.Common.DTOs.Auth;
 using Identity.Application.Features.Auth.Commands.LoginGoogle;
 using Identity.Application.Features.Auth.Commands.Logout;
 using Identity.Application.Features.Auth.Commands.Refresh;
 using Identity.Application.Features.Auth.Request;
+using Identity.Application.Features.Auth.Queries.GetProfile;
 using Identity.Common.Options;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -38,6 +40,19 @@ namespace Identity.API.Controllers.V1
             _sender = sender;
             _memoryCache = memoryCache;
             _googleAuthSettings = googleAuthSettings.Value;
+        }
+
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfileAsync(CancellationToken cancellationToken = default)
+        {
+            ProfileDto profile = await _sender.Send(new GetProfileQuery(), cancellationToken);
+
+            return Ok(new ApiResponse<ProfileDto>
+            {
+                Success = true,
+                Message = "Lấy thông tin profile thành công",
+                Data = profile
+            });
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
@@ -86,8 +101,8 @@ namespace Identity.API.Controllers.V1
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddDays(7)
+                SameSite = SameSiteMode.None,
+                Expires = DateTimeOffset.UtcNow.AddDays(_appSettings.JwtConfig!.RefreshTokenExpirationDays)
             });
 
             return Ok(new AuthResult
@@ -154,8 +169,8 @@ namespace Identity.API.Controllers.V1
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddDays(_appSettings.JwtConfig.RefreshTokenExpirationDays)
+                SameSite = SameSiteMode.None,
+                Expires = DateTimeOffset.UtcNow.AddDays(_appSettings.JwtConfig!.RefreshTokenExpirationDays)
             });
 
             return Redirect(returnUrl!);

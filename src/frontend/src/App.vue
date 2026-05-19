@@ -13,9 +13,10 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { store, closeBooking, addTicket, clearToast, closeAuth } from './features/events/store'
+import { tryRefresh } from './features/events/auth/auth.service'
 import AppHeader from './layouts/AppHeader.vue'
 import AppFooter from './layouts/AppFooter.vue'
 import BookingModal from './features/booking/components/BookingModal.vue'
@@ -29,4 +30,34 @@ const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 const handleBookingSuccess = (bookedTicket) => {
   addTicket(bookedTicket)
 }
+
+const handleAuthMessage = async (event) => {
+  if (event.origin !== window.location.origin) return
+
+  if (event.data?.type === 'ticket-hub:auth-success') {
+    try {
+      await tryRefresh()
+      store.toast = { message: 'Đăng nhập thành công!', icon: '👋' }
+    } catch (err) {
+      store.toast = { message: 'Đăng nhập không hoàn tất. Vui lòng thử lại.', icon: '⚠️' }
+    } finally {
+      closeAuth()
+    }
+  }
+
+  if (event.data?.type === 'ticket-hub:auth-error') {
+    const err = event.data?.error
+    const msg = (err && (err.message || err.error || JSON.stringify(err))) || 'Đăng nhập Google thất bại.'
+    store.toast = { message: msg, icon: '⚠️' }
+    closeAuth()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('message', handleAuthMessage)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('message', handleAuthMessage)
+})
 </script>

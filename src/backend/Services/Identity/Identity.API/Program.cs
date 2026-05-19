@@ -1,8 +1,12 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Identity.API.Endpoints;
 using Identity.API.Extensions;
 using Identity.Application.Common.Mappers;
 using Identity.Application.Features.Auth.Commands.LoginAdmin.Initiate;
+using Identity.Application.Features.Auth.Validators;
 using Identity.Common.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +38,10 @@ builder.Services.Register();
 builder.Services.AddHttpClient();
 builder.Services.AddCustomRedis(builder.Configuration);
 builder.Services.AddAuthorization();
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssembly(typeof(LoginRequestValidator).Assembly);
+builder.Services.AddCustomFluentValidation();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(UserProfile).Assembly));
@@ -43,6 +51,8 @@ var app = builder.Build();
 #region Database Initialization
 await app.UseDatabaseInitialization();
 #endregion
+
+app.MapWellKnownEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -54,6 +64,7 @@ app.UseHttpsRedirection();
 
 app.UseRateLimiter();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 #region Custom Middlewares

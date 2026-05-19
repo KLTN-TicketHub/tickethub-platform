@@ -2,7 +2,7 @@
 
 namespace BuildingBlocks.Domain.DDD
 {
-    public interface IBaseUnitOfWork<TContext> where TContext : DbContext
+    public interface IBaseUnitOfWork
     {
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);
