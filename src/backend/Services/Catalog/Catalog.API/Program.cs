@@ -16,6 +16,8 @@ builder.Services.AddCustomOptions(builder.Configuration);
 
 builder.Services.AddCustomDb(builder.Configuration);
 
+builder.Services.AddMassTransitWithRabbitMq();
+
 builder.Services.AddCustomRateLimit(
     builder.Configuration.GetSection("AppSettings:RateLimit").Get<RateLimitConfig>());
 
@@ -41,6 +43,7 @@ builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(CatalogProfile).Assembl
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.AddCustomFluentValidation();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
