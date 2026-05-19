@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Identity.Domain.Interfaces
 {
-    public interface IUnitOfWork : IBaseUnitOfWork<IdentityDbContext>
+    public interface IUnitOfWork : IBaseUnitOfWork
     {
         IRefreshTokenRepository RefreshTokenRepository { get; }
     }

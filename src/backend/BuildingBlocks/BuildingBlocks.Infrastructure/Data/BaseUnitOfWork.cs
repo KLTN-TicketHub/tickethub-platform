@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace BuildingBlocks.Infrastructure.Data
 {
-    public abstract class BaseUnitOfWork<TContext> : IBaseUnitOfWork<TContext>
+    public abstract class BaseUnitOfWork<TContext> : IBaseUnitOfWork
         where TContext : DbContext
     {
         private readonly TContext _dbContext;

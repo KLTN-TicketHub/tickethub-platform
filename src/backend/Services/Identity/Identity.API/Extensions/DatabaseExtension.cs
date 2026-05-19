@@ -1,4 +1,5 @@
-﻿using Identity.Infrastructure.Data.Contexts;
+﻿using BuildingBlocks.Infrastructure.Auditing;
+using Identity.Infrastructure.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Identity.API.Extensions
@@ -9,9 +10,11 @@ namespace Identity.API.Extensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddDbContext<IdentityDbContext>(option =>
+            services.AddDbContext<IdentityDbContext>((sp, options) =>
             {
-                option.UseSqlServer(configuration.GetConnectionString("PrimaryDbConnection"));
+                options.UseSqlServer(configuration.GetConnectionString("PrimaryDbConnection"));
+
+                options.AddInterceptors(sp.GetRequiredService<AuditInterceptor>());
             });
 
             return services;

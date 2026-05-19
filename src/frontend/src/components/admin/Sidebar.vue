@@ -29,22 +29,27 @@
 
     <!-- Footer -->
     <div class="p-4 border-t border-border-main">
-      <router-link 
-        to="/" 
+      <button 
+        type="button"
+        @click="handleLogout"
         class="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-muted hover:bg-danger/10 hover:text-danger transition-all group"
       >
         <svg class="w-5 h-5 opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
         <span class="text-[14px]">Thoát Admin</span>
-      </router-link>
+      </button>
     </div>
   </aside>
 </template>
 
 <script setup>
 import { h } from 'vue'
+import { useRouter } from 'vue-router'
 import { isSidebarOpen, toggleSidebar } from '../../stores/adminStore'
+import { logout as authLogout } from '../../services/auth/auth.service'
+
+const router = useRouter()
 
 const menuItems = [
   { 
@@ -91,6 +96,13 @@ const menuItems = [
 const closeSidebarMobile = () => {
   if (window.innerWidth <= 768 && isSidebarOpen.value) {
     toggleSidebar()
+  }
+}
+
+const handleLogout = async () => {
+  await authLogout()
+  if (router.currentRoute.value.path.startsWith('/admin')) {
+    router.replace('/admin/login')
   }
 }
 </script>

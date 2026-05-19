@@ -1,6 +1,6 @@
 <template>
-  <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[500] flex items-center justify-center p-4" @click="$emit('close')">
-    <div class="bg-surface border border-border-main rounded-[32px] w-full max-w-[420px] max-h-[90vh] overflow-y-auto p-8 shadow-2xl animate-in zoom-in duration-300" @click.stop>
+  <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-500 flex items-center justify-center p-4" @click="$emit('close')">
+    <div class="bg-surface border border-border-main rounded-4xl w-full max-w-105 max-h-[90vh] overflow-y-auto p-8 shadow-2xl animate-in zoom-in duration-300" @click.stop>
       <!-- Header -->
       <div class="flex justify-between items-center mb-6">
         <h2 class="font-heading text-2xl font-bold text-main">{{ isLogin ? 'Đăng nhập' : 'Đăng ký' }}</h2>
@@ -79,7 +79,7 @@
           type="submit" 
           variant="primary" 
           size="lg"
-          class="w-full !py-4 mt-2 !rounded-2xl shadow-xl shadow-primary/20"
+          class="w-full py-4! mt-2 rounded-2xl! shadow-xl shadow-primary/20"
           :disabled="isLoading || passwordMismatch"
           :loading="isLoading"
         >
@@ -97,7 +97,7 @@
         </div>
 
         <div class="flex gap-4 justify-center">
-          <button class="w-12 h-12 rounded-full border border-border-main bg-card flex items-center justify-center text-xl text-[#DB4437] hover:border-[#DB4437] hover:-translate-y-1 transition-all shadow-lg hover:shadow-[#DB4437]/20">
+          <button type="button" @click="handleGoogleLogin" class="w-12 h-12 rounded-full border border-border-main bg-card flex items-center justify-center text-xl text-[#DB4437] hover:border-[#DB4437] hover:-translate-y-1 transition-all shadow-lg hover:shadow-[#DB4437]/20">
             G
           </button>
           <button class="w-12 h-12 rounded-full border border-border-main bg-card flex items-center justify-center text-xl text-[#4267B2] hover:border-[#4267B2] hover:-translate-y-1 transition-all shadow-lg hover:shadow-[#4267B2]/20">
@@ -115,6 +115,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { store, login, register, isLoading } from '../features/events/store'
+import { openGooglePopup } from '../features/events/auth/auth.service'
 import BaseButton from '../shared/components/BaseButton.vue'
 
 const emit = defineEmits(['close'])
@@ -148,6 +149,10 @@ const handleSubmit = async () => {
   } else {
     await register(form.value.name, form.value.email, form.value.password)
   }
+}
+
+const handleGoogleLogin = () => {
+  openGooglePopup(window.location.href)
 }
 </script>
 
