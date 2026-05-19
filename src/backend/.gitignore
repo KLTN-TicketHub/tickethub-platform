@@ -88,9 +88,13 @@ bld/
 *.ndf
 
 # Sensitive config files
-**/appsettings.*.json
-!**/appsettings.json
-!**/appsettings.Development.json
+**/.env
+**/.env.*
+!**/.env.example
+
+# ASP.NET Core config
+**/appsettings*.json
+!**/appsettings.example.json
 
 # Microsoft Azure Web App publish settings
 *.pubxml
