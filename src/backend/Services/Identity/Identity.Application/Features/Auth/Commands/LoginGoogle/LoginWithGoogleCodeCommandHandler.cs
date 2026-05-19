@@ -18,8 +18,6 @@ namespace Identity.Application.Features.Auth.Commands.LoginGoogle
         private const string CustomerRoleName = "Customer";
 
         private readonly IGoogleAuthService _googleAuthService;
-        private readonly GoogleAuthSettings _googleSettings;
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly UserManager<User> _userManager;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IUnitOfWork _unitOfWork;
@@ -29,8 +27,6 @@ namespace Identity.Application.Features.Auth.Commands.LoginGoogle
 
         public LoginWithGoogleCodeCommandHandler(
             IGoogleAuthService googleAuthService,
-            IOptions<GoogleAuthSettings> googleSettings,
-            IHttpClientFactory httpClientFactory,
             UserManager<User> userManager,
             IJwtTokenService jwtTokenService,
             IUnitOfWork unitOfWork,
@@ -39,8 +35,6 @@ namespace Identity.Application.Features.Auth.Commands.LoginGoogle
             IOptions<AppSettings> appSettings)
         {
             _googleAuthService = googleAuthService;
-            _googleSettings = googleSettings.Value;
-            _httpClientFactory = httpClientFactory;
             _userManager = userManager;
             _jwtTokenService = jwtTokenService;
             _unitOfWork = unitOfWork;
