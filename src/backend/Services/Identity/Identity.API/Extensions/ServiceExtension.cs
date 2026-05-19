@@ -31,6 +31,7 @@ namespace Identity.API.Extensions
             services.AddScoped<IGoogleAuthService, GoogleAuthService>();
             services.AddScoped<ICacheService, RedisCacheService>();
             services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
+            services.AddScoped<IFileService, FileService>();
 
             return services;
         }

@@ -41,7 +41,7 @@ namespace Identity.API.Controllers.V1.Moderator
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Expires = DateTimeOffset.UtcNow.AddDays(refreshTokenExpirationDays)
             });
 

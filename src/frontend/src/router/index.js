@@ -9,6 +9,7 @@ import CreateEventPage from '../pages/CreateEventPage.vue'
 import EarlyBirdPage from '../pages/EarlyBirdPage.vue'
 import StarsPage from '../pages/StarsPage.vue'
 import DestinationsPage from '../pages/DestinationsPage.vue'
+import AuthCallback from '../pages/AuthCallback.vue'
 
 // Admin
 import AdminLayout from '../layouts/AdminLayout.vue'
@@ -28,6 +29,7 @@ const routes = [
   { path: '/early-bird', name: 'early-bird', component: EarlyBirdPage },
   { path: '/stars', name: 'stars', component: StarsPage },
   { path: '/destinations', name: 'destinations', component: DestinationsPage },
+  { path: '/auth/callback', name: 'auth-callback', component: AuthCallback },
   
   // Admin Routes
   {

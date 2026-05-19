@@ -178,6 +178,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { store, selectEvent, openAuth, logout } from '../../stores/eventStore'
 import { getEvents } from '../../stores/eventStore'
+import { logout as authLogout } from '../../services/auth/auth.service'
 import BaseButton from '../ui/BaseButton.vue'
 
 const router = useRouter()
@@ -213,7 +214,8 @@ const goToEvent = (event) => {
   router.push('/event/' + event.id)
 }
 
-const handleLogout = () => {
+const handleLogout = async () => {
+  await authLogout()
   logout()
   showDropdown.value = false
 }
