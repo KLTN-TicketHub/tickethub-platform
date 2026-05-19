@@ -91,9 +91,9 @@ bld/
 **/.env
 **/.env.*
 !**/.env.example
-**/appsettings.*.json
-!**/appsettings.json
-!**/appsettings.Development.json
+
+# ASP.NET Core config
+**/appsettings*.json
 !**/appsettings.example.json
 
 # Microsoft Azure Web App publish settings
