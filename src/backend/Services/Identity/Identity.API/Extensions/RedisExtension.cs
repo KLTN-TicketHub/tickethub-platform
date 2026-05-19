@@ -6,7 +6,6 @@
         {
             services.AddStackExchangeRedisCache(options =>
             {
-                Console.WriteLine(configuration["Redis:ConnectionString"]);
                 options.Configuration =
                     configuration["Redis:ConnectionString"];
 
