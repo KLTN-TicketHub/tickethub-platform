@@ -19,4 +19,9 @@
 	  <ProjectReference Include="..\Catalog.Common\Catalog.Common.csproj" />
 	  <ProjectReference Include="..\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <None Update="Keys\public.pem">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 </Project>

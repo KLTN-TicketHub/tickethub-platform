@@ -29,12 +29,12 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Catal
 
 // Register JWT auth from Identity (uses ConfigurationManager internally)
 builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddAuthorization();
 
 builder.Services.AddCustomSwagger();
 builder.Services.AddCustomApiVersioning();
 
 builder.Services.AddCustomRedis(builder.Configuration);
-builder.Services.AddAuthorization();
 
 #region AutoMapper
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(CatalogProfile).Assembly));
@@ -54,6 +54,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandling();
+app.UseRequestResponseLogging();
 
 app.UseHttpsRedirection();
 
@@ -61,8 +62,6 @@ app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseRequestResponseLogging();
 
 app.MapControllers();
 
