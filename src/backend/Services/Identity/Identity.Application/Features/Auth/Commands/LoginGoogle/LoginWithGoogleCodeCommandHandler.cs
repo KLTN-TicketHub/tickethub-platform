@@ -88,14 +88,18 @@ namespace Identity.Application.Features.Auth.Commands.LoginGoogle
         {
             User? user = await FindLinkedGoogleUserAsync(payload.Subject);
 
-            if (user != null) return user;
+            if (user != null)
+            {
+                await SyncGoogleProfileAsync(user, payload);
+                return user;
+            }
 
             user = await _userManager.FindByEmailAsync(payload.Email);
 
             if (user != null)
             {
                 await EnsureUserIsCustomerAsync(user);
-
+                await SyncGoogleProfileAsync(user, payload);
                 await LinkGoogleLoginAsync(user, payload.Subject, cancellation);
                 return user;
             }
@@ -163,6 +167,34 @@ namespace Identity.Application.Features.Auth.Commands.LoginGoogle
             string local = payload.Email?.Split('@').FirstOrDefault() ?? "googleuser";
             string subpart = payload.Subject.Length > 8 ? payload.Subject.Substring(0, 8) : payload.Subject;
             return $"{local}-{subpart}".ToLowerInvariant();
+        }
+
+        private async Task SyncGoogleProfileAsync(User user, GoogleTokenPayloadDto payload)
+        {
+            bool hasChanges = false;
+
+            string newFullName = string.IsNullOrWhiteSpace(payload.Name) ? payload.Email! : payload.Name;
+
+            if (!string.IsNullOrWhiteSpace(newFullName) && user.FullName != newFullName)
+            {
+                user.FullName = newFullName;
+                hasChanges = true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(payload.Picture) && user.ImageUrl != payload.Picture)
+            {
+                user.ImageUrl = payload.Picture;
+                hasChanges = true;
+            }
+
+            if (hasChanges)
+            {
+                IdentityResult result = await _userManager.UpdateAsync(user);
+
+                if (!result.Succeeded)
+                    throw new BusinessRuleException(
+                        $"Không thể cập nhật thông tin người dùng: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            }
         }
     }
 }
