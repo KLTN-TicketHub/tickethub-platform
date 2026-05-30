@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace BuildingBlocks.Domain.DDD
+﻿namespace BuildingBlocks.Domain.DDD
 {
     public interface IBaseUnitOfWork
     {

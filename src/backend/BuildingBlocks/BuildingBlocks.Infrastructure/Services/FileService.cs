@@ -2,9 +2,6 @@
 using BuildingBlocks.Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BuildingBlocks.Infrastructure.Services
 {

@@ -1,6 +1,5 @@
 using BuildingBlocks.Domain.DDD;
 using Identity.Domain.Interfaces.IIdentity_AuthRepositories;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Identity.Domain.Interfaces
 {

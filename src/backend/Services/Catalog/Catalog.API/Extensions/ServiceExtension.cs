@@ -1,10 +1,8 @@
 using BuildingBlocks.Application.Interfaces;
-using BuildingBlocks.Domain.DDD;
 using BuildingBlocks.Infrastructure.Auditing;
 using BuildingBlocks.Infrastructure.Services;
 using Catalog.Domain.Interfaces;
 using Catalog.Infrastructure.Data.Contexts;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Catalog.API.Extensions
 {

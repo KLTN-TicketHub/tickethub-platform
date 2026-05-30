@@ -1,0 +1,26 @@
+﻿using BuildingBlocks.Domain.DDD;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Catalog.Domain.Entities
+{
+    public class ZonePricing : SoftDeleteEntity, IAggregateRoot
+    {
+        public Event? Event { get; set; }
+        public Guid EventId { get; set; }
+
+        public Zone? Zone { get; set; }
+        public Guid ZoneId { get; set; }
+
+        public TicketType? TicketType { get; set; }
+        public Guid TicketTypeId { get; set; }
+
+        //Giá niêm yết
+        public decimal ListedPrice { get; set; }
+
+        public int PublishedQuota { get; set; }
+
+        public string Status { get; set; }
+    }
+}
