@@ -14,8 +14,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Common\DTOs\Venues\" />
-	  <Folder Include="Features\Venues\Commands\" />
-	  <Folder Include="Features\Venues\Requests\" />
+	  <Folder Include="Features\Venues\Commands\CreateVenue\" />
 	  <Folder Include="Features\Venues\Validators\" />
 	  <Folder Include="Features\Venues\Queries\" />
 	</ItemGroup>

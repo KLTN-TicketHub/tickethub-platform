@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Domain.DDD;
+using Catalog.Domain.Enums;
 
 namespace Catalog.Domain.Entities
 {
@@ -18,6 +19,6 @@ namespace Catalog.Domain.Entities
 
         public int PublishedQuota { get; set; }
 
-        public string Status { get; set; }
+        public CatalogStatus Status { get; set; }
     }
 }

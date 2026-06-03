@@ -1,4 +1,5 @@
 ﻿using Catalog.Domain.Entities;
+using Catalog.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -46,7 +47,8 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .HasPrecision(18, 2);
 
             builder.Property(s => s.LayoutStatus)
-                .IsRequired();
+                .IsRequired()
+                .HasConversion<string>();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Catalog.Domain.Entities;
+using Catalog.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -56,7 +57,25 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
 
             builder.Property(e => e.Status)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasConversion<string>();
+
+            builder.Property(e => e.CustomVenueName)
+                .HasMaxLength(200);
+
+            builder.Property(e => e.CustomAddressLine)
+                .HasMaxLength(200);
+
+            builder.Property(e => e.CustomWard)
+                .HasMaxLength(100);
+            
+            builder.Property(e => e.CustomDistrict)
+                .HasMaxLength(100);
+
+            builder.Property(e => e.CustomProvinceCity)
+                .HasMaxLength(100);
+
+            builder.Property(e => e.CustomCountry)
+                .HasMaxLength(100);
 
             builder.Property(e => e.RowVersion)
                 .IsRowVersion();

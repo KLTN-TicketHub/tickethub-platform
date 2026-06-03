@@ -2,6 +2,8 @@ using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Infrastructure.Auditing;
 using BuildingBlocks.Infrastructure.Services;
 using Catalog.Domain.Interfaces;
+using Catalog.Domain.Interfaces.IRepositories;
+using Catalog.Infrastructure.Data.Repositories;
 using Catalog.Infrastructure.Data.Contexts;
 
 namespace Catalog.API.Extensions
@@ -28,6 +30,15 @@ namespace Catalog.API.Extensions
         public static IServiceCollection RegisterRepositories(IServiceCollection services)
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IVenueRepository, VenueRepository>();
+            services.AddScoped<IEventRepository, EventRepository>();
+            services.AddScoped<IEventCategoryRepository, EventCategoryRepository>();
+            services.AddScoped<IEventApprovalRepository, EventApprovalRepository>();
+            services.AddScoped<ISeatRepository, SeatRepository>();
+            services.AddScoped<ISeatMapRepository, SeatMapRepository>();
+            services.AddScoped<ITicketTypeRepository, TicketTypeRepository>();
+            services.AddScoped<IZoneRepository, ZoneRepository>();
+            services.AddScoped<IZonePricingRepository, ZonePricingRepository>();
             services.AddScoped<AuditInterceptor>();
             return services;
         }

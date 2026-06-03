@@ -1,4 +1,5 @@
 ﻿using Catalog.Domain.Entities;
+using Catalog.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -28,7 +29,8 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .HasMaxLength(500);
 
             builder.Property(ec => ec.Status)
-                .IsRequired();
+                .IsRequired()
+                .HasConversion<string>();
 
             builder.Property(ec => ec.RowVersion)
                 .IsRowVersion();

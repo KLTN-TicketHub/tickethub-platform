@@ -1,4 +1,7 @@
 ﻿using BuildingBlocks.Domain.DDD;
+using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Catalog.Domain.Entities
 {
@@ -43,5 +46,29 @@ namespace Catalog.Domain.Entities
 
         private readonly List<SeatMap> _seatMaps = new List<SeatMap>();
         public IReadOnlyCollection<SeatMap> SeatMaps => _seatMaps.AsReadOnly();
+
+        public static string NormalizeVenueCode(string name, int maxLen = 40)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return string.Empty;
+
+            var normalized = name.Normalize(NormalizationForm.FormD);
+            var sb = new StringBuilder();
+            foreach (var ch in normalized)
+            {
+                var cat = CharUnicodeInfo.GetUnicodeCategory(ch);
+                if (cat != UnicodeCategory.NonSpacingMark)
+                    sb.Append(ch);
+            }
+            var withoutDiacritics = sb.ToString().Normalize(NormalizationForm.FormC);
+
+            var replaced = Regex.Replace(withoutDiacritics, @"[^A-Za-z0-9]+", "-");
+
+            var trimmed = replaced.Trim('-').ToUpperInvariant();
+            trimmed = Regex.Replace(trimmed, @"[^A-Z0-9\-]", string.Empty);
+
+            if (trimmed.Length > maxLen) trimmed = trimmed.Substring(0, maxLen).Trim('-');
+
+            return trimmed;
+        }
     }
 }

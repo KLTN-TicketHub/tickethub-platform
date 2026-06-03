@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Domain.DDD;
+using Catalog.Domain.Enums;
 
 namespace Catalog.Domain.Entities
 {
@@ -8,7 +9,9 @@ namespace Catalog.Domain.Entities
         public Guid VenueId { get; set; }
 
         public SeatMap? SeatMap { get; set; }
-        public Guid SeatMapId { get; set; }
+        public Guid? SeatMapId { get; set; }
+
+        public Guid OrganizerId { get; set; }
 
         public string Title { get; set; }
 
@@ -30,7 +33,19 @@ namespace Catalog.Domain.Entities
         public string CoverImageUrl { get; set; }
 
         //Trạng thái (VD: 'Published', 'PendingApproval')
-        public string Status { get; set; }
+        public EventStatus Status { get; set; }
+
+        public string? CustomVenueName { get; set; }
+
+        public string? CustomAddressLine { get; set; }
+
+        public string? CustomWard { get; set; }
+
+        public string? CustomDistrict { get; set; }
+
+        public string? CustomProvinceCity { get; set; }
+
+        public string? CustomCountry { get; set; }
 
         public byte[] RowVersion { get; set; } = default!;
 

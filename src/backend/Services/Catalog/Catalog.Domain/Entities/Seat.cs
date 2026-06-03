@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Domain.DDD;
+using Catalog.Domain.Enums;
 
 namespace Catalog.Domain.Entities
 {
@@ -21,7 +22,7 @@ namespace Catalog.Domain.Entities
 
         public decimal Radius { get; set; }
 
-        public string LayoutStatus { get; set; }
+        public SeatLayoutStatus LayoutStatus { get; set; }
 
         public byte[] RowVersion { get; set; } = default!;
     }

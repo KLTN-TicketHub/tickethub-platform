@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Domain.DDD;
+using Catalog.Domain.Enums;
 
 namespace Catalog.Domain.Entities
 {
@@ -8,7 +9,7 @@ namespace Catalog.Domain.Entities
         public Guid EventId { get; set; }
 
         //Trạng thái duyệt
-        public string ApprovalStatus { get; set; }
+        public EventApprovalStatus ApprovalStatus { get; set; }
 
         public string? Reason { get; set; }
 

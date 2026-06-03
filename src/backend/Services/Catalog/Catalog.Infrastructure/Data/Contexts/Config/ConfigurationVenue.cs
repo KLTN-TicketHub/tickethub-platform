@@ -20,6 +20,9 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .IsRequired()
                 .HasMaxLength(50);
 
+            builder.HasIndex(v => v.VenueName)
+                .IsUnique();
+
             builder.Property(v => v.AddressLine)
                 .IsRequired()
                 .HasMaxLength(200);
