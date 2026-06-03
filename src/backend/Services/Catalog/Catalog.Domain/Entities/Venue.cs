@@ -39,5 +39,9 @@ namespace Catalog.Domain.Entities
         public string? WebsiteUrl { get; set; }
 
         public byte[] RowVersion { get; set; } = default!;
+
+
+        private readonly List<SeatMap> _seatMaps = new List<SeatMap>();
+        public IReadOnlyCollection<SeatMap> SeatMaps => _seatMaps.AsReadOnly();
     }
 }

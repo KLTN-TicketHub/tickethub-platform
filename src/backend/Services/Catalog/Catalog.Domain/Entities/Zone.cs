@@ -34,5 +34,8 @@ namespace Catalog.Domain.Entities
         public string Status { get; set; }
 
         public byte[] RowVersion { get; set; } = default!;
+
+        private readonly List<Seat> _seats = new List<Seat>();
+        public IReadOnlyCollection<Seat> Seats => _seats.AsReadOnly();
     }
 }

@@ -1,7 +1,4 @@
 ﻿using BuildingBlocks.Domain.DDD;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Catalog.Domain.Entities
 {
@@ -26,5 +23,8 @@ namespace Catalog.Domain.Entities
         public decimal Height { get; set; }
 
         public byte[] RowVersion { get; set; } = default!;
+
+        private readonly List<Zone> _zones = new List<Zone>();
+        public IReadOnlyCollection<Zone> Zones => _zones.AsReadOnly();
     }
 }

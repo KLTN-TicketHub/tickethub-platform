@@ -15,5 +15,8 @@ namespace Catalog.Domain.Entities
         public string Status { get; set; }
 
         public byte[] RowVersion { get; set; } = default!;
+
+        private readonly List<Event> _events = new List<Event>();
+        public IReadOnlyCollection<Event> Events => _events.AsReadOnly();
     }
 }

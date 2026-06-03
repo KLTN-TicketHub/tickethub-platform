@@ -24,6 +24,7 @@ namespace Catalog.Domain.Entities
 
         public DateTime SaleCloseAt { get; set; }
 
+        //Đơn vị tiền tệ (VD: 'USD', 'VND')
         public string CurrencyCode { get; set; }
 
         public string CoverImageUrl { get; set; }
@@ -32,5 +33,8 @@ namespace Catalog.Domain.Entities
         public string Status { get; set; }
 
         public byte[] RowVersion { get; set; } = default!;
+
+        private readonly List<EventCategory> _categories = new List<EventCategory>();
+        public IReadOnlyCollection<EventCategory> Categories => _categories.AsReadOnly();
     }
 }

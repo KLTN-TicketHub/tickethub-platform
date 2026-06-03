@@ -45,7 +45,24 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .HasMaxLength(100);
 
             builder.Property(v => v.Longitude)
-                .
+                .IsRequired()
+                .HasPrecision(18, 8);
+
+            builder.Property(v => v.Latitude)
+                .IsRequired()
+                .HasPrecision(18, 8);
+
+            builder.Property(v => v.TotalCapacity)
+                .IsRequired();
+
+            builder.Property(v => v.PhoneNumber)
+                .HasMaxLength(15);
+
+            builder.Property(v => v.WebsiteUrl)
+                .HasMaxLength(100);
+
+            builder.Property(v => v.RowVersion)
+                .IsRowVersion();
         }
     }
 }
