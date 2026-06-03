@@ -2,7 +2,7 @@
 using BuildingBlocks.Contracts.Models.Responses;
 using Identity.Application.Features.Auth.Commands.LoginAdmin.Confirm;
 using Identity.Application.Features.Auth.Commands.LoginAdmin.Initiate;
-using Identity.Application.Features.Auth.Request;
+using Identity.Application.Features.Auth.Requests;
 using Identity.Common.Options;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

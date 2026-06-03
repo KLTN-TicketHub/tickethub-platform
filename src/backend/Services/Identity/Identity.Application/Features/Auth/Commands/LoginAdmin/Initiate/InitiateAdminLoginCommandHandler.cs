@@ -1,7 +1,7 @@
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Events.Email;
 using BuildingBlocks.Domain.Exceptions;
-using Identity.Application.Features.Auth.Request;
+using Identity.Application.Features.Auth.Requests;
 using Identity.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;

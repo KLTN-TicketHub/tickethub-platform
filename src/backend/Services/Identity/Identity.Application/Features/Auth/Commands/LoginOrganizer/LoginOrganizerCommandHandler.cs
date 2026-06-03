@@ -2,7 +2,7 @@ using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Domain.Exceptions;
 using Identity.Application.Common.DTOs.Auth;
 using Identity.Application.Common.Interfaces.IExternalServices.ITokenServices;
-using Identity.Application.Features.Auth.Request;
+using Identity.Application.Features.Auth.Requests;
 using Identity.Common.Options;
 using Identity.Domain.Entities;
 using Identity.Domain.Interfaces;

@@ -1,4 +1,4 @@
-﻿namespace Identity.Application.Features.Auth.Request
+﻿namespace Identity.Application.Features.Auth.Requests
 {
     public class LoginRequest
     {

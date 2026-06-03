@@ -1,4 +1,4 @@
-using Identity.Application.Features.Auth.Request;
+using Identity.Application.Features.Auth.Requests;
 using MediatR;
 
 namespace Identity.Application.Features.Auth.Commands.LoginAdmin.Initiate

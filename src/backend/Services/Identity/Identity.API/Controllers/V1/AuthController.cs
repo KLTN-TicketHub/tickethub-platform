@@ -1,11 +1,12 @@
 ﻿using BuildingBlocks.API.Extensions;
+using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Responses;
 using Identity.Application.Common.DTOs.Auth;
 using Identity.Application.Features.Auth.Commands.LoginGoogle;
 using Identity.Application.Features.Auth.Commands.Logout;
 using Identity.Application.Features.Auth.Commands.Refresh;
 using Identity.Application.Features.Auth.Queries.GetProfile;
-using Identity.Application.Features.Auth.Request;
+using Identity.Application.Features.Auth.Requests;
 using Identity.Common.Options;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -43,6 +44,8 @@ namespace Identity.API.Controllers.V1
         }
 
         [HttpGet("profile")]
+        [EnableRateLimiting(RateLimitPolicies.PerUser)]
+        [Authorize(Roles = Roles.Customer)]
         public async Task<IActionResult> GetProfileAsync(CancellationToken cancellationToken = default)
         {
             ProfileDto profile = await _sender.Send(new GetProfileQuery(), cancellationToken);

@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Identity.Application.Features.Auth.Request;
+using Identity.Application.Features.Auth.Requests;
 
 namespace Identity.Application.Features.Auth.Validators
 {
