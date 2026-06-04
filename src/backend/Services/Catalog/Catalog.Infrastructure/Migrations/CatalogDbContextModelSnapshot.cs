@@ -90,30 +90,6 @@ namespace Catalog.Infrastructure.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<string>("CustomAddressLine")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("CustomCountry")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("CustomDistrict")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("CustomProvinceCity")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("CustomVenueName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("CustomWard")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<DateTime?>("DeleteAt")
                         .HasColumnType("datetime2");
 
@@ -172,7 +148,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("VenueId")
+                    b.Property<Guid?>("VenueId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -299,6 +275,74 @@ namespace Catalog.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EventCategory", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.EventLocation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AddressLine")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeleteAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("District")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ProvinceCity")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("VenueName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Ward")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId")
+                        .IsUnique();
+
+                    b.ToTable("EventLocation", (string)null);
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.Seat", b =>
@@ -795,8 +839,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.HasOne("Catalog.Domain.Entities.Venue", "Venue")
                         .WithMany()
                         .HasForeignKey("VenueId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("SeatMap");
 
@@ -808,6 +851,17 @@ namespace Catalog.Infrastructure.Migrations
                     b.HasOne("Catalog.Domain.Entities.Event", "Event")
                         .WithMany()
                         .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.EventLocation", b =>
+                {
+                    b.HasOne("Catalog.Domain.Entities.Event", "Event")
+                        .WithOne("Location")
+                        .HasForeignKey("Catalog.Domain.Entities.EventLocation", "EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -887,6 +941,11 @@ namespace Catalog.Infrastructure.Migrations
                         .HasForeignKey("EventsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Event", b =>
+                {
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.SeatMap", b =>

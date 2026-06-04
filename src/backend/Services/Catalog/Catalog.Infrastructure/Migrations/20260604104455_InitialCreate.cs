@@ -151,7 +151,7 @@ namespace Catalog.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    VenueId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    VenueId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     SeatMapId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     OrganizerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
@@ -164,12 +164,6 @@ namespace Catalog.Infrastructure.Migrations
                     CurrencyCode = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     CoverImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CustomVenueName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    CustomAddressLine = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    CustomWard = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    CustomDistrict = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    CustomProvinceCity = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    CustomCountry = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -290,6 +284,37 @@ namespace Catalog.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EventLocation",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    VenueName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    AddressLine = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Ward = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    District = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ProvinceCity = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Country = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    EventId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventLocation", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EventLocation_Event_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Event",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Seat",
                 columns: table => new
                 {
@@ -386,6 +411,12 @@ namespace Catalog.Infrastructure.Migrations
                 column: "EventsId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EventLocation_EventId",
+                table: "EventLocation",
+                column: "EventId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Seat_ZoneId",
                 table: "Seat",
                 column: "ZoneId");
@@ -433,6 +464,9 @@ namespace Catalog.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "EventEventCategory");
+
+            migrationBuilder.DropTable(
+                name: "EventLocation");
 
             migrationBuilder.DropTable(
                 name: "Seat");

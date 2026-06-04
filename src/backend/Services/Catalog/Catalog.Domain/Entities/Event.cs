@@ -6,7 +6,7 @@ namespace Catalog.Domain.Entities
     public class Event : SoftDeleteEntity, IAggregateRoot
     {
         public Venue? Venue { get; set; }
-        public Guid VenueId { get; set; }
+        public Guid? VenueId { get; set; }
 
         public SeatMap? SeatMap { get; set; }
         public Guid? SeatMapId { get; set; }
@@ -35,21 +35,16 @@ namespace Catalog.Domain.Entities
         //Trạng thái (VD: 'Published', 'PendingApproval')
         public EventStatus Status { get; set; }
 
-        public string? CustomVenueName { get; set; }
-
-        public string? CustomAddressLine { get; set; }
-
-        public string? CustomWard { get; set; }
-
-        public string? CustomDistrict { get; set; }
-
-        public string? CustomProvinceCity { get; set; }
-
-        public string? CustomCountry { get; set; }
-
         public byte[] RowVersion { get; set; } = default!;
+
+        public EventLocation? Location { get; set; }
 
         private readonly List<EventCategory> _categories = new List<EventCategory>();
         public IReadOnlyCollection<EventCategory> Categories => _categories.AsReadOnly();
+
+        public void SetEventLocation(string venueName, string addressLine, string ward, string district, string provinceCity, string country)
+        {
+            Location = new EventLocation(venueName, addressLine, ward, district, provinceCity, country);
+        }
     }
 }

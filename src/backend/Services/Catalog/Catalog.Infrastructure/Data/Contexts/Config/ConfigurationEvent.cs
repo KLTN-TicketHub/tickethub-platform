@@ -59,29 +59,16 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .IsRequired()
                 .HasConversion<string>();
 
-            builder.Property(e => e.CustomVenueName)
-                .HasMaxLength(200);
-
-            builder.Property(e => e.CustomAddressLine)
-                .HasMaxLength(200);
-
-            builder.Property(e => e.CustomWard)
-                .HasMaxLength(100);
-            
-            builder.Property(e => e.CustomDistrict)
-                .HasMaxLength(100);
-
-            builder.Property(e => e.CustomProvinceCity)
-                .HasMaxLength(100);
-
-            builder.Property(e => e.CustomCountry)
-                .HasMaxLength(100);
-
             builder.Property(e => e.RowVersion)
                 .IsRowVersion();
 
             builder.HasMany(e => e.Categories)
                 .WithMany(ec => ec.Events);
+
+            builder.HasOne(e => e.Location)
+                .WithOne(e => e.Event)
+                .HasForeignKey<EventLocation>(el => el.EventId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
