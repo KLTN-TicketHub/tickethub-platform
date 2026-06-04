@@ -13,10 +13,15 @@
 		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Common\DTOs\Venues\" />
-	  <Folder Include="Features\Venues\Commands\CreateVenue\" />
 	  <Folder Include="Features\Venues\Validators\" />
 	  <Folder Include="Features\Venues\Queries\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+	  <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Contracts\BuildingBlocks.Contracts.csproj" />
+	  <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+	  <ProjectReference Include="..\Catalog.Common\Catalog.Common.csproj" />
+	  <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -6,5 +6,13 @@ namespace Catalog.Domain.Interfaces
     public interface IUnitOfWork : IBaseUnitOfWork
     {
         IVenueRepository VenueRepository { get; }
+        IEventRepository EventRepository { get; }
+        IEventCategoryRepository EventCategoryRepository { get; }
+        IEventApprovalRepository EventApprovalRepository { get; }
+        ISeatRepository SeatRepository { get; }
+        ISeatMapRepository SeatMapRepository { get; }
+        ITicketTypeRepository TicketTypeRepository { get; }
+        IZoneRepository ZoneRepository { get; }
+        IZonePricingRepository ZonePricingRepository { get; }
     }
 }

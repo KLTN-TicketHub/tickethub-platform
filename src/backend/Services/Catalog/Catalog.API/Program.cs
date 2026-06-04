@@ -42,6 +42,7 @@ builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(CatalogProfile).Assembl
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(CatalogProfile).Assembly);
 builder.Services.AddCustomFluentValidation();
 builder.Services.AddHttpContextAccessor();
 

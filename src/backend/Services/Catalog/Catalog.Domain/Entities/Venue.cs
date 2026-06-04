@@ -34,9 +34,6 @@ namespace Catalog.Domain.Entities
         //Vĩ độ
         public decimal Latitude { get; set; }
 
-        //Tổng sức chứa
-        public int TotalCapacity { get; set; }
-
         public string PhoneNumber { get; set; }
 
         public string? WebsiteUrl { get; set; }
@@ -47,28 +44,66 @@ namespace Catalog.Domain.Entities
         private readonly List<SeatMap> _seatMaps = new List<SeatMap>();
         public IReadOnlyCollection<SeatMap> SeatMaps => _seatMaps.AsReadOnly();
 
+        public Venue(
+            string venueName,
+            string addressLine,
+            string ward,
+            string district,
+            string provinceCity,
+            string country,
+            decimal longitude,
+            decimal latitude,
+            string phoneNumber,
+            string? websiteUrl = null)
+        {
+            VenueName = venueName;
+            AddressLine = addressLine;
+            Ward = ward;
+            District = district;
+            ProvinceCity = provinceCity;
+            Country = country;
+            Longitude = longitude;
+            Latitude = latitude;
+            PhoneNumber = phoneNumber;
+            WebsiteUrl = websiteUrl;
+        }
+
         public static string NormalizeVenueCode(string name, int maxLen = 40)
         {
             if (string.IsNullOrWhiteSpace(name)) return string.Empty;
 
-            var normalized = name.Normalize(NormalizationForm.FormD);
-            var sb = new StringBuilder();
+            string normalized = name.Normalize(NormalizationForm.FormD);
+            StringBuilder sb = new StringBuilder();
             foreach (var ch in normalized)
             {
-                var cat = CharUnicodeInfo.GetUnicodeCategory(ch);
+                UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory(ch);
                 if (cat != UnicodeCategory.NonSpacingMark)
                     sb.Append(ch);
             }
-            var withoutDiacritics = sb.ToString().Normalize(NormalizationForm.FormC);
+            string withoutDiacritics = sb.ToString().Normalize(NormalizationForm.FormC);
 
-            var replaced = Regex.Replace(withoutDiacritics, @"[^A-Za-z0-9]+", "-");
+            string replaced = Regex.Replace(withoutDiacritics, @"[^A-Za-z0-9]+", "-");
 
-            var trimmed = replaced.Trim('-').ToUpperInvariant();
+            string trimmed = replaced.Trim('-').ToUpperInvariant();
             trimmed = Regex.Replace(trimmed, @"[^A-Z0-9\-]", string.Empty);
 
             if (trimmed.Length > maxLen) trimmed = trimmed.Substring(0, maxLen).Trim('-');
 
             return trimmed;
+        }
+
+        public static string GenerateSlugFromVenueCode(string venueCode)
+        {
+            if (string.IsNullOrWhiteSpace(venueCode))
+                return string.Empty;
+
+            return venueCode.Trim().ToLowerInvariant();
+        }
+
+        public void SetVenueCode(string venueCode)
+        {
+            VenueCode = venueCode;
+            Slug = GenerateSlugFromVenueCode(venueCode);
         }
     }
 }

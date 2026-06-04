@@ -97,7 +97,6 @@ namespace Catalog.Infrastructure.Migrations
                     Slug = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Longitude = table.Column<decimal>(type: "decimal(18,8)", precision: 18, scale: 8, nullable: false),
                     Latitude = table.Column<decimal>(type: "decimal(18,8)", precision: 18, scale: 8, nullable: false),
-                    TotalCapacity = table.Column<int>(type: "int", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     WebsiteUrl = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
@@ -395,6 +394,12 @@ namespace Catalog.Infrastructure.Migrations
                 name: "IX_SeatMap_VenueId",
                 table: "SeatMap",
                 column: "VenueId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Venue_VenueCode",
+                table: "Venue",
+                column: "VenueCode",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Zone_SeatMapId",

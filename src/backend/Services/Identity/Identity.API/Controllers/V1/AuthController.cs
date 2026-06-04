@@ -1,5 +1,4 @@
 ﻿using BuildingBlocks.API.Extensions;
-using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Responses;
 using Identity.Application.Common.DTOs.Auth;
 using Identity.Application.Features.Auth.Commands.LoginGoogle;
@@ -44,8 +43,6 @@ namespace Identity.API.Controllers.V1
         }
 
         [HttpGet("profile")]
-        [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [Authorize(Roles = Roles.Customer)]
         public async Task<IActionResult> GetProfileAsync(CancellationToken cancellationToken = default)
         {
             ProfileDto profile = await _sender.Send(new GetProfileQuery(), cancellationToken);

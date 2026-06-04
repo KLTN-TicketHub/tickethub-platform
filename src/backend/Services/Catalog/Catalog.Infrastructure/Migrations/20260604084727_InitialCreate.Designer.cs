@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Catalog.Infrastructure.Migrations
 {
     [DbContext(typeof(CatalogDbContext))]
-    [Migration("20260603101325_InitialCreate")]
+    [Migration("20260604084727_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -584,9 +584,6 @@ namespace Catalog.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("TotalCapacity")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdateAt")
                         .HasColumnType("datetime2");
 
@@ -613,6 +610,9 @@ namespace Catalog.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("VenueCode")
+                        .IsUnique();
 
                     b.ToTable("Venue", (string)null);
                 });

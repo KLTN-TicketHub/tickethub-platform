@@ -1,13 +1,14 @@
 using BuildingBlocks.Infrastructure.Data;
 using Catalog.Domain.Entities;
 using Catalog.Domain.Interfaces.IRepositories;
+using Catalog.Infrastructure.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Infrastructure.Data.Repositories
 {
-    public class EventCategoryRepository : BaseRepository<EventCategory, DbContext>, IEventCategoryRepository
+    public class EventCategoryRepository : BaseRepository<EventCategory, CatalogDbContext>, IEventCategoryRepository
     {
-        public EventCategoryRepository(DbContext dbContext) : base(dbContext)
+        public EventCategoryRepository(CatalogDbContext dbContext) : base(dbContext)
         {
         }
     }

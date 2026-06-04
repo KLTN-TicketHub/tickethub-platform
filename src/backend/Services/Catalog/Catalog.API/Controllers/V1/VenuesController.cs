@@ -1,5 +1,10 @@
 ﻿using BuildingBlocks.API.Extensions;
 using BuildingBlocks.Contracts.Constants;
+using BuildingBlocks.Contracts.Models.Responses;
+using Catalog.Application.Common.DTOs.Venues;
+using Catalog.Application.Features.Venues.Commands.CreateVenue;
+using Catalog.Application.Features.Venues.Requests;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +19,25 @@ namespace Catalog.API.Controllers.V1
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class VenuesController : ControllerBase
     {
-        [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [Authorize(Roles = Roles.Admin)]
-        [HttpPost]
-        public IActionResult CreateVenueAsync()
+        private readonly ISender _sender;
+
+        public VenuesController(ISender sender)
         {
-            throw new NotImplementedException();
+            _sender = sender;
+        }
+        [EnableRateLimiting(RateLimitPolicies.PerUser)]
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> CreateVenueAsync([FromBody] CreateVenueRequest request, CancellationToken cancellationToken = default)
+        {
+            var result = await _sender.Send(new CreateVenueCommand(request), cancellationToken);
+
+            return Ok(new ApiResponse<VenueDto>
+            {
+                Success = true,
+                Message = "Tạo địa điểm thành công",
+                Data = result
+            });
         }
     }
 }

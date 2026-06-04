@@ -22,10 +22,10 @@ namespace Identity.Application.Features.Auth.Commands.LoginModerator
 
         public LoginModeratorCommandHandler(
             ICurrentUserService currentUserService,
-             UserManager<User> userManager,
-             IUnitOfWork unitOfWork,
-             IJwtTokenService jwtTokenService,
-             IOptions<AppSettings> appSettings)
+            UserManager<User> userManager,
+            IUnitOfWork unitOfWork,
+            IJwtTokenService jwtTokenService,
+            IOptions<AppSettings> appSettings)
         {
             _currentUserService = currentUserService;
             _userManager = userManager;

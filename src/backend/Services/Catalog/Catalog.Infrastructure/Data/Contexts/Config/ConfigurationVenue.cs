@@ -20,7 +20,7 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .IsRequired()
                 .HasMaxLength(50);
 
-            builder.HasIndex(v => v.VenueName)
+            builder.HasIndex(v => v.VenueCode)
                 .IsUnique();
 
             builder.Property(v => v.AddressLine)
@@ -54,9 +54,6 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
             builder.Property(v => v.Latitude)
                 .IsRequired()
                 .HasPrecision(18, 8);
-
-            builder.Property(v => v.TotalCapacity)
-                .IsRequired();
 
             builder.Property(v => v.PhoneNumber)
                 .HasMaxLength(15);

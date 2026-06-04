@@ -6,5 +6,6 @@ namespace Catalog.Domain.Interfaces.IRepositories
 {
     public interface IVenueRepository : IBaseRepository<Venue, DbContext>
     {
+        Task<string> GenerateNextVenueCodeAsync(string venueName, CancellationToken cancellation = default);
     }
 }
