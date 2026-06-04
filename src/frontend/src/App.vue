@@ -1,63 +1,90 @@
 <template>
-  <AppHeader v-if="!isAdminRoute" />
+  <!-- Public shell: Header + content + Footer -->
+  <template v-if="!isPortalRoute">
+    <AppHeader @open-auth="showAuthModal = true" />
 
-  <main :class="{ 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20': !isAdminRoute }">
-    <RouterView />
-  </main>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 pt-6 min-h-[calc(100vh-140px)]">
+      <router-view v-slot="{ Component, route: viewRoute }">
+        <Transition name="page" mode="out-in">
+          <component :is="Component" :key="viewRoute.path" />
+        </Transition>
+      </router-view>
+    </main>
 
-  <AppFooter v-if="!isAdminRoute" />
+    <AppFooter />
+  </template>
 
-  <BookingModal v-if="!isAdminRoute && store.showBooking && store.bookingEvent" :event="store.bookingEvent" @close="closeBooking" @success="handleBookingSuccess" />
-  <AuthModal v-if="!isAdminRoute && store.showAuth" @close="closeAuth" />
-  <ToastNotification v-if="!isAdminRoute && store.toast" :message="store.toast.message" :icon="store.toast.icon" @close="clearToast" />
+  <!-- Portal shell: Full-screen layout with its own chrome -->
+  <template v-else>
+    <router-view v-slot="{ Component, route: viewRoute }">
+      <Transition name="page" mode="out-in">
+        <component :is="Component" :key="viewRoute.path" />
+      </Transition>
+    </router-view>
+  </template>
+
+  <!-- Auth Modal (global, available on any public page) -->
+  <AuthModal
+    :visible="showAuthModal"
+    @close="showAuthModal = false"
+    @success="handleAuthSuccess"
+  />
+  <!-- Global Toast Notifications -->
+  <AppToast />
 </template>
 
 <script setup>
-import { computed, onMounted, onBeforeUnmount } from 'vue'
+/**
+ * App.vue — Root Orchestrator
+ *
+ * Uses route.meta.portal to switch between the public shell
+ * (AppHeader + content + AppFooter) and the portal shell
+ * (OrganizerLayout / AdminLayout handle their own chrome).
+ *
+ * Hosts the global AuthModal and initialises auth state on mount.
+ */
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { store, closeBooking, addTicket, clearToast, closeAuth } from './stores/eventStore'
-import { tryRefresh } from './services/auth/auth.service'
-import AppHeader from './components/layout/AppHeader.vue'
-import AppFooter from './components/layout/AppFooter.vue'
-import BookingModal from './components/BookingModal.vue'
-import AuthModal from './components/AuthModal.vue'
-import ToastNotification from './components/ToastNotification.vue'
+import { useAuthStore } from '@/features/auth/store'
+import AppHeader from '@/shared/layouts/AppHeader.vue'
+import AppFooter from '@/shared/layouts/AppFooter.vue'
+import AuthModal from '@/features/auth/components/AuthModal.vue'
+import AppToast from '@/shared/components/AppToast.vue'
 
 const route = useRoute()
+const authStore = useAuthStore()
 
-const isAdminRoute = computed(() => route.path.startsWith('/admin'))
+/** True when the user is inside /admin or /organizer portals */
+const isPortalRoute = computed(() => !!route.meta?.portal)
 
-const handleBookingSuccess = (bookedTicket) => {
-  addTicket(bookedTicket)
-}
+/** Auth modal visibility */
+const showAuthModal = ref(false)
 
-const handleAuthMessage = async (event) => {
-  if (event.origin !== window.location.origin) return
-
-  if (event.data?.type === 'ticket-hub:auth-success') {
-    try {
-      await tryRefresh()
-      store.toast = { message: 'Đăng nhập thành công!', icon: '👋' }
-    } catch (err) {
-      store.toast = { message: 'Đăng nhập không hoàn tất. Vui lòng thử lại.', icon: '⚠️' }
-    } finally {
-      closeAuth()
-    }
-  }
-
-  if (event.data?.type === 'ticket-hub:auth-error') {
-    const err = event.data?.error
-    const msg = (err && (err.message || err.error || JSON.stringify(err))) || 'Đăng nhập Google thất bại.'
-    store.toast = { message: msg, icon: '⚠️' }
-    closeAuth()
-  }
-}
-
+/** Rehydrate auth state from localStorage on app startup */
 onMounted(() => {
-  window.addEventListener('message', handleAuthMessage)
+  authStore.initAuth()
 })
 
-onBeforeUnmount(() => {
-  window.removeEventListener('message', handleAuthMessage)
-})
+function handleAuthSuccess() {
+  console.info(`[TicketHub] Logged in as ${authStore.userDisplayName} (${authStore.userRole})`)
+}
 </script>
+
+<style scoped>
+/* ── Page Transition ───────────────────────────────────────────────────────── */
+.page-enter-active {
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.page-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+</style>

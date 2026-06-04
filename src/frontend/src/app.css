@@ -1,0 +1,347 @@
+/* ============================================================================
+ * TicketHub — Global Design System Stylesheet
+ * Tailwind CSS v4 (CSS-first configuration)
+ * Theme: Premium Dark Mode + Glassmorphism
+ * ========================================================================== */
+
+/* ── Fonts ─────────────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── Tailwind Core ─────────────────────────────────────────────────────────── */
+@import "tailwindcss";
+
+/* ── Theme Tokens ──────────────────────────────────────────────────────────── */
+@theme {
+  /* Primary palette */
+  --color-primary: #00C853;
+  --color-primary-dark: #00A040;
+  --color-primary-light: #33D470;
+  --color-primary-dim: rgba(0, 200, 83, 0.12);
+  --color-primary-ghost: rgba(0, 200, 83, 0.06);
+
+  /* Surface system (darkest → lightest) */
+  --color-bg: #0A0F0D;
+  --color-bg-elevated: #0E1410;
+  --color-surface: #111916;
+  --color-card: #141B16;
+  --color-card-hover: #1A231D;
+  --color-card-2: #182019;
+
+  /* Borders */
+  --color-border-main: #1C2B20;
+  --color-border-light: rgba(255, 255, 255, 0.08);
+  --color-border-focus: rgba(0, 200, 83, 0.4);
+
+  /* Typography */
+  --color-main: #E2F0E6;
+  --color-muted: #6A8A72;
+  --color-dimmed: #4A6B52;
+
+  /* Accent palette */
+  --color-accent: #B9FF6A;
+  --color-danger: #FF4757;
+  --color-danger-dim: rgba(255, 71, 87, 0.12);
+  --color-gold: #FFD700;
+  --color-warning: #FAAD14;
+  --color-warning-dim: rgba(250, 173, 20, 0.12);
+  --color-info: #3B82F6;
+  --color-info-dim: rgba(59, 130, 246, 0.12);
+
+  /* Font stacks */
+  --font-heading: "Clash Display", sans-serif;
+  --font-sans: "DM Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Elevation shadows */
+  --shadow-glow: 0 0 20px rgba(0, 200, 83, 0.15);
+  --shadow-glow-strong: 0 0 30px rgba(0, 200, 83, 0.3);
+  --shadow-glow-accent: 0 0 40px rgba(185, 255, 106, 0.1);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.6);
+
+  /* Transition presets (accessible as --ease-*) */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Radii */
+  --radius-panel: 16px;
+  --radius-card: 12px;
+  --radius-button: 10px;
+  --radius-input: 10px;
+  --radius-badge: 6px;
+
+  /* Animation durations */
+  --animate-fade-up: fade-up 0.6s var(--ease-out-expo) forwards;
+  --animate-fade-in: fade-in 0.5s ease-out forwards;
+  --animate-fade-down: fade-down 0.6s var(--ease-out-expo) forwards;
+  --animate-scale-in: scale-in 0.3s var(--ease-spring) forwards;
+  --animate-slide-left: slide-left 0.4s var(--ease-out-expo) forwards;
+  --animate-slide-right: slide-right 0.4s var(--ease-out-expo) forwards;
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
+  --animate-spin-slow: spin 1.2s linear infinite;
+  --animate-shimmer: shimmer 2s linear infinite;
+}
+
+/* ── Base Reset & Defaults ─────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Premium Scrollbar ─────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-main);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-main) transparent;
+}
+
+/* ── Utility Layer ─────────────────────────────────────────────────────────── */
+@utility glass-panel {
+  background: rgba(20, 27, 22, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+@utility glass-panel-hover {
+  background: rgba(20, 27, 22, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+
+  &:hover {
+    border-color: rgba(0, 200, 83, 0.2);
+    box-shadow: var(--shadow-card), var(--shadow-glow);
+    background: rgba(20, 27, 22, 0.8);
+  }
+}
+
+@utility glass-input {
+  background: rgba(14, 20, 16, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-main);
+  border-radius: var(--radius-input);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+
+  &:focus {
+    border-color: var(--color-border-focus);
+    box-shadow: 0 0 0 3px var(--color-primary-dim), 0 0 16px var(--color-primary-ghost);
+    outline: none;
+  }
+}
+
+@utility glass-modal {
+  background: rgba(17, 25, 22, 0.85);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-modal), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility text-gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@utility glow-border {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(0, 200, 83, 0.3), transparent 60%);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::after {
+    opacity: 1;
+  }
+}
+
+@utility shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+@utility ticket-notch {
+  position: relative;
+  
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background-color: var(--color-bg);
+    border-radius: 50%;
+    z-index: 10;
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.06);
+  }
+
+  &::before {
+    left: -13px;
+  }
+
+  &::after {
+    right: -13px;
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.06);
+  }
+}
+
+@utility qr-pattern {
+  background-color: transparent;
+  background-image: 
+    linear-gradient(45deg, var(--color-main) 25%, transparent 25%, transparent 75%, var(--color-main) 75%, var(--color-main)),
+    linear-gradient(45deg, var(--color-main) 25%, transparent 25%, transparent 75%, var(--color-main) 75%, var(--color-main));
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
+  opacity: 0.8;
+  mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+}
+
+/* ── Stagger Delays (for lists animated with animate-fade-up) ──────────────── */
+@utility stagger-1 { animation-delay: 0.05s; }
+@utility stagger-2 { animation-delay: 0.1s; }
+@utility stagger-3 { animation-delay: 0.15s; }
+@utility stagger-4 { animation-delay: 0.2s; }
+@utility stagger-5 { animation-delay: 0.25s; }
+@utility stagger-6 { animation-delay: 0.3s; }
+@utility stagger-7 { animation-delay: 0.35s; }
+@utility stagger-8 { animation-delay: 0.4s; }
+
+/* ── Keyframes ─────────────────────────────────────────────────────────────── */
+@keyframes fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes scale-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-left {
+  0% {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-right {
+  0% {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(0, 200, 83, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(0, 200, 83, 0.35);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

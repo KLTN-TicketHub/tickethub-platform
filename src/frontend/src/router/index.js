@@ -1,55 +1,99 @@
+/**
+ * TicketHub — Application Router
+ *
+ * Three distinct route groups with meta-driven portal detection:
+ *   1. Public   — No portal meta, wrapped by AppHeader/AppFooter
+ *   2. Organizer — meta.portal = 'organizer', rendered inside OrganizerLayout
+ *   3. Admin     — meta.portal = 'admin', rendered inside AdminLayout
+ *
+ * Lazy-loaded feature pages keep the initial bundle slim.
+ */
 import { createRouter, createWebHistory } from 'vue-router'
-import HomePage from '../pages/HomePage.vue'
-import CategoryPage from '../pages/CategoryPage.vue'
-import EventDetailPage from '../pages/EventDetailPage.vue'
-import MyTicketsPage from '../pages/MyTicketsPage.vue'
-import ProfilePage from '../pages/ProfilePage.vue'
-import OrganizerPage from '../pages/OrganizerPage.vue'
-import CreateEventPage from '../pages/CreateEventPage.vue'
-import EarlyBirdPage from '../pages/EarlyBirdPage.vue'
-import StarsPage from '../pages/StarsPage.vue'
-import DestinationsPage from '../pages/DestinationsPage.vue'
-import AuthCallback from '../pages/AuthCallback.vue'
 
-// Admin
-import AdminLayout from '../layouts/AdminLayout.vue'
-import AdminDashboard from '../pages/admin/AdminDashboard.vue'
-import EventsAdmin from '../pages/admin/EventsAdmin.vue'
-import UsersAdmin from '../pages/admin/UsersAdmin.vue'
-import OrdersAdmin from '../pages/admin/OrdersAdmin.vue'
+/* ── Lazy-loaded layouts ───────────────────────────────────────────────────── */
+const OrganizerLayout = () => import('@/shared/layouts/OrganizerLayout.vue')
+const AdminLayout = () => import('@/shared/layouts/AdminLayout.vue')
 
+/* ── Route Definitions ─────────────────────────────────────────────────────── */
 const routes = [
-  { path: '/', name: 'home', component: HomePage },
-  { path: '/:type(concerts|arts|sports|experiences|workshops|others)', name: 'category', component: CategoryPage },
-  { path: '/event/:id', name: 'event-detail', component: EventDetailPage },
-  { path: '/my-tickets', name: 'my-tickets', component: MyTicketsPage },
-  { path: '/profile', name: 'profile', component: ProfilePage },
-  { path: '/organizer', name: 'organizer', component: OrganizerPage },
-  { path: '/create-event', name: 'create-event', component: CreateEventPage },
-  { path: '/early-bird', name: 'early-bird', component: EarlyBirdPage },
-  { path: '/stars', name: 'stars', component: StarsPage },
-  { path: '/destinations', name: 'destinations', component: DestinationsPage },
-  { path: '/auth/callback', name: 'auth-callback', component: AuthCallback },
-  
-  // Admin Routes
+  /* ╔══════════════════════════════════════════════╗
+     ║  PUBLIC ROUTES                               ║
+     ╚══════════════════════════════════════════════╝ */
+  {
+    path: '/',
+    name: 'home',
+    component: () => import('@/features/events/pages/HomePage.vue'),
+  },
+  {
+    path: '/my-tickets',
+    name: 'my-tickets',
+    component: () => import('@/features/customer/pages/MyTicketsPage.vue'),
+  },
+  {
+    path: '/event/:id',
+    name: 'event-detail',
+    component: () => import('@/features/events/pages/EventDetailPage.vue'),
+  },
+  {
+    path: '/event/:id/booking',
+    name: 'event-booking',
+    component: () => import('@/features/booking/pages/EventBookingPage.vue'),
+  },
+
+  /* ╔══════════════════════════════════════════════╗
+     ║  ORGANIZER PORTAL                            ║
+     ╚══════════════════════════════════════════════╝ */
+  {
+    path: '/organizer',
+    component: OrganizerLayout,
+    meta: { portal: 'organizer' },
+    children: [
+      {
+        path: '',
+        name: 'organizer-dashboard',
+        component: () => import('@/features/organizer/pages/OrganizerDashboard.vue'),
+        meta: { portal: 'organizer' },
+      },
+      {
+        path: 'create',
+        name: 'organizer-create-event',
+        component: () => import('@/features/organizer/pages/CreateEventPage.vue'),
+        meta: { portal: 'organizer' },
+      },
+    ],
+  },
+
+  /* ╔══════════════════════════════════════════════╗
+     ║  ADMIN PORTAL                                ║
+     ╚══════════════════════════════════════════════╝ */
   {
     path: '/admin',
     component: AdminLayout,
+    meta: { portal: 'admin' },
     children: [
-      { path: '', redirect: '/admin/dashboard' },
-      { path: 'dashboard', name: 'admin-dashboard', component: AdminDashboard },
-      { path: 'events', name: 'admin-events', component: EventsAdmin },
-      { path: 'users', name: 'admin-users', component: UsersAdmin },
-      { path: 'orders', name: 'admin-orders', component: OrdersAdmin },
-    ]
-  }
+      {
+        path: '',
+        name: 'admin-dashboard',
+        component: () => import('@/features/admin/pages/AdminDashboard.vue'),
+        meta: { portal: 'admin' },
+      },
+    ],
+  },
+
+  /* ── Catch-All (redirect to home) ────────────────────────────────────────── */
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/',
+  },
 ]
 
+/* ── Router Instance ───────────────────────────────────────────────────────── */
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior() {
-    return { top: 0 }
+  scrollBehavior(_to, _from, savedPosition) {
+    if (savedPosition) return savedPosition
+    return { top: 0, behavior: 'smooth' }
   },
 })
 
