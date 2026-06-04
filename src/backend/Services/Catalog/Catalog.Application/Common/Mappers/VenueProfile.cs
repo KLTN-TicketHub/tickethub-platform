@@ -51,7 +51,9 @@ namespace Catalog.Application.Common.Mappers
                 .ForMember(dest => dest.WebsiteUrl,
                 opt => opt.MapFrom(src => src.WebsiteUrl))
                 .ForMember(dest => dest.CreatedAt,
-                opt => opt.MapFrom(src => src.CreatedAt));
+                opt => opt.MapFrom(src => src.CreatedAt))
+                .ForMember(dest => dest.RowVersion,
+                opt => opt.MapFrom(src => src.RowVersion));
 
             CreateMap<UpdateVenueRequest, Venue>()
                 .ForMember(dest => dest.VenueName,

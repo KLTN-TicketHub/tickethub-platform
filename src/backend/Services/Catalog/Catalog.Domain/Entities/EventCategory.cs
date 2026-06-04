@@ -19,5 +19,11 @@ namespace Catalog.Domain.Entities
 
         private readonly List<Event> _events = new List<Event>();
         public IReadOnlyCollection<Event> Events => _events.AsReadOnly();
+
+        public EventCategory(string categoryName, string? description)
+        {
+            CategoryName = categoryName;
+            Description = description;
+        }
     }
 }

@@ -43,7 +43,8 @@ namespace Catalog.Application.Features.Venues.Queries.GetVenueById
                     Latitude = v.Latitude,
                     PhoneNumber = v.PhoneNumber,
                     WebsiteUrl = v.WebsiteUrl,
-                    CreatedAt = v.CreatedAt
+                    CreatedAt = v.CreatedAt,
+                    RowVersion = v.RowVersion
                 },
                 cancellation: cancellationToken) ?? throw new NotFoundException("Không tìm thấy địa điểm");
         }

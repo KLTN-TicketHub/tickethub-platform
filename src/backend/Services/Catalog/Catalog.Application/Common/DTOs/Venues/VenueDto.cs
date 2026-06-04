@@ -16,5 +16,6 @@ namespace Catalog.Application.Common.DTOs.Venues
         public string PhoneNumber { get; set; } = default!;
         public string? WebsiteUrl { get; set; }
         public DateTime? CreatedAt { get; set; }
+        public byte[]? RowVersion { get; set; }
     }
 }
