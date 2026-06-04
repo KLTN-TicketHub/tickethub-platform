@@ -41,6 +41,18 @@ const routes = [
       { path: 'events', name: 'admin-events', component: EventsAdmin },
       { path: 'users', name: 'admin-users', component: UsersAdmin },
       { path: 'orders', name: 'admin-orders', component: OrdersAdmin },
+      
+      // Các trang tạo mới vừa được thêm vào
+      { 
+        path: 'categories/create', 
+        name: 'admin-create-category', 
+        component: () => import('@/pages/admin/CreateCategoryPage.vue') 
+      },
+      { 
+        path: 'venues/create', 
+        name: 'admin-create-venue', 
+        component: () => import('@/pages/admin/CreateVenuePage.vue') 
+      },
     ]
   }
 ]
