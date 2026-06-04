@@ -18,7 +18,9 @@ namespace Identity.Application.Common.Mappers
                 .ForMember(dest => dest.Email,
                 opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.ImageUrl,
-                opt => opt.MapFrom(src => src.ImageUrl));
+                opt => opt.MapFrom(src => src.ImageUrl))
+                .ForMember(dest => dest.CreateAt,
+                opt => opt.MapFrom(src => src.CreateAt));
         }
     }
 }

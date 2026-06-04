@@ -49,6 +49,30 @@ namespace Catalog.Application.Common.Mappers
                 .ForMember(dest => dest.PhoneNumber,
                 opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.WebsiteUrl,
+                opt => opt.MapFrom(src => src.WebsiteUrl))
+                .ForMember(dest => dest.CreatedAt,
+                opt => opt.MapFrom(src => src.CreatedAt));
+
+            CreateMap<UpdateVenueRequest, Venue>()
+                .ForMember(dest => dest.VenueName,
+                opt => opt.MapFrom(src => src.VenueName))
+                .ForMember(dest => dest.AddressLine,
+                opt => opt.MapFrom(src => src.AddressLine))
+                .ForMember(dest => dest.Ward,
+                opt => opt.MapFrom(src => src.Ward))
+                .ForMember(dest => dest.District,
+                opt => opt.MapFrom(src => src.District))
+                .ForMember(dest => dest.ProvinceCity,
+                opt => opt.MapFrom(src => src.ProvinceCity))
+                .ForMember(dest => dest.Country,
+                opt => opt.MapFrom(src => src.Country))
+                .ForMember(dest => dest.Longitude,
+                opt => opt.MapFrom(src => src.Longitude))
+                .ForMember(dest => dest.Latitude,
+                opt => opt.MapFrom(src => src.Latitude))
+                .ForMember(dest => dest.PhoneNumber,
+                opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.WebsiteUrl,
                 opt => opt.MapFrom(src => src.WebsiteUrl));
         }
     }

@@ -13,10 +13,6 @@
 		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Features\Venues\Validators\" />
-	  <Folder Include="Features\Venues\Queries\" />
-	</ItemGroup>
-	<ItemGroup>
 	  <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
 	  <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Contracts\BuildingBlocks.Contracts.csproj" />
 	  <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />

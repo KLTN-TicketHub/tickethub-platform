@@ -3,8 +3,8 @@ using BuildingBlocks.Infrastructure.Auditing;
 using BuildingBlocks.Infrastructure.Services;
 using Catalog.Domain.Interfaces;
 using Catalog.Domain.Interfaces.IRepositories;
-using Catalog.Infrastructure.Data.Repositories;
 using Catalog.Infrastructure.Data.Contexts;
+using Catalog.Infrastructure.Data.Repositories;
 
 namespace Catalog.API.Extensions
 {

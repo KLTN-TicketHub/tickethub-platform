@@ -3,7 +3,6 @@ using Catalog.Domain.Entities;
 using Catalog.Domain.Interfaces.IRepositories;
 using Catalog.Infrastructure.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Catalog.Infrastructure.Data.Repositories

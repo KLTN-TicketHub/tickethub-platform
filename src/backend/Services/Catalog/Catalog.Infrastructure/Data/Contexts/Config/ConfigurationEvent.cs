@@ -1,5 +1,4 @@
 ﻿using Catalog.Domain.Entities;
-using Catalog.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

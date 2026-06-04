@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BuildingBlocks.Contracts.Constants
+﻿namespace BuildingBlocks.Contracts.Constants
 {
     public static class Roles
     {
