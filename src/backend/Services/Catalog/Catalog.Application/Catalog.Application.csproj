@@ -19,5 +19,10 @@
 	  <ProjectReference Include="..\Catalog.Common\Catalog.Common.csproj" />
 	  <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Features\EventCategories\Commands\CreateEventCategory\" />
+	  <Folder Include="Features\EventCategories\Validators\" />
+	  <Folder Include="Features\EventCategories\Queries\" />
+	</ItemGroup>
 
 </Project>

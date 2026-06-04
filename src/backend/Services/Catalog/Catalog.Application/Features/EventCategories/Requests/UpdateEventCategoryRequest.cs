@@ -1,9 +1,8 @@
-﻿namespace Catalog.Application.Features.EventCategories.Requests
+namespace Catalog.Application.Features.EventCategories.Requests
 {
-    public class CreateEventRequest
+    public class UpdateEventCategoryRequest
     {
         public string CategoryName { get; set; } = default!;
-
         public string? Description { get; set; }
     }
 }

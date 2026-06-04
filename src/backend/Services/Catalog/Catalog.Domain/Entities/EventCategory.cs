@@ -27,6 +27,7 @@ namespace Catalog.Domain.Entities
         {
             CategoryName = categoryName;
             Description = description;
+            Status = CatalogStatus.Active;
         }
 
         public static string NormalizeCategoryCode(string name, int maxLen = 40)
