@@ -29,11 +29,11 @@
 
       <div class="flex items-center gap-3 cursor-pointer group">
         <div class="flex flex-col text-right hidden sm:flex">
-          <span class="text-[14px] font-bold text-main group-hover:text-primary transition-colors">Admin User</span>
-          <span class="text-[11px] font-bold text-muted uppercase tracking-wider">Superuser</span>
+          <span class="text-[14px] font-bold text-main group-hover:text-primary transition-colors">{{ store.user?.name || 'Admin User' }}</span>
+          <span class="text-[11px] font-bold text-muted uppercase tracking-wider">{{ store.user?.roles?.[0] || 'Superuser' }}</span>
         </div>
         <div class="w-10 h-10 rounded-xl overflow-hidden border-2 border-border-main group-hover:border-primary transition-all shadow-lg">
-          <img src="https://ui-avatars.com/api/?name=Admin+User&background=00C853&color=fff" alt="Admin" class="w-full h-full object-cover" />
+          <img :src="store.user?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(store.user?.name || 'Admin')}&background=00C853&color=fff`" alt="Admin" class="w-full h-full object-cover" />
         </div>
       </div>
     </div>
@@ -44,6 +44,7 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { toggleSidebar, adminSearch } from '../../stores/adminStore'
+import { store } from '../../stores/eventStore'
 
 const route = useRoute()
 const localSearch = ref('')

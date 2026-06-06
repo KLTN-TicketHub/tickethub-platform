@@ -6,6 +6,8 @@ export function setToken(t) {
   accessToken = t
   if (t) {
     localStorage.setItem(LOGIN_FLAG_KEY, 'true')
+  } else {
+    localStorage.removeItem(LOGIN_FLAG_KEY)
   }
 }
 

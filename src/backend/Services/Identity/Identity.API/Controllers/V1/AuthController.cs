@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.API.Extensions;
+using BuildingBlocks.API.Extensions;
 using BuildingBlocks.Contracts.Models.Responses;
 using Identity.Application.Common.DTOs.Auth;
 using Identity.Application.Features.Auth.Commands.LoginGoogle;
@@ -70,7 +70,13 @@ namespace Identity.API.Controllers.V1
 
             await _sender.Send(new LogoutCommand(Request.Cookies["refreshToken"]!), cancellationToken);
 
-            Response.Cookies.Delete("refreshToken");
+            Response.Cookies.Delete("refreshToken", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Path = "/"
+            });
 
             return Ok(new ApiResponse
             {

@@ -26,6 +26,13 @@ export function setupInterceptors(api, tokenService) {
         return Promise.reject(err)
       }
 
+      // 1. Nếu Backend trả về lỗi 403 (Forbidden - Từ chối quyền truy cập API)
+      if (err.response && err.response.status === 403) {
+        window.location.replace('/403')
+        return Promise.reject(err)
+      }
+
+      // 2. Nếu Backend trả về lỗi 401 (Unauthorized - Hết hạn token)
       if (err.response && err.response.status === 401 && !orig._retry) {
         if (isRefreshing) {
           return new Promise((resolve, reject) => {

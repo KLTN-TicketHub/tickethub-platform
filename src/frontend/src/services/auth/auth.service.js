@@ -1,6 +1,6 @@
 import axios from 'axios'
 import api from '../api/axios'
-import { GOOGLE_REDIRECT, AUTH_REFRESH, AUTH_PROFILE, AUTH_LOGOUT } from '../api/endpoints'
+import { GOOGLE_REDIRECT, AUTH_REFRESH, AUTH_PROFILE, AUTH_LOGOUT, ADMIN_AUTH_LOGIN, ADMIN_AUTH_CONFIRM } from '../api/endpoints'
 import * as tokenService from './token.service'
 import { store } from '../../stores/eventStore'
 
@@ -23,10 +23,19 @@ function applyUserFromToken(token) {
   if (!payload) return
   // try common claim names
   const name = payload.name || payload.unique_name || payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || payload['sub'] || null
+  
+  // Trích xuất roles từ các claim JWT phổ biến
+  let roles = []
+  const roleClaim = payload.role || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+  if (roleClaim) {
+    roles = Array.isArray(roleClaim) ? roleClaim : [roleClaim]
+  }
+
   if (name) {
     store.user = {
       name: String(name).split('@')[0] || String(name),
       email: payload.email || null,
+      roles: roles,
       initial: String(name).charAt(0).toUpperCase()
     }
   }
@@ -279,6 +288,7 @@ export async function tryRefresh() {
       return newToken
     } catch (e) {
       tokenService.setToken(null)
+      store.user = null
       throw e
     } finally {
       if (lockInfo && lockInfo.acquired) releaseLock(lockInfo.id)
@@ -289,20 +299,46 @@ export async function tryRefresh() {
   return ongoingRefresh
 }
 
-export async function logout() {
+export async function loginAdmin(username, password) {
+  const response = await axios.post(buildApiUrl(ADMIN_AUTH_LOGIN), {
+    userName: username,
+    password: password
+  }, { withCredentials: true })
+  return response.data
+}
+
+export async function confirmAdmin(username, code) {
+  const response = await axios.post(buildApiUrl(ADMIN_AUTH_CONFIRM), {
+    userName: username,
+    code: code
+  }, { withCredentials: true })
+
+  const newToken = response.data?.accessToken || null
+  tokenService.setToken(newToken)
+  setCurrentRole('admin')
+
   try {
-    // Only call backend logout if we have an access token (prevents 401 for anonymous clients)
+    const profile = await fetchProfile(newToken)
+    applyUserFromProfile(profile)
+  } catch (error) {
+    applyUserFromToken(newToken)
+  }
+
+  return newToken
+}
+
+export async function logout() {
+  const role = getCurrentRole()
+  try {
     const currentToken = tokenService.getToken()
     if (currentToken) {
-      // Use the api axios instance so the Authorization header (accessToken) is attached by interceptors
       await api.post(AUTH_LOGOUT, {}, { withCredentials: true })
     }
   } finally {
     tokenService.clearLogin()
     store.user = null
     clearCurrentRole()
-    // After logout, always redirect to homepage
-    window.location.replace('/')
+    redirectToRoleLogin(role)
   }
 }
 
@@ -315,6 +351,8 @@ export default {
   setCurrentRole,
   getCurrentRole,
   clearCurrentRole,
-  redirectToRoleLogin
-  ,shouldRedirectToLogin
+  redirectToRoleLogin,
+  shouldRedirectToLogin,
+  loginAdmin,
+  confirmAdmin
 }
