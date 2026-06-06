@@ -24,11 +24,18 @@ namespace Catalog.Domain.Entities
 
         public decimal Height { get; set; }
 
+        public bool IsStage { get; set; }
+
+        //Phân khu có ghế hoặc không
+        public bool IsReservingSeat { get; set; }
+
+        public bool IsSalable { get; set; }
+
         public string SvgElementId { get; set; }
 
-        public int Capacity { get; set; }
+        public int? Capacity { get; set; }
 
-        public decimal BasePrice { get; set; }
+        public decimal? BasePrice { get; set; }
 
         public int DisplayOrder { get; set; }
 

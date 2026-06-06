@@ -50,6 +50,15 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .IsRequired()
                 .HasPrecision(18, 2);
 
+            builder.Property(z => z.IsStage)
+                .IsRequired();
+
+            builder.Property(z => z.IsReservingSeat)
+                .IsRequired();
+
+            builder.Property(z => z.IsSalable)
+                .IsRequired();
+
             builder.Property(z => z.SvgElementId)
                 .IsRequired()
                 .HasMaxLength(50);
@@ -61,7 +70,6 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .IsRequired();
 
             builder.Property(z => z.BasePrice)
-                .IsRequired()
                 .HasPrecision(18, 2);
 
             builder.Property(z => z.Status)

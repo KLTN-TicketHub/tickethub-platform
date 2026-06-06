@@ -12,6 +12,8 @@ namespace Catalog.Domain.Entities
 
         public string SeatName { get; set; }
 
+        public int Position { get; set; }
+
         public string RowLabel { get; set; }
 
         public string SvgElementId { get; set; }
