@@ -1,5 +1,7 @@
 ﻿using BuildingBlocks.API.Extensions;
 using BuildingBlocks.Contracts.Models.Responses;
+using Identity.Application.Features.Admin.Moderators.Commands.ActivateModeratorAccount;
+using Identity.Application.Features.Admin.Moderators.Requests;
 using Identity.Application.Features.Auth.Commands.LoginModerator;
 using Identity.Application.Features.Auth.Requests;
 using Identity.Common.Options;
@@ -50,6 +52,21 @@ namespace Identity.API.Controllers.V1.Moderator
                 Success = true,
                 Message = "Đăng nhập thành công",
                 AccessToken = result.AccessToken
+            });
+        }
+        [EnableRateLimiting(RateLimitPolicies.PerUser)]
+        [AllowAnonymous]
+        [HttpPost("activate-account")]
+        public async Task<IActionResult> ActivateModeratorAccountAsync(
+            [FromBody] ActivateModeratorAccountRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            await _sender.Send(new ActivateModeratorAccountCommand(request), cancellationToken);
+
+            return Ok(new ApiResponse
+            {
+                Success = true,
+                Message = "Kích hoạt tài khoản Moderator thành công."
             });
         }
     }

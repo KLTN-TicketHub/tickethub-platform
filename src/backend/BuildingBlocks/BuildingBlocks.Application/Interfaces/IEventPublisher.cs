@@ -2,7 +2,7 @@
 {
     public interface IEventPublisher
     {
-        Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
+        void Publish<TEvent>(TEvent @event)
             where TEvent : class;
     }
 }

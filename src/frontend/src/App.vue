@@ -25,7 +25,7 @@ import ToastNotification from './components/ToastNotification.vue'
 
 const route = useRoute()
 
-const isAdminRoute = computed(() => route.path.startsWith('/admin'))
+const isAdminRoute = computed(() => route.path.startsWith('/admin') || route.path.startsWith('/moderator') || route.path === '/activate-account')
 
 const handleBookingSuccess = (bookedTicket) => {
   addTicket(bookedTicket)

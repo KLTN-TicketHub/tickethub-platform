@@ -1,4 +1,3 @@
-using AutoMapper;
 using BuildingBlocks.Domain.Exceptions;
 using Catalog.Application.Common.DTOs.EventCategories;
 using Catalog.Domain.Interfaces;

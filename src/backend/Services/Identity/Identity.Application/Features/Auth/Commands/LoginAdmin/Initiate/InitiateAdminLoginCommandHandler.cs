@@ -3,6 +3,7 @@ using BuildingBlocks.Contracts.Events.Email;
 using BuildingBlocks.Domain.Exceptions;
 using Identity.Application.Features.Auth.Requests;
 using Identity.Domain.Entities;
+using Identity.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Cryptography;
@@ -15,17 +16,20 @@ namespace Identity.Application.Features.Auth.Commands.LoginAdmin.Initiate
         private readonly UserManager<User> _userManager;
         private readonly ICacheService _cacheService;
         private readonly IEventPublisher _eventPublisher;
+        private readonly IUnitOfWork _unitOfWork;
 
         public InitiateAdminLoginCommandHandler(
             ICurrentUserService currentUserService,
             UserManager<User> userManager,
             ICacheService cacheService,
-            IEventPublisher eventPublisher)
+            IEventPublisher eventPublisher,
+            IUnitOfWork unitOfWork)
         {
             _currentUserService = currentUserService;
             _userManager = userManager;
             _cacheService = cacheService;
             _eventPublisher = eventPublisher;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Unit> Handle(
@@ -75,7 +79,8 @@ namespace Identity.Application.Features.Auth.Commands.LoginAdmin.Initiate
 
             try
             {
-                await _eventPublisher.PublishAsync(@event, cancellationToken);
+                _eventPublisher.Publish(@event);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
-﻿using BuildingBlocks.Infrastructure.Auditing;
+﻿using BuildingBlocks.Domain.Outbox;
+using BuildingBlocks.Infrastructure.Auditing;
 using Identity.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace Identity.Infrastructure.Data.Contexts
         public DbSet<Role> Roles { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<OutboxMessage> OutboxMessages { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder builder)

@@ -1,4 +1,5 @@
 using BuildingBlocks.API.Extensions;
+using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Application.Common.DTOs.EventCategories;
 using Catalog.Application.Features.EventCategories.Commands.CreateEventCategory;
@@ -28,7 +29,7 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [AllowAnonymous]
+        [Authorize(Roles = Roles.Moderator)]
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetEventCategoryByIdAsync(
             [FromRoute] Guid id,
@@ -45,7 +46,7 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [AllowAnonymous]
+        [Authorize(Roles = Roles.Moderator)]
         [HttpPost]
         public async Task<IActionResult> CreateEventCategoryAsync([FromBody] CreateEventCategoryRequest request, CancellationToken cancellationToken = default)
         {

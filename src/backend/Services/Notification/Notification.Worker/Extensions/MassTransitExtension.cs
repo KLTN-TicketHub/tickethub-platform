@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using Microsoft.Extensions.Options;
 using Notification.Common.Options;
 using Notification.Worker.Consumers;
@@ -12,6 +12,7 @@ namespace Notification.Worker.Extensions
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<SendEmailCodeConsumer>();
+                x.AddConsumer<SendModeratorWelcomeEmailConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {

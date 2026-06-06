@@ -15,6 +15,7 @@ import StarsPage from '../pages/StarsPage.vue'
 import DestinationsPage from '../pages/DestinationsPage.vue'
 import AuthCallback from '../pages/AuthCallback.vue'
 import ForbiddenPage from '../pages/ForbiddenPage.vue'
+import ActivateAccountPage from '../pages/ActivateAccountPage.vue'
 
 // Admin
 import AdminLayout from '../layouts/AdminLayout.vue'
@@ -23,6 +24,12 @@ import EventsAdmin from '../pages/admin/EventsAdmin.vue'
 import UsersAdmin from '../pages/admin/UsersAdmin.vue'
 import OrdersAdmin from '../pages/admin/OrdersAdmin.vue'
 import AdminLoginPage from '../pages/admin/AdminLoginPage.vue'
+import ModeratorsAdmin from '../pages/admin/ModeratorsAdmin.vue'
+
+// Moderator
+import ModeratorLayout from '../layouts/ModeratorLayout.vue'
+import ModeratorDashboard from '../pages/moderator/ModeratorDashboard.vue'
+import ModeratorLoginPage from '../pages/moderator/ModeratorLoginPage.vue'
 
 const routes = [
   { path: '/', name: 'home', component: HomePage },
@@ -37,6 +44,8 @@ const routes = [
   { path: '/destinations', name: 'destinations', component: DestinationsPage },
   { path: '/auth/callback', name: 'auth-callback', component: AuthCallback },
   { path: '/admin/login', name: 'admin-login', component: AdminLoginPage },
+  { path: '/moderator/login', name: 'moderator-login', component: ModeratorLoginPage },
+  { path: '/activate-account', name: 'activate-account', component: ActivateAccountPage },
   { path: '/403', name: 'forbidden', component: ForbiddenPage },
   
   // Admin Routes
@@ -49,7 +58,19 @@ const routes = [
       { path: 'dashboard', name: 'admin-dashboard', component: AdminDashboard },
       { path: 'events', name: 'admin-events', component: EventsAdmin },
       { path: 'users', name: 'admin-users', component: UsersAdmin },
+      { path: 'moderators', name: 'admin-moderators', component: ModeratorsAdmin },
       { path: 'orders', name: 'admin-orders', component: OrdersAdmin },
+    ]
+  },
+
+  // Moderator Routes
+  {
+    path: '/moderator',
+    component: ModeratorLayout,
+    meta: { requiresAuth: true, role: 'moderator' },
+    children: [
+      { path: '', redirect: '/moderator/dashboard' },
+      { path: 'dashboard', name: 'moderator-dashboard', component: ModeratorDashboard },
     ]
   }
 ]
@@ -74,6 +95,7 @@ const DASHBOARD_PATHS = {
   admin: '/admin/dashboard',
   organizer: '/organizer',
   staff: '/staff/dashboard',
+  moderator: '/moderator/dashboard',
   user: '/'
 }
 
@@ -81,6 +103,7 @@ const LOGIN_PATHS = {
   admin: '/admin/login',
   organizer: '/organizer/login',
   staff: '/staff/login',
+  moderator: '/moderator/login',
   user: '/'
 }
 
@@ -88,6 +111,7 @@ function getExpectedRole(path) {
   if (path.startsWith('/admin')) return 'admin'
   if (path.startsWith('/organizer')) return 'organizer'
   if (path.startsWith('/staff')) return 'staff'
+  if (path.startsWith('/moderator')) return 'moderator'
   return 'user'
 }
 
@@ -95,6 +119,7 @@ function getUserRole(user) {
   if (!user) return 'user'
   const roles = user.roles || []
   if (roles.some(r => r.toLowerCase() === 'admin')) return 'admin'
+  if (roles.some(r => r.toLowerCase() === 'moderator')) return 'moderator'
   if (roles.some(r => r.toLowerCase() === 'organizer')) return 'organizer'
   if (roles.some(r => r.toLowerCase() === 'staff')) return 'staff'
   return 'user'

@@ -51,6 +51,7 @@ const homePath = computed(() => {
   if (!store.user) return '/'
   const roles = store.user.roles || []
   if (roles.some(r => r.toLowerCase() === 'admin')) return '/admin/dashboard'
+  if (roles.some(r => r.toLowerCase() === 'moderator')) return '/moderator/dashboard'
   if (roles.some(r => r.toLowerCase() === 'organizer')) return '/organizer'
   if (roles.some(r => r.toLowerCase() === 'staff')) return '/staff/dashboard'
   return '/'

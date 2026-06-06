@@ -1,17 +1,30 @@
 ﻿using BuildingBlocks.Application.Interfaces;
-using MassTransit;
+using BuildingBlocks.Domain.Outbox;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace BuildingBlocks.Infrastructure.Services
 {
-    public class MassTransitEventPublisher : IEventPublisher
+    public class MassTransitEventPublisher<TContext> : IEventPublisher where TContext : DbContext
     {
-        readonly IPublishEndpoint _publishEndpoint;
-        public MassTransitEventPublisher(IPublishEndpoint publishEndpoint)
+        readonly TContext _context;
+
+        public MassTransitEventPublisher(TContext context)
         {
-            _publishEndpoint = publishEndpoint;
+            _context = context;
         }
 
-        public Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
-            => _publishEndpoint.Publish(@event, cancellationToken);
+        public void Publish<TEvent>(TEvent @event) where TEvent : class
+        {
+            OutboxMessage message = new()
+            {
+                Id = Guid.NewGuid(),
+                Type = typeof(TEvent).AssemblyQualifiedName!,
+                Payload = JsonSerializer.Serialize(@event),
+                OccurredOn = DateTime.UtcNow
+            };
+
+            _context.Set<OutboxMessage>().Add(message);
+        }
     }
 }

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import api from '../api/axios'
-import { GOOGLE_REDIRECT, AUTH_REFRESH, AUTH_PROFILE, AUTH_LOGOUT, ADMIN_AUTH_LOGIN, ADMIN_AUTH_CONFIRM } from '../api/endpoints'
+import { GOOGLE_REDIRECT, AUTH_REFRESH, AUTH_PROFILE, AUTH_LOGOUT, ADMIN_AUTH_LOGIN, ADMIN_AUTH_CONFIRM, MODERATOR_AUTH_LOGIN, ADMIN_MODERATOR_REGISTER, MODERATOR_ACTIVATE_ACCOUNT } from '../api/endpoints'
 import * as tokenService from './token.service'
 import { store } from '../../stores/eventStore'
 
@@ -67,11 +67,30 @@ async function fetchProfile(accessToken) {
   return response.data?.data || response.data || null
 }
 
+async function hydrateUserProfile(accessToken) {
+  try {
+    const profile = await fetchProfile(accessToken)
+    applyUserFromProfile(profile)
+  } catch (error) {
+    applyUserFromToken(accessToken)
+  }
+}
+
+async function handleAuthSuccess(accessToken, role) {
+  tokenService.setToken(accessToken)
+  if (role) {
+    setCurrentRole(role)
+  }
+  await hydrateUserProfile(accessToken)
+}
+
+
 const ROLE_STORAGE_KEY = 'ticket-hub-current-role'
 const ROLE_LOGIN_PATHS = {
   admin: '/admin/login',
   organizer: '/organizer/login',
   staff: '/staff/login',
+  moderator: '/moderator/login',
   user: '/login'
 }
 
@@ -85,6 +104,7 @@ function getRoleFromPath(pathname = window.location.pathname) {
   if (pathname.startsWith('/admin')) return 'admin'
   if (pathname.startsWith('/organizer')) return 'organizer'
   if (pathname.startsWith('/staff')) return 'staff'
+  if (pathname.startsWith('/moderator')) return 'moderator'
   return 'user'
 }
 
@@ -175,12 +195,7 @@ export async function handleGooglePopupCallback() {
 
   if (!token) throw lastError || new Error('Failed to refresh after Google login')
 
-  try {
-    const profile = await fetchProfile(token)
-    applyUserFromProfile(profile)
-  } catch (error) {
-    applyUserFromToken(token)
-  }
+  await hydrateUserProfile(token)
 
   if (window.opener && window.opener !== window) {
     window.opener.postMessage({ type: 'ticket-hub:auth-success', token }, window.location.origin)
@@ -266,12 +281,7 @@ export async function tryRefresh() {
       const resp = await fallbackAttemptRefresh()
       const newToken = resp.data?.accessToken || null
       tokenService.setToken(newToken)
-      try {
-        const profile = await fetchProfile(newToken)
-        applyUserFromProfile(profile)
-      } catch (error) {
-        applyUserFromToken(newToken)
-      }
+      await hydrateUserProfile(newToken)
       return newToken
     }
 
@@ -279,12 +289,7 @@ export async function tryRefresh() {
       const resp = await axios.post(buildApiUrl(AUTH_REFRESH), {}, { withCredentials: true })
       const newToken = resp.data?.accessToken || null
       tokenService.setToken(newToken)
-      try {
-        const profile = await fetchProfile(newToken)
-        applyUserFromProfile(profile)
-      } catch (error) {
-        applyUserFromToken(newToken)
-      }
+      await hydrateUserProfile(newToken)
       return newToken
     } catch (e) {
       tokenService.setToken(null)
@@ -314,17 +319,33 @@ export async function confirmAdmin(username, code) {
   }, { withCredentials: true })
 
   const newToken = response.data?.accessToken || null
-  tokenService.setToken(newToken)
-  setCurrentRole('admin')
-
-  try {
-    const profile = await fetchProfile(newToken)
-    applyUserFromProfile(profile)
-  } catch (error) {
-    applyUserFromToken(newToken)
-  }
-
+  await handleAuthSuccess(newToken, 'admin')
   return newToken
+}
+
+export async function loginModerator(username, password) {
+  const response = await axios.post(buildApiUrl(MODERATOR_AUTH_LOGIN), {
+    userName: username,
+    password: password
+  }, { withCredentials: true })
+
+  const newToken = response.data?.accessToken || null
+  await handleAuthSuccess(newToken, 'moderator')
+  return response.data
+}
+
+export async function registerModerator(formData) {
+  const response = await api.post(ADMIN_MODERATOR_REGISTER, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+  return response.data
+}
+
+export async function activateModeratorAccount(data) {
+  const response = await api.post(MODERATOR_ACTIVATE_ACCOUNT, data)
+  return response.data
 }
 
 export async function logout() {
@@ -354,5 +375,8 @@ export default {
   redirectToRoleLogin,
   shouldRedirectToLogin,
   loginAdmin,
-  confirmAdmin
+  confirmAdmin,
+  loginModerator,
+  registerModerator,
+  activateModeratorAccount
 }

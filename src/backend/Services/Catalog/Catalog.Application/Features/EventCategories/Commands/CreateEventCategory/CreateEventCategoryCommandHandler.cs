@@ -26,7 +26,7 @@ namespace Catalog.Application.Features.EventCategories.Commands.CreateEventCateg
 
         private async Task<EventCategoryDto> CreateEventCategoryAsync(CreateEventCategoryRequest request, CancellationToken cancellation = default)
         {
-            if(await _unitOfWork
+            if (await _unitOfWork
                 .EventCategoryRepository
                 .IsExistsAsync(
                     nameof(EventCategory.CategoryName),

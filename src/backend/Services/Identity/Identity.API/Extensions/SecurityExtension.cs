@@ -1,4 +1,4 @@
-﻿using Identity.Common.Options;
+using Identity.Common.Options;
 using Identity.Domain.Entities;
 using Identity.Infrastructure.Data.Contexts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -28,6 +28,11 @@ namespace Identity.API.Extensions
                 options.SignIn.RequireConfirmedEmail = true;
             }).AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.Configure<DataProtectionTokenProviderOptions>(options =>
+            {
+                options.TokenLifespan = TimeSpan.FromMinutes(15);
+            });
             #endregion
 
             #region JWT configuration

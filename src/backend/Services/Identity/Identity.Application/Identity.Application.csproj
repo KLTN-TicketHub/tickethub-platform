@@ -17,6 +17,7 @@
     <ProjectReference Include="..\Identity.Domain\Identity.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Features\Admin\Moderators\Commands\ActivateModeratorAccount\" />
     <Folder Include="Features\Auth\Commands\LoginGoogle\" />
   </ItemGroup>
 </Project>

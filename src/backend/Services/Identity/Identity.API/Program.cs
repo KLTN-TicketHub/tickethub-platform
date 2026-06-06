@@ -1,13 +1,16 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
+using BuildingBlocks.Infrastructure.Outbox;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Hangfire;
 using Identity.API.Endpoints;
 using Identity.API.Extensions;
 using Identity.Application.Common.Mappers;
 using Identity.Application.Features.Auth.Commands.LoginAdmin.Initiate;
 using Identity.Application.Features.Auth.Validators;
 using Identity.Common.Options;
+using Identity.Infrastructure.Data.Contexts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +38,7 @@ builder.Services.AddCustomApiVersioning();
 builder.Services.AddCustomSwagger();
 
 builder.Services.Register();
+builder.Services.AddCustomHangfire(builder.Configuration.GetConnectionString("HangfireDbConnection")!);
 builder.Services.AddHttpClient();
 builder.Services.AddCustomRedis(builder.Configuration);
 builder.Services.AddAuthorization();
@@ -42,6 +46,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(LoginRequestValidator).Assembly);
 builder.Services.AddCustomFluentValidation();
+builder.Services.AddHostedService<OutboxProcessor<IdentityDbContext>>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(UserProfile).Assembly));
@@ -58,6 +63,7 @@ app.MapWellKnownEndpoints();
 if (app.Environment.IsDevelopment())
 {
     app.UseCustomSwaggerUI();
+    app.UseHangfireDashboard("/hangfire");
 }
 
 app.UseHttpsRedirection();
@@ -73,5 +79,6 @@ app.UseRequestResponseLogging();
 #endregion
 
 app.MapControllers();
+app.UseStaticFiles();
 
 app.Run();
