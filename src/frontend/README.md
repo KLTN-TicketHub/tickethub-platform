@@ -44,16 +44,39 @@ Hệ thống sử dụng cơ chế **Token-Based Authentication** lai giữa Mem
 
 4.  **Tự động phân vùng định tuyến (Route Guard Namespace)**:
     *   Nằm tại [router/index.js](file:///d:/Develop/KLTN/tickethub-platform/src/frontend/src/router/index.js).
-    *   Hệ thống tự động phân chia quyền truy cập dựa trên **tiền tố URL**:
-        *   `/admin/...` $\rightarrow$ Yêu cầu tài khoản có quyền `admin`.
-        *   `/organizer/...` $\rightarrow$ Yêu cầu tài khoản có quyền `organizer`.
-        *   `/staff/...` $\rightarrow$ Yêu cầu tài khoản có quyền `staff`.
-        *   Tất cả các route còn lại $\rightarrow$ Dành cho khách vãng lai và quyền `user`.
-    *   Nếu người dùng cố tình truy cập trái phép phân vùng khác, Route Guard sẽ tự động đẩy họ về đúng trang chủ/dashboard tương ứng của họ (`DASHBOARD_PATHS[userRole]`), ngăn chặn việc lộ thông tin hoặc giao diện không thuộc phạm vi vai trò.
+    *   Hệ thống tự động phân chia quyền truy cập dựa trên **t---
+
+## 📂 2. Cấu trúc Thư mục Dự án (Project Directory Structure)
+
+Mã nguồn Frontend được tổ chức theo kiến trúc Modular & Clean Architecture giúp phân cấp trách nhiệm rõ ràng:
+
+```
+src/
+├── assets/             # Tài nguyên tĩnh và CSS toàn cục (Tailwind CSS 4 / CSS variables)
+│   └── main.css        # Khai báo theme hệ thống, màu sắc và typography
+├── components/         # Các UI Components tái sử dụng
+│   ├── admin/          # Component đặc thù cho admin panel (Sidebar, Topbar, v.v.)
+│   ├── category/       # Component phục vụ hiển thị danh mục sự kiện
+│   ├── layout/         # Bố cục giao diện khách hàng (AppHeader, AppFooter, v.v.)
+│   ├── ui/             # Các Component UI nền tảng (BaseButton, BaseBadge, BaseTable, v.v.)
+│   └── *.vue           # Các Modal/Notification dùng chung (AuthModal, BookingModal, v.v.)
+├── layouts/            # Khung layout chính (AdminLayout.vue điều phối cấu trúc admin)
+├── mocks/              # Dữ liệu giả lập (Mock data) phục vụ chạy FE độc lập khi dev
+├── pages/              # Trang giao diện chính (Router Views) tương ứng với các route
+│   ├── admin/          # Tập hợp các trang quản trị (AdminDashboard, EventsAdmin, UsersAdmin, v.v.)
+│   └── *.vue           # Tập hợp các trang của người dùng (HomePage, ProfilePage, MyTicketsPage, v.v.)
+├── router/             # Cấu hình Vue Router (index.js) & logic gác cổng bảo mật
+├── services/           # Tầng kết nối API Backend & Xử lý nghiệp vụ logic
+│   ├── api/            # Axios Client, Interceptors tự động và danh mục Endpoints tập trung
+│   └── auth/           # Nghiệp vụ xử lý session, decode JWT token, quản lý RAM accessToken
+├── stores/             # Quản lý State toàn cục bằng Vue Reactivity Store (eventStore.js)
+├── App.vue             # Component gốc của ứng dụng Vue 3
+└── main.js             # Điểm khởi tạo ứng dụng (Mount Vue app, Router, CSS, v.v.)
+```
 
 ---
 
-## 🛠️ 2. Hướng dẫn Phát triển Chức năng Mới (Từng bước chi tiết)
+## 🛠️ 3. Hướng dẫn Phát triển Chức năng Mới (Từng bước chi tiết)
 
 Để mở rộng hệ thống mà không làm phá vỡ kiến trúc sẵn có, hãy thực hiện theo đúng quy trình 5 bước sau đây khi thêm bất kỳ một chức năng mới nào.
 
@@ -181,7 +204,7 @@ onMounted(async () => {
 
 ---
 
-## 🎨 3. Quy chuẩn UI/UX và Viết Code
+## 🎨 4. Quy chuẩn UI/UX và Viết Code
 
 Để ứng dụng đạt chất lượng visual tối đa và có tính đồng nhất cao, tất cả lập trình viên cần tuân thủ các quy tắc sau:
 
