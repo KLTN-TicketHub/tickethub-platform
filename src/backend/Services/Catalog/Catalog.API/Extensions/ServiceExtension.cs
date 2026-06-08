@@ -20,7 +20,7 @@ namespace Catalog.API.Extensions
         public static IServiceCollection RegisterServices(IServiceCollection services)
         {
             services.AddScoped<ICacheService, RedisCacheService>();
-            services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
+            services.AddScoped<IEventPublisher, MassTransitEventPublisher<CatalogDbContext>>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFileService, FileService>();
 
@@ -38,7 +38,6 @@ namespace Catalog.API.Extensions
             services.AddScoped<ISeatMapRepository, SeatMapRepository>();
             services.AddScoped<ITicketTypeRepository, TicketTypeRepository>();
             services.AddScoped<IZoneRepository, ZoneRepository>();
-            services.AddScoped<IZonePricingRepository, ZonePricingRepository>();
             services.AddScoped<AuditInterceptor>();
             return services;
         }

@@ -13,6 +13,5 @@ namespace Catalog.Domain.Interfaces
         ISeatMapRepository SeatMapRepository { get; }
         ITicketTypeRepository TicketTypeRepository { get; }
         IZoneRepository ZoneRepository { get; }
-        IZonePricingRepository ZonePricingRepository { get; }
     }
 }

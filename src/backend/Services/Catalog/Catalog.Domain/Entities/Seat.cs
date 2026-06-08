@@ -1,18 +1,16 @@
-﻿using BuildingBlocks.Domain.DDD;
+using BuildingBlocks.Domain.DDD;
 using Catalog.Domain.Enums;
 
 namespace Catalog.Domain.Entities
 {
     public class Seat : SoftDeleteEntity, IAggregateRoot
     {
-        public Zone? Zone { get; set; }
-        public Guid ZoneId { get; set; }
+        public Row? Row { get; set; }
+        public Guid RowId { get; set; }
 
         public string SeatCode { get; set; }
 
         public string SeatName { get; set; }
-
-        public int Position { get; set; }
 
         public string RowLabel { get; set; }
 

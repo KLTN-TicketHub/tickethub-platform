@@ -15,8 +15,7 @@ namespace Catalog.Infrastructure.Data.Contexts
             ISeatRepository seatRepository,
             ISeatMapRepository seatMapRepository,
             ITicketTypeRepository ticketTypeRepository,
-            IZoneRepository zoneRepository,
-            IZonePricingRepository zonePricingRepository) : base(dbContext)
+            IZoneRepository zoneRepository) : base(dbContext)
         {
             VenueRepository = venueRepository;
             EventRepository = eventRepository;
@@ -26,7 +25,6 @@ namespace Catalog.Infrastructure.Data.Contexts
             SeatMapRepository = seatMapRepository;
             TicketTypeRepository = ticketTypeRepository;
             ZoneRepository = zoneRepository;
-            ZonePricingRepository = zonePricingRepository;
         }
 
         public IVenueRepository VenueRepository { get; set; }
@@ -37,6 +35,5 @@ namespace Catalog.Infrastructure.Data.Contexts
         public ISeatMapRepository SeatMapRepository { get; set; }
         public ITicketTypeRepository TicketTypeRepository { get; set; }
         public IZoneRepository ZoneRepository { get; set; }
-        public IZonePricingRepository ZonePricingRepository { get; set; }
     }
 }

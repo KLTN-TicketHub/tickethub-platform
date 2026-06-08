@@ -27,8 +27,5 @@
 	  <ProjectReference Include="..\Catalog.Common\Catalog.Common.csproj" />
 	  <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Migrations\" />
-	</ItemGroup>
 
 </Project>

@@ -6,7 +6,6 @@ namespace Catalog.Application.Common.Mappers
     {
         public CatalogProfile()
         {
-            // TODO: Add mapping profiles for Catalog DTOs and domain models here
         }
     }
 }

@@ -12,9 +12,9 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
 
             builder.HasKey(s => s.Id);
 
-            builder.HasOne(s => s.Zone)
-                   .WithMany(z => z.Seats)
-                   .HasForeignKey(s => s.ZoneId)
+            builder.HasOne(s => s.Row)
+                   .WithMany(r => r.Seats)
+                   .HasForeignKey(s => s.RowId)
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(s => s.SeatCode)
@@ -22,10 +22,6 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .HasMaxLength(50);
 
             builder.Property(s => s.SeatName)
-                .IsRequired()
-                .HasMaxLength(50);
-
-            builder.Property(s => s.RowLabel)
                 .IsRequired()
                 .HasMaxLength(50);
 

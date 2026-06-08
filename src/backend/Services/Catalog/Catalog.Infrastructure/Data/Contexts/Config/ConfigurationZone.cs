@@ -63,6 +63,8 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .IsRequired()
                 .HasMaxLength(50);
 
+            builder.Property(z => z.ElementJson);
+
             builder.Property(z => z.Capacity)
                 .IsRequired();
 

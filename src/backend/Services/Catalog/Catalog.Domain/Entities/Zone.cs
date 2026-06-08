@@ -33,6 +33,8 @@ namespace Catalog.Domain.Entities
 
         public string SvgElementId { get; set; }
 
+        public string? ElementJson { get; set; }
+
         public int? Capacity { get; set; }
 
         public decimal? BasePrice { get; set; }
@@ -43,7 +45,7 @@ namespace Catalog.Domain.Entities
 
         public byte[] RowVersion { get; set; } = default!;
 
-        private readonly List<Seat> _seats = new List<Seat>();
-        public IReadOnlyCollection<Seat> Seats => _seats.AsReadOnly();
+        private readonly List<Row> _rows = new List<Row>();
+        public IReadOnlyCollection<Row> Rows => _rows.AsReadOnly();
     }
 }

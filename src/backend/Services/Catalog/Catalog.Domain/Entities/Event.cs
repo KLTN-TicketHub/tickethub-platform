@@ -42,6 +42,9 @@ namespace Catalog.Domain.Entities
         private readonly List<EventCategory> _categories = new List<EventCategory>();
         public IReadOnlyCollection<EventCategory> Categories => _categories.AsReadOnly();
 
+        private readonly List<TicketType> _ticketTypes = new List<TicketType>();
+        public IReadOnlyCollection<TicketType> TicketTypes => _ticketTypes.AsReadOnly();
+
         public void SetEventLocation(string venueName, string addressLine, string ward, string district, string provinceCity, string country)
         {
             Location = new EventLocation(venueName, addressLine, ward, district, provinceCity, country);
