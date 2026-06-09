@@ -26,17 +26,9 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .IsRequired()
                 .HasMaxLength(100);
 
-            builder.Property(s => s.Version)
-                .IsRequired()
-                .HasMaxLength(200);
-
             builder.Property(s => s.SvgFileUrl)
                 .IsRequired()
                 .HasMaxLength(500);
-
-            builder.Property(s => s.CanvasJsonData)
-                .IsRequired()
-                .HasColumnType("nvarchar(max)");
 
             builder.Property(s => s.Width)
                 .IsRequired()

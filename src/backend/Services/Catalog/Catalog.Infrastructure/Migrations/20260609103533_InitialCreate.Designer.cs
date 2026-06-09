@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Catalog.Infrastructure.Migrations
 {
     [DbContext(typeof(CatalogDbContext))]
-    [Migration("20260608144615_InitialCreate")]
+    [Migration("20260609103533_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -475,10 +475,6 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CanvasJsonData")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");

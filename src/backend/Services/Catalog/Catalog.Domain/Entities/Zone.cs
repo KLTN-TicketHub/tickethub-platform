@@ -1,5 +1,9 @@
-﻿using BuildingBlocks.Domain.DDD;
+using BuildingBlocks.Domain.DDD;
 using Catalog.Domain.Enums;
+using System.Globalization;
+using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Catalog.Domain.Entities
 {
@@ -10,9 +14,7 @@ namespace Catalog.Domain.Entities
 
         public string ZoneName { get; set; }
 
-        public string ZoneCode { get; set; }
-
-        public string ZoneType { get; set; }
+        public string ZoneCode { get; private set; }
 
         public string Color { get; set; }
 
@@ -47,5 +49,61 @@ namespace Catalog.Domain.Entities
 
         private readonly List<Row> _rows = new List<Row>();
         public IReadOnlyCollection<Row> Rows => _rows.AsReadOnly();
+
+        public Zone(
+            string zoneName,
+            string color,
+            decimal x,
+            decimal y,
+            decimal width,
+            decimal height,
+            bool isStage,
+            bool isReservingSeat,
+            bool isSalable,
+            string svgElementId,
+            string? elementJson = null,
+            int? capacity = null,
+            decimal? basePrice = null,
+            int displayOrder = 0)
+        {
+            ZoneName = zoneName;
+            Color = color;
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
+            IsStage = isStage;
+            IsReservingSeat = isReservingSeat;
+            IsSalable = isSalable;
+            SvgElementId = svgElementId;
+            ElementJson = elementJson;
+            Capacity = capacity;
+            BasePrice = basePrice;
+            DisplayOrder = displayOrder;
+            Status = CatalogStatus.Active;
+        }
+
+        public static string NormalizeZoneCode(string name, int maxLen = 40)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return string.Empty;
+            string normalized = name.Normalize(NormalizationForm.FormD);
+            StringBuilder sb = new StringBuilder();
+            foreach (var ch in normalized)
+            {
+                UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory(ch);
+                if (cat != UnicodeCategory.NonSpacingMark)
+                    sb.Append(ch);
+            }
+            string withoutDiacritics = sb.ToString().Normalize(NormalizationForm.FormC);
+            string replaced = Regex.Replace(withoutDiacritics, @"[^A-Za-z0-9]+", "-");
+            string trimmed = replaced.Trim('-').ToUpperInvariant();
+            trimmed = Regex.Replace(trimmed, @"[^A-Z0-9\-]", string.Empty);
+            if (trimmed.Length > maxLen) trimmed = trimmed.Substring(0, maxLen).Trim('-');
+            return trimmed;
+        }
+        public void SetZoneCode(string zoneCode)
+        {
+            ZoneCode = zoneCode;
+        }
     }
 }

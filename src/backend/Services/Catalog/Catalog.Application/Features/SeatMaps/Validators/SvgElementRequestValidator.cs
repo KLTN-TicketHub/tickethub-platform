@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Catalog.Application.Features.SeatMaps.Validators
 {
-    public class SvgElementRequestValidator : AbstractValidator<SvgElementRequest>
+    public class SvgElementRequestValidator : AbstractValidator<CreateSvgElementRequest>
     {
         public SvgElementRequestValidator()
         {

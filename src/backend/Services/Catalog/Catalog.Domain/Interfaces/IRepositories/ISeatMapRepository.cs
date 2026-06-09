@@ -6,5 +6,6 @@ namespace Catalog.Domain.Interfaces.IRepositories
 {
     public interface ISeatMapRepository : IBaseRepository<SeatMap, DbContext>
     {
+        Task<string> GenerateNextSeatMapCodeAsync(Guid venueId, string seatMapName, CancellationToken cancellation = default);
     }
 }

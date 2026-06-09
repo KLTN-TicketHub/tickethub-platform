@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -97,7 +98,6 @@ namespace Catalog.Infrastructure.Migrations
                     SeatMapCode = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Version = table.Column<int>(type: "int", maxLength: 200, nullable: false),
                     SvgFileUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    CanvasJsonData = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Width = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Height = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),

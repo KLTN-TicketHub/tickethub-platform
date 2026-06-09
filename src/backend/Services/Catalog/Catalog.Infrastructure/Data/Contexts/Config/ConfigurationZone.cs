@@ -26,10 +26,6 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .IsRequired()
                 .HasMaxLength(50);
 
-            builder.Property(z => z.ZoneType)
-                .IsRequired()
-                .HasMaxLength(50);
-
             builder.Property(z => z.Color)
                 .IsRequired()
                 .HasMaxLength(20);

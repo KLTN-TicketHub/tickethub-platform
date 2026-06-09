@@ -15,5 +15,13 @@ namespace Catalog.Domain.Entities
 
         private readonly List<Seat> _seats = new List<Seat>();
         public IReadOnlyCollection<Seat> Seats => _seats.AsReadOnly();
+
+        public byte[] RowVersion { get; set; }
+
+        public Row(string rowName)
+        {
+            RowName = rowName;
+            Status = CatalogStatus.Active;
+        }
     }
 }

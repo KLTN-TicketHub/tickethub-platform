@@ -1,6 +1,6 @@
 ﻿namespace Catalog.Application.Features.SeatMaps.Requests
 {
-    public class SvgElementRequest
+    public class CreateSvgElementRequest
     {
         public string Type { get; set; }
 
