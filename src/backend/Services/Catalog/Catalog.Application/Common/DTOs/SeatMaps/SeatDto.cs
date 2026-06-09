@@ -1,6 +1,4 @@
-﻿using Catalog.Domain.Enums;
-
-namespace Catalog.Application.Common.DTOs.SeatMaps
+﻿namespace Catalog.Application.Common.DTOs.SeatMaps
 {
     public class SeatDto
     {
@@ -8,7 +6,7 @@ namespace Catalog.Application.Common.DTOs.SeatMaps
 
         public string SeatName { get; set; }
 
-        public string SeatCode { get; set; } 
+        public string SeatCode { get; set; }
 
         public string SvgElementId { get; set; }
 
@@ -18,7 +16,7 @@ namespace Catalog.Application.Common.DTOs.SeatMaps
 
         public decimal Radius { get; set; }
 
-        public SeatLayoutStatus LayoutStatus { get; set; }
+        public string LayoutStatus { get; set; }
 
         public byte[] RowVersion { get; set; }
     }

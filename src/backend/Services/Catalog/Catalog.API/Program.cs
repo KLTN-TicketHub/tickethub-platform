@@ -56,6 +56,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandling();
 app.UseRequestResponseLogging();
+await app.UseDatabaseInitialization();
 
 app.UseHttpsRedirection();
 

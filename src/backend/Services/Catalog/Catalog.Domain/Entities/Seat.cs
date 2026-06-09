@@ -9,23 +9,23 @@ namespace Catalog.Domain.Entities
     public class Seat : SoftDeleteEntity, IAggregateRoot
     {
         public Row? Row { get; set; }
-        public Guid RowId { get; set; }
+        public Guid RowId { get; private set; }
 
         public string SeatCode { get; private set; }
 
-        public string SeatName { get; set; }
+        public string SeatName { get; private set; }
 
-        public string SvgElementId { get; set; }
+        public string SvgElementId { get; private set; }
 
-        public decimal X { get; set; }
+        public decimal X { get; private set; }
 
-        public decimal Y { get; set; }
+        public decimal Y { get; private set; }
 
-        public decimal Radius { get; set; }
+        public decimal Radius { get; private set; }
 
-        public SeatLayoutStatus LayoutStatus { get; set; }
+        public SeatLayoutStatus LayoutStatus { get; private set; }
 
-        public byte[] RowVersion { get; set; } = default!;
+        public byte[] RowVersion { get; private set; } = default!;
 
         public Seat(
             string seatName,

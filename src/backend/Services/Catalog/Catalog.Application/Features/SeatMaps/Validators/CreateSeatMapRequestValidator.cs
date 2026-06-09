@@ -1,4 +1,4 @@
-﻿using Catalog.Application.Features.SeatMaps.Requests;
+using Catalog.Application.Features.SeatMaps.Requests;
 using FluentValidation;
 
 namespace Catalog.Application.Features.SeatMaps.Validators
@@ -22,9 +22,13 @@ namespace Catalog.Application.Features.SeatMaps.Validators
                 .NotEmpty().WithMessage("Chiều cao không được để trống.")
                 .GreaterThan(0).WithMessage("Chiều cao phải lớn hơn 0.");
 
-            RuleFor(x => x.SvgFile)
-                .NotNull().WithMessage("Tệp SVG không được để trống.")
-                .Must(file => file.ContentType == "image/svg+xml").WithMessage("Tệp phải có định dạng SVG.");
+            RuleFor(x => x.SvgFileUrl)
+                .Must(url => string.IsNullOrEmpty(url) || Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute))
+                .WithMessage("Đường dẫn tệp SVG không hợp lệ.")
+                .When(x => x.SvgFileUrl != null);
+
+            RuleFor(x => x.Zones)
+                .NotEmpty().WithMessage("Danh sách khu vực không được để trống.");
 
             RuleForEach(x => x.Zones).SetValidator(new CreateZoneRequestValidator());
         }

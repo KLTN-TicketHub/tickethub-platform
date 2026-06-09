@@ -44,6 +44,9 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
             builder.Property(s => s.LayoutStatus)
                 .IsRequired()
                 .HasConversion<string>();
+
+            builder.Property(s => s.RowVersion)
+                .IsRowVersion();
         }
     }
 }

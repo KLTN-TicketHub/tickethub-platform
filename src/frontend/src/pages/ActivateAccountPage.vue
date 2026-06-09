@@ -211,7 +211,20 @@ const handleActivate = async () => {
   } catch (err) {
     const errorData = err.response?.data
     if (errorData?.errors) {
-      validationErrors.value = { ...errorData.errors }
+      if (Array.isArray(errorData.errors)) {
+        const normalized = {}
+        errorData.errors.forEach(item => {
+          if (item && item.field) {
+            if (!normalized[item.field]) {
+              normalized[item.field] = []
+            }
+            normalized[item.field].push(item.message)
+          }
+        })
+        validationErrors.value = normalized
+      } else {
+        validationErrors.value = { ...errorData.errors }
+      }
     } else {
       validationErrors.value.general = errorData?.message || err.message || 'Lỗi kết nối máy chủ.'
     }

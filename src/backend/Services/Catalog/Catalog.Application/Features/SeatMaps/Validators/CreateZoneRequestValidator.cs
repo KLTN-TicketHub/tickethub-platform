@@ -1,9 +1,5 @@
 using Catalog.Application.Features.SeatMaps.Requests;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 
 namespace Catalog.Application.Features.SeatMaps.Validators
 {
@@ -35,16 +31,12 @@ namespace Catalog.Application.Features.SeatMaps.Validators
                 .NotEmpty().WithMessage("Chiều cao không được để trống.")
                 .GreaterThan(0).WithMessage("Chiều cao phải lớn hơn 0.");
 
-            RuleFor(x => x.Capacity)
-                .NotEmpty().WithMessage("Sức chứa không được để trống.")
-                .GreaterThan(0).WithMessage("Sức chứa phải lớn hơn 0.");
-
             RuleFor(x => x.SvgElementId)
                .MaximumLength(50).WithMessage("ID phần tử SVG không được vượt quá 50 ký tự.")
                .When(x => !string.IsNullOrWhiteSpace(x.SvgElementId));
 
             RuleForEach(x => x.SvgElements)
-                .SetValidator(new SvgElementRequestValidator())
+                .SetValidator(new CreateSvgElementRequestValidator())
                 .When(x => x.SvgElements != null);
 
             RuleForEach(x => x.Rows)

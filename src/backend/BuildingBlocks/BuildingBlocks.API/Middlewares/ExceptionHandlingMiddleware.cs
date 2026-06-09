@@ -13,6 +13,17 @@ namespace BuildingBlocks.API.Middlewares
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
+        private static readonly JsonSerializerOptions _logJsonOptions = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+
+        private static readonly JsonSerializerOptions _responseJsonOptions = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
         public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
         {
             _next = next;
@@ -44,14 +55,6 @@ namespace BuildingBlocks.API.Middlewares
             {
                 statusCode = (int)validatorException.HttpStatusCode;
 
-                var validationErrorsJson = validatorException.ValidationErrors.Any()
-                    ? JsonSerializer.Serialize(validatorException.ValidationErrors, new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                    })
-                    : "{}";
-
                 _logger.LogWarning(ex,
                     "Validation error occurred. " +
                     "TraceId: {TraceId}, " +
@@ -71,15 +74,28 @@ namespace BuildingBlocks.API.Middlewares
                     requestPath,
                     requestMethod,
                     validatorException.Timestamp,
-                    validationErrorsJson);
+                    validatorException.ValidationErrors.Any()
+                        ? JsonSerializer.Serialize(validatorException.ValidationErrors, _logJsonOptions)
+                        : "{}");
 
                 if (validatorException.ValidationErrors.Any())
                 {
+                    IEnumerable<object> flattenedErrors = validatorException.ValidationErrors
+                        .SelectMany(kvp => (kvp.Value ?? [])
+                            .Select(msg => new
+                            {
+                                field = string.IsNullOrEmpty(kvp.Key)
+                                    ? kvp.Key
+                                    : char.ToLowerInvariant(kvp.Key[0]) + kvp.Key[1..],
+                                message = msg
+                            }))
+                        .ToList();
+
                     response = new
                     {
                         success = false,
-                        message = "Một hoặc nhiều lỗi xác thực đã xảy ra.",
-                        errors = validatorException.ValidationErrors,
+                        message = "One or more validation errors occurred.",
+                        errors = flattenedErrors,
                         error = new
                         {
                             code = validatorException.ErrorCode,
@@ -179,12 +195,8 @@ namespace BuildingBlocks.API.Middlewares
             context.Response.StatusCode = statusCode;
             context.Response.ContentType = "application/json";
 
-            var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            });
-
-            await context.Response.WriteAsync(json);
+            await context.Response.WriteAsync(
+                JsonSerializer.Serialize(response, _responseJsonOptions));
         }
     }
 

@@ -1,5 +1,3 @@
-﻿using Microsoft.AspNetCore.Http;
-
 namespace Catalog.Application.Features.SeatMaps.Requests
 {
     public class CreateSeatMapRequest
@@ -12,8 +10,8 @@ namespace Catalog.Application.Features.SeatMaps.Requests
 
         public decimal Height { get; set; }
 
-        public IFormFile SvgFile { get; set; }
+        public string? SvgFileUrl { get; set; }
 
-        public List<CreateZoneRequest>? Zones { get; set; }
+        public List<CreateZoneRequest> Zones { get; set; }
     }
 }

@@ -108,10 +108,10 @@ namespace Identity.Application.Features.Admin.Moderators.Commands.RegisterModera
             if (request.Avatar is null)
                 return null;
 
-            if (!_fileService.IsValidImage(request.Avatar))
+            if (!_fileService.IsValidFile(request.Avatar))
                 throw new ValidatorException(nameof(request.Avatar), "File ảnh không hợp lệ. Chỉ chấp nhận .jpg, .jpeg, .png, .webp.");
 
-            return await _fileService.SaveImageAsync(request.Avatar, "moderators", cancellationToken);
+            return await _fileService.SaveFileAsync(request.Avatar, "moderators", cancellationToken);
         }
 
         private void PublishActivationEventAsync(

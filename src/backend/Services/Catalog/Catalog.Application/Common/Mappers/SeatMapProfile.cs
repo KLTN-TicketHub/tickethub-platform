@@ -3,9 +3,6 @@ using BuildingBlocks.Contracts.Extensions;
 using Catalog.Application.Common.DTOs.SeatMaps;
 using Catalog.Application.Features.SeatMaps.Requests;
 using Catalog.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
 
 namespace Catalog.Application.Common.Mappers
@@ -109,7 +106,9 @@ namespace Catalog.Application.Common.Mappers
                     src.VenueId,
                     src.SeatMapName,
                     src.Width,
-                    src.Height));
+                    src.Height))
+                .ForMember(dest => dest.Zones,
+                opt => opt.Ignore());
 
             CreateMap<CreateZoneRequest, Zone>()
                 .ConstructUsing(src => new Zone(
@@ -123,8 +122,25 @@ namespace Catalog.Application.Common.Mappers
                     src.IsReservingSeat,
                     src.IsSalable,
                     src.SvgElementId,
-                    src.Capacity));
+                    src.Capacity,
+                    src.BasePrice,
+                    src.DisplayOrder ?? 0))
+                .ForMember(dest => dest.Rows,
+                opt => opt.Ignore());
 
+            CreateMap<CreateRowRequest, Row>()
+                .ConstructUsing(src => new Row(
+                    src.RowLabel))
+                .ForMember(dest => dest.Seats,
+                opt => opt.Ignore());
+
+            CreateMap<CreateSeatRequest, Seat>()
+                .ConstructUsing(src => new Seat(
+                    src.SeatName,
+                    src.SvgElementId,
+                    src.X,
+                    src.Y,
+                    src.Radius));
         }
     }
 }

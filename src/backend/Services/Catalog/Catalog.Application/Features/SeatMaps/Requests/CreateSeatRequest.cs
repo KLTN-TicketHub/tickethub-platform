@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Catalog.Application.Features.SeatMaps.Requests
+﻿namespace Catalog.Application.Features.SeatMaps.Requests
 {
     public class CreateSeatRequest
     {

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Catalog.Infrastructure.Migrations
 {
     [DbContext(typeof(CatalogDbContext))]
-    [Migration("20260609103533_InitialCreate")]
+    [Migration("20260609160801_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -374,6 +374,12 @@ namespace Catalog.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -426,13 +432,11 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<Guid>("RowId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("RowLabel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<string>("SeatCode")
                         .IsRequired()
@@ -524,10 +528,6 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.Property<Guid>("VenueId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Version")
-                        .HasMaxLength(200)
-                        .HasColumnType("int");
 
                     b.Property<decimal>("Width")
                         .HasPrecision(18, 2)
@@ -822,11 +822,6 @@ namespace Catalog.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ZoneType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 

@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace Catalog.Application.Features.SeatMaps.Validators
 {
-    public class SvgElementRequestValidator : AbstractValidator<CreateSvgElementRequest>
+    public class CreateSvgElementRequestValidator : AbstractValidator<CreateSvgElementRequest>
     {
-        public SvgElementRequestValidator()
+        public CreateSvgElementRequestValidator()
         {
             RuleFor(x => x.Type)
                 .NotEmpty().WithMessage("Loại phần tử SVG không được để trống.")

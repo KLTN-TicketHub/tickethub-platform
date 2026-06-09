@@ -18,8 +18,6 @@
 
         public decimal Latitude { get; set; }
 
-        public int TotalCapacity { get; set; }
-
         public string PhoneNumber { get; set; } = default!;
 
         public string? WebsiteUrl { get; set; }

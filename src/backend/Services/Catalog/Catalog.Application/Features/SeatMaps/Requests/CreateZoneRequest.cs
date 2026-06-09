@@ -14,7 +14,7 @@
 
         public decimal Height { get; set; }
 
-        public int Capacity { get; set; }
+        public int? Capacity { get; set; }
 
         public bool IsStage { get; set; }
 
@@ -24,10 +24,12 @@
 
         public string SvgElementId { get; set; }
 
+        public decimal? BasePrice { get; set; }
+
+        public int? DisplayOrder { get; set; }
+
         public List<CreateSvgElementRequest>? SvgElements { get; set; }
 
         public List<CreateRowRequest>? Rows { get; set; }
-
-        public Guid? TicketTypeId { get; set; }
     }
 }

@@ -2,7 +2,6 @@ using BuildingBlocks.Domain.DDD;
 using Catalog.Domain.Enums;
 using System.Globalization;
 using System.Text;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace Catalog.Domain.Entities
@@ -35,7 +34,7 @@ namespace Catalog.Domain.Entities
 
         public string SvgElementId { get; set; }
 
-        public string? ElementJson { get; set; }
+        public string? ElementJson { get; private set; }
 
         public int? Capacity { get; set; }
 
@@ -61,7 +60,6 @@ namespace Catalog.Domain.Entities
             bool isReservingSeat,
             bool isSalable,
             string svgElementId,
-            string? elementJson = null,
             int? capacity = null,
             decimal? basePrice = null,
             int displayOrder = 0)
@@ -76,7 +74,6 @@ namespace Catalog.Domain.Entities
             IsReservingSeat = isReservingSeat;
             IsSalable = isSalable;
             SvgElementId = svgElementId;
-            ElementJson = elementJson;
             Capacity = capacity;
             BasePrice = basePrice;
             DisplayOrder = displayOrder;
@@ -104,6 +101,16 @@ namespace Catalog.Domain.Entities
         public void SetZoneCode(string zoneCode)
         {
             ZoneCode = zoneCode;
+        }
+
+        public void AddRow(Row row)
+        {
+            _rows.Add(row);
+        }
+
+        public void SetElementJson(string elementJson)
+        {
+            ElementJson = elementJson;
         }
     }
 }

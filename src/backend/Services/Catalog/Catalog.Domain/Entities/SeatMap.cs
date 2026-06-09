@@ -21,7 +21,7 @@ namespace Catalog.Domain.Entities
 
         public decimal Height { get; set; }
 
-        public byte[] RowVersion { get; set; } = default!;
+        public byte[] RowVersion { get; private set; } = default!;
 
         private readonly List<Zone> _zones = new List<Zone>();
         public IReadOnlyCollection<Zone> Zones => _zones.AsReadOnly();
@@ -67,6 +67,11 @@ namespace Catalog.Domain.Entities
         public void SetSeatMapCode(string seatMapCode)
         {
             SeatMapCode = seatMapCode;
+        }
+
+        public void AddZone(Zone zone)
+        {
+            _zones.Add(zone);
         }
     }
 }

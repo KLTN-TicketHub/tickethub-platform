@@ -4,12 +4,12 @@ namespace BuildingBlocks.Application.Interfaces
 {
     public interface IFileService
     {
-        Task<string> SaveImageAsync(
+        Task<string> SaveFileAsync(
             IFormFile formFile,
             string folder,
             CancellationToken cancellationToken = default);
 
-        Task<List<string>> SaveImagesAsync(
+        Task<List<string>> SaveFilesAsync(
             IList<IFormFile> formFiles,
             string folder,
             CancellationToken cancellationToken = default);
@@ -22,7 +22,7 @@ namespace BuildingBlocks.Application.Interfaces
 
         string GetFileUrl(string relativePath);
 
-        bool IsValidImage(IFormFile formFile);
+        bool IsValidFile(IFormFile formFile);
 
         string GetAbsoluteUrl(string relativePath);
 

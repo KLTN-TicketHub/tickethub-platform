@@ -7,21 +7,26 @@ namespace Catalog.Domain.Entities
     {
         public Zone? Zone { get; set; }
 
-        public Guid ZoneId { get; set; }
+        public Guid ZoneId { get; private set; }
 
-        public string RowName { get; set; }
+        public string RowName { get; private set; }
 
         public CatalogStatus Status { get; set; }
 
         private readonly List<Seat> _seats = new List<Seat>();
         public IReadOnlyCollection<Seat> Seats => _seats.AsReadOnly();
 
-        public byte[] RowVersion { get; set; }
+        public byte[] RowVersion { get; private set; }
 
         public Row(string rowName)
         {
             RowName = rowName;
             Status = CatalogStatus.Active;
+        }
+
+        public void AddSeat(Seat seat)
+        {
+            _seats.Add(seat);
         }
     }
 }

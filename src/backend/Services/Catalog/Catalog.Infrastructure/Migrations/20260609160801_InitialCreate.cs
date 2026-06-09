@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -96,7 +95,6 @@ namespace Catalog.Infrastructure.Migrations
                     VenueId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SeatMapName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     SeatMapCode = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Version = table.Column<int>(type: "int", maxLength: 200, nullable: false),
                     SvgFileUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Width = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Height = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
@@ -172,7 +170,6 @@ namespace Catalog.Infrastructure.Migrations
                     SeatMapId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ZoneName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     ZoneCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    ZoneType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Color = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     X = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Y = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
@@ -300,6 +297,7 @@ namespace Catalog.Infrastructure.Migrations
                     ZoneId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RowName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -370,13 +368,12 @@ namespace Catalog.Infrastructure.Migrations
                     RowId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SeatCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     SeatName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    RowLabel = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SvgElementId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     X = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Y = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Radius = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     LayoutStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),

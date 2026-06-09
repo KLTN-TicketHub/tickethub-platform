@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -9,7 +9,7 @@ namespace BuildingBlocks.Infrastructure.Services
     {
         private readonly string _baseDirectory;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+        private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg" };
         private readonly long _maxFileSize = 5 * 1024 * 1024;
         private readonly ILogger<FileService> _logger;
 
@@ -21,12 +21,12 @@ namespace BuildingBlocks.Infrastructure.Services
             Directory.CreateDirectory(_baseDirectory);
         }
 
-        public async Task<string> SaveImageAsync(
+        public async Task<string> SaveFileAsync(
             IFormFile formFile,
             string folder,
             CancellationToken cancellationToken = default)
         {
-            if (!IsValidImage(formFile))
+            if (!IsValidFile(formFile))
                 throw new ValidatorException("File is invalid or empty.");
 
             string folderPath = Path.Combine(_baseDirectory, folder);
@@ -43,7 +43,7 @@ namespace BuildingBlocks.Infrastructure.Services
             return Path.Combine("/uploads", folder, fileName).Replace("\\", "/");
         }
 
-        public async Task<List<string>> SaveImagesAsync(
+        public async Task<List<string>> SaveFilesAsync(
             IList<IFormFile> formFiles,
             string folder,
             CancellationToken cancellationToken = default)
@@ -52,16 +52,16 @@ namespace BuildingBlocks.Infrastructure.Services
 
             for (int i = 0; i < formFiles.Count; i++)
             {
-                if (IsValidImage(formFiles[i]))
+                if (IsValidFile(formFiles[i]))
                 {
-                    filePaths.Add(await SaveImageAsync(formFiles[i], folder, cancellationToken));
+                    filePaths.Add(await SaveFileAsync(formFiles[i], folder, cancellationToken));
                 }
             }
 
             return filePaths;
         }
 
-        public bool IsValidImage(IFormFile formFile)
+        public bool IsValidFile(IFormFile formFile)
         {
             if (formFile == null || formFile.Length == 0)
                 return false;
@@ -103,7 +103,15 @@ namespace BuildingBlocks.Infrastructure.Services
 
         public bool FileExists(string filePath)
         {
-            return File.Exists(Path.Combine(_baseDirectory, filePath).Replace("/", "\\"));
+            string relativePath = filePath.TrimStart('/', '\\');
+
+            if (relativePath.StartsWith("uploads", StringComparison.OrdinalIgnoreCase))
+            {
+                relativePath = relativePath.Substring("uploads".Length).TrimStart('/', '\\');
+            }
+
+            string fullPath = Path.Combine(_baseDirectory, relativePath);
+            return File.Exists(fullPath);
         }
 
         public bool DeleteFiles(IList<string> filePaths)
