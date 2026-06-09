@@ -14,6 +14,6 @@ namespace Catalog.Application.Features.SeatMaps.Requests
 
         public IFormFile SvgFile { get; set; }
 
-
+        public List<CreateZoneRequest>? Zones { get; set; }
     }
 }

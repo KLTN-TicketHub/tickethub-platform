@@ -46,7 +46,7 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [Authorize(Roles = Roles.Moderator)]
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateEventCategoryAsync([FromBody] CreateEventCategoryRequest request, CancellationToken cancellationToken = default)
         {
