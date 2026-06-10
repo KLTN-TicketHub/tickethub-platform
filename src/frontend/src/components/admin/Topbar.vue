@@ -1,54 +1,86 @@
 <template>
-  <header class="h-[72px] bg-surface border-b border-border-main flex items-center justify-between px-6 md:px-10 sticky top-0 z-[50]">
-    <!-- Left: Search & Mobile Menu -->
-    <div class="flex items-center gap-4 flex-1">
-      <button class="md:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-card border border-border-main text-muted hover:text-primary transition-all" @click="toggleSidebar">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
-      </button>
+  <header class="sticky top-0 z-[100] bg-[#0A0F0D]/90 backdrop-blur-2xl border-b border-white/5 py-4">
+    <div class="px-6 md:px-10 flex items-center justify-between gap-6">
+      
+      <!-- Brand & Nav -->
+      <div class="flex items-center gap-10">
+        <router-link :to="role === 'admin' ? '/admin/dashboard' : '/moderator/dashboard'" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 bg-primary text-black rounded-xl flex items-center justify-center font-bold text-xl shadow-[0_0_20px_rgba(0,200,83,0.3)] group-hover:scale-110 transition-transform">
+            <PhCrown weight="fill" v-if="role === 'admin'" />
+            <PhShieldCheck weight="fill" v-else />
+          </div>
+          <div class="hidden xl:flex flex-col">
+            <span class="font-heading font-black text-xl tracking-tight text-white uppercase leading-none">TicketHub</span>
+            <span class="text-[10px] font-bold text-primary uppercase tracking-[0.3em] mt-1">{{ role === 'admin' ? 'Admin Space' : 'Moderator' }}</span>
+          </div>
+        </router-link>
 
-      <div class="hidden sm:flex items-center gap-3 bg-card border border-border-main rounded-xl px-4 w-full max-w-[400px] group focus-within:border-primary transition-all">
-        <svg class="w-4 h-4 text-muted group-focus-within:text-primary transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input 
-          type="text" 
-          :placeholder="searchPlaceholder" 
-          class="flex-1 bg-transparent border-none py-3 text-[14px] text-main outline-none placeholder:text-muted/50" 
-          v-model="localSearch"
-          @input="handleInput"
-        />
+        <nav class="hidden lg:flex items-center gap-1 bg-white/5 border border-white/10 rounded-full p-1">
+          <router-link 
+            v-for="item in activeMenuItems" 
+            :key="item.path" 
+            :to="item.path"
+            class="px-4 py-2 rounded-full text-[13px] font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2 group"
+            active-class="!text-black !bg-primary shadow-[0_0_15px_rgba(0,200,83,0.3)]"
+          >
+            <component :is="item.icon" weight="bold" class="text-lg opacity-80 group-hover:opacity-100" />
+            {{ item.label }}
+          </router-link>
+        </nav>
       </div>
-    </div>
-    
-    <!-- Right: Actions & Profile -->
-    <div class="flex items-center gap-6">
-      <button class="relative w-10 h-10 flex items-center justify-center rounded-xl bg-card border border-border-main text-muted hover:text-primary transition-all group">
-        <svg class="w-5 h-5 group-hover:animate-bounce" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full ring-2 ring-surface"></span>
-      </button>
 
-      <div class="w-[1px] h-6 bg-border-main hidden sm:block"></div>
+      <!-- Right Side -->
+      <div class="flex items-center gap-4">
+        <div class="hidden sm:flex items-center gap-3 bg-[#111916] border border-white/10 rounded-full px-4 py-2 w-64 group focus-within:border-primary/50 focus-within:bg-white/5 transition-all">
+          <PhMagnifyingGlass class="text-white/40 group-focus-within:text-primary text-lg" weight="bold" />
+          <input 
+            type="text" 
+            :placeholder="searchPlaceholder" 
+            class="flex-1 bg-transparent border-none text-[13px] text-white outline-none placeholder:text-white/30 font-medium" 
+            v-model="localSearch"
+            @input="handleInput"
+          />
+        </div>
 
-      <div class="flex items-center gap-3 cursor-pointer group">
-        <div class="flex flex-col text-right hidden sm:flex">
-          <span class="text-[14px] font-bold text-main group-hover:text-primary transition-colors">{{ store.user?.name || 'Admin User' }}</span>
-          <span class="text-[11px] font-bold text-muted uppercase tracking-wider">{{ store.user?.roles?.[0] || 'Superuser' }}</span>
-        </div>
-        <div class="w-10 h-10 rounded-xl overflow-hidden border-2 border-border-main group-hover:border-primary transition-all shadow-lg">
-          <img :src="store.user?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(store.user?.name || 'Admin')}&background=00C853&color=fff`" alt="Admin" class="w-full h-full object-cover" />
-        </div>
+        <button @click="handleLogout" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-danger hover:border-danger/30 hover:bg-danger/10 transition-all group">
+          <PhSignOut class="text-lg group-hover:scale-110 transition-transform" weight="bold" />
+        </button>
       </div>
+
     </div>
   </header>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
-import { toggleSidebar, adminSearch } from '../../stores/adminStore'
-import { store } from '../../stores/eventStore'
+import { useRoute, useRouter } from 'vue-router'
+import { adminSearch } from '../../stores/adminStore'
+import { logout as authLogout } from '../../services/auth/auth.service'
+import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset } from '@phosphor-icons/vue'
+
+const props = defineProps({
+  role: { type: String, default: 'admin' }
+})
 
 const route = useRoute()
+const router = useRouter()
 const localSearch = ref('')
 let debounceTimer = null
+
+const adminMenuItems = [
+  { label: 'Tổng quan', path: '/admin/dashboard', icon: PhSquaresFour },
+  { label: 'Sự kiện', path: '/admin/events', icon: PhTicket },
+  { label: 'Người dùng', path: '/admin/users', icon: PhUsers },
+  { label: 'Kiểm duyệt', path: '/admin/moderators', icon: PhShieldCheck },
+  { label: 'Đơn hàng', path: '/admin/orders', icon: PhReceipt },
+]
+
+const modMenuItems = [
+  { label: 'Tổng quan', path: '/moderator/dashboard', icon: PhSquaresFour },
+  { label: 'Duyệt sự kiện', path: '/moderator/events', icon: PhCheckSquareOffset },
+]
+
+const activeMenuItems = computed(() => props.role === 'admin' ? adminMenuItems : modMenuItems)
 
 const searchPlaceholder = computed(() => {
   if (route.path.includes('/events')) return 'Tìm sự kiện...'
@@ -59,9 +91,11 @@ const searchPlaceholder = computed(() => {
 
 const handleInput = () => {
   clearTimeout(debounceTimer)
-  debounceTimer = setTimeout(() => {
-    adminSearch.value = localSearch.value
-  }, 300)
+  debounceTimer = setTimeout(() => { adminSearch.value = localSearch.value }, 300)
+}
+
+const handleLogout = async () => {
+  await authLogout()
+  router.replace(props.role === 'admin' ? '/admin/login' : '/moderator/login')
 }
 </script>
-

@@ -22,19 +22,18 @@ const props = defineProps({
 
 const badgeClasses = computed(() => {
   return [
-    // Base styles
-    'inline-flex items-center justify-center font-bold font-sans uppercase tracking-wider rounded-full',
+    'inline-flex items-center justify-center font-bold font-sans uppercase tracking-[0.1em] rounded-full border',
     
     // Sizes
-    props.size === 'sm' ? 'px-2 py-0.5 text-[10px]' : '',
-    props.size === 'md' ? 'px-3 py-1 text-xs' : '',
+    props.size === 'sm' ? 'px-2 py-0.5 text-[9px]' : '',
+    props.size === 'md' ? 'px-3 py-1 text-[11px]' : '',
     
     // Variants
-    props.variant === 'primary' ? 'bg-primary-dim text-primary' : '',
-    props.variant === 'success' ? 'bg-primary-dim text-primary border border-primary/20' : '', // Similar to primary but with border
-    props.variant === 'warning' ? 'bg-gold/15 text-gold border border-gold/30' : '',
-    props.variant === 'danger' ? 'bg-danger/15 text-danger border border-danger/30' : '',
-    props.variant === 'neutral' ? 'bg-card text-muted border border-border-main' : ''
+    props.variant === 'primary' ? 'bg-primary/10 text-primary border-primary/20' : '',
+    props.variant === 'success' ? 'bg-[#00E05D]/10 text-[#00E05D] border-[#00E05D]/20' : '',
+    props.variant === 'warning' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' : '',
+    props.variant === 'danger' ? 'bg-red-500/10 text-red-500 border-red-500/20' : '',
+    props.variant === 'neutral' ? 'bg-white/5 text-white/60 border-white/10' : ''
   ]
 })
 </script>

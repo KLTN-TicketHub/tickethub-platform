@@ -4,7 +4,7 @@
     :disabled="disabled || loading"
     @click="$emit('click', $event)"
   >
-    <span v-if="loading" class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+    <div v-if="loading" class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
     <slot v-else name="icon-left"></slot>
     <slot></slot>
     <slot name="icon-right"></slot>
@@ -25,34 +25,27 @@ const props = defineProps({
     default: 'md',
     validator: (v) => ['sm', 'md', 'lg'].includes(v)
   },
-  loading: {
-    type: Boolean,
-    default: false
-  },
-  disabled: {
-    type: Boolean,
-    default: false
-  }
+  loading: Boolean,
+  disabled: Boolean
 })
 
 defineEmits(['click'])
 
 const buttonClasses = computed(() => {
   return [
-    // Base styles
-    'inline-flex items-center justify-center rounded-xl font-sans font-medium transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap',
+    'inline-flex items-center justify-center rounded-full font-bold transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
     
     // Sizes
-    props.size === 'sm' ? 'px-3 py-1.5 text-xs gap-1.5' : '',
-    props.size === 'md' ? 'px-4 py-2 text-sm gap-2' : '',
-    props.size === 'lg' ? 'px-6 py-3 text-base gap-2.5' : '',
+    props.size === 'sm' ? 'px-4 py-2 text-[13px] gap-1.5' : '',
+    props.size === 'md' ? 'px-6 py-2.5 text-[14px] gap-2' : '',
+    props.size === 'lg' ? 'px-8 py-3.5 text-[16px] gap-2.5' : '',
     
     // Variants
-    props.variant === 'primary' ? 'bg-primary text-black font-semibold hover:bg-[#00E05D] shadow-[0_0_15px_rgba(0,200,83,0.2)] hover:shadow-[0_0_25px_rgba(0,200,83,0.4)] hover:-translate-y-0.5' : '',
-    props.variant === 'ghost' ? 'bg-transparent text-main hover:bg-white/5 hover:text-primary' : '',
-    props.variant === 'outline' ? 'bg-transparent border border-white/10 text-main hover:border-primary/50 hover:bg-primary/5 hover:text-primary hover:-translate-y-0.5' : '',
-    props.variant === 'danger' ? 'bg-danger text-white hover:bg-danger/90 hover:shadow-[0_0_20px_rgba(255,71,87,0.3)] hover:-translate-y-0.5' : '',
-    props.variant === 'glass' ? 'glass hover:bg-white/10 text-white hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:-translate-y-0.5' : ''
+    props.variant === 'primary' ? 'bg-primary text-black hover:bg-[#00E05D] shadow-[0_4px_14px_rgba(0,200,83,0.1)] hover:shadow-[0_6px_20px_rgba(0,200,83,0.2)]' : '',
+    props.variant === 'ghost' ? 'bg-transparent text-white/70 hover:bg-white/5 hover:text-white' : '',
+    props.variant === 'outline' ? 'bg-transparent border border-white/10 text-white/80 hover:border-white/30 hover:bg-white/5 hover:text-white' : '',
+    props.variant === 'danger' ? 'bg-danger/10 border border-danger/20 text-danger hover:bg-danger hover:text-white' : '',
+    props.variant === 'glass' ? 'bg-white/5 backdrop-blur-md border border-white/10 text-white hover:bg-white/10' : ''
   ]
 })
 </script>

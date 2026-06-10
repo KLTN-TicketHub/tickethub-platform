@@ -16,6 +16,7 @@ import DestinationsPage from '../pages/DestinationsPage.vue'
 import AuthCallback from '../pages/AuthCallback.vue'
 import ForbiddenPage from '../pages/ForbiddenPage.vue'
 import ActivateAccountPage from '../pages/ActivateAccountPage.vue'
+import NotFoundPage from '../pages/NotFoundPage.vue'
 
 // Admin
 import AdminLayout from '../layouts/AdminLayout.vue'
@@ -47,6 +48,7 @@ const routes = [
   { path: '/moderator/login', name: 'moderator-login', component: ModeratorLoginPage },
   { path: '/activate-account', name: 'activate-account', component: ActivateAccountPage },
   { path: '/403', name: 'forbidden', component: ForbiddenPage },
+  { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFoundPage },
   
   // Admin Routes
   {

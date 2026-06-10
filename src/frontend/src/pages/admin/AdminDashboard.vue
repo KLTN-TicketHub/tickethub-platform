@@ -1,83 +1,105 @@
 <template>
-  <div class="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
+  <div class="flex flex-col gap-10 animate-fade-up pb-12">
     <!-- Header -->
-    <div>
-      <h1 class="font-heading text-3xl font-bold text-main mb-2">Tổng quan</h1>
-      <p class="text-muted font-medium italic">Chào mừng trở lại! Đây là tóm tắt hoạt động của hệ thống hôm nay.</p>
+    <div class="flex flex-col gap-2">
+      <h1 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight">Tổng quan</h1>
+      <p class="text-white/50 font-medium text-lg max-w-2xl">Theo dõi hiệu suất nền tảng, doanh thu và các hoạt động mới nhất trong ngày.</p>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div v-for="stat in mainStats" :key="stat.label" 
-        class="bg-card border border-border-main p-6 rounded-[24px] flex items-center gap-5 group hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300"
+    <!-- Stats Bento Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div v-for="(stat, idx) in mainStats" :key="stat.label" 
+        class="relative overflow-hidden rounded-[2rem] p-8 flex flex-col gap-6 group transition-transform duration-500 hover:-translate-y-1"
+        :class="stat.bgClass"
       >
-        <div 
-          class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300 shadow-inner" 
-          :style="{ backgroundColor: stat.bg, color: stat.color }"
-        >
-          <component :is="stat.icon" class="w-6 h-6" />
+        <div class="flex justify-between items-start relative z-10">
+          <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-lg" :class="stat.iconBgClass">
+            <component :is="stat.icon" weight="fill" :class="stat.iconColorClass" />
+          </div>
+          <span class="text-[10px] font-bold uppercase tracking-[0.2em]" :class="stat.iconColorClass">{{ stat.sub }}</span>
         </div>
-        <div class="flex flex-col">
-          <span class="text-[11px] font-bold text-muted uppercase tracking-widest mb-1">{{ stat.label }}</span>
-          <span class="text-2xl font-bold text-main">{{ stat.value }}</span>
-          <span class="text-[12px] text-muted font-medium mt-1">{{ stat.sub }}</span>
+        <div class="flex flex-col relative z-10 mt-4">
+          <span class="text-[13px] font-bold text-white/50 mb-1">{{ stat.label }}</span>
+          <span class="text-4xl font-heading font-black text-white tracking-tight">{{ stat.value }}</span>
         </div>
+        <!-- Decorative Glow -->
+        <div class="absolute -bottom-10 -right-10 w-40 h-40 rounded-full blur-[50px] opacity-20 pointer-events-none transition-opacity duration-500 group-hover:opacity-40" :class="stat.glowClass"></div>
       </div>
     </div>
 
-    <!-- Dashboard Content -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Recent Events Table -->
-      <div class="lg:col-span-2 bg-card border border-border-main rounded-[32px] overflow-hidden shadow-xl flex flex-col">
-        <div class="p-6 border-b border-border-main flex justify-between items-center bg-card/50">
-          <h3 class="text-lg font-bold text-main">Sự kiện mới đăng</h3>
-          <router-link to="/admin/events" class="text-primary text-[13px] font-bold hover:underline transition-all">Tất cả →</router-link>
+    <!-- Main Content Area -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Recent Events Table (Takes 8 cols) -->
+      <div class="lg:col-span-8 flex flex-col gap-6">
+        <div class="flex justify-between items-end px-2">
+          <h3 class="text-2xl font-bold font-heading text-white">Sự kiện mới đăng</h3>
+          <router-link to="/admin/events" class="text-[13px] font-bold text-primary hover:text-white transition-colors flex items-center gap-1 group">
+            Xem tất cả <PhArrowRight weight="bold" class="group-hover:translate-x-1 transition-transform" />
+          </router-link>
         </div>
-        
-        <BaseTable :columns="eventColumns" :data="recentEvents" variant="ghost">
+        <BaseTable :columns="eventColumns" :data="recentEvents">
           <template #event="{ row }">
-            <div class="flex items-center gap-3">
-              <img :src="row.image" class="w-10 h-7 rounded-md object-cover border border-border-main shadow-sm" />
-              <span class="font-bold text-main group-hover:text-primary transition-colors line-clamp-1">{{ row.title }}</span>
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl overflow-hidden border border-white/10 flex-shrink-0">
+                <img :src="row.image" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              </div>
+              <span class="font-bold text-white group-hover:text-primary transition-colors line-clamp-1">{{ row.title }}</span>
             </div>
           </template>
-          
           <template #category="{ row }">
-            <span class="text-[13px] text-muted font-medium capitalize">{{ row.category }}</span>
+            <span class="text-[13px] text-white/60 font-bold uppercase tracking-wider">{{ row.category }}</span>
           </template>
-          
           <template #date="{ row }">
-            <span class="text-[13px] text-muted font-medium">{{ formatDate(row.dateStart) }}</span>
+            <span class="text-[14px] text-white/80 font-medium">{{ formatDate(row.dateStart) }}</span>
           </template>
-          
           <template #status="{ row }">
-            <BaseBadge :variant="getStatusVariant(row.status)" size="xs">{{ getStatusLabel(row.status) }}</BaseBadge>
+            <BaseBadge :variant="getStatusVariant(row.status)">{{ getStatusLabel(row.status) }}</BaseBadge>
           </template>
         </BaseTable>
       </div>
 
-      <!-- Right Column -->
-      <div class="flex flex-col gap-8">
-        <!-- Recent Orders -->
-        <div class="bg-card border border-border-main rounded-[32px] overflow-hidden shadow-xl">
-          <div class="p-6 border-b border-border-main flex justify-between items-center bg-card/50">
-            <h3 class="text-lg font-bold text-main">Đơn hàng mới</h3>
-            <router-link to="/admin/orders" class="text-primary text-[13px] font-bold hover:underline transition-all">Tất cả →</router-link>
+      <!-- Right Column (Takes 4 cols) -->
+      <div class="lg:col-span-4 flex flex-col gap-8">
+        
+        <!-- Revenue by category -->
+        <div class="bg-[#111916]/50 border border-white/5 rounded-[2rem] p-8 flex flex-col gap-8">
+          <h3 class="text-xl font-bold font-heading text-white">Doanh thu thể loại</h3>
+          <div class="flex flex-col gap-6">
+            <div v-for="cat in revenueByCategory" :key="cat.name" class="flex flex-col gap-3 group">
+              <div class="flex justify-between items-center">
+                <span class="text-[14px] font-bold text-white/80 flex items-center gap-3">
+                  <component :is="cat.icon" weight="fill" class="text-white/40 group-hover:text-primary transition-colors" />
+                  {{ cat.name }}
+                </span>
+                <span class="text-[13px] font-bold text-white">{{ formatPrice(cat.revenue) }}</span>
+              </div>
+              <div class="h-1.5 bg-white/5 rounded-full overflow-hidden relative">
+                <div class="absolute top-0 left-0 h-full bg-primary rounded-full transition-all duration-1000" :style="{ width: cat.percent + '%' }"></div>
+              </div>
+            </div>
           </div>
-          <div class="divide-y divide-border-main/30">
-            <div v-for="order in recentOrders" :key="order.id" class="p-5 flex items-center justify-between hover:bg-surface/50 transition-all group">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-surface border border-border-main flex items-center justify-center text-[13px] font-bold text-primary shadow-inner group-hover:border-primary/30 transition-colors">
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="bg-[#111916]/50 border border-white/5 rounded-[2rem] p-8 flex flex-col gap-6">
+          <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold font-heading text-white">Đơn hàng mới</h3>
+          </div>
+          <div class="flex flex-col gap-5">
+            <div v-for="order in recentOrders" :key="order.id" class="flex items-center justify-between group cursor-pointer">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[13px] font-bold text-white/60 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                   {{ order.user.name.charAt(0) }}
                 </div>
                 <div class="flex flex-col">
-                  <span class="text-[14px] font-bold text-main leading-tight group-hover:text-primary transition-colors">{{ order.user.name }}</span>
-                  <span class="text-[11px] text-muted line-clamp-1 max-w-[140px]">{{ order.event.title }}</span>
+                  <span class="text-[14px] font-bold text-white leading-tight group-hover:text-primary transition-colors">{{ order.user.name }}</span>
+                  <span class="text-[12px] text-white/40 line-clamp-1 max-w-[120px] mt-0.5">{{ order.event.title }}</span>
                 </div>
               </div>
               <div class="flex flex-col items-end gap-1">
                 <span class="text-[14px] font-bold text-primary">{{ formatPrice(order.totalPrice) }}</span>
-                <BaseBadge :variant="order.status === 'confirmed' ? 'primary' : 'secondary'" size="xs" class="!px-1.5 !py-0.5 !text-[9px]">
+                <BaseBadge :variant="order.status === 'confirmed' ? 'primary' : 'neutral'" size="sm">
                   {{ order.status === 'confirmed' ? 'Xong' : 'Chờ' }}
                 </BaseBadge>
               </div>
@@ -85,42 +107,24 @@
           </div>
         </div>
 
-        <!-- Revenue by category -->
-        <div class="bg-card border border-border-main rounded-[32px] p-8 shadow-xl">
-          <h3 class="text-lg font-bold text-main mb-6">Doanh thu theo loại</h3>
-          <div class="flex flex-col gap-6">
-            <div v-for="cat in revenueByCategory" :key="cat.name" class="flex flex-col gap-2.5">
-              <div class="flex justify-between items-center">
-                <span class="text-[13px] font-bold text-main flex items-center gap-2">
-                  <span class="w-6 h-6 flex items-center justify-center rounded-lg bg-surface border border-border-main text-[12px]">{{ cat.icon }}</span>
-                  {{ cat.name }}
-                </span>
-                <span class="text-[12px] font-bold text-muted">{{ formatPrice(cat.revenue) }}</span>
-              </div>
-              <div class="h-2 bg-surface rounded-full overflow-hidden border border-border-main/50 relative">
-                <div 
-                  class="h-full bg-gradient-to-r from-primary/40 to-primary rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(0,200,83,0.3)]"
-                  :style="{ width: cat.percent + '%' }"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, h } from 'vue'
+import { computed } from 'vue'
 import { getEvents } from '../../stores/eventStore'
 import { usersData, ordersData } from '../../stores/adminStore'
 import BaseBadge from '../../components/ui/BaseBadge.vue'
 import BaseTable from '../../components/ui/BaseTable.vue'
+import { 
+  PhTicket, PhUsers, PhReceipt, PhCoins, PhArrowRight,
+  PhMicrophoneStage, PhTrophy, PhMaskHappy, PhCompass, PhBooks 
+} from '@phosphor-icons/vue'
 
 const allEvents = computed(() => getEvents())
 
-// Column definition for summary table
 const eventColumns = [
   { key: 'event', label: 'Sự kiện' },
   { key: 'category', label: 'Thể loại' },
@@ -128,54 +132,56 @@ const eventColumns = [
   { key: 'status', label: 'Trạng thái', class: 'text-right' },
 ]
 
-// Icons
-const EventIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', strokeWidth: '2', viewBox: '0 0 24 24' }, [h('rect', { x: '3', y: '4', width: '18', height: '18', rx: '2' }), h('line', { x1: '16', y1: '2', x2: '16', y2: '6' }), h('line', { x1: '8', y1: '2', x2: '8', y2: '6' }), h('line', { x1: '3', y1: '10', x2: '21', y2: '10' })])
-const UserIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', strokeWidth: '2', viewBox: '0 0 24 24' }, [h('path', { d: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2' }), h('circle', { cx: '9', cy: '7', r: '4' })])
-const OrderIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', strokeWidth: '2', viewBox: '0 0 24 24' }, [h('circle', { cx: '9', cy: '21', r: '1' }), h('circle', { cx: '20', cy: '21', r: '1' }), h('path', { d: 'M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6' })])
-const MoneyIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', strokeWidth: '2', viewBox: '0 0 24 24' }, [h('line', { x1: '12', y1: '1', x2: '12', y2: '23' }), h('path', { d: 'M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' })])
-
 const mainStats = computed(() => [
   { 
     label: 'Tổng sự kiện', 
     value: allEvents.value.length, 
-    sub: `${allEvents.value.filter(e => e.status === 'upcoming').length} sắp diễn ra`,
-    icon: EventIcon,
-    bg: 'var(--color-primary-dim)',
-    color: 'var(--color-primary)'
+    sub: 'Đang mở',
+    icon: PhTicket,
+    bgClass: 'bg-[#111916] border border-white/5',
+    iconBgClass: 'bg-primary/10',
+    iconColorClass: 'text-primary',
+    glowClass: 'bg-primary'
   },
   { 
     label: 'Người dùng', 
     value: usersData.length, 
-    sub: `${usersData.filter(u => u.status === 'active').length} đang hoạt động`,
-    icon: UserIcon,
-    bg: 'rgba(99, 102, 241, 0.1)',
-    color: '#818cf8'
+    sub: 'Hoạt động',
+    icon: PhUsers,
+    bgClass: 'bg-[#111916] border border-white/5',
+    iconBgClass: 'bg-[#818cf8]/10',
+    iconColorClass: 'text-[#818cf8]',
+    glowClass: 'bg-[#818cf8]'
   },
   { 
     label: 'Đơn hàng', 
     value: ordersData.length, 
-    sub: `${ordersData.filter(o => o.status === 'confirmed').length} đã xác nhận`,
-    icon: OrderIcon,
-    bg: 'var(--color-warning-dim)',
-    color: 'var(--color-warning)'
+    sub: 'Thành công',
+    icon: PhReceipt,
+    bgClass: 'bg-[#111916] border border-white/5',
+    iconBgClass: 'bg-yellow-500/10',
+    iconColorClass: 'text-yellow-500',
+    glowClass: 'bg-yellow-500'
   },
   { 
     label: 'Doanh thu', 
     value: formatPrice(ordersData.filter(o => o.status === 'confirmed').reduce((sum, o) => sum + o.totalPrice, 0)), 
-    sub: 'Từ các đơn thành công',
-    icon: MoneyIcon,
-    bg: 'rgba(236, 72, 153, 0.1)',
-    color: '#f472b6'
+    sub: 'Tuần này',
+    icon: PhCoins,
+    bgClass: 'bg-[#111916] border border-white/5',
+    iconBgClass: 'bg-[#f472b6]/10',
+    iconColorClass: 'text-[#f472b6]',
+    glowClass: 'bg-[#f472b6]'
   }
 ])
 
-const recentEvents = computed(() => allEvents.value.slice(0, 6))
+const recentEvents = computed(() => allEvents.value.slice(0, 5))
 const recentOrders = computed(() => [...ordersData].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5))
 
 const revenueByCategory = computed(() => {
   const cats = { concerts: 0, sports: 0, arts: 0, experiences: 0, workshops: 0 }
   const labels = { concerts: 'Concert', sports: 'Thể thao', arts: 'Sân khấu', experiences: 'Trải nghiệm', workshops: 'Workshop' }
-  const icons = { concerts: '🎵', sports: '⚽', arts: '🎭', experiences: '🧭', workshops: '📚' }
+  const icons = { concerts: PhMicrophoneStage, sports: PhTrophy, arts: PhMaskHappy, experiences: PhCompass, workshops: PhBooks }
   
   ordersData.filter(o => o.status === 'confirmed').forEach(o => {
     const ev = allEvents.value.find(e => e.title === o.event.title)
@@ -187,21 +193,17 @@ const revenueByCategory = computed(() => {
     icon: icons[key],
     revenue: val,
     percent: Math.round((val / max) * 100)
-  }))
+  })).sort((a,b) => b.revenue - a.revenue)
 })
 
 const getStatusVariant = (status) => {
   if (status === 'upcoming') return 'primary'
   if (status === 'sold-out') return 'danger'
-  return 'secondary'
+  return 'neutral'
 }
 
 const getStatusLabel = (status) => {
-  const map = {
-    'upcoming': 'Sắp tới',
-    'sold-out': 'Hết vé',
-    'ended': 'Kết thúc'
-  }
+  const map = { 'upcoming': 'Sắp diễn ra', 'sold-out': 'Hết vé', 'ended': 'Đã kết thúc' }
   return map[status] || status
 }
 
@@ -215,4 +217,3 @@ const formatPrice = (n) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(n).replace('₫', 'đ')
 }
 </script>
-

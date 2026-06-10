@@ -2,26 +2,26 @@
   <div class="min-h-[80vh] flex items-center justify-center py-20 px-4 animate-fade-up">
     <div class="max-w-2xl w-full text-center space-y-10 relative">
       <!-- Decor Background -->
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-danger/20 blur-[120px] rounded-full pointer-events-none"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/20 blur-[120px] rounded-full pointer-events-none"></div>
 
-      <div class="w-28 h-28 mx-auto bg-danger/10 border border-danger/20 rounded-[2rem] flex items-center justify-center text-6xl text-danger shadow-[0_0_50px_rgba(239,68,68,0.2)] relative z-10">
-        <PhShieldSlash weight="duotone" />
+      <div class="w-28 h-28 mx-auto bg-[#111916] border border-white/5 rounded-[2rem] flex items-center justify-center text-6xl text-primary shadow-inner relative z-10 group hover:scale-110 transition-transform">
+        <PhMagnifyingGlass weight="duotone" class="group-hover:rotate-12 transition-transform duration-500" />
       </div>
 
       <div class="space-y-4 relative z-10">
-        <h1 class="font-heading text-8xl font-black text-white tracking-tighter">403</h1>
-        <h2 class="text-3xl font-black text-white">Truy cập bị từ chối</h2>
+        <h1 class="font-heading text-8xl font-black text-white tracking-tighter">404</h1>
+        <h2 class="text-3xl font-black text-white">Không tìm thấy trang</h2>
         <p class="text-lg text-white/50 font-medium max-w-md mx-auto">
-          Tài khoản của bạn không có đủ quyền hạn để truy cập vào phân vùng này. Vui lòng quay lại trang chủ hoặc đăng nhập bằng một tài khoản khác.
+          Trang bạn đang tìm kiếm có thể đã bị xóa, thay đổi đường dẫn hoặc tạm thời không khả dụng.
         </p>
       </div>
 
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 relative z-10">
         <BaseButton variant="primary" size="lg" class="w-full sm:w-auto !px-10 !rounded-2xl flex items-center justify-center gap-2" @click="goHome">
-          <PhHouse weight="fill" /> Quay lại an toàn
+          <PhHouse weight="fill" /> Về trang chủ
         </BaseButton>
-        <BaseButton variant="ghost" size="lg" class="w-full sm:w-auto !px-10 !rounded-2xl border border-white/10 hover:border-white/20 hover:bg-white/5 flex items-center justify-center gap-2" @click="handleLogout">
-          <PhSignOut weight="bold" /> Đăng xuất tài khoản
+        <BaseButton variant="ghost" size="lg" class="w-full sm:w-auto !px-10 !rounded-2xl border border-white/10 hover:border-white/20 hover:bg-white/5 flex items-center justify-center gap-2" @click="router.back()">
+          <PhArrowLeft weight="bold" /> Quay lại
         </BaseButton>
       </div>
     </div>
@@ -31,10 +31,9 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { logout } from '../services/auth/auth.service'
 import { store } from '../stores/eventStore'
 import BaseButton from '../components/ui/BaseButton.vue'
-import { PhShieldSlash, PhHouse, PhSignOut } from '@phosphor-icons/vue'
+import { PhMagnifyingGlass, PhHouse, PhArrowLeft } from '@phosphor-icons/vue'
 
 const router = useRouter()
 
@@ -50,9 +49,5 @@ const homePath = computed(() => {
 
 const goHome = () => {
   router.push(homePath.value)
-}
-
-const handleLogout = async () => {
-  await logout()
 }
 </script>

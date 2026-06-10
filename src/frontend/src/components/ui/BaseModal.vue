@@ -2,42 +2,37 @@
   <Teleport to="body">
     <Transition
       enter-active-class="transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]"
-      enter-from-class="opacity-0 scale-95 backdrop-blur-0"
-      enter-to-class="opacity-100 scale-100 backdrop-blur-xl"
+      enter-from-class="opacity-0 scale-95 translate-y-4"
+      enter-to-class="opacity-100 scale-100 translate-y-0"
       leave-active-class="transition-all duration-300 ease-in"
-      leave-from-class="opacity-100 scale-100 backdrop-blur-xl"
-      leave-to-class="opacity-0 scale-95 backdrop-blur-0"
+      leave-from-class="opacity-100 scale-100 translate-y-0"
+      leave-to-class="opacity-0 scale-95 translate-y-4"
     >
       <div v-if="show" class="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-6" @mousedown.self="$emit('close')">
-        <!-- Backdrop Backdrop -->
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="absolute inset-0 bg-[#0A0F0D]/80 backdrop-blur-md transition-opacity"></div>
 
-        <!-- Modal Content -->
         <div 
-          class="relative w-full overflow-hidden bg-card border border-border-main rounded-[3rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.8)] flex flex-col"
+          class="relative w-full overflow-hidden bg-[#111916] border border-white/10 rounded-[2rem] shadow-[0_40px_80px_rgba(0,0,0,0.8)] flex flex-col"
           :class="[maxWidthClass]"
         >
-          <!-- Header -->
-          <div class="flex items-center justify-between p-6 px-10 border-b border-border-main bg-card/50">
+          <div class="flex items-center justify-between p-6 px-8 border-b border-white/5 bg-white/[0.02]">
             <div class="flex flex-col">
-              <h2 class="text-2xl font-bold font-heading text-main leading-tight">{{ title }}</h2>
-              <p v-if="subtitle" class="text-[13px] font-medium text-muted mt-0.5">{{ subtitle }}</p>
+              <h2 class="text-2xl font-black font-heading text-white leading-tight">{{ title }}</h2>
+              <p v-if="subtitle" class="text-[13px] font-medium text-white/50 mt-1">{{ subtitle }}</p>
             </div>
             <button 
               @click="$emit('close')"
-              class="w-10 h-10 rounded-full flex items-center justify-center bg-surface border border-border-main text-muted hover:text-main hover:border-primary transition-all group"
+              class="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all group active:scale-90"
             >
-              <span class="text-xl group-active:scale-90 transition-transform">✕</span>
+              <PhX weight="bold" class="text-lg group-hover:rotate-90 transition-transform" />
             </button>
           </div>
 
-          <!-- Body -->
-          <div class="flex-1 overflow-y-auto max-h-[80vh] scroll-smooth p-6 px-10">
+          <div class="flex-1 overflow-y-auto max-h-[80vh] scroll-smooth p-6 px-8 hide-scroll">
             <slot />
           </div>
 
-          <!-- Footer -->
-          <div v-if="$slots.footer" class="p-6 px-10 border-t border-border-main bg-card/30 flex items-center justify-end gap-4">
+          <div v-if="$slots.footer" class="p-6 px-8 border-t border-white/5 bg-white/[0.02] flex items-center justify-end gap-4">
             <slot name="footer" />
           </div>
         </div>
@@ -48,15 +43,13 @@
 
 <script setup>
 import { computed } from 'vue'
+import { PhX } from '@phosphor-icons/vue'
 
 const props = defineProps({
   show: Boolean,
   title: String,
   subtitle: String,
-  size: {
-    type: String,
-    default: 'md' // sm, md, lg, xl
-  }
+  size: { type: String, default: 'md' }
 })
 
 defineEmits(['close'])
@@ -70,3 +63,8 @@ const maxWidthClass = computed(() => {
   }
 })
 </script>
+
+<style scoped>
+.hide-scroll::-webkit-scrollbar { display: none; }
+.hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+</style>

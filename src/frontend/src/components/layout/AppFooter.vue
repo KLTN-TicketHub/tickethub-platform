@@ -1,82 +1,61 @@
 <template>
-  <footer class="bg-surface border-t border-border-main pt-24 pb-12 overflow-hidden relative">
-    <!-- Decorative Background Element -->
-    <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 blur-[120px] rounded-full pointer-events-none"></div>
+  <footer class="bg-bg border-t border-white/5 pt-20 pb-12 overflow-hidden relative">
+    <!-- Decorative -->
+    <div class="absolute top-0 right-1/4 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none"></div>
     
     <div class="max-w-[1440px] mx-auto px-6 md:px-10">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-20">
+      <div class="flex flex-col lg:flex-row justify-between gap-16 mb-20 relative z-10">
         
-        <!-- Brand & About -->
-        <div class="lg:col-span-4 space-y-8">
-          <router-link to="/" class="flex items-center gap-4 group">
-            <div class="w-12 h-12 bg-primary text-black rounded-[14px] flex items-center justify-center font-bold text-2xl shadow-[0_0_30px_rgba(0,200,83,0.3)] group-hover:scale-110 transition-all">
-              ◉
+        <!-- Brand -->
+        <div class="lg:w-1/3 space-y-6">
+          <router-link to="/" class="flex items-center gap-3 group">
+            <div class="w-10 h-10 bg-primary text-black rounded-xl flex items-center justify-center font-bold text-xl shadow-[0_0_20px_rgba(0,200,83,0.3)] group-hover:scale-110 transition-transform">
+              <PhTicket weight="fill" />
             </div>
-              <span class="font-heading font-black text-2xl tracking-tighter text-white uppercase">TicketHub</span>
+            <span class="font-heading font-black text-2xl tracking-tight text-white uppercase">TicketHub</span>
           </router-link>
           
-          <p class="text-muted font-medium leading-relaxed max-w-sm">
-            TicketHub là nền tảng phân phối vé sự kiện hàng đầu, mang đến những trải nghiệm giải trí đẳng cấp và kết nối cộng đồng qua âm nhạc, nghệ thuật và thể thao.
+          <p class="text-muted text-[15px] font-medium leading-relaxed max-w-sm">
+            Nền tảng phân phối vé sự kiện cao cấp. Khám phá những trải nghiệm giải trí đẳng cấp và kết nối cộng đồng.
           </p>
 
-          <div class="flex items-center gap-4">
-            <a v-for="s in SOCIALS" :key="s.name" href="#" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-lg hover:bg-primary hover:text-black hover:border-primary transition-all duration-300">
-              {{ s.icon }}
+          <div class="flex items-center gap-3 pt-2">
+            <a v-for="s in SOCIALS" :key="s.name" href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-lg hover:bg-white/10 hover:text-white transition-all text-white/50">
+              <component :is="s.icon" weight="fill" />
             </a>
           </div>
         </div>
 
-        <!-- Links Columns -->
-        <div v-for="col in FOOTER_COLS" :key="col.title" class="lg:col-span-2 space-y-8">
-          <h4 class="text-[13px] font-bold text-white uppercase tracking-[0.2em]">{{ col.title }}</h4>
-          <ul class="space-y-4">
-            <li v-for="link in col.links" :key="link.label">
-                <a href="#" class="text-[15px] font-medium text-muted hover:text-primary transition-colors flex items-center gap-2 group">
-                <span class="w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                {{ link.label }}
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Newsletter / App -->
-        <div class="lg:col-span-2 space-y-8">
-          <h4 class="text-[13px] font-bold text-white uppercase tracking-[0.2em]">Tải ứng dụng</h4>
-          <div class="space-y-4">
-            <a href="#" class="block bg-card border border-white/10 rounded-2xl p-4 hover:border-primary transition-all group">
-              <div class="flex items-center gap-3">
-                <span class="text-2xl group-hover:scale-110 transition-transform">🍎</span>
-                <div class="flex flex-col">
-                  <span class="text-[10px] text-muted font-bold uppercase">Download on</span>
-                  <span class="text-[14px] font-bold text-white">App Store</span>
-                </div>
-              </div>
-            </a>
-            <a href="#" class="block bg-card border border-white/10 rounded-2xl p-4 hover:border-primary transition-all group">
-              <div class="flex items-center gap-3">
-                <span class="text-2xl group-hover:scale-110 transition-transform">🤖</span>
-                <div class="flex flex-col">
-                  <span class="text-[10px] text-muted font-bold uppercase">Get it on</span>
-                  <span class="text-[14px] font-bold text-white">Google Play</span>
-                </div>
-              </div>
-            </a>
+        <!-- Links -->
+        <div class="lg:w-2/3 flex flex-wrap lg:justify-end gap-12 md:gap-24">
+          <div v-for="col in FOOTER_COLS" :key="col.title" class="space-y-6 min-w-[140px]">
+            <h4 class="text-[12px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
+              <component :is="col.icon" weight="bold" class="text-primary text-lg" />
+              {{ col.title }}
+            </h4>
+            <ul class="space-y-4">
+              <li v-for="link in col.links" :key="link.label">
+                <a href="#" class="text-[14px] font-medium text-white/60 hover:text-white transition-colors">
+                  {{ link.label }}
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
 
       <!-- Bottom Bar -->
-      <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
-        <div class="flex flex-col md:flex-row items-center gap-4 md:gap-12">
-          <span class="text-[13px] text-muted font-medium">© 2025 TicketHub Corporation. All rights reserved.</span>
+      <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex flex-col md:flex-row items-center gap-6">
+          <span class="text-[13px] text-white/40 font-medium">© 2026 TicketHub. All rights reserved.</span>
           <div class="flex items-center gap-6">
-            <a href="#" class="text-[12px] text-muted hover:text-white transition-colors">Điều khoản sử dụng</a>
-            <a href="#" class="text-[12px] text-muted hover:text-white transition-colors">Chính sách bảo mật</a>
+            <a href="#" class="text-[13px] text-white/40 hover:text-white transition-colors">Privacy Policy</a>
+            <a href="#" class="text-[13px] text-white/40 hover:text-white transition-colors">Terms of Service</a>
           </div>
         </div>
         
-        <div class="flex items-center gap-3 text-muted font-bold text-[11px] uppercase tracking-widest">
-          Made with <span class="text-primary animate-pulse">💚</span> in Vietnam
+        <div class="flex items-center gap-2 text-white/40 font-medium text-[13px]">
+          Made with <PhHeart weight="fill" class="text-primary animate-pulse" /> in Vietnam
         </div>
       </div>
     </div>
@@ -84,42 +63,44 @@
 </template>
 
 <script setup>
+import { 
+  PhTicket, PhFacebookLogo, PhInstagramLogo, PhYoutubeLogo, PhTiktokLogo, 
+  PhHeart, PhCalendarStar, PhHeadset, PhBuildings
+} from '@phosphor-icons/vue'
+
 const SOCIALS = [
-  { name: 'FB', icon: 'f' },
-  { name: 'IG', icon: 'i' },
-  { name: 'YT', icon: 'y' },
-  { name: 'TT', icon: 't' },
+  { name: 'FB', icon: PhFacebookLogo },
+  { name: 'IG', icon: PhInstagramLogo },
+  { name: 'YT', icon: PhYoutubeLogo },
+  { name: 'TT', icon: PhTiktokLogo },
 ]
 
 const FOOTER_COLS = [
   {
-    title: '🎫 Sự kiện',
+    title: 'Sự kiện',
+    icon: PhCalendarStar,
     links: [
-      { label: 'Âm nhạc & Concert' },
-      { label: 'Sân khấu & Nghệ thuật' },
-      { label: 'Thể thao & Esports' },
-      { label: 'Hội thảo & Workshop' },
-      { label: 'Triển lãm & Trải nghiệm' },
+      { label: 'Concert & Âm nhạc' },
+      { label: 'Nghệ thuật & Sân khấu' },
+      { label: 'Thể thao' },
     ]
   },
   {
-    title: '🎧 Hỗ trợ',
+    title: 'Hỗ trợ',
+    icon: PhHeadset,
     links: [
       { label: 'Trung tâm trợ giúp' },
-      { label: 'Liên hệ hỗ trợ' },
       { label: 'Chính sách hoàn tiền' },
-      { label: 'Câu hỏi thường gặp (FAQ)' },
-      { label: 'Bảo mật thông tin' },
+      { label: 'Liên hệ' },
     ]
   },
   {
-    title: '🏢 Công ty',
+    title: 'Công ty',
+    icon: PhBuildings,
     links: [
       { label: 'Về TicketHub' },
-      { label: 'Tin tức & Báo chí' },
-      { label: 'Cơ hội nghề nghiệp' },
-      { label: 'Trở thành đối tác' },
-      { label: 'Liên hệ hợp tác' },
+      { label: 'Tuyển dụng' },
+      { label: 'Đối tác' },
     ]
   }
 ]

@@ -1,94 +1,76 @@
 <template>
-  <div class="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+  <div class="flex flex-col gap-8 animate-fade-up pb-12">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-      <div>
-        <h1 class="font-heading text-3xl font-bold text-main mb-2">Quản lý người dùng</h1>
-        <p class="text-muted font-medium">Quản lý thành viên và phân quyền trên hệ thống</p>
-      </div>
+    <div class="flex flex-col gap-2">
+      <h1 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight">Quản lý người dùng</h1>
+      <p class="text-white/50 font-medium text-lg">Quản lý thành viên và phân quyền trên hệ thống</p>
     </div>
 
     <!-- Filter Bar -->
-    <div class="bg-card border border-border-main p-6 rounded-[24px] flex flex-col lg:flex-row gap-4 items-center">
-      <div class="flex-1 flex items-center gap-3 bg-surface border border-border-main rounded-xl px-4 w-full group focus-within:border-primary transition-all">
-        <svg class="w-4 h-4 text-muted group-focus-within:text-primary transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-6 bg-[#111916] border border-white/5 rounded-[2rem] p-4 lg:px-6">
+      <div class="flex-1 flex items-center gap-3 bg-white/5 border border-white/10 rounded-full px-4 group focus-within:border-primary/50 transition-all w-full max-w-md">
+        <PhMagnifyingGlass class="text-white/40 group-focus-within:text-primary text-lg transition-colors" weight="bold" />
         <input 
           type="text" 
           v-model="localSearch" 
           placeholder="Tìm theo tên hoặc email..." 
-          class="flex-1 bg-transparent border-none py-3 text-[14px] text-main outline-none"
+          class="flex-1 bg-transparent border-none py-2.5 text-[14px] text-white outline-none placeholder:text-white/30"
         />
       </div>
-      <div class="flex gap-4 w-full lg:w-auto">
-        <BaseSelect 
-          :options="roleOptions" 
-          v-model="roleFilter"
-          class="min-w-[160px] flex-1 lg:flex-none"
-        />
-        <BaseSelect 
-          :options="statusOptions" 
-          v-model="statusFilter"
-          class="min-w-[160px] flex-1 lg:flex-none"
-        />
+      <div class="flex items-center gap-3 overflow-x-auto hide-scroll">
+        <BaseSelect :options="roleOptions" v-model="roleFilter" class="w-[180px] flex-shrink-0" />
+        <BaseSelect :options="statusOptions" v-model="statusFilter" class="w-[180px] flex-shrink-0" />
       </div>
     </div>
 
     <!-- Table Container -->
-    <div class="bg-card border border-border-main rounded-[32px] overflow-hidden shadow-xl">
+    <div class="flex flex-col gap-4">
       <BaseTable :columns="columns" :data="filteredUsers">
-        <!-- User Slot -->
         <template #user="{ row }">
           <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-[13px] font-bold text-primary shadow-inner uppercase">
+            <div class="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[13px] font-bold text-primary shadow-inner uppercase">
               {{ row.name.charAt(0) }}
             </div>
-            <span class="font-bold text-main">{{ row.name }}</span>
+            <span class="font-bold text-white">{{ row.name }}</span>
           </div>
         </template>
-
-        <!-- Email Slot -->
         <template #email="{ row }">
-          <span class="text-[14px] text-muted font-medium">{{ row.email }}</span>
+          <span class="text-[14px] text-white/70 font-medium">{{ row.email }}</span>
         </template>
-
-        <!-- Role Slot -->
         <template #role="{ row }">
           <span 
-            class="text-[11px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg border"
-            :class="row.role === 'admin' ? 'bg-primary/5 text-primary border-primary/20' : 'bg-surface text-muted border-border-main'"
+            class="text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border"
+            :class="row.role === 'admin' ? 'bg-primary/10 text-primary border-primary/20' : 'bg-white/5 text-white/60 border-white/10'"
           >
             {{ row.role }}
           </span>
         </template>
-
-        <!-- Status Slot -->
         <template #status="{ row }">
-          <BaseBadge :variant="row.status === 'active' ? 'primary' : 'secondary'" size="sm">
+          <BaseBadge :variant="row.status === 'active' ? 'primary' : 'neutral'">
             {{ row.status === 'active' ? 'Kích hoạt' : 'Vô hiệu' }}
           </BaseBadge>
         </template>
-
-        <!-- Actions Slot -->
         <template #actions="{ row }">
           <div class="flex justify-end gap-2">
-            <BaseButton variant="ghost" size="sm" class="!p-2 hover:!text-primary" @click="viewUser(row)">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <BaseButton variant="ghost" size="sm" class="!px-3 hover:!bg-white/10" @click="viewUser(row)">
+              <PhEye weight="bold" class="text-white/70" />
             </BaseButton>
-            <BaseButton variant="ghost" size="sm" class="!p-2 hover:!text-warning" @click="toggleStatus(row)">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+            <BaseButton variant="ghost" size="sm" class="!px-3 hover:!bg-warning/10 hover:!text-warning" @click="toggleStatus(row)">
+              <PhProhibit weight="bold" class="text-warning/70 hover:text-warning" />
             </BaseButton>
-            <BaseButton variant="ghost" size="sm" class="!p-2 hover:!text-danger" @click="confirmDelete(row)">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <BaseButton variant="ghost" size="sm" class="!px-3 hover:!bg-danger/10 hover:!text-danger" @click="confirmDelete(row)">
+              <PhTrash weight="bold" class="text-danger/70 hover:text-danger" />
             </BaseButton>
           </div>
         </template>
       </BaseTable>
 
-      <!-- Empty State -->
-      <div v-if="filteredUsers.length === 0" class="py-20 flex flex-col items-center text-center">
-        <div class="w-20 h-20 bg-surface rounded-full flex items-center justify-center text-4xl mb-6 shadow-inner">👤</div>
-        <h3 class="text-xl font-bold text-main mb-2">Không tìm thấy người dùng</h3>
-        <p class="text-muted max-w-xs mb-8">Hãy thử thay đổi từ khóa tìm kiếm hoặc bộ lọc của bạn.</p>
+      <div v-if="filteredUsers.length === 0" class="py-20 flex flex-col items-center text-center bg-[#111916]/50 border border-white/5 rounded-[2rem]">
+        <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center text-4xl mb-6 shadow-inner text-white/20">
+          <PhUsers weight="duotone" />
+        </div>
+        <h3 class="text-xl font-bold font-heading text-white mb-2">Không tìm thấy người dùng</h3>
+        <p class="text-white/50 max-w-xs mb-8">Thử thay đổi từ khóa hoặc xóa các bộ lọc để tìm lại.</p>
         <BaseButton variant="outline" size="sm" @click="resetFilters">Xóa bộ lọc</BaseButton>
       </div>
     </div>
@@ -102,6 +84,7 @@ import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseTable from '../../components/ui/BaseTable.vue'
 import BaseBadge from '../../components/ui/BaseBadge.vue'
 import BaseSelect from '../../components/ui/BaseSelect.vue'
+import { PhMagnifyingGlass, PhEye, PhProhibit, PhTrash, PhUsers } from '@phosphor-icons/vue'
 
 const localSearch = ref('')
 const roleFilter = ref('all')
@@ -127,7 +110,6 @@ const columns = [
   { key: 'actions', label: '', class: 'w-32' },
 ]
 
-// Sync with global topbar search
 watch(adminSearch, (val) => { localSearch.value = val })
 
 const filteredUsers = computed(() => {
@@ -140,9 +122,7 @@ const filteredUsers = computed(() => {
   })
 })
 
-const viewUser = (user) => {
-  addToast(`Đang xem hồ sơ của ${user.name}`, 'success')
-}
+const viewUser = (user) => { addToast(`Đang xem hồ sơ của ${user.name}`, 'success') }
 
 const toggleStatus = (user) => {
   const newStatus = user.status === 'active' ? 'disabled' : 'active'
@@ -154,17 +134,13 @@ const toggleStatus = (user) => {
 }
 
 const confirmDelete = (user) => {
-  openConfirm(
-    'Xóa người dùng',
-    `Bạn có chắc chắn muốn xóa "${user.name}"? Hành động này không thể hoàn tác.`,
-    () => {
-      const idx = usersData.findIndex(u => u.id === user.id)
-      if (idx !== -1) {
-        usersData.splice(idx, 1)
-        addToast(`Người dùng "${user.name}" đã bị xóa`, 'error')
-      }
+  openConfirm('Xóa người dùng', `Bạn có chắc chắn muốn xóa "${user.name}"? Hành động này không thể hoàn tác.`, () => {
+    const idx = usersData.findIndex(u => u.id === user.id)
+    if (idx !== -1) {
+      usersData.splice(idx, 1)
+      addToast(`Người dùng "${user.name}" đã bị xóa`, 'error')
     }
-  )
+  })
 }
 
 const resetFilters = () => {
@@ -173,4 +149,7 @@ const resetFilters = () => {
   statusFilter.value = 'all'
 }
 </script>
-
+<style scoped>
+.hide-scroll::-webkit-scrollbar { display: none; }
+.hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+</style>

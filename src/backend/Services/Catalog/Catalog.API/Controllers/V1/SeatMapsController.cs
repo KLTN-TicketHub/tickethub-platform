@@ -67,5 +67,26 @@ namespace Catalog.API.Controllers.V1
                 Data = _fileService.GetAbsoluteUrl(url)
             });
         }
+
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetSeatMapById(Guid id, CancellationToken cancellation = default)
+        {
+            //var result = await _sender.Send(new GetSeatMapByIdRequest(id), cancellation);
+            //if (result == null)
+            //    return NotFound(new ApiResponse
+            //    {
+            //        Success = false,
+            //        Message = "Không tìm thấy sơ đồ chỗ ngồi."
+            //    });
+            //return Ok(new ApiResponse<SeatMapDto>
+            //{
+            //    Data = result,
+            //    Success = true,
+            //    Message = "Lấy thông tin sơ đồ chỗ ngồi thành công."
+            //});
+
+            throw new NotImplementedException();
+        }
     }
 }

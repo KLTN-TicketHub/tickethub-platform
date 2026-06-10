@@ -1,252 +1,235 @@
 <template>
   <div class="flex flex-col gap-24 pb-20 overflow-hidden">
     
-    <!-- PREMIUM HERO SECTION -->
-    <section class="relative h-[85vh] min-h-[600px] w-full rounded-[3rem] overflow-hidden group/hero shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)] border border-white/5 animate-fade-in">
+    <!-- PREMIUM HERO SECTION (Asymmetric) -->
+    <section class="relative min-h-[85vh] w-full pt-10">
       <div 
         v-for="(s, i) in heroSlides" 
         :key="s.id" 
         class="absolute inset-0 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]"
-        :class="[i === slide ? 'opacity-100 z-10 scale-100' : 'opacity-0 z-0 scale-110 pointer-events-none']"
+        :class="[i === slide ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none']"
       >
-        <!-- Dynamic Background Layer -->
-        <div class="absolute inset-0 overflow-hidden">
-          <img 
-            :src="s.event.image" 
-            :alt="s.event.title" 
-            class="w-full h-full object-cover transition-transform duration-[20s] ease-linear" 
-            :class="[i === slide ? 'scale-115 rotate-1' : 'scale-100']" 
-          />
-          <!-- Multi-stage Gradient Overlays -->
-          <div class="absolute inset-0 bg-gradient-to-r from-bg via-bg/80 to-transparent"></div>
-          <div class="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-90"></div>
-          <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(0,200,83,0.15),transparent_50%)]"></div>
-        </div>
-
-        <!-- Content Container -->
-        <div class="relative z-20 h-full max-w-[1400px] mx-auto px-6 md:px-10 flex flex-col justify-center max-w-4xl pt-20">
-          <div class="space-y-8 transform transition-all duration-1000 delay-200" :class="[i === slide ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0']">
-            
+        <div class="max-w-[1440px] mx-auto px-6 md:px-10 h-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          <!-- Text Content (Left) -->
+          <div class="lg:col-span-6 relative z-20 space-y-8 transform transition-all duration-1000 delay-200" :class="[i === slide ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0']">
             <!-- Floating Feature Badge -->
-            <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 backdrop-blur-2xl border border-white/10 text-primary shadow-2xl">
-              <span class="flex h-2 w-2 rounded-full bg-primary animate-ping"></span>
-              <span class="text-[11px] font-bold tracking-[0.3em] uppercase">Sự kiện đặc sắc</span>
+            <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-primary/30 text-primary uppercase tracking-[0.25em] text-[10px] font-bold">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+              Sự kiện nổi bật
             </div>
             
-            <h1 class="text-5xl md:text-8xl font-bold font-heading text-main leading-[1] tracking-tight drop-shadow-2xl">
+            <h1 class="text-6xl md:text-[5.5rem] font-black font-heading text-white leading-[0.9] tracking-tighter drop-shadow-lg">
               {{ s.event.title }}
             </h1>
             
-            <p class="text-lg md:text-xl text-muted max-w-xl leading-relaxed font-medium">
-              Khám phá trải nghiệm giải trí đẳng cấp và sở hữu tấm vé vàng ngay hôm nay tại TicketHub.
+            <p class="text-lg md:text-xl text-white/60 max-w-lg leading-relaxed font-medium">
+              Khám phá những trải nghiệm giải trí đẳng cấp và sở hữu tấm vé giới hạn ngay hôm nay tại TicketHub.
             </p>
 
-            <div class="flex flex-wrap items-center gap-8 pt-4">
+            <div class="flex flex-wrap items-center gap-8 pt-6">
               <div class="flex flex-col">
-                <span class="text-[11px] text-muted font-bold uppercase tracking-widest mb-1">Giá vé chỉ từ</span>
-                <span class="text-3xl md:text-4xl font-heading font-bold text-primary">{{ formatPrice(s.event.priceRange) }}</span>
+                <span class="text-[11px] text-white/40 font-bold uppercase tracking-widest mb-1">Giá vé từ</span>
+                <span class="text-3xl font-heading font-black text-white">{{ formatPrice(s.event.priceRange) }}</span>
               </div>
-              <div class="h-12 w-px bg-white/10 hidden md:block"></div>
               <div class="flex items-center gap-4">
-                <BaseButton variant="primary" size="lg" class="!px-10 !rounded-2xl shadow-2xl shadow-primary/30" @click="goToEvent(s.event)">
-                  Đặt vé ngay 🎟️
+                <BaseButton variant="primary" size="lg" class="!px-10 !rounded-full shadow-[0_0_30px_rgba(0,200,83,0.3)] hover:scale-105 active:scale-95 transition-transform" @click="goToEvent(s.event)">
+                  Đặt vé ngay
                 </BaseButton>
-                <BaseButton variant="glass" size="lg" class="!rounded-2xl" @click="goToEvent(s.event)">
+                <BaseButton variant="ghost" size="lg" class="!rounded-full border border-white/20 hover:bg-white/10" @click="goToEvent(s.event)">
                   Chi tiết
                 </BaseButton>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Slide Navigation Icons -->
-      <div class="absolute bottom-12 right-12 z-30 flex items-center gap-6">
-        <button 
-          class="w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 text-white hover:bg-primary hover:text-black hover:border-primary transition-all duration-500 group"
-          @click="goSlide((slide - 1 + heroSlides.length) % heroSlides.length)"
-        >
-          <span class="text-2xl group-active:scale-90 transition-transform flex items-center justify-center">←</span>
-        </button>
-        <div class="flex gap-2">
-          <div 
-            v-for="(_, i) in heroSlides" 
-            :key="i" 
-            class="h-1.5 rounded-full transition-all duration-700" 
-            :class="[i === slide ? 'w-12 bg-primary' : 'w-2 bg-white/20']"
-          />
-        </div>
-        <button 
-          class="w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 text-white hover:bg-primary hover:text-black hover:border-primary transition-all duration-500 group"
-          @click="goSlide((slide + 1) % heroSlides.length)"
-        >
-          <span class="text-2xl group-active:scale-90 transition-transform flex items-center justify-center">→</span>
-        </button>
-      </div>
-    </section>
-
-
-    <!-- TRENDING SECTION -->
-    <section class="max-w-[1400px] mx-auto px-6 md:px-10 animate-fade-up [animation-delay:400ms]">
-      <div class="flex items-end justify-between mb-12">
-        <div>
-          <h2 class="text-4xl font-bold font-heading text-main mb-2 flex items-center gap-4">
-            <span class="w-2 h-10 bg-primary rounded-full"></span>
-            Đang Thịnh Hành
-          </h2>
-          <p class="text-muted font-medium">Những sự kiện nóng hổi nhất không thể bỏ qua</p>
-        </div>
-        <router-link to="/concerts" class="text-sm font-bold text-primary hover:text-white flex items-center gap-2 group transition-all">
-          Xem tất cả <span class="group-hover:translate-x-1 transition-transform">→</span>
-        </router-link>
-      </div>
-      
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        <EventCard 
-          v-for="(e, idx) in trending.slice(0, 4)" 
-          :key="e.id" 
-          :event="e" 
-          :rank="idx + 1"
-          :style="`animation-delay: ${idx * 100}ms`"
-          class="animate-fade-up"
-        />
-      </div>
-    </section>
-
-    <section class="py-16 animate-fade-up [animation-delay:500ms]">
-      <!-- Header inside container -->
-      <div class="max-w-[1400px] mx-auto px-6 md:px-10 mb-10 flex items-center justify-between">
-        <h2 class="text-3xl font-bold font-heading text-white flex items-center gap-4">
-          <span class="text-2xl">⭐</span> Nghệ sĩ nổi bật
-        </h2>
-        <div class="flex items-center gap-6">
-          <router-link to="/stars" class="text-sm font-bold text-muted hover:text-primary transition-colors">Xem tất cả</router-link>
-          <div class="flex gap-2">
-            <button @click="scrollContainer(starsScroll, -300)" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary hover:text-black transition-all">←</button>
-            <button @click="scrollContainer(starsScroll, 300)" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary hover:text-black transition-all">→</button>
+          <!-- Visual Asset (Right) -->
+          <div class="lg:col-span-6 h-[50vh] lg:h-[80vh] relative rounded-[2rem] overflow-hidden group shadow-2xl transform transition-all duration-[1.5s]" :class="[i === slide ? 'translate-x-0 opacity-100' : 'translate-x-20 opacity-0']">
+            <img 
+              :src="s.event.image" 
+              :alt="s.event.title" 
+              class="w-full h-full object-cover transition-transform duration-[20s] ease-linear scale-105" 
+              :class="[i === slide ? 'scale-110 rotate-1' : '']" 
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-80 lg:hidden"></div>
+            <div class="absolute inset-0 border border-white/10 rounded-[2rem] pointer-events-none mix-blend-overlay"></div>
           </div>
         </div>
       </div>
+
+      <!-- Slide Controls -->
+      <div class="max-w-[1440px] mx-auto px-6 md:px-10 absolute bottom-10 left-0 right-0 z-30 flex items-center justify-between pointer-events-none">
+        <div class="pointer-events-auto flex gap-3">
+          <div 
+            v-for="(_, i) in heroSlides" 
+            :key="i" 
+            class="h-1 rounded-full transition-all duration-700 cursor-pointer" 
+            :class="[i === slide ? 'w-16 bg-primary' : 'w-4 bg-white/20']"
+            @click="goSlide(i)"
+          />
+        </div>
+        <div class="pointer-events-auto flex items-center gap-4">
+          <button class="w-12 h-12 rounded-full border border-white/20 text-white flex items-center justify-center hover:bg-white/10 active:scale-90 transition-all" @click="goSlide((slide - 1 + heroSlides.length) % heroSlides.length)">
+            <PhArrowLeft weight="bold" />
+          </button>
+          <button class="w-12 h-12 rounded-full border border-white/20 text-white flex items-center justify-center hover:bg-white/10 active:scale-90 transition-all" @click="goSlide((slide + 1) % heroSlides.length)">
+            <PhArrowRight weight="bold" />
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRENDING SECTION (Bento Grid) -->
+    <section class="max-w-[1440px] mx-auto px-6 md:px-10 pt-10">
+      <div class="flex items-end justify-between mb-12">
+        <div>
+          <h2 class="text-4xl lg:text-5xl font-black font-heading text-white mb-3">Đang Thịnh Hành</h2>
+          <p class="text-white/50 text-lg font-medium">Những sự kiện nóng hổi nhất không thể bỏ qua</p>
+        </div>
+        <router-link to="/concerts" class="text-sm font-bold text-primary hover:text-white flex items-center gap-2 group transition-all hidden md:flex">
+          Xem tất cả <PhArrowRight weight="bold" class="group-hover:translate-x-1 transition-transform" />
+        </router-link>
+      </div>
       
-      <!-- Full-width scroll area with side padding -->
-      <div ref="starsScroll" class="flex gap-8 overflow-x-auto pb-6 hide-scroll scroll-smooth px-[max(1.5rem,calc((100vw-1400px)/2+1.5rem))] md:px-[max(2.5rem,calc((100vw-1400px)/2+2.5rem))]">
+      <!-- Asymmetric Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-6 gap-6 lg:gap-8">
+        <div 
+          v-for="(e, idx) in trending.slice(0, 5)" 
+          :key="e.id" 
+          class="animate-fade-up w-full"
+          :class="{
+            'md:col-span-4': idx === 0,
+            'md:col-span-2': idx === 1 || idx === 2,
+            'md:col-span-3': idx === 3 || idx === 4,
+          }"
+          :style="`animation-delay: ${idx * 100}ms`"
+        >
+          <EventCard :event="e" :rank="idx + 1" class="h-full w-full" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ARTISTS SECTION -->
+    <section class="py-16">
+      <div class="max-w-[1440px] mx-auto px-6 md:px-10 mb-10 flex items-center justify-between">
+        <h2 class="text-3xl lg:text-4xl font-bold font-heading text-white flex items-center gap-4">
+          <PhStar weight="fill" class="text-primary" /> Nghệ sĩ nổi bật
+        </h2>
+        <div class="flex items-center gap-4">
+          <button @click="scrollContainer(starsScroll, -300)" class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 text-white transition-all active:scale-95"><PhArrowLeft weight="bold" /></button>
+          <button @click="scrollContainer(starsScroll, 300)" class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 text-white transition-all active:scale-95"><PhArrowRight weight="bold" /></button>
+        </div>
+      </div>
+      
+      <div ref="starsScroll" class="flex gap-8 overflow-x-auto pb-6 hide-scroll scroll-smooth px-6 md:px-10 max-w-[1440px] mx-auto">
         <div 
           v-for="star in stars" 
           :key="star.id" 
-          class="flex flex-col items-center gap-4 flex-shrink-0 group cursor-pointer"
+          class="flex flex-col items-center gap-5 flex-shrink-0 group cursor-pointer"
         >
           <div class="relative">
-            <div class="w-32 h-32 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-primary transition-all duration-500 shadow-xl group-hover:shadow-primary/20">
-              <img :src="star.image" :alt="star.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <div class="w-32 h-32 lg:w-40 lg:h-40 rounded-full overflow-hidden border border-white/10 group-hover:border-primary/50 transition-colors duration-500 shadow-2xl">
+              <img :src="star.image" :alt="star.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 grayscale group-hover:grayscale-0" />
             </div>
-            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-primary text-black text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg">
+            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white text-black text-[11px] font-black px-3 py-1 rounded-full shadow-lg border border-black/10">
               {{ star.followers }}
             </div>
           </div>
           <div class="text-center">
-            <div class="font-bold text-white group-hover:text-primary transition-colors">{{ star.name }}</div>
-            <div class="text-[11px] text-muted font-bold uppercase tracking-widest mt-0.5">Nghệ sĩ</div>
+            <div class="font-bold text-lg text-white group-hover:text-primary transition-colors">{{ star.name }}</div>
+            <div class="text-[10px] text-white/40 font-bold uppercase tracking-[0.2em] mt-1">Nghệ sĩ</div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="py-16 animate-fade-up [animation-delay:600ms]">
-      <div class="max-w-[1400px] mx-auto px-6 md:px-10 mb-10 flex items-center justify-between">
-        <h2 class="text-3xl font-bold font-heading text-white flex items-center gap-4">
-          <span class="text-2xl">📍</span> Điểm đến thú vị
+    <!-- DESTINATIONS SECTION -->
+    <section class="py-10">
+      <div class="max-w-[1440px] mx-auto px-6 md:px-10 mb-10 flex items-center justify-between">
+        <h2 class="text-3xl lg:text-4xl font-bold font-heading text-white flex items-center gap-4">
+          <PhMapPin weight="fill" class="text-primary" /> Điểm đến thú vị
         </h2>
-        <div class="flex items-center gap-6">
-          <router-link to="/destinations" class="text-sm font-bold text-muted hover:text-primary transition-colors">Khám phá thêm</router-link>
-          <div class="flex gap-2">
-            <button @click="scrollContainer(destinationsScroll, -400)" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary hover:text-black transition-all">←</button>
-            <button @click="scrollContainer(destinationsScroll, 400)" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary hover:text-black transition-all">→</button>
-          </div>
+        <div class="flex items-center gap-4">
+          <button @click="scrollContainer(destinationsScroll, -400)" class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 text-white transition-all active:scale-95"><PhArrowLeft weight="bold" /></button>
+          <button @click="scrollContainer(destinationsScroll, 400)" class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 text-white transition-all active:scale-95"><PhArrowRight weight="bold" /></button>
         </div>
       </div>
       
-      <div ref="destinationsScroll" class="flex gap-6 overflow-x-auto pb-8 hide-scroll snap-x scroll-smooth px-[max(1.5rem,calc((100vw-1400px)/2+1.5rem))] md:px-[max(2.5rem,calc((100vw-1400px)/2+2.5rem))]">
+      <div ref="destinationsScroll" class="flex gap-6 overflow-x-auto pb-8 hide-scroll snap-x scroll-smooth px-6 md:px-10 max-w-[1440px] mx-auto">
         <div 
           v-for="place in destinations" 
           :key="place.id" 
-          class="relative w-[340px] h-[220px] flex-shrink-0 rounded-[2rem] overflow-hidden group cursor-pointer border border-white/5 shadow-xl transition-all duration-500 hover:-translate-y-1 snap-start"
+          class="relative w-[340px] lg:w-[400px] aspect-[4/3] flex-shrink-0 rounded-[1.5rem] overflow-hidden group cursor-pointer border border-white/5 snap-start"
         >
-          <img :src="place.image" :alt="place.name" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent group-hover:from-primary/40 transition-colors duration-500"></div>
+          <img :src="place.image" :alt="place.name" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent group-hover:from-black/90 transition-colors duration-500"></div>
           
-          <div class="absolute bottom-5 left-6 right-6 space-y-1">
-            <div class="text-[10px] font-bold text-primary-light uppercase tracking-widest">{{ place.city }}</div>
-            <div class="text-lg font-bold text-white group-hover:translate-x-1 transition-transform">{{ place.name }}</div>
-            <div class="text-[11px] text-white/60 font-medium">{{ place.events }} sự kiện đang diễn ra</div>
+          <div class="absolute bottom-6 left-8 right-8">
+            <div class="text-[11px] font-bold text-primary uppercase tracking-[0.2em] mb-2">{{ place.city }}</div>
+            <div class="text-2xl font-bold font-heading text-white group-hover:text-primary transition-colors">{{ place.name }}</div>
+            <div class="text-[13px] text-white/50 font-medium mt-1">{{ place.events }} sự kiện đang diễn ra</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- PROMO EXPERIENCE BANNER -->
-    <section class="max-w-[1400px] mx-auto px-6 md:px-10 animate-fade-up [animation-delay:500ms]">
-      <div class="relative group rounded-[3rem] overflow-hidden bg-surface border border-border-main p-12 md:p-24 shadow-2xl">
-        <div class="absolute inset-0 opacity-20 grayscale bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-        <div class="absolute -right-24 -bottom-24 w-96 h-96 bg-primary/20 blur-[120px] rounded-full group-hover:bg-primary/30 transition-all duration-1000"></div>
+    <!-- PROMO TYPOGRAPHY BANNER -->
+    <section class="max-w-[1440px] mx-auto px-6 md:px-10 py-10">
+      <div class="group rounded-[2rem] bg-[#111916] border border-white/5 p-12 lg:p-20 text-center relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');"></div>
         
-        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div class="space-y-8">
-            <div class="inline-flex px-4 py-1.5 rounded-full bg-primary/20 border border-primary/30 text-primary text-[11px] font-bold tracking-widest uppercase">
-              ✨ Đặc quyền thành viên
-            </div>
-            <h2 class="text-5xl md:text-6xl font-bold font-heading text-main leading-tight">Săn Vé Sớm <br/><span class="text-primary">Tiết Kiệm 40%</span></h2>
-            <p class="text-lg text-muted font-medium leading-relaxed max-w-md">
-              Tham gia cộng đồng TicketHub ngay hôm nay để nhận thông báo sớm nhất và ưu đãi giá vé cực sốc.
-            </p>
-            <BaseButton variant="primary" size="lg" class="!px-10 !rounded-2xl" @click="router.push('/early-bird')">
-              Đăng ký ngay
-            </BaseButton>
-          </div>
-          <div class="relative hidden lg:block">
-            <div class="aspect-square bg-gradient-to-tr from-primary to-primary-dark rounded-[4rem] rotate-12 scale-90 opacity-10 animate-pulse"></div>
-            <div class="absolute inset-0 flex items-center justify-center text-[180px] drop-shadow-2xl animate-float">
-              🎟️
-            </div>
-          </div>
+        <div class="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
+          <PhTicket weight="duotone" class="text-6xl text-primary mb-6 opacity-80" />
+          <h2 class="text-4xl md:text-6xl font-black font-heading text-white leading-[1.1] mb-6">
+            Mở khóa <span class="text-primary">Đặc Quyền</span> Săn Vé Sớm
+          </h2>
+          <p class="text-lg text-white/60 font-medium mb-10 max-w-xl">
+            Trở thành thành viên TicketHub để nhận thông báo sớm nhất, chỗ ngồi đẹp nhất và tiết kiệm đến 40% cho các sự kiện hàng đầu.
+          </p>
+          <BaseButton variant="primary" size="lg" class="!px-12 !rounded-full !text-base shadow-[0_0_30px_rgba(0,200,83,0.2)] hover:scale-105 active:scale-95 transition-transform" @click="router.push('/early-bird')">
+            Tham gia ngay
+          </BaseButton>
         </div>
       </div>
     </section>
 
-    <section v-for="(cat, idx) in categories" :key="cat.key" class="py-12 animate-fade-up" :style="`animation-delay: ${600 + idx * 100}ms`">
-      <div class="max-w-[1400px] mx-auto px-6 md:px-10 mb-12 flex items-center justify-between">
-        <h2 class="text-4xl font-bold font-heading text-main flex items-center gap-4">
-          <span class="text-4xl opacity-80 grayscale group-hover:grayscale-0 transition-all">{{ cat.icon }}</span> 
+    <!-- CATEGORIES -->
+    <section v-for="(cat, idx) in categories" :key="cat.key" class="py-12">
+      <div class="max-w-[1440px] mx-auto px-6 md:px-10 mb-10 flex items-center justify-between">
+        <h2 class="text-3xl lg:text-4xl font-bold font-heading text-white flex items-center gap-4">
+          <component :is="cat.icon" weight="fill" class="text-white/30" /> 
           {{ cat.label }}
         </h2>
-        <div class="flex items-center gap-6">
-          <router-link :to="'/' + cat.key" class="text-sm font-bold text-primary hover:text-white flex items-center gap-2 group transition-all">
-            Khám phá <span class="group-hover:translate-x-1 transition-transform">→</span>
+        <div class="flex items-center gap-4">
+          <router-link :to="'/' + cat.key" class="text-sm font-bold text-white/50 hover:text-white hidden md:flex items-center gap-2 transition-colors">
+            Khám phá <PhArrowRight weight="bold" />
           </router-link>
           <div class="flex gap-2">
-            <button @click="scrollContainer($refs['catScroll_' + idx][0], -350)" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary hover:text-black transition-all">←</button>
-            <button @click="scrollContainer($refs['catScroll_' + idx][0], 350)" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary hover:text-black transition-all">→</button>
+            <button @click="scrollContainer($refs['catScroll_' + idx][0], -350)" class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 text-white transition-all active:scale-95"><PhArrowLeft weight="bold" /></button>
+            <button @click="scrollContainer($refs['catScroll_' + idx][0], 350)" class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 text-white transition-all active:scale-95"><PhArrowRight weight="bold" /></button>
           </div>
         </div>
       </div>
 
-      <div :ref="'catScroll_' + idx" class="flex gap-8 overflow-x-auto pb-12 hide-scroll snap-x scroll-smooth px-[max(1.5rem,calc((100vw-1400px)/2+1.5rem))] md:px-[max(2.5rem,calc((100vw-1400px)/2+2.5rem))]">
+      <div :ref="'catScroll_' + idx" class="flex gap-6 overflow-x-auto pb-12 hide-scroll snap-x scroll-smooth px-6 md:px-10 max-w-[1440px] mx-auto">
         <EventCard 
           v-for="e in cat.items" 
           :key="e.id" 
           :event="e" 
-          class="w-[320px] flex-shrink-0 snap-start"
+          class="w-[300px] lg:w-[340px] flex-shrink-0 snap-start"
         />
       </div>
     </section>
 
-    <!-- TRUSTED BY SECTION -->
-    <section class="max-w-[1400px] mx-auto px-6 md:px-10 py-12 border-t border-border-main animate-fade-up [animation-delay:900ms]">
-      <div class="flex flex-wrap justify-center md:justify-between items-center gap-12 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
-        <div class="text-2xl font-bold font-heading text-main">TICKETBOX</div>
-        <div class="text-2xl font-bold font-heading text-main">SPOTIFY</div>
-        <div class="text-2xl font-bold font-heading text-main">VIETNAM AIRLINES</div>
-        <div class="text-2xl font-bold font-heading text-main">VINPEARL</div>
-        <div class="text-2xl font-bold font-heading text-main">SHOPEE</div>
+    <!-- TRUSTED BY -->
+    <section class="max-w-[1440px] mx-auto px-6 md:px-10 py-20 border-t border-white/5">
+      <div class="text-center text-[10px] uppercase tracking-[0.3em] font-bold text-white/30 mb-10">Đối tác đồng hành</div>
+      <div class="flex flex-wrap justify-center items-center gap-12 lg:gap-24 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+        <div class="text-2xl font-black font-heading text-white">TICKETBOX</div>
+        <div class="text-2xl font-black font-heading text-white">SPOTIFY</div>
+        <div class="text-2xl font-black font-heading text-white">VIETNAM AIRLINES</div>
+        <div class="text-2xl font-black font-heading text-white">VINPEARL</div>
+        <div class="text-2xl font-black font-heading text-white">SHOPEE</div>
       </div>
     </section>
 
@@ -259,6 +242,10 @@ import { useRouter } from 'vue-router'
 import { getEvents, selectEvent, fetchStars, fetchDestinations } from '../stores/eventStore'
 import EventCard from '../components/EventCard.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
+import { 
+  PhArrowLeft, PhArrowRight, PhStar, PhMapPin, PhTicket, 
+  PhMicrophoneStage, PhTrophy, PhMaskHappy, PhCompass, PhBooks 
+} from '@phosphor-icons/vue'
 
 const router = useRouter()
 const allEvents = getEvents()
@@ -311,11 +298,11 @@ const trending = computed(() => allEvents.filter(e => e.featured))
 
 const categories = computed(() => {
   const cats = [
-    { key: 'concerts', icon: '🎵', label: 'Nhạc & Concert' },
-    { key: 'sports', icon: '⚽', label: 'Thể thao' },
-    { key: 'arts', icon: '🎭', label: 'Nghệ thuật' },
-    { key: 'experiences', icon: '🧭', label: 'Trải nghiệm' },
-    { key: 'workshops', icon: '📚', label: 'Workshop' },
+    { key: 'concerts', icon: PhMicrophoneStage, label: 'Nhạc & Concert' },
+    { key: 'sports', icon: PhTrophy, label: 'Thể thao' },
+    { key: 'arts', icon: PhMaskHappy, label: 'Nghệ thuật' },
+    { key: 'experiences', icon: PhCompass, label: 'Trải nghiệm' },
+    { key: 'workshops', icon: PhBooks, label: 'Workshop' },
   ]
   return cats.map(c => ({
     ...c,
@@ -331,12 +318,6 @@ const formatPrice = (range) => {
 </script>
 
 <style scoped>
-@keyframes float {
-  0%, 100% { transform: translateY(0) rotate(12deg); }
-  50% { transform: translateY(-20px) rotate(15deg); }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
+.hide-scroll::-webkit-scrollbar { display: none; }
+.hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
