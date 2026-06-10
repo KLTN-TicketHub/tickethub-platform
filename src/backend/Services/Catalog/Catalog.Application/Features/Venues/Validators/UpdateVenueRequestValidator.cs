@@ -31,14 +31,6 @@ namespace Catalog.Application.Features.Venues.Validators
                 .NotEmpty().WithMessage("Quốc gia không được để trống.")
                 .MaximumLength(100).WithMessage("Quốc gia không được vượt quá 100 ký tự.");
 
-            RuleFor(x => x.Longitude)
-                .InclusiveBetween(-180m, 180m)
-                .WithMessage("Kinh độ phải nằm trong khoảng từ -180 đến 180.");
-
-            RuleFor(x => x.Latitude)
-                .InclusiveBetween(-90m, 90m)
-                .WithMessage("Vĩ độ phải nằm trong khoảng từ -90 đến 90.");
-
             RuleFor(x => x.PhoneNumber)
                 .NotEmpty().WithMessage("Số điện thoại không được để trống.")
                 .MaximumLength(15).WithMessage("Số điện thoại không được vượt quá 15 ký tự.");

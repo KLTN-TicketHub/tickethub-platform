@@ -17,8 +17,6 @@ namespace Catalog.Application.Common.Mappers
                     src.District,
                     src.ProvinceCity,
                     src.Country,
-                    src.Longitude,
-                    src.Latitude,
                     src.PhoneNumber,
                     src.WebsiteUrl
                 ));
@@ -42,10 +40,6 @@ namespace Catalog.Application.Common.Mappers
                 opt => opt.MapFrom(src => src.Country))
                 .ForMember(dest => dest.Slug,
                 opt => opt.MapFrom(src => src.Slug))
-                .ForMember(dest => dest.Longitude,
-                opt => opt.MapFrom(src => src.Longitude))
-                .ForMember(dest => dest.Latitude,
-                opt => opt.MapFrom(src => src.Latitude))
                 .ForMember(dest => dest.PhoneNumber,
                 opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.WebsiteUrl,
@@ -68,10 +62,6 @@ namespace Catalog.Application.Common.Mappers
                 opt => opt.MapFrom(src => src.ProvinceCity))
                 .ForMember(dest => dest.Country,
                 opt => opt.MapFrom(src => src.Country))
-                .ForMember(dest => dest.Longitude,
-                opt => opt.MapFrom(src => src.Longitude))
-                .ForMember(dest => dest.Latitude,
-                opt => opt.MapFrom(src => src.Latitude))
                 .ForMember(dest => dest.PhoneNumber,
                 opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.WebsiteUrl,

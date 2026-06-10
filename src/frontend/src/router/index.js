@@ -31,6 +31,9 @@ import ModeratorsAdmin from '../pages/admin/ModeratorsAdmin.vue'
 import ModeratorLayout from '../layouts/ModeratorLayout.vue'
 import ModeratorDashboard from '../pages/moderator/ModeratorDashboard.vue'
 import ModeratorLoginPage from '../pages/moderator/ModeratorLoginPage.vue'
+import ModeratorCreateVenuePage from '../pages/moderator/ModeratorCreateVenuePage.vue'
+import ModeratorVenuesPage from '../pages/moderator/ModeratorVenuesPage.vue'
+import ModeratorEditVenuePage from '../pages/moderator/ModeratorEditVenuePage.vue'
 
 const routes = [
   { path: '/', name: 'home', component: HomePage },
@@ -73,6 +76,9 @@ const routes = [
     children: [
       { path: '', redirect: '/moderator/dashboard' },
       { path: 'dashboard', name: 'moderator-dashboard', component: ModeratorDashboard },
+      { path: 'venues', name: 'moderator-venues', component: ModeratorVenuesPage },
+      { path: 'venues/create', name: 'moderator-venues-create', component: ModeratorCreateVenuePage },
+      { path: 'venues/:id/edit', name: 'moderator-venues-edit', component: ModeratorEditVenuePage },
     ]
   }
 ]

@@ -12,3 +12,15 @@ export const MODERATOR_ACTIVATE_ACCOUNT = '/auth/moderator/activate-account'
 // example domain endpoints (extend as needed)
 export const EVENTS = '/events'
 export const USERS = '/users'
+
+// Catalog
+export const VENUE_CREATE = '/catalog/venues'
+export const VENUE_LIST = '/catalog/venues'
+export const VENUE_DETAIL = (id) => `/catalog/venues/${id}`
+export const VENUE_UPDATE = (id) => `/catalog/venues/${id}`
+export const VENUE_DELETE = (id) => `/catalog/venues/${id}`
+
+// Locations (Vietnam Provinces API)
+export const LOCATION_PROVINCES = '/p/'
+export const LOCATION_DISTRICTS = (provinceCode) => `/p/${provinceCode}`
+export const LOCATION_WARDS = (districtCode) => `/d/${districtCode}`

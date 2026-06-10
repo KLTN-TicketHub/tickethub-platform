@@ -47,14 +47,6 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .IsRequired()
                 .HasMaxLength(100);
 
-            builder.Property(v => v.Longitude)
-                .IsRequired()
-                .HasPrecision(18, 8);
-
-            builder.Property(v => v.Latitude)
-                .IsRequired()
-                .HasPrecision(18, 8);
-
             builder.Property(v => v.PhoneNumber)
                 .HasMaxLength(15);
 

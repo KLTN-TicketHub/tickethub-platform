@@ -28,12 +28,6 @@ namespace Catalog.Domain.Entities
 
         public string Slug { get; set; }
 
-        //Kinh độ
-        public decimal Longitude { get; set; }
-
-        //Vĩ độ
-        public decimal Latitude { get; set; }
-
         public string PhoneNumber { get; set; }
 
         public string? WebsiteUrl { get; set; }
@@ -51,8 +45,6 @@ namespace Catalog.Domain.Entities
             string district,
             string provinceCity,
             string country,
-            decimal longitude,
-            decimal latitude,
             string phoneNumber,
             string? websiteUrl = null)
         {
@@ -62,8 +54,6 @@ namespace Catalog.Domain.Entities
             District = district;
             ProvinceCity = provinceCity;
             Country = country;
-            Longitude = longitude;
-            Latitude = latitude;
             PhoneNumber = phoneNumber;
             WebsiteUrl = websiteUrl;
         }

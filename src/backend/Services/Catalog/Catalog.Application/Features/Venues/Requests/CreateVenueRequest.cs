@@ -14,10 +14,6 @@
 
         public string Country { get; set; } = default!;
 
-        public decimal Longitude { get; set; }
-
-        public decimal Latitude { get; set; }
-
         public string PhoneNumber { get; set; } = default!;
 
         public string? WebsiteUrl { get; set; }

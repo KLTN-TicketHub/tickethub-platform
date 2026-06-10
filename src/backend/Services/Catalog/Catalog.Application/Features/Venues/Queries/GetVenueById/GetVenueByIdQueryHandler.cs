@@ -39,8 +39,6 @@ namespace Catalog.Application.Features.Venues.Queries.GetVenueById
                     ProvinceCity = v.ProvinceCity,
                     Country = v.Country,
                     Slug = v.Slug,
-                    Longitude = v.Longitude,
-                    Latitude = v.Latitude,
                     PhoneNumber = v.PhoneNumber,
                     WebsiteUrl = v.WebsiteUrl,
                     CreatedAt = v.CreatedAt,

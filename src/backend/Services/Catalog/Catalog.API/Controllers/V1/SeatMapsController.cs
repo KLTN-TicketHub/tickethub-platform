@@ -69,8 +69,9 @@ namespace Catalog.API.Controllers.V1
         }
 
         [AllowAnonymous]
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetSeatMapById(Guid id, CancellationToken cancellation = default)
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetSeatMapById(
+            [FromRoute] Guid id, CancellationToken cancellation = default)
         {
             //var result = await _sender.Send(new GetSeatMapByIdRequest(id), cancellation);
             //if (result == null)
