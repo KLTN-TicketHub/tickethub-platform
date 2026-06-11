@@ -1,4 +1,3 @@
-using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Application.Common.DTOs.SeatMaps;

@@ -23,7 +23,7 @@ namespace Catalog.Application.Features.SeatMaps.Queries.GetSeatMapById
             return await GetSeatMapByIdAsync(request.VenueId, request.Id, cancellationToken);
         }
 
-        private async Task<SeatMapDto> GetSeatMapByIdAsync(Guid venueId,Guid id, CancellationToken cancellationToken = default)
+        private async Task<SeatMapDto> GetSeatMapByIdAsync(Guid venueId, Guid id, CancellationToken cancellationToken = default)
         {
             return await _unitOfWork.SeatMapRepository.GetOneUntrackedAsync(
                 filter: x => x.VenueId == venueId && x.Id == id && !x.IsDeleted && !x.Venue.IsDeleted,
@@ -54,7 +54,7 @@ namespace Catalog.Application.Features.SeatMaps.Queries.GetSeatMapById
                         Capacity = z.Capacity,
                         BasePrice = z.BasePrice,
                         DisplayOrder = z.DisplayOrder,
-                        SvgElements = z.ElementJson != null ? 
+                        SvgElements = z.ElementJson != null ?
                             JsonSerializer.Deserialize<List<SvgElementDto>>(z.ElementJson) ?? new List<SvgElementDto>() : null,
                         Rows = z.Rows.Select(r => new RowDto
                         {

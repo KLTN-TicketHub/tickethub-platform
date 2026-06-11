@@ -15,7 +15,7 @@ namespace Catalog.Application.Features.SeatMaps.Queries.GetSeatMapsByVenueId
         }
         public async Task<PaginatedResult<SeatMapListItemDto>> Handle(GetSeatMapsByVenueIdQuery request, CancellationToken cancellationToken)
         {
-            return await GetSeatMapsByVenueIdAsync( request.VenueId, request.Request, cancellationToken);
+            return await GetSeatMapsByVenueIdAsync(request.VenueId, request.Request, cancellationToken);
         }
 
         private async Task<PaginatedResult<SeatMapListItemDto>> GetSeatMapsByVenueIdAsync(

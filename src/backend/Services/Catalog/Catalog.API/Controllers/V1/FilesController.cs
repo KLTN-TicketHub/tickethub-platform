@@ -1,9 +1,7 @@
 ﻿using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Models.Responses;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Catalog.API.Controllers.V1

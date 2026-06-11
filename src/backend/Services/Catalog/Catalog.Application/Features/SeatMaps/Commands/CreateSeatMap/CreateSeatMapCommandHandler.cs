@@ -27,7 +27,7 @@ namespace Catalog.Application.Features.SeatMaps.Commands.CreateSeatMap
 
         public async Task<SeatMapDto> Handle(CreateSeatMapCommand command, CancellationToken cancellation = default)
         {
-            return await CreateSeatMapAsync(command.VenueId,command.Request, cancellation);
+            return await CreateSeatMapAsync(command.VenueId, command.Request, cancellation);
         }
 
         private async Task<SeatMapDto> CreateSeatMapAsync(Guid venueId, CreateSeatMapRequest request, CancellationToken cancellation = default)
