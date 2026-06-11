@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="999" height="666" viewBox="0 0 999 666" fill="none">
+    <!-- Premium Dark Mode Background -->
+    <rect width="999" height="666" fill="#0b0f19"/>
+
+    <!-- STAGE Zone (isStage=true, no seats, trapezoid + spotlights decoration) -->
+    <g id="STAGE">
+        <!-- Ambient Stage Glow (Behind Stage) -->
+        <path fill="rgba(56, 189, 248, 0.08)" d="M 300 20 L 700 20 L 750 150 L 250 150 Z"/>
+        
+        <!-- Main Trapezoid Stage Platform -->
+        <path fill="#1e293b" stroke="#38bdf8" stroke-width="3" d="M 330 30 L 670 30 C 690 70 680 120 640 130 C 580 145 420 145 360 130 C 320 120 310 70 330 30 Z"/>
+        
+        <!-- Spotlight Cone Left -->
+        <path fill="rgba(56, 189, 248, 0.04)" d="M 350 30 L 100 400 L 250 430 Z"/>
+        
+        <!-- Spotlight Cone Right -->
+        <path fill="rgba(56, 189, 248, 0.04)" d="M 650 30 L 750 430 L 900 400 Z"/>
+
+        <!-- Led Border (Decorative Segmented Lines) -->
+        <path stroke="rgba(56, 189, 248, 0.5)" stroke-width="2" stroke-dasharray="6,4" d="M 345 40 L 655 40"/>
+
+        <!-- Stage Text Label -->
+        <text x="500" y="85" fill="#f8fafc" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="900" letter-spacing="4" text-anchor="middle">SÂN KHẤU CHÍNH</text>
+        <text x="500" y="105" fill="#38bdf8" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="bold" letter-spacing="1" text-anchor="middle">MAIN STAGE</text>
+    </g>
+
+    <!-- Zone 1: Zone-VIP-Slanted (Seated, Slanted Polygon shape on the Left) -->
+    <g id="Zone-VIP-Slanted">
+        <!-- Slanted Background Path -->
+        <path fill="rgba(99, 102, 241, 0.08)" stroke="#6366f1" stroke-width="2.5" stroke-linejoin="round" d="M 80 180 L 420 220 L 360 380 L 40 330 Z"/>
+        
+        <!-- Label -->
+        <text x="220" y="360" fill="#a5b4fc" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" transform="rotate(7, 220, 360)">KHU VIP CHÉO (SLANTED)</text>
+
+        <!-- ROW A (5 seats) -->
+        <text x="130" y="214" fill="#a5b4fc" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="900" text-anchor="middle">A</text>
+        <circle id="Slan_A_1" cx="160.0" cy="210.0" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_A_2" cx="195.0" cy="214.5" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_A_3" cx="230.0" cy="219.0" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_A_4" cx="265.0" cy="223.5" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_A_5" cx="300.0" cy="228.0" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <text x="330" y="232" fill="#a5b4fc" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="900" text-anchor="middle">A</text>
+
+        <!-- ROW B (5 seats) -->
+        <text x="115" y="254" fill="#a5b4fc" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="900" text-anchor="middle">B</text>
+        <circle id="Slan_B_1" cx="145.0" cy="250.0" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_B_2" cx="180.0" cy="254.5" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_B_3" cx="215.0" cy="259.0" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_B_4" cx="250.0" cy="263.5" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_B_5" cx="285.0" cy="268.0" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <text x="315" y="272" fill="#a5b4fc" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="900" text-anchor="middle">B</text>
+
+        <!-- ROW C (5 seats) -->
+        <text x="100" y="294" fill="#a5b4fc" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="900" text-anchor="middle">C</text>
+        <circle id="Slan_C_1" cx="130.0" cy="290.0" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_C_2" cx="165.0" cy="294.5" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_C_3" cx="200.0" cy="299.0" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_C_4" cx="235.0" cy="303.5" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_C_5" cx="270.0" cy="308.0" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <text x="300" y="312" fill="#a5b4fc" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="900" text-anchor="middle">C</text>
+
+        <!-- ROW D (5 seats) -->
+        <text x="85" y="334" fill="#a5b4fc" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="900" text-anchor="middle">D</text>
+        <circle id="Slan_D_1" cx="115.0" cy="330.0" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_D_2" cx="150.0" cy="334.5" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_D_3" cx="185.0" cy="339.0" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_D_4" cx="220.0" cy="343.5" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <circle id="Slan_D_5" cx="255.0" cy="348.0" r="10.5" fill="#0b0f19" stroke="#6366f1" stroke-width="2.5"/>
+        <text x="285" y="352" fill="#a5b4fc" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="900" text-anchor="middle">D</text>
+    </g>
+
+    <!-- Zone 2: Zone-VIP-Crescent (Seated, Crescent shape on the Right) -->
+    <g id="Zone-VIP-Crescent">
+        <!-- Crescent Arch Background Path -->
+        <path fill="rgba(245, 158, 11, 0.08)" stroke="#f59e0b" stroke-width="2.5" stroke-linejoin="round" d="M 570 220 C 650 170, 850 170, 910 220 L 950 330 C 850 280, 650 280, 610 330 Z"/>
+        
+        <!-- Label -->
+        <text x="760" y="305" fill="#fde047" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">KHU VIP VÒNG CUNG (CRESCENT)</text>
+
+        <!-- ROW A (6 seats) -->
+        <text x="590" y="214" fill="#fde047" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="900" text-anchor="middle">A</text>
+        <circle id="Cres_A_1" cx="620.0" cy="210.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_A_2" cx="670.0" cy="195.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_A_3" cx="720.0" cy="188.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_A_4" cx="770.0" cy="188.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_A_5" cx="820.0" cy="195.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_A_6" cx="870.0" cy="210.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <text x="900" y="214" fill="#fde047" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="900" text-anchor="middle">A</text>
+
+        <!-- ROW B (6 seats) -->
+        <text x="605" y="254" fill="#fde047" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="900" text-anchor="middle">B</text>
+        <circle id="Cres_B_1" cx="635.0" cy="250.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_B_2" cx="682.0" cy="236.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_B_3" cx="730.0" cy="230.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_B_4" cx="778.0" cy="230.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_B_5" cx="826.0" cy="236.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_B_6" cx="873.0" cy="250.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <text x="903" y="254" fill="#fde047" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="900" text-anchor="middle">B</text>
+
+        <!-- ROW C (6 seats) -->
+        <text x="620" y="294" fill="#fde047" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="900" text-anchor="middle">C</text>
+        <circle id="Cres_C_1" cx="650.0" cy="290.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_C_2" cx="695.0" cy="277.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_C_3" cx="740.0" cy="272.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_C_4" cx="785.0" cy="272.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_C_5" cx="830.0" cy="277.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <circle id="Cres_C_6" cx="875.0" cy="290.0" r="10.5" fill="#0b0f19" stroke="#f59e0b" stroke-width="2.5"/>
+        <text x="905" y="294" fill="#fde047" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="900" text-anchor="middle">C</text>
+    </g>
+
+    <!-- Zone 3: Zone-GA-Standing (Standing, Wavy organic shape - No seats) -->
+    <g id="Zone-GA-Standing">
+        <!-- Wavy Curved Background Path (No circles inside) -->
+        <path fill="rgba(16, 185, 129, 0.05)" stroke="#10b981" stroke-width="2.5" stroke-linejoin="round" d="M 60 440 Q 280 400 500 440 Q 720 400 940 440 L 910 610 Q 500 640 90 610 Z"/>
+        
+        <!-- Decorative Grid dots (representing crowd standing spots without being sellable seats) -->
+        <!-- These are paths so they don't get parsed as sellable seat circles (only <circle> is parsed as seat) -->
+        <path d="M 120 480 L 122 480 M 160 480 L 162 480 M 200 480 L 202 480 M 240 480 L 242 480 M 280 480 L 282 480 M 320 480 L 322 480 M 360 480 L 362 480 M 400 480 L 402 480 M 440 480 L 442 480 M 480 480 L 482 480 M 520 480 L 522 480 M 560 480 L 562 480 M 600 480 L 602 480 M 640 480 L 642 480 M 680 480 L 682 480 M 720 480 L 722 480 M 760 480 L 762 480 M 800 480 L 802 480 M 840 480 L 842 480 M 880 480 L 882 480" stroke="rgba(16, 185, 129, 0.15)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M 140 515 L 142 515 M 180 515 L 182 515 M 220 515 L 222 515 M 260 515 L 262 515 M 300 515 L 302 515 M 340 515 L 342 515 M 380 515 L 382 515 M 420 515 L 422 515 M 460 515 L 462 515 M 500 515 L 502 515 M 540 515 L 542 515 M 580 515 L 582 515 M 620 515 L 622 515 M 660 515 L 662 515 M 700 515 L 702 515 M 740 515 L 742 515 M 780 515 L 782 515 M 820 515 L 822 515 M 860 515 L 862 515" stroke="rgba(16, 185, 129, 0.15)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M 120 550 L 122 550 M 160 550 L 162 550 M 200 550 L 202 550 M 240 550 L 242 550 M 280 550 L 282 550 M 320 550 L 322 550 M 360 550 L 362 550 M 400 550 L 402 550 M 440 550 L 442 550 M 480 550 L 482 550 M 520 550 L 522 550 M 560 550 L 562 550 M 600 550 L 602 550 M 640 550 L 642 550 M 680 550 L 682 550 M 720 550 L 722 550 M 760 550 L 762 550 M 800 550 L 802 550 M 840 550 L 842 550 M 880 550 L 882 550" stroke="rgba(16, 185, 129, 0.15)" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- Labels -->
+        <text x="500" y="525" fill="#10b981" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle">KHU ĐỨNG TỰ DO (WAVY GA)</text>
+        <text x="500" y="548" fill="#ffffff" fill-opacity="0.35" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="bold" letter-spacing="0.5" text-anchor="middle">Khu vực đứng tự do · Không phân định số ghế</text>
+    </g>
+</svg>

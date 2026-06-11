@@ -35,6 +35,14 @@ namespace Catalog.Application.Features.SeatMaps.Validators
                .MaximumLength(50).WithMessage("ID phần tử SVG không được vượt quá 50 ký tự.")
                .When(x => !string.IsNullOrWhiteSpace(x.SvgElementId));
 
+            RuleFor(x => x.Rows)
+                .NotEmpty().WithMessage("Danh sách hàng không được để trống.")
+                .When(x => x.IsReservingSeat);
+
+            RuleFor(x => x.Rows)
+                .Empty().WithMessage("Danh sách hàng phải trống khi khu vực không có ghế.")
+                .When(x => !x.IsReservingSeat);
+
             RuleForEach(x => x.SvgElements)
                 .SetValidator(new CreateSvgElementRequestValidator())
                 .When(x => x.SvgElements != null);

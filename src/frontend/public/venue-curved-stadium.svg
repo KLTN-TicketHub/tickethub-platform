@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000" fill="none">
+    <!-- Dark slate canvas background -->
+    <rect width="1000" height="1000" fill="#0b0f19"/>
+
+    <!-- Light blue stadium background outline -->
+    <path fill="#e6f9ff" stroke="#a0e0ff" stroke-width="3" d="M 150 200 C 350 240, 650 240, 850 200 C 930 500, 910 850, 880 900 C 700 970, 300 970, 120 900 C 90 850, 70 500, 150 200 Z"/>
+
+    <!-- 1. STAGE ZONE -->
+    <g id="STAGE">
+        <!-- Gray Ellipse Stage Platform -->
+        <path fill="#c2c4cd" stroke="#a0a2aa" stroke-width="2" d="M 220 100 A 280 70 0 1 0 780 100 A 280 70 0 1 0 220 100 Z"/>
+        <!-- Stage Text Label -->
+        <text x="500" y="106" fill="#333333" font-family="system-ui, sans-serif" font-size="20" font-weight="bold" text-anchor="middle">STAGE/ SÂN KHẤU</text>
+    </g>
+
+    <!-- 2. TOP PINK ZONE (Rows A & B) -->
+    <g id="Zone-Top-Pink">
+        <!-- Left block background path -->
+        <path fill="#ffdad9" d="M 130 205 C 250 185, 475 200, 485 205 L 485 305 C 475 305, 250 290, 122 290 Z"/>
+        <!-- Right block background path -->
+        <path fill="#ffdad9" d="M 515 205 C 525 200, 750 185, 870 205 L 878 290 C 750 290, 525 305, 515 305 Z"/>
+
+        <!-- Center aisle row label texts -->
+        <text x="500" y="245" fill="#ff4d4d" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">A</text>
+        <text x="500" y="285" fill="#ff4d4d" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">B</text>
+
+        <!-- ROW A SEATS -->
+        <!-- Left Wing -->
+        <circle id="Pink_A_L1" cx="210" cy="240" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Pink_A_L2" cx="240" cy="240" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Pink_A_L3" cx="270" cy="240" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Pink_A_L4" cx="300" cy="240" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Pink_A_L5" cx="330" cy="240" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Pink_A_L6" cx="360" cy="240" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <!-- Right Wing -->
+        <circle id="Pink_A_R1" cx="640" cy="240" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Pink_A_R2" cx="670" cy="240" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Pink_A_R3" cx="700" cy="240" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Pink_A_R4" cx="730" cy="240" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Pink_A_R5" cx="760" cy="240" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Pink_A_R6" cx="790" cy="240" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Pink_A_R7" cx="820" cy="240" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+
+        <!-- ROW B SEATS -->
+        <!-- Left Wing -->
+        <circle id="Pink_B_L1" cx="180" cy="280" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Pink_B_L2" cx="210" cy="280" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Pink_B_L3" cx="240" cy="280" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Pink_B_L4" cx="270" cy="280" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Pink_B_L5" cx="300" cy="280" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Pink_B_L6" cx="330" cy="280" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Pink_B_L7" cx="360" cy="280" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <!-- Right Wing -->
+        <circle id="Pink_B_R1" cx="640" cy="280" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Pink_B_R2" cx="670" cy="280" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Pink_B_R3" cx="700" cy="280" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Pink_B_R4" cx="730" cy="280" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Pink_B_R5" cx="760" cy="280" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Pink_B_R6" cx="790" cy="280" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Pink_B_R7" cx="820" cy="280" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+    </g>
+
+    <!-- 3. MIDDLE JAGGED ZONE (Rows C to L) -->
+    <g id="Zone-Mid-Jagged">
+        <!-- Left block jagged background path -->
+        <path fill="#ffdad9" d="M 122 290 L 215 325 L 235 370 L 215 415 L 235 460 L 200 505 L 218 550 L 198 595 L 218 640 L 232 685 L 205 730 L 470 730 L 455 640 L 455 595 L 435 550 L 465 505 L 450 460 L 465 415 L 450 360 L 450 335 L 485 305 Z"/>
+        <!-- Right block jagged background path -->
+        <path fill="#ffdad9" d="M 878 290 L 785 325 L 765 370 L 785 415 L 765 460 L 800 505 L 782 550 L 802 595 L 782 640 L 768 685 L 795 730 L 530 730 L 545 640 L 545 595 L 565 550 L 535 505 L 550 460 L 535 415 L 550 360 L 550 335 L 515 305 Z"/>
+
+        <!-- Left Exit sign and arrow -->
+        <text x="180" y="450" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="bold">EXIT</text>
+        <path stroke="#ffffff" stroke-width="2" fill="none" d="M 170 450 L 150 450 M 155 445 L 150 450 L 155 455"/>
+
+        <!-- Right Exit sign and arrow -->
+        <text x="820" y="450" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="bold">EXIT</text>
+        <path stroke="#ffffff" stroke-width="2" fill="none" d="M 830 450 L 850 450 M 845 445 L 850 450 L 845 455"/>
+
+        <!-- Center aisle row label texts -->
+        <text x="500" y="325" fill="#ff4d4d" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">C</text>
+        <text x="500" y="365" fill="#ff4d4d" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">D</text>
+        <text x="500" y="405" fill="#ff4d4d" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">E</text>
+        <text x="500" y="445" fill="#ff4d4d" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">F</text>
+        <text x="500" y="485" fill="#ff4d4d" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">G</text>
+        <text x="500" y="525" fill="#ff4d4d" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">H</text>
+        <text x="500" y="565" fill="#ff4d4d" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">I</text>
+        <text x="500" y="605" fill="#ff4d4d" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">J</text>
+        <text x="500" y="645" fill="#ff4d4d" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">K</text>
+        <text x="500" y="685" fill="#ff4d4d" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">L</text>
+
+        <!-- ROW C SEATS -->
+        <circle id="Mid_C_L1" cx="240" cy="320" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Mid_C_L2" cx="270" cy="320" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Mid_C_L3" cx="300" cy="320" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Mid_C_L4" cx="330" cy="320" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Mid_C_L5" cx="360" cy="320" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Mid_C_L6" cx="390" cy="320" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Mid_C_R1" cx="610" cy="320" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Mid_C_R2" cx="640" cy="320" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Mid_C_R3" cx="670" cy="320" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Mid_C_R4" cx="700" cy="320" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Mid_C_R5" cx="730" cy="320" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Mid_C_R6" cx="760" cy="320" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+
+        <!-- ROW D SEATS -->
+        <circle id="Mid_D_L1" cx="230" cy="360" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Mid_D_L2" cx="260" cy="360" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Mid_D_L3" cx="290" cy="360" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Mid_D_L4" cx="320" cy="360" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Mid_D_L5" cx="350" cy="360" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Mid_D_R1" cx="650" cy="360" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Mid_D_R2" cx="680" cy="360" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Mid_D_R3" cx="710" cy="360" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Mid_D_R4" cx="740" cy="360" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Mid_D_R5" cx="770" cy="360" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+    </g>
+
+    <!-- 4. BOTTOM CYAN ZONE (Rows M to Q) -->
+    <g id="Zone-Bottom-Cyan">
+        <!-- Curved Area Background -->
+        <path fill="rgba(203, 241, 245, 0.5)" d="M 120 740 C 300 740, 700 740, 880 740 C 860 840, 820 910, 500 930 C 180 910, 140 840, 120 740 Z"/>
+        
+        <!-- Center aisle row label texts -->
+        <text x="500" y="765" fill="#2c6c75" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">M</text>
+        <text x="500" y="805" fill="#2c6c75" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">N</text>
+        <text x="500" y="845" fill="#2c6c75" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">O</text>
+        <text x="500" y="885" fill="#2c6c75" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">P</text>
+        <text x="500" y="925" fill="#2c6c75" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">Q</text>
+
+        <!-- ROW M SEATS -->
+        <circle id="Cyan_M_L1" cx="220" cy="760" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_M_L2" cx="250" cy="760" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_M_L3" cx="280" cy="760" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_M_L4" cx="310" cy="760" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_M_L5" cx="340" cy="760" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_M_L6" cx="370" cy="760" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_M_L7" cx="400" cy="760" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_M_L8" cx="430" cy="760" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_M_R1" cx="570" cy="760" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_M_R2" cx="600" cy="760" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Cyan_M_R3" cx="630" cy="760" r="10" fill="#ff3b30" stroke="#cc1100" stroke-width="1.5"/>
+        <circle id="Cyan_M_R4" cx="660" cy="760" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_M_R5" cx="690" cy="760" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_M_R6" cx="720" cy="760" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_M_R7" cx="750" cy="760" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_M_R8" cx="780" cy="760" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+
+        <!-- ROW N SEATS -->
+        <circle id="Cyan_N_L1" cx="230" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_L2" cx="260" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_L3" cx="290" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_L4" cx="320" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_L5" cx="350" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_L6" cx="380" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_L7" cx="410" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_L8" cx="440" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_R1" cx="560" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_R2" cx="590" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_R3" cx="620" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_R4" cx="650" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_R5" cx="680" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_R6" cx="710" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_R7" cx="740" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle id="Cyan_N_R8" cx="770" cy="800" r="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+    </g>
+</svg>

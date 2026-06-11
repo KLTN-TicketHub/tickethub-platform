@@ -1,0 +1,307 @@
+{
+  "seatMapName": "Sơ đồ Khán đài Hình Cung",
+  "width": 1000.00,
+  "height": 1000.00,
+  "svgFileUrl": "/uploads/seatmaps/venue-curved-stadium.svg",
+  "zones": [
+    {
+      "zoneName": "STAGE",
+      "color": "#c2c4cd",
+      "x": 220.00,
+      "y": 30.00,
+      "width": 560.00,
+      "height": 140.00,
+      "capacity": 0,
+      "isStage": true,
+      "isReservingSeat": false,
+      "isSalable": false,
+      "svgElementId": "STAGE",
+      "basePrice": 0,
+      "displayOrder": 0,
+      "svgElements": [
+        {
+          "type": "path",
+          "x": 220.00,
+          "y": 30.00,
+          "width": 560.00,
+          "height": 140.00,
+          "fill": "#c2c4cd",
+          "stroke": "#a0a2aa",
+          "strokeWidth": 2.00,
+          "data": "M 220 100 A 280 70 0 1 0 780 100 A 280 70 0 1 0 220 100 Z"
+        },
+        {
+          "type": "text",
+          "x": 500.00,
+          "y": 106.00,
+          "fill": "#333333",
+          "text": "STAGE/ SÂN KHẤU",
+          "fontSize": 20.00,
+          "fontFamily": "system-ui, sans-serif"
+        }
+      ],
+      "rows": []
+    },
+    {
+      "zoneName": "TOP PINK ZONE",
+      "color": "#ffdad9",
+      "x": 115.00,
+      "y": 150.00,
+      "width": 770.00,
+      "height": 150.00,
+      "capacity": 24,
+      "isStage": false,
+      "isReservingSeat": true,
+      "isSalable": true,
+      "svgElementId": "Zone-Top-Pink",
+      "basePrice": 2500000.00,
+      "displayOrder": 1,
+      "svgElements": [
+        {
+          "type": "path",
+          "x": 115.00,
+          "y": 150.00,
+          "width": 770.00,
+          "height": 150.00,
+          "fill": "#ffdad9",
+          "data": "M 115 170 C 250 150, 750 150, 885 170 C 895 210, 895 250, 885 290 C 750 310, 250 310, 115 290 C 105 250, 105 210, 115 170 Z"
+        },
+        {
+          "type": "text",
+          "x": 500.00,
+          "y": 215.00,
+          "fill": "#ff4d4d",
+          "text": "A",
+          "fontSize": 14.00,
+          "fontFamily": "system-ui, sans-serif"
+        },
+        {
+          "type": "text",
+          "x": 500.00,
+          "y": 265.00,
+          "fill": "#ff4d4d",
+          "text": "B",
+          "fontSize": 14.00,
+          "fontFamily": "system-ui, sans-serif"
+        }
+      ],
+      "rows": [
+        {
+          "rowLabel": "A",
+          "seatRequests": [
+            { "seatName": "L1", "svgElementId": "Pink_A_L1", "x": 200.0, "y": 210.0, "radius": 10.0 },
+            { "seatName": "L2", "svgElementId": "Pink_A_L2", "x": 230.0, "y": 210.0, "radius": 10.0 },
+            { "seatName": "L3", "svgElementId": "Pink_A_L3", "x": 260.0, "y": 210.0, "radius": 10.0 },
+            { "seatName": "L4", "svgElementId": "Pink_A_L4", "x": 290.0, "y": 210.0, "radius": 10.0 },
+            { "seatName": "L5", "svgElementId": "Pink_A_L5", "x": 320.0, "y": 210.0, "radius": 10.0 },
+            { "seatName": "R1", "svgElementId": "Pink_A_R1", "x": 680.0, "y": 210.0, "radius": 10.0 },
+            { "seatName": "R2", "svgElementId": "Pink_A_R2", "x": 710.0, "y": 210.0, "radius": 10.0 },
+            { "seatName": "R3", "svgElementId": "Pink_A_R3", "x": 740.0, "y": 210.0, "radius": 10.0 },
+            { "seatName": "R4", "svgElementId": "Pink_A_R4", "x": 770.0, "y": 210.0, "radius": 10.0 },
+            { "seatName": "R5", "svgElementId": "Pink_A_R5", "x": 800.0, "y": 210.0, "radius": 10.0 }
+          ]
+        },
+        {
+          "rowLabel": "B",
+          "seatRequests": [
+            { "seatName": "L1", "svgElementId": "Pink_B_L1", "x": 180.0, "y": 260.0, "radius": 10.0 },
+            { "seatName": "L2", "svgElementId": "Pink_B_L2", "x": 210.0, "y": 260.0, "radius": 10.0 },
+            { "seatName": "L3", "svgElementId": "Pink_B_L3", "x": 240.0, "y": 260.0, "radius": 10.0 },
+            { "seatName": "L4", "svgElementId": "Pink_B_L4", "x": 270.0, "y": 260.0, "radius": 10.0 },
+            { "seatName": "L5", "svgElementId": "Pink_B_L5", "x": 300.0, "y": 260.0, "radius": 10.0 },
+            { "seatName": "L6", "svgElementId": "Pink_B_L6", "x": 330.0, "y": 260.0, "radius": 10.0 },
+            { "seatName": "L7", "svgElementId": "Pink_B_L7", "x": 360.0, "y": 260.0, "radius": 10.0 },
+            { "seatName": "R1", "svgElementId": "Pink_B_R1", "x": 640.0, "y": 260.0, "radius": 10.0 },
+            { "seatName": "R2", "svgElementId": "Pink_B_R2", "x": 670.0, "y": 260.0, "radius": 10.0 },
+            { "seatName": "R3", "svgElementId": "Pink_B_R3", "x": 700.0, "y": 260.0, "radius": 10.0 },
+            { "seatName": "R4", "svgElementId": "Pink_B_R4", "x": 730.0, "y": 260.0, "radius": 10.0 },
+            { "seatName": "R5", "svgElementId": "Pink_B_R5", "x": 760.0, "y": 260.0, "radius": 10.0 },
+            { "seatName": "R6", "svgElementId": "Pink_B_R6", "x": 790.0, "y": 260.0, "radius": 10.0 },
+            { "seatName": "R7", "svgElementId": "Pink_B_R7", "x": 820.0, "y": 260.0, "radius": 10.0 }
+          ]
+        }
+      ]
+    },
+    {
+      "zoneName": "MIDDLE JAGGED ZONE",
+      "color": "#ffdad9",
+      "x": 40.00,
+      "y": 300.00,
+      "width": 920.00,
+      "height": 420.00,
+      "capacity": 240,
+      "isStage": false,
+      "isReservingSeat": true,
+      "isSalable": true,
+      "svgElementId": "Zone-Mid-Jagged",
+      "basePrice": 1800000.00,
+      "displayOrder": 2,
+      "svgElements": [
+        {
+          "type": "path",
+          "x": 40.00,
+          "y": 300.00,
+          "width": 430.00,
+          "height": 420.00,
+          "fill": "#ffdad9",
+          "data": "M 115 300 L 220 320 L 240 380 L 205 440 L 220 500 L 190 560 L 210 620 L 225 680 L 200 720 L 460 720 L 470 300 Z"
+        },
+        {
+          "type": "path",
+          "x": 530.00,
+          "y": 300.00,
+          "width": 430.00,
+          "height": 420.00,
+          "fill": "#ffdad9",
+          "data": "M 885 300 L 780 320 L 760 380 L 795 440 L 780 500 L 810 560 L 790 620 L 775 680 L 800 720 L 540 720 L 530 300 Z"
+        },
+        {
+          "type": "text",
+          "x": 180.00,
+          "y": 450.00,
+          "fill": "#ffffff",
+          "text": "EXIT",
+          "fontSize": 12.00,
+          "fontFamily": "system-ui, sans-serif"
+        },
+        {
+          "type": "path",
+          "x": 150.00,
+          "y": 445.00,
+          "width": 20.00,
+          "height": 10.00,
+          "stroke": "#ffffff",
+          "strokeWidth": 2.00,
+          "data": "M 170 450 L 150 450 M 155 445 L 150 450 L 155 455"
+        },
+        {
+          "type": "text",
+          "x": 820.00,
+          "y": 450.00,
+          "fill": "#ffffff",
+          "text": "EXIT",
+          "fontSize": 12.00,
+          "fontFamily": "system-ui, sans-serif"
+        },
+        {
+          "type": "path",
+          "x": 830.00,
+          "y": 445.00,
+          "width": 20.00,
+          "height": 10.00,
+          "stroke": "#ffffff",
+          "strokeWidth": 2.00,
+          "data": "M 830 450 L 850 450 M 845 445 L 850 450 L 845 455"
+        },
+        {
+          "type": "text",
+          "x": 500.00,
+          "y": 325.00,
+          "fill": "#ff4d4d",
+          "text": "C",
+          "fontSize": 14.00,
+          "fontFamily": "system-ui, sans-serif"
+        },
+        {
+          "type": "text",
+          "x": 500.00,
+          "y": 385.00,
+          "fill": "#ff4d4d",
+          "text": "D",
+          "fontSize": 14.00,
+          "fontFamily": "system-ui, sans-serif"
+        }
+      ],
+      "rows": [
+        {
+          "rowLabel": "C",
+          "seatRequests": [
+            { "seatName": "L1", "svgElementId": "Mid_C_L1", "x": 240.0, "y": 320.0, "radius": 10.0 },
+            { "seatName": "L2", "svgElementId": "Mid_C_L2", "x": 270.0, "y": 320.0, "radius": 10.0 },
+            { "seatName": "L3", "svgElementId": "Mid_C_L3", "x": 300.0, "y": 320.0, "radius": 10.0 },
+            { "seatName": "L4", "svgElementId": "Mid_C_L4", "x": 330.0, "y": 320.0, "radius": 10.0 },
+            { "seatName": "L5", "svgElementId": "Mid_C_L5", "x": 360.0, "y": 320.0, "radius": 10.0 },
+            { "seatName": "L6", "svgElementId": "Mid_C_L6", "x": 390.0, "y": 320.0, "radius": 10.0 },
+            { "seatName": "R1", "svgElementId": "Mid_C_R1", "x": 610.0, "y": 320.0, "radius": 10.0 },
+            { "seatName": "R2", "svgElementId": "Mid_C_R2", "x": 640.0, "y": 320.0, "radius": 10.0 },
+            { "seatName": "R3", "svgElementId": "Mid_C_R3", "x": 670.0, "y": 320.0, "radius": 10.0 },
+            { "seatName": "R4", "svgElementId": "Mid_C_R4", "x": 700.0, "y": 320.0, "radius": 10.0 },
+            { "seatName": "R5", "svgElementId": "Mid_C_R5", "x": 730.0, "y": 320.0, "radius": 10.0 },
+            { "seatName": "R6", "svgElementId": "Mid_C_R6", "x": 760.0, "y": 320.0, "radius": 10.0 }
+          ]
+        },
+        {
+          "rowLabel": "D",
+          "seatRequests": [
+            { "seatName": "L1", "svgElementId": "Mid_D_L1", "x": 250.0, "y": 380.0, "radius": 10.0 },
+            { "seatName": "L2", "svgElementId": "Mid_D_L2", "x": 280.0, "y": 380.0, "radius": 10.0 },
+            { "seatName": "L3", "svgElementId": "Mid_D_L3", "x": 310.0, "y": 380.0, "radius": 10.0 },
+            { "seatName": "L4", "svgElementId": "Mid_D_L4", "x": 340.0, "y": 380.0, "radius": 10.0 },
+            { "seatName": "R1", "svgElementId": "Mid_D_R1", "x": 660.0, "y": 380.0, "radius": 10.0 },
+            { "seatName": "R2", "svgElementId": "Mid_D_R2", "x": 690.0, "y": 380.0, "radius": 10.0 },
+            { "seatName": "R3", "svgElementId": "Mid_D_R3", "x": 720.0, "y": 380.0, "radius": 10.0 },
+            { "seatName": "R4", "svgElementId": "Mid_D_R4", "x": 750.0, "y": 380.0, "radius": 10.0 }
+          ]
+        }
+      ]
+    },
+    {
+      "zoneName": "BOTTOM CYAN ZONE",
+      "color": "#cbf1f5",
+      "x": 105.00,
+      "y": 720.00,
+      "width": 790.00,
+      "height": 210.00,
+      "capacity": 80,
+      "isStage": false,
+      "isReservingSeat": true,
+      "isSalable": true,
+      "svgElementId": "Zone-Bottom-Cyan",
+      "basePrice": 1200000.00,
+      "displayOrder": 3,
+      "svgElements": [
+        {
+          "type": "path",
+          "x": 105.00,
+          "y": 720.00,
+          "width": 790.00,
+          "height": 210.00,
+          "fill": "#cbf1f5",
+          "data": "M 115 730 H 885 C 895 800, 850 900, 500 930 C 150 900, 105 800, 115 730 Z"
+        },
+        {
+          "type": "text",
+          "x": 500.00,
+          "y": 765.00,
+          "fill": "#2c6c75",
+          "text": "M",
+          "fontSize": 14.00,
+          "fontFamily": "system-ui, sans-serif"
+        }
+      ],
+      "rows": [
+        {
+          "rowLabel": "M",
+          "seatRequests": [
+            { "seatName": "L1", "svgElementId": "Cyan_M_L1", "x": 220.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "L2", "svgElementId": "Cyan_M_L2", "x": 250.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "L3", "svgElementId": "Cyan_M_L3", "x": 280.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "L4", "svgElementId": "Cyan_M_L4", "x": 310.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "L5", "svgElementId": "Cyan_M_L5", "x": 340.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "L6", "svgElementId": "Cyan_M_L6", "x": 370.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "L7", "svgElementId": "Cyan_M_L7", "x": 400.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "L8", "svgElementId": "Cyan_M_L8", "x": 430.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "R1", "svgElementId": "Cyan_M_R1", "x": 570.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "R2", "svgElementId": "Cyan_M_R2", "x": 600.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "R3", "svgElementId": "Cyan_M_R3", "x": 630.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "R4", "svgElementId": "Cyan_M_R4", "x": 660.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "R5", "svgElementId": "Cyan_M_R5", "x": 690.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "R6", "svgElementId": "Cyan_M_R6", "x": 720.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "R7", "svgElementId": "Cyan_M_R7", "x": 750.0, "y": 760.0, "radius": 10.0 },
+            { "seatName": "R8", "svgElementId": "Cyan_M_R8", "x": 780.0, "y": 760.0, "radius": 10.0 }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -20,6 +20,9 @@ export const VENUE_DETAIL = (id) => `/catalog/venues/${id}`
 export const VENUE_UPDATE = (id) => `/catalog/venues/${id}`
 export const VENUE_DELETE = (id) => `/catalog/venues/${id}`
 export const VENUE_SEATMAPS = (venueId) => `/catalog/venue/${venueId}/seat-maps`
+export const VENUE_SEATMAP_CREATE = (venueId) => `/catalog/venue/${venueId}/seat-maps`
+export const VENUE_SEATMAP_DETAIL = (venueId, seatMapId) => `/catalog/venue/${venueId}/seat-maps/${seatMapId}`
+export const UPLOAD_SVG = '/catalog/files/upload-svg'
 
 // Locations (Vietnam Provinces API)
 export const LOCATION_PROVINCES = '/p/'

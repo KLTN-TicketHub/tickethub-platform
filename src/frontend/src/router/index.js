@@ -35,6 +35,8 @@ import ModeratorCreateVenuePage from '../pages/moderator/ModeratorCreateVenuePag
 import ModeratorVenuesPage from '../pages/moderator/ModeratorVenuesPage.vue'
 import ModeratorEditVenuePage from '../pages/moderator/ModeratorEditVenuePage.vue'
 import ModeratorVenueSeatMapsPage from '../pages/moderator/ModeratorVenueSeatMapsPage.vue'
+import ModeratorCreateSeatMapPage from '../pages/moderator/ModeratorCreateSeatMapPage.vue'
+import ModeratorSeatMapDetailPage from '../pages/moderator/ModeratorSeatMapDetailPage.vue'
 
 const routes = [
   { path: '/', name: 'home', component: HomePage },
@@ -81,6 +83,8 @@ const routes = [
       { path: 'venues/create', name: 'moderator-venues-create', component: ModeratorCreateVenuePage },
       { path: 'venues/:id/edit', name: 'moderator-venues-edit', component: ModeratorEditVenuePage },
       { path: 'venues/:id/seat-maps', name: 'moderator-venues-seatmaps', component: ModeratorVenueSeatMapsPage },
+      { path: 'venues/:id/seat-maps/create', name: 'moderator-venues-seatmaps-create', component: ModeratorCreateSeatMapPage },
+      { path: 'venues/:id/seat-maps/:seatMapId', name: 'moderator-venues-seatmaps-detail', component: ModeratorSeatMapDetailPage },
     ]
   }
 ]

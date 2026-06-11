@@ -19,11 +19,11 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
 
             builder.Property(s => s.SeatCode)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasMaxLength(200);
 
             builder.Property(s => s.SeatName)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasMaxLength(200);
 
             builder.Property(s => s.SvgElementId)
                 .IsRequired()

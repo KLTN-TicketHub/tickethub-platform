@@ -18,8 +18,10 @@
 
         public bool IsStage { get; set; }
 
+        //Phân khu có ghế hoặc không
         public bool IsReservingSeat { get; set; }
 
+        //Phân khu có bán được vé hay không
         public bool IsSalable { get; set; }
 
         public string SvgElementId { get; set; }
