@@ -103,7 +103,6 @@ namespace Catalog.Application.Common.Mappers
 
             CreateMap<CreateSeatMapRequest, SeatMap>()
                 .ConstructUsing(src => new SeatMap(
-                    src.VenueId,
                     src.SeatMapName,
                     src.Width,
                     src.Height))

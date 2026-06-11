@@ -6,13 +6,22 @@
         <h1 class="font-heading text-3xl md:text-4xl font-black text-white tracking-tight">Cập nhật Địa điểm</h1>
         <p class="text-white/50 font-medium text-lg">Chỉnh sửa thông tin địa điểm đang lưu trữ.</p>
       </div>
-      <router-link
-        to="/moderator/venues"
-        class="inline-flex items-center justify-center gap-2 px-4 py-2 text-[14px] font-bold text-white/70 bg-white/5 border border-white/10 rounded-xl hover:text-white hover:bg-white/10 transition-all"
-      >
-        <PhArrowLeft weight="bold" />
-        Trở về
-      </router-link>
+      <div class="flex items-center gap-3">
+        <router-link
+          :to="`/moderator/venues/${venueId}/seat-maps`"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2 text-[14px] font-bold text-primary bg-primary/10 border border-primary/20 rounded-xl hover:bg-primary hover:text-black transition-all"
+        >
+          <PhSquaresFour weight="bold" />
+          Sơ đồ ghế
+        </router-link>
+        <router-link
+          to="/moderator/venues"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2 text-[14px] font-bold text-white/70 bg-white/5 border border-white/10 rounded-xl hover:text-white hover:bg-white/10 transition-all"
+        >
+          <PhArrowLeft weight="bold" />
+          Trở về
+        </router-link>
+      </div>
     </div>
 
     <!-- Main Form -->
@@ -209,7 +218,7 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getProvinces, getDistricts, getWards } from '../../services/location.service'
 import { getVenueById, updateVenue } from '../../services/venue.service'
-import { PhCircleNotch, PhCheckCircle, PhWarningCircle, PhMapPin, PhGlobeHemisphereWest, PhArrowLeft } from '@phosphor-icons/vue'
+import { PhCircleNotch, PhCheckCircle, PhWarningCircle, PhMapPin, PhGlobeHemisphereWest, PhArrowLeft, PhSquaresFour } from '@phosphor-icons/vue'
 
 const router = useRouter()
 const route = useRoute()

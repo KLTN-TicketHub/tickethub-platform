@@ -27,23 +27,23 @@ namespace Catalog.Application.Features.SeatMaps.Commands.CreateSeatMap
 
         public async Task<SeatMapDto> Handle(CreateSeatMapCommand command, CancellationToken cancellation = default)
         {
-            return await CreateSeatMapAsync(command.Request, cancellation);
+            return await CreateSeatMapAsync(command.VenueId,command.Request, cancellation);
         }
 
-        private async Task<SeatMapDto> CreateSeatMapAsync(CreateSeatMapRequest request, CancellationToken cancellation = default)
+        private async Task<SeatMapDto> CreateSeatMapAsync(Guid venueId, CreateSeatMapRequest request, CancellationToken cancellation = default)
         {
             Venue? venue = await _unitOfWork.VenueRepository.GetOneUntrackedAsync<Venue>(
-                filter: v => v.Id == request.VenueId && !v.IsDeleted,
+                filter: v => v.Id == venueId && !v.IsDeleted,
                 include: v => v.Include(v => v.SeatMaps.Where(sm => sm.SeatMapName == request.SeatMapName && !sm.IsDeleted)),
                 cancellation: cancellation)
-                    ?? throw new NotFoundException($"Không tìm thấy địa điểm với ID {request.VenueId}");
+                    ?? throw new NotFoundException($"Không tìm thấy địa điểm với ID {venueId}");
 
             if (venue.SeatMaps.Any())
                 throw new ValidatorException(nameof(request.SeatMapName), $"Đã tồn tại sơ đồ chỗ ngồi với tên '{request.SeatMapName}' trong địa điểm này.");
 
             string seatMapCode = await _unitOfWork
                 .SeatMapRepository
-                .GenerateNextSeatMapCodeAsync(request.VenueId, request.SeatMapName, cancellation);
+                .GenerateNextSeatMapCodeAsync(venueId, request.SeatMapName, cancellation);
 
             int tempDisplayOrder = 0;
             request.Zones = request.Zones.OrderBy(z => z.DisplayOrder).ToList();
@@ -53,6 +53,7 @@ namespace Catalog.Application.Features.SeatMaps.Commands.CreateSeatMap
             });
 
             SeatMap seatMap = _mapper.Map<SeatMap>(request);
+            seatMap.VenueId = venueId;
             seatMap.SetSeatMapCode(seatMapCode);
 
             if (!string.IsNullOrWhiteSpace(request.SvgFileUrl))

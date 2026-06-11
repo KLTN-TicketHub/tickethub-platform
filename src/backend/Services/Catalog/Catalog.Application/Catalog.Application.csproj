@@ -23,7 +23,6 @@
 	  <Folder Include="Features\EventCategories\Commands\CreateEventCategory\" />
 	  <Folder Include="Features\EventCategories\Validators\" />
 	  <Folder Include="Features\EventCategories\Queries\" />
-	  <Folder Include="Features\SeatMaps\Queries\" />
 	</ItemGroup>
 
 </Project>

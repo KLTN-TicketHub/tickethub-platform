@@ -27,13 +27,11 @@ namespace Catalog.Domain.Entities
         public IReadOnlyCollection<Zone> Zones => _zones.AsReadOnly();
 
         public SeatMap(
-            Guid venueId,
             string seatMapName,
             decimal width,
             decimal height,
             string? svgFileUrl = null)
         {
-            VenueId = venueId;
             SeatMapName = seatMapName;
             Width = width;
             Height = height;

@@ -7,9 +7,6 @@ namespace Catalog.Application.Features.SeatMaps.Validators
     {
         public CreateSeatMapRequestValidator()
         {
-            RuleFor(x => x.VenueId)
-                .NotEmpty().WithMessage("Mã địa điểm không được để trống.");
-
             RuleFor(x => x.SeatMapName)
                 .NotEmpty().WithMessage("Tên sơ đồ chỗ ngồi không được để trống.")
                 .MaximumLength(200).WithMessage("Tên sơ đồ chỗ ngồi không được vượt quá 200 ký tự.");

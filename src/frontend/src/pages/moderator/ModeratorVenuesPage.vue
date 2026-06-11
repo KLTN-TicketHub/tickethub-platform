@@ -3,6 +3,14 @@
     <!-- Header & Actions -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
       <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2 text-white/50 text-sm font-medium mb-1">
+          <router-link to="/moderator/dashboard" class="hover:text-primary transition-colors flex items-center gap-1">
+            <PhArrowLeft weight="bold" class="text-xs" />
+            Tổng quan
+          </router-link>
+          <span>/</span>
+          <span class="text-white/30">Địa điểm</span>
+        </div>
         <h1 class="font-heading text-3xl md:text-4xl font-black text-white tracking-tight">Địa điểm</h1>
         <p class="text-white/50 font-medium text-lg">Quản lý danh sách các địa điểm tổ chức sự kiện.</p>
       </div>
@@ -88,15 +96,16 @@
               <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-white/50">Mã</th>
               <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-white/50">Tên địa điểm</th>
               <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-white/50">Địa chỉ</th>
+              <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-white/50">Sơ đồ ghế</th>
               <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-white/50 text-right">Thao tác</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-white/5">
             <tr v-if="isLoading" class="animate-pulse">
-              <td colspan="4" class="px-6 py-8 text-center text-white/40 font-medium">Đang tải dữ liệu...</td>
+              <td colspan="5" class="px-6 py-8 text-center text-white/40 font-medium">Đang tải dữ liệu...</td>
             </tr>
             <tr v-else-if="venues.length === 0">
-              <td colspan="4" class="px-6 py-8 text-center text-white/40 font-medium">Không tìm thấy địa điểm nào.</td>
+              <td colspan="5" class="px-6 py-8 text-center text-white/40 font-medium">Không tìm thấy địa điểm nào.</td>
             </tr>
             <tr v-else v-for="venue in venues" :key="venue.id" class="hover:bg-white/[0.02] transition-colors group">
               <td class="px-6 py-4 text-[13px] font-medium text-white/60">{{ venue.venueCode }}</td>
@@ -107,8 +116,21 @@
                 </div>
               </td>
               <td class="px-6 py-4 text-[13px] text-white/80 max-w-[200px] truncate">{{ venue.addressLine }}, {{ venue.ward }}</td>
+              <td class="px-6 py-4 text-[13px] text-white/80">
+                <router-link
+                  :to="`/moderator/venues/${venue.id}/seat-maps`"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary hover:bg-primary hover:text-black transition-all hover:scale-[1.03] active:scale-95"
+                  title="Xem danh sách sơ đồ ghế"
+                >
+                  <PhSquaresFour class="w-3.5 h-3.5" weight="bold" />
+                  {{ venue.seatMapCount || 0 }} sơ đồ
+                </router-link>
+              </td>
               <td class="px-6 py-4 text-right">
                 <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <router-link :to="`/moderator/venues/${venue.id}/seat-maps`" class="w-8 h-8 rounded-lg bg-[#818cf8]/10 text-[#818cf8] flex items-center justify-center hover:bg-[#818cf8] hover:text-white transition-colors" title="Sơ đồ ghế">
+                    <PhSquaresFour weight="bold" />
+                  </router-link>
                   <router-link :to="`/moderator/venues/${venue.id}/edit`" class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-black transition-colors" title="Chỉnh sửa">
                     <PhPencilSimple weight="bold" />
                   </router-link>
@@ -151,7 +173,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { getVenues, deleteVenue } from '../../services/venue.service'
 import { getProvinces, getDistricts } from '../../services/location.service'
-import { PhPlus, PhMagnifyingGlass, PhPencilSimple, PhTrash } from '@phosphor-icons/vue'
+import { PhPlus, PhMagnifyingGlass, PhPencilSimple, PhTrash, PhSquaresFour, PhArrowLeft } from '@phosphor-icons/vue'
 
 const venues = ref([])
 const totalPages = ref(0)

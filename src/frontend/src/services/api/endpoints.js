@@ -19,6 +19,7 @@ export const VENUE_LIST = '/catalog/venues'
 export const VENUE_DETAIL = (id) => `/catalog/venues/${id}`
 export const VENUE_UPDATE = (id) => `/catalog/venues/${id}`
 export const VENUE_DELETE = (id) => `/catalog/venues/${id}`
+export const VENUE_SEATMAPS = (venueId) => `/catalog/venue/${venueId}/seat-maps`
 
 // Locations (Vietnam Provinces API)
 export const LOCATION_PROVINCES = '/p/'

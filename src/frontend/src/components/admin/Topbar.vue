@@ -20,8 +20,12 @@
             v-for="item in activeMenuItems" 
             :key="item.path" 
             :to="item.path"
-            class="px-4 py-2 rounded-full text-[13px] font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2 group"
-            active-class="!text-black !bg-primary shadow-[0_0_15px_rgba(0,200,83,0.3)]"
+            class="px-4 py-2 rounded-full text-[13px] font-bold transition-all flex items-center gap-2 group"
+            :class="[
+              isRouteActive(item.path) 
+                ? 'text-black bg-primary shadow-[0_0_15px_rgba(0,200,83,0.3)] font-black' 
+                : 'text-white/70 hover:text-white hover:bg-white/10'
+            ]"
           >
             <component :is="item.icon" weight="bold" class="text-lg opacity-80 group-hover:opacity-100" />
             {{ item.label }}
@@ -45,8 +49,33 @@
         <button @click="handleLogout" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-danger hover:border-danger/30 hover:bg-danger/10 transition-all group">
           <PhSignOut class="text-lg group-hover:scale-110 transition-transform" weight="bold" />
         </button>
+
+        <!-- Hamburger Menu for Mobile -->
+        <button @click="showMobileMenu = !showMobileMenu" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all">
+          <PhList v-if="!showMobileMenu" class="text-xl" weight="bold" />
+          <PhX v-else class="text-xl" weight="bold" />
+        </button>
       </div>
 
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div v-if="showMobileMenu" class="lg:hidden absolute top-full left-0 right-0 bg-[#0A0F0D]/95 backdrop-blur-3xl border-b border-white/5 py-4 px-6 flex flex-col gap-3 shadow-2xl z-[99]">
+      <router-link 
+        v-for="item in activeMenuItems" 
+        :key="item.path" 
+        :to="item.path"
+        @click="showMobileMenu = false"
+        class="px-4 py-3 rounded-xl text-[14px] font-bold transition-all flex items-center gap-3"
+        :class="[
+          isRouteActive(item.path) 
+            ? 'text-black bg-primary font-black shadow-[0_0_15px_rgba(0,200,83,0.3)]' 
+            : 'text-white/70 hover:text-white hover:bg-white/5'
+        ]"
+      >
+        <component :is="item.icon" weight="bold" class="text-lg" />
+        {{ item.label }}
+      </router-link>
     </div>
   </header>
 </template>
@@ -56,7 +85,7 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { adminSearch } from '../../stores/adminStore'
 import { logout as authLogout } from '../../services/auth/auth.service'
-import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin } from '@phosphor-icons/vue'
+import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin, PhList, PhX } from '@phosphor-icons/vue'
 
 const props = defineProps({
   role: { type: String, default: 'admin' }
@@ -65,6 +94,7 @@ const props = defineProps({
 const route = useRoute()
 const router = useRouter()
 const localSearch = ref('')
+const showMobileMenu = ref(false)
 let debounceTimer = null
 
 const adminMenuItems = [
@@ -82,6 +112,13 @@ const modMenuItems = [
 ]
 
 const activeMenuItems = computed(() => props.role === 'admin' ? adminMenuItems : modMenuItems)
+
+const isRouteActive = (path) => {
+  if (path.endsWith('/dashboard') || path === '/' || path === '/admin' || path === '/moderator') {
+    return route.path === path
+  }
+  return route.path.startsWith(path)
+}
 
 const searchPlaceholder = computed(() => {
   if (route.path.includes('/events')) return 'Tìm sự kiện...'
