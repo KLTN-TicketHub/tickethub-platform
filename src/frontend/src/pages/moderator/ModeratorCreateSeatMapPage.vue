@@ -53,6 +53,392 @@
         <p class="text-white/20 text-xs mt-3">Chỉ chấp nhận file .svg theo chuẩn TicketHub Seatmap</p>
       </div>
 
+      <!-- Figma Seatmap Design Handbook -->
+      <div class="bg-[#111916]/30 border border-white/10 rounded-[2rem] p-6 md:p-8 flex flex-col gap-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between cursor-pointer select-none" @click="showGuide = !showGuide">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center">
+              <PhFigmaLogo weight="bold" class="text-xl animate-pulse" />
+            </div>
+            <div>
+              <h3 class="text-base md:text-lg font-bold text-white">Cẩm Nang Thiết Kế Sơ Đồ Ghế (Figma)</h3>
+              <p class="text-[11px] md:text-xs text-white/50">Quy tắc vẽ & xuất tệp SVG tương thích 100% với hệ thống TicketHub</p>
+            </div>
+          </div>
+          <button class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-white/60 hover:text-white flex items-center justify-center transition-colors">
+            <PhCaretDown :class="showGuide ? 'rotate-180' : ''" class="transition-transform duration-300 text-sm" weight="bold" />
+          </button>
+        </div>
+
+        <!-- Guide Content (Collapsible) -->
+        <div v-show="showGuide" class="border-t border-white/5 pt-6 flex flex-col lg:flex-row gap-6">
+          <!-- Guide Tabs (Left / Top on mobile) -->
+          <div class="lg:w-60 flex flex-row lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 scrollbar-none flex-shrink-0">
+            <button
+              v-for="(tab, index) in guideTabs"
+              :key="index"
+              @click="activeGuideTab = index"
+              class="whitespace-nowrap lg:whitespace-normal px-4 py-2.5 rounded-xl text-[12px] font-bold transition-all flex items-center gap-2 border"
+              :class="activeGuideTab === index ? 'bg-primary/10 text-primary border-primary/25 shadow-lg shadow-primary/5' : 'text-white/40 border-transparent hover:text-white hover:bg-white/5'"
+            >
+              <PhLayout v-if="tab.type === 'canvas'" class="text-base" :weight="activeGuideTab === index ? 'fill' : 'bold'" />
+              <PhListDashes v-else-if="tab.type === 'hierarchy'" class="text-base" :weight="activeGuideTab === index ? 'fill' : 'bold'" />
+              <PhCircle v-else-if="tab.type === 'seats'" class="text-base" :weight="activeGuideTab === index ? 'fill' : 'bold'" />
+              <PhPen v-else-if="tab.type === 'paths'" class="text-base" :weight="activeGuideTab === index ? 'fill' : 'bold'" />
+              <PhTextT v-else-if="tab.type === 'text'" class="text-base" :weight="activeGuideTab === index ? 'fill' : 'bold'" />
+              <PhPalette v-else-if="tab.type === 'colors'" class="text-base" :weight="activeGuideTab === index ? 'fill' : 'bold'" />
+              <PhSliders v-else-if="tab.type === 'export'" class="text-base" :weight="activeGuideTab === index ? 'fill' : 'bold'" />
+              <PhTable v-else-if="tab.type === 'table'" class="text-base" :weight="activeGuideTab === index ? 'fill' : 'bold'" />
+              
+              <span>{{ tab.title }}</span>
+            </button>
+          </div>
+
+          <!-- Guide Tab Details (Right) -->
+          <div class="flex-1 min-w-0 bg-[#080D0B]/60 border border-white/5 rounded-2xl p-6 text-[13px] leading-relaxed text-white/70">
+            <!-- Canvas Setup Tab -->
+            <div v-if="activeGuideTab === 0" class="flex flex-col gap-4">
+              <div class="flex items-center gap-2 text-white font-bold text-[14px]">
+                <PhLayout class="text-primary text-base" weight="fill" />
+                <span>1. Thiết Lập Khung Bản Vẽ (Canvas Setup)</span>
+              </div>
+              <p class="text-white/60">Để đảm bảo hệ tọa độ chính xác, sơ đồ ghế bắt buộc phải được thiết kế bên trong một Frame gốc.</p>
+              
+              <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex gap-3 text-red-400">
+                <PhWarningCircle class="text-base flex-shrink-0 mt-0.5" weight="fill" />
+                <div>
+                  <h4 class="font-bold text-[13px] mb-1">Quy định bắt buộc:</h4>
+                  <p class="text-[12px] leading-relaxed">Toàn bộ sơ đồ ghế phải nằm gọn trong một <strong>Frame</strong> duy nhất làm gốc. Không vẽ tự do ngoài màn hình làm việc (Canvas).</p>
+                </div>
+              </div>
+
+              <ul class="space-y-3 pl-2">
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Kích thước Frame gốc:</strong> Khuyên dùng dạng hình vuông hoặc tỉ lệ tiêu chuẩn, ví dụ: <code class="bg-white/5 px-1.5 py-0.5 rounded font-mono text-primary">1000px x 1000px</code> hoặc <code class="bg-white/5 px-1.5 py-0.5 rounded font-mono text-primary">999px x 666px</code>.
+                  </div>
+                </li>
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Hệ tọa độ:</strong> Điểm <code class="bg-white/5 px-1 rounded font-mono text-primary">(0,0)</code> bắt đầu từ góc trên bên trái của Frame. Tránh dịch chuyển tọa độ gốc của Frame sau khi đã vẽ các phần tử bên trong.
+                  </div>
+                </li>
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Đặt tên Frame gốc:</strong> Đặt tên phản ánh địa điểm hoặc cấu trúc, ví dụ: <code class="bg-white/5 px-1.5 py-0.5 rounded font-mono text-primary">Curved-Stadium-Layout</code>.
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Layer Hierarchy Tab -->
+            <div v-else-if="activeGuideTab === 1" class="flex flex-col gap-4">
+              <div class="flex items-center gap-2 text-white font-bold text-[14px]">
+                <PhListDashes class="text-primary text-base" weight="fill" />
+                <span>2. Cấu Trúc Cây Thư Mục & Phân Cấp Layer (Hierarchy)</span>
+              </div>
+              <p class="text-white/60">Trình bóc tách SVG của hệ thống tìm phân khu dựa trên các nhóm cấp 1 (Group cấp cao nhất nằm ngay dưới Frame gốc). Các layer con bên trong nhóm đó sẽ được tự động quy về Phân khu (Zone) đó.</p>
+
+              <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 flex gap-3 text-yellow-400">
+                <PhWarning class="text-base flex-shrink-0 mt-0.5" weight="fill" />
+                <div>
+                  <h4 class="font-bold text-[13px] mb-1">Cảnh báo cấu trúc:</h4>
+                  <p class="text-[12px] leading-relaxed">
+                    <strong>Không lồng quá nhiều Group con:</strong> Parser sẽ duyệt phẳng các layer con. Lồng quá nhiều group bên trong sẽ làm sai lệch cấu trúc dữ liệu.<br/>
+                    <strong>Tên Group Phân khu:</strong> Phải bắt đầu bằng tiền tố <code class="bg-white/5 px-1.5 py-0.5 rounded font-mono text-yellow-300">Zone-</code> (ngoại trừ phân khu sân khấu đặt tên là <code class="bg-white/5 px-1.5 py-0.5 rounded font-mono text-yellow-300">STAGE</code>). Ví dụ: <code class="font-mono">Zone-VIP-Left</code>, <code class="font-mono">Zone-Standard</code>.
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <span class="text-white font-semibold">Sơ đồ phân cấp layer chuẩn trong Figma:</span>
+                <pre class="bg-black/40 border border-white/5 rounded-xl p-4 text-[12px] font-mono text-white/80 leading-relaxed overflow-x-auto select-all">
+[Frame] Curved-Stadium-Layout (Gốc)
+ ├── [Group] STAGE (Sân khấu - Không mở bán)
+ │    ├── [Vector] StageBackground (Hình nền sân khấu)
+ │    ├── [Text] SÂN KHẤU CHÍNH (Tiêu đề chữ)
+ │    ├── [Vector] Left-Spotlight (Đường trang trí)
+ │    └── [Vector] Exit-Door-Left (Đồ họa lối thoát)
+ ├── [Group] Zone-Top-Pink (Phân khu ghế VVIP)
+ │    ├── [Vector] ZoneBackground (Hình nền hồng)
+ │    ├── [Text] A (Ký hiệu hàng ghế A)
+ │    ├── [Text] B (Ký hiệu hàng ghế B)
+ │    ├── [Ellipse] Pink_A_L1 (Ghế 1 hàng A bên trái)
+ │    └── ... (Các ghế khác)
+ └── [Group] Zone-GA (Phân khu đứng tự do)
+      └── [Vector] ZoneBackground (Hình nền xanh)</pre>
+              </div>
+            </div>
+
+            <!-- Seats Rule Tab -->
+            <div v-else-if="activeGuideTab === 2" class="flex flex-col gap-4">
+              <div class="flex items-center gap-2 text-white font-bold text-[14px]">
+                <PhCircle class="text-primary text-base" weight="fill" />
+                <span>3. Quy Tắc Vẽ Ghế Ngồi (Seats)</span>
+              </div>
+              <p class="text-white/60">Ghế ngồi trong database được lưu dưới dạng hình tròn có tọa độ tâm <code class="font-mono text-primary">(x,y)</code> và bán kính <code class="font-mono text-primary">r</code> (radius).</p>
+
+              <ul class="space-y-3 pl-2">
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Công cụ sử dụng:</strong> Chỉ dùng công cụ <strong>Ellipse</strong> (Phím tắt <kbd class="bg-white/10 px-1 py-0.5 rounded text-[11px] font-mono">O</kbd>).
+                  </div>
+                </li>
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Kích thước hình tròn:</strong> Bắt buộc chiều rộng và chiều cao phải bằng nhau (ví dụ: <code class="bg-white/5 px-1.5 py-0.5 rounded font-mono text-primary">20px x 20px</code> hoặc <code class="bg-white/5 px-1.5 py-0.5 rounded font-mono text-primary">24px x 24px</code>). Tuyệt đối không vẽ hình bầu dục (oval).
+                  </div>
+                </li>
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Quy tắc đặt tên ID ghế (Figma Layer Name):</strong> Tên layer trong Figma sẽ trở thành thuộc tính <code class="bg-white/5 px-1.5 py-0.5 rounded font-mono text-primary">id="..."</code> trong mã SVG. ID này phải là duy nhất trong cùng một hàng và tuân thủ định dạng tối giản:
+                    <div class="bg-black/30 border border-white/5 rounded-lg p-3 my-2 text-[12px] font-mono">
+                      <span class="text-primary font-bold">Định dạng tối giản chuẩn:</span> TênHàng_SốGhế<br/>
+                      <span class="text-white/40">Ví dụ:</span><br/>
+                      &bull; <span class="text-white font-bold">A_1</span>: Ghế số 1 của hàng A.<br/>
+                      &bull; <span class="text-white font-bold">B_12</span>: Ghế số 12 của hàng B.
+                    </div>
+                  </div>
+                </li>
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Sắp xếp ghế:</strong> Bạn có thể xếp ghế cong, chéo, hoặc giãn cách tạo lối đi tùy ý. Parser sẽ tự động đọc tọa độ trung tâm <code class="font-mono text-primary">(cx, cy)</code> của từng hình tròn để lưu vào DB.
+                  </div>
+                </li>
+              </ul>
+
+              <div class="bg-primary/5 border border-primary/20 rounded-xl p-4 flex gap-3 text-primary/85">
+                <PhInfo class="text-base flex-shrink-0 mt-0.5" weight="fill" />
+                <div class="text-[12px] leading-relaxed">
+                  <strong class="text-white">Không cần thêm mã khu vào ID ghế:</strong> Vì các hình tròn ghế đã nằm gọn trong Group của phân khu (ví dụ: <code class="bg-white/5 px-1 rounded font-mono text-white">&lt;g id="Zone-A"&gt;</code>), trình bóc tách tự động sẽ tự liên kết ghế với phân khu tương ứng.<br/>
+                  Lập trình viên chỉ cần lấy ID ghế tách (<code class="font-mono text-primary">split('_')</code>) thành: <strong>Hàng ghế (RowLabel)</strong> là chữ phía trước dấu gạch dưới, và <strong>Số ghế (SeatName)</strong> là số ở phía sau.
+                </div>
+              </div>
+            </div>
+
+            <!-- Background Paths Tab -->
+            <div v-else-if="activeGuideTab === 3" class="flex flex-col gap-4">
+              <div class="flex items-center gap-2 text-white font-bold text-[14px]">
+                <PhPen class="text-primary text-base" weight="fill" />
+                <span>4. Thiết Kế Hình Nền Phân Khu & Đồ Họa Trang Trí (Paths)</span>
+              </div>
+              <p class="text-white/60">Quy tắc vẽ nền cho phân khu và các chi tiết trang trí không mở bán.</p>
+
+              <ul class="space-y-3 pl-2">
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Công cụ sử dụng:</strong> Dùng công cụ <strong>Pen</strong> (Phím tắt <kbd class="bg-white/10 px-1 py-0.5 rounded text-[11px] font-mono">P</kbd>) hoặc vẽ vector tự do để tạo các hình dạng uốn lượn, hình elip dẹt, đa giác răng cưa làm nền cho phân khu.
+                  </div>
+                </li>
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Bóc tách tự động:</strong> Trình duyệt chỉ cần chuỗi vẽ hình học <code class="bg-white/5 px-1 rounded font-mono text-primary">d="..."</code> (dữ liệu vector) để hiển thị nền phân khu. Do đó, bạn có thể thoải mái vẽ hình dạng bất kỳ mà không sợ lỗi lưu trữ.
+                  </div>
+                </li>
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Đồ họa trang trí tĩnh (EXIT, Mũi tên, Vách ngăn):</strong>
+                    Gom tất cả các nét vẽ trang trí vào nhóm <code class="font-mono text-primary">STAGE</code> (hoặc một phân khu phụ có cấu hình <code class="font-mono text-primary">isSalable: false</code>).
+                  </div>
+                </li>
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Chuyển đổi các hình vẽ cơ bản:</strong>
+                    Chuyển đổi các hình vẽ cơ bản như hình chữ nhật bo góc làm biển báo sang dạng <strong>Path</strong> bằng cách bấm chuột phải chọn <strong>Flatten</strong> (Phím tắt <kbd class="bg-white/10 px-1.5 py-0.5 rounded text-[11px] font-mono">Ctrl + E</kbd>), để parser của FE bóc tách đồng bộ sang thẻ <code class="font-mono text-primary">&lt;path&gt;</code> mà không gặp lỗi không tương thích.
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Text Elements Tab -->
+            <div v-else-if="activeGuideTab === 4" class="flex flex-col gap-4">
+              <div class="flex items-center gap-2 text-white font-bold text-[14px]">
+                <PhTextT class="text-primary text-base" weight="fill" />
+                <span>5. Viết Chữ & Tên Hàng Ghế (Text Elements)</span>
+              </div>
+              <p class="text-white/60">Quy tắc hiển thị ký hiệu hàng ghế ở các lối đi hoặc các nhãn văn bản.</p>
+
+              <ul class="space-y-3 pl-2">
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Công cụ sử dụng:</strong> Chỉ dùng công cụ <strong>Text</strong> (Phím tắt <kbd class="bg-white/10 px-1 py-0.5 rounded text-[11px] font-mono">T</kbd>).
+                  </div>
+                </li>
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Định vị chữ:</strong> Đặt chữ (ví dụ ký hiệu hàng ghế <code class="font-mono text-primary">A</code>, <code class="font-mono text-primary">B</code>, <code class="font-mono text-primary">C</code>...) tại tọa độ mong muốn (ví dụ ở giữa lối đi). Hệ thống sẽ bóc tách lấy tọa độ <code class="font-mono text-primary">x</code>, <code class="font-mono text-primary">y</code> làm điểm neo và nội dung chữ để lưu vào DB.
+                  </div>
+                </li>
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">FONT CHỮ:</strong> Khuyên dùng các font hệ thống hoặc font phổ biến như <code class="bg-white/5 px-1.5 py-0.5 rounded font-mono text-primary">Inter</code>, <code class="bg-white/5 px-1.5 py-0.5 rounded font-mono text-primary">system-ui</code>, <code class="bg-white/5 px-1.5 py-0.5 rounded font-mono text-primary">Arial</code>, <code class="bg-white/5 px-1.5 py-0.5 rounded font-mono text-primary">sans-serif</code> để hiển thị đồng bộ ở mọi thiết bị.
+                  </div>
+                </li>
+              </ul>
+
+              <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex gap-3 text-red-400">
+                <PhWarningCircle class="text-base flex-shrink-0 mt-0.5" weight="fill" />
+                <div>
+                  <h4 class="font-bold text-[13px] mb-1">Cấm Flatten Text:</h4>
+                  <p class="text-[12px] leading-relaxed">Tuyệt đối <strong>không nhấn chuột phải chọn Outline Stroke hoặc Flatten</strong> đối với văn bản. Làm như vậy chữ viết sẽ bị rã thành các đường vẽ hình học (<code class="font-mono">&lt;path&gt;</code>), hệ thống sẽ mất thông tin chuỗi ký tự text và không thể hiển thị động được.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Colors Rule Tab -->
+            <div v-else-if="activeGuideTab === 5" class="flex flex-col gap-4">
+              <div class="flex items-center gap-2 text-white font-bold text-[14px]">
+                <PhPalette class="text-primary text-base" weight="fill" />
+                <span>6. Tiêu Chuẩn Màu Sắc (No-Defs Rule)</span>
+              </div>
+              
+              <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 flex gap-3 text-yellow-400">
+                <PhWarning class="text-base flex-shrink-0 mt-0.5" weight="fill" />
+                <div>
+                  <h4 class="font-bold text-[13px] mb-1">Quy tắc No-Defs:</h4>
+                  <p class="text-[12px] leading-relaxed">
+                    Do hệ thống bóc tách dữ liệu theo phân khu và loại bỏ tệp SVG gốc, thẻ <code class="font-mono bg-white/5 px-1.5 py-0.5 rounded text-yellow-300">&lt;defs&gt;</code> (nơi lưu các hiệu ứng dải màu Gradient, Grid Pattern) <strong>sẽ bị xóa bỏ</strong>. Nếu bạn dùng màu Gradient trong thiết kế, hình vẽ sẽ bị lỗi mất màu (hiển thị màu đen hoặc trong suốt).
+                  </p>
+                </div>
+              </div>
+
+              <ul class="space-y-3 pl-2">
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Quy tắc phối màu:</strong> Chỉ sử dụng màu đơn sắc (Solid Color) hoặc màu bán trong suốt sử dụng hệ màu RGBA.
+                  </div>
+                </li>
+                <li class="flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+                  <div>
+                    <strong class="text-white">Cách tạo nền trong suốt (Ví dụ nền hồng mờ của phân khu):</strong>
+                    <ol class="list-decimal list-inside pl-2 space-y-1 mt-1 text-[12px] text-white/60">
+                      <li>Chọn đối tượng nền phân khu.</li>
+                      <li>Trong mục <strong class="text-white">Fill</strong> ở bảng bên phải, chỉnh độ mờ (Opacity) của màu tô (ví dụ: đặt màu là <code class="font-mono text-primary">#ffdad9</code> và chỉnh kênh Alpha/Opacity của màu đó về <code class="font-mono text-primary">10%</code> hoặc <code class="font-mono text-primary">15%</code>).</li>
+                    </ol>
+                    <span class="text-[11px] text-yellow-400/80 block mt-1">&bull; Lưu ý: Tránh chỉnh Opacity của cả layer/group vì sẽ làm mờ luôn cả các ghế ngồi bên trong.</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Export Settings Tab -->
+            <div v-else-if="activeGuideTab === 6" class="flex flex-col gap-4">
+              <div class="flex items-center gap-2 text-white font-bold text-[14px]">
+                <PhSliders class="text-primary text-base" weight="fill" />
+                <span>7. Thiết Lập Khi Xuất File SVG Từ Figma</span>
+              </div>
+              <p class="text-white/60">Đây là bước quyết định để xuất ra tệp SVG chuẩn cho code:</p>
+
+              <ol class="list-decimal list-inside space-y-1.5 pl-2">
+                <li>Chọn <strong>Frame gốc</strong> của sơ đồ ghế (Ví dụ: <code class="font-mono text-primary">Curved-Stadium-Layout</code>).</li>
+                <li>Ở panel bên phải, kéo xuống mục <strong>Export</strong>, chọn định dạng là <strong>SVG</strong>.</li>
+                <li>Nhấp vào nút <strong>3 chấm `...`</strong> (Export settings) bên cạnh định dạng và thiết lập chính xác:</li>
+              </ol>
+
+              <div class="overflow-x-auto rounded-xl border border-white/10 mt-2">
+                <table class="w-full text-left border-collapse text-[12px]">
+                  <thead>
+                    <tr class="bg-white/5 border-b border-white/10 text-white/70 font-bold">
+                      <th class="py-2.5 px-3">Thiết lập</th>
+                      <th class="py-2.5 px-3">Trạng thái</th>
+                      <th class="py-2.5 px-3">Lý do</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5 text-white/60">
+                    <tr>
+                      <td class="py-2.5 px-3 font-bold text-white">Include "id" attribute</td>
+                      <td class="py-2.5 px-3 text-emerald-400 font-bold">BẮT BUỘC BẬT (Checked)</td>
+                      <td class="py-2.5 px-3">Để Figma xuất tên các Group và tên Ghế thành thuộc tính <code class="font-mono">id="..."</code> trong mã SVG.</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2.5 px-3 font-bold text-white">Outline text</td>
+                      <td class="py-2.5 px-3 text-red-400 font-bold">BẮT BUỘC TẮT (Unchecked)</td>
+                      <td class="py-2.5 px-3">Để giữ nguyên chữ viết dưới dạng thẻ <code class="font-mono">&lt;text&gt;</code>. Nếu bật, chữ viết sẽ bị biến thành thẻ <code class="font-mono">&lt;path&gt;</code> hình học.</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2.5 px-3 font-bold text-white">Use absolute bounds</td>
+                      <td class="py-2.5 px-3 text-red-400 font-bold">BẮT BUỘC TẮT (Unchecked)</td>
+                      <td class="py-2.5 px-3">Giúp căn chỉnh tọa độ của các phần tử con tương đối so với Frame gốc <code class="font-mono">(0,0)</code>, tránh tọa độ bị lệch âm hoặc quá lớn.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Comparison Table Tab -->
+            <div v-else-if="activeGuideTab === 7" class="flex flex-col gap-4">
+              <div class="flex items-center gap-2 text-white font-bold text-[14px]">
+                <PhTable class="text-primary text-base" weight="fill" />
+                <span>Bảng Đối Chiếu Figma &rarr; SVG &rarr; Database</span>
+              </div>
+              <p class="text-white/60">Cách các phần tử Figma ánh xạ vào hệ thống:</p>
+
+              <div class="overflow-x-auto rounded-xl border border-white/10">
+                <table class="w-full text-left border-collapse text-[12px]">
+                  <thead>
+                    <tr class="bg-white/5 border-b border-white/10 text-white/70 font-bold">
+                      <th class="py-2.5 px-3">Layer trong Figma</th>
+                      <th class="py-2.5 px-3">Thẻ SVG xuất ra</th>
+                      <th class="py-2.5 px-3">Trường dữ liệu trong DB</th>
+                      <th class="py-2.5 px-3">Mục đích sử dụng</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5 text-white/60">
+                    <tr>
+                      <td class="py-2.5 px-3 font-bold text-white">Group <code class="font-mono">STAGE</code></td>
+                      <td class="py-2.5 px-3"><code class="font-mono">&lt;g id="STAGE"&gt;</code></td>
+                      <td class="py-2.5 px-3">Phân khu <code class="font-mono">isStage = true</code>, <code class="font-mono">isSalable = false</code></td>
+                      <td class="py-2.5 px-3">Container chứa sân khấu và trang trí khán phòng.</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2.5 px-3 font-bold text-white">Group <code class="font-mono">Zone-VIP</code></td>
+                      <td class="py-2.5 px-3"><code class="font-mono">&lt;g id="Zone-VIP"&gt;</code></td>
+                      <td class="py-2.5 px-3">Phân khu <code class="font-mono">isStage = false</code>, <code class="font-mono">isSalable = true</code></td>
+                      <td class="py-2.5 px-3">Container chứa ghế ngồi mở bán của phân khu VIP.</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2.5 px-3 font-bold text-white">Nền phân khu (Vector)</td>
+                      <td class="py-2.5 px-3"><code class="font-mono">&lt;path d="..." /&gt;</code></td>
+                      <td class="py-2.5 px-3">Cột <code class="font-mono">ElementJson -> data</code></td>
+                      <td class="py-2.5 px-3">Vẽ hình dạng hình học (Răng cưa, hình cong) của khu vực.</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2.5 px-3 font-bold text-white">Ghế ngồi (Ellipse <code class="font-mono">O</code>)</td>
+                      <td class="py-2.5 px-3"><code class="font-mono">&lt;circle id="A_1" /&gt;</code></td>
+                      <td class="py-2.5 px-3">Bảng <code class="font-mono">Seat -> SeatName: "1"</code>, <code class="font-mono">SeatCode</code></td>
+                      <td class="py-2.5 px-3">Lưu trữ ghế ngồi vật lý, vị trí click đặt vé của khách.</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2.5 px-3 font-bold text-white">Tên hàng ghế (Text <code class="font-mono">T</code>)</td>
+                      <td class="py-2.5 px-3"><code class="font-mono">&lt;text&gt;A&lt;/text&gt;</code></td>
+                      <td class="py-2.5 px-3">Cột <code class="font-mono">ElementJson -> text</code></td>
+                      <td class="py-2.5 px-3">Hiển thị chữ cái chỉ dẫn hàng ghế ở lối đi.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Parse Errors -->
       <div v-if="parseErrors.length > 0" class="bg-red-500/10 border border-red-500/20 rounded-2xl p-5 flex flex-col gap-3">
         <div class="flex items-center gap-2 text-red-400 font-bold text-[14px]">
@@ -457,7 +843,8 @@ import { validateSeatMap, validateZoneConfig } from '../../utils/svgValidator.js
 import { createSeatMap, uploadSVGFile } from '../../services/venue.service.js'
 import {
   PhArrowLeft, PhArrowRight, PhUploadSimple, PhWarningCircle, PhWarning,
-  PhCheckCircle, PhCheck, PhCircleNotch, PhFloppyDisk, PhTextT, PhInfo
+  PhCheckCircle, PhCheck, PhCircleNotch, PhFloppyDisk, PhTextT, PhInfo,
+  PhFigmaLogo, PhCaretDown, PhPalette, PhSliders, PhTable, PhPen, PhCircle, PhListDashes, PhLayout
 } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -478,6 +865,20 @@ const parseWarnings = ref([])
 
 const seatMapName = ref('')
 const zoneConfigs = ref([])
+
+// Figma Design Handbook state
+const showGuide = ref(true)
+const activeGuideTab = ref(0)
+const guideTabs = [
+  { title: '1. Canvas Setup', type: 'canvas' },
+  { title: '2. Phân cấp Layer', type: 'hierarchy' },
+  { title: '3. Quy tắc Ghế ngồi', type: 'seats' },
+  { title: '4. Nền & Đồ họa', type: 'paths' },
+  { title: '5. Chữ & Tên hàng', type: 'text' },
+  { title: '6. Tiêu chuẩn Màu', type: 'colors' },
+  { title: '7. Figma Export', type: 'export' },
+  { title: '8. Bảng đối chiếu', type: 'table' }
+]
 const configErrors = reactive({})
 const zoneConfigErrors = ref([])
 
