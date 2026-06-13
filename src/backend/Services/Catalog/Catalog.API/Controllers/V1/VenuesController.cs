@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.API.Extensions;
+using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Application.Common.DTOs.Venues;
@@ -30,7 +31,7 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [AllowAnonymous]
+        [Authorize(Roles = Roles.Moderator)]
         [HttpGet]
         public async Task<IActionResult> GetVenuesAsync(
             [FromQuery] GetVenuesRequest request,
@@ -47,7 +48,6 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [AllowAnonymous]
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetVenueByIdAsync(
             [FromRoute] Guid id,
@@ -64,7 +64,7 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [AllowAnonymous]
+        [Authorize(Roles = Roles.Moderator)]
         [HttpPost]
         public async Task<IActionResult> CreateVenueAsync([FromBody] CreateVenueRequest request, CancellationToken cancellationToken = default)
         {
@@ -79,7 +79,7 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [AllowAnonymous]
+        [Authorize(Roles = Roles.Moderator)]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> UpdateVenueAsync(
             [FromRoute] Guid id,
@@ -97,7 +97,7 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [AllowAnonymous]
+        [Authorize(Roles = Roles.Moderator)]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteVenueAsync(
             [FromRoute] Guid id,

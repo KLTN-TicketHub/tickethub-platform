@@ -1,3 +1,4 @@
+using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Application.Common.DTOs.SeatMaps;
@@ -25,7 +26,7 @@ namespace Catalog.API.Controllers.V1
             _sender = sender;
         }
 
-        [AllowAnonymous]
+        [Authorize(Roles = Roles.Moderator)]
         [HttpPost]
         public async Task<IActionResult> CreateSeatMap(
             [FromRoute] Guid venueId,
@@ -42,7 +43,6 @@ namespace Catalog.API.Controllers.V1
             });
         }
 
-        [AllowAnonymous]
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetSeatMapById(
             [FromRoute] Guid venueId,
@@ -61,7 +61,6 @@ namespace Catalog.API.Controllers.V1
             throw new NotImplementedException();
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetSeatMapsByVenueId(
             [FromRoute] Guid venueId,

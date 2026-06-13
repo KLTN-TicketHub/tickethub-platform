@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Responses;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -19,7 +20,7 @@ namespace Catalog.API.Controllers.V1
             _fileService = fileService;
         }
 
-        [AllowAnonymous]
+        [Authorize(Roles = Roles.Moderator)]
         [HttpPost("upload-svg")]
         public async Task<IActionResult> UploadSvg(IFormFile file, CancellationToken cancellation = default)
         {

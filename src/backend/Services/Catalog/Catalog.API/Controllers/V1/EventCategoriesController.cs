@@ -48,7 +48,9 @@ namespace Catalog.API.Controllers.V1
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> CreateEventCategoryAsync([FromBody] CreateEventCategoryRequest request, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> CreateEventCategoryAsync(
+            [FromBody] CreateEventCategoryRequest request,
+            CancellationToken cancellationToken = default)
         {
             var result = await _sender.Send(new CreateEventCategoryCommand(request), cancellationToken);
 
