@@ -1,4 +1,4 @@
-﻿using Catalog.Domain.Entities;
+using Catalog.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,15 +12,13 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
 
             builder.HasKey(e => e.Id);
 
-            builder.HasOne(e => e.Venue)
-                .WithMany()
-                .HasForeignKey(e => e.VenueId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             builder.HasOne(e => e.SeatMap)
                 .WithMany()
                 .HasForeignKey(e => e.SeatMapId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Property(e => e.OrganizerId)
+                .IsRequired();
 
             builder.Property(e => e.Title)
                 .IsRequired()

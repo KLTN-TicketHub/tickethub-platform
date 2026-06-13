@@ -44,9 +44,9 @@ namespace Catalog.Infrastructure.Migrations
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -73,9 +73,9 @@ namespace Catalog.Infrastructure.Migrations
                     WebsiteUrl = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -98,9 +98,9 @@ namespace Catalog.Infrastructure.Migrations
                     Height = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -121,7 +121,6 @@ namespace Catalog.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    VenueId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     SeatMapId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     OrganizerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
@@ -136,9 +135,9 @@ namespace Catalog.Infrastructure.Migrations
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -152,12 +151,6 @@ namespace Catalog.Infrastructure.Migrations
                         principalTable: "SeatMap",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Event_Venue_VenueId",
-                        column: x => x.VenueId,
-                        principalTable: "Venue",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -167,7 +160,7 @@ namespace Catalog.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SeatMapId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ZoneName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ZoneCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ZoneCode = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Color = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     X = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Y = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
@@ -184,9 +177,9 @@ namespace Catalog.Infrastructure.Migrations
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -214,9 +207,9 @@ namespace Catalog.Infrastructure.Migrations
                     ReviewerName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     ReviewedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -269,9 +262,9 @@ namespace Catalog.Infrastructure.Migrations
                     Country = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     EventId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -297,9 +290,9 @@ namespace Catalog.Infrastructure.Migrations
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -334,9 +327,9 @@ namespace Catalog.Infrastructure.Migrations
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -364,8 +357,8 @@ namespace Catalog.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RowId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SeatCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    SeatName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    SeatCode = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    SeatName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     SvgElementId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     X = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Y = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
@@ -373,9 +366,9 @@ namespace Catalog.Infrastructure.Migrations
                     LayoutStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -395,11 +388,6 @@ namespace Catalog.Infrastructure.Migrations
                 name: "IX_Event_SeatMapId",
                 table: "Event",
                 column: "SeatMapId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Event_VenueId",
-                table: "Event",
-                column: "VenueId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventApproval_EventId",

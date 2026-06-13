@@ -4,14 +4,15 @@
       
       <!-- Brand & Nav -->
       <div class="flex items-center gap-10">
-        <router-link :to="role === 'admin' ? '/admin/dashboard' : '/moderator/dashboard'" class="flex items-center gap-3 group">
+        <router-link :to="role === 'admin' ? '/admin/dashboard' : role === 'moderator' ? '/moderator/dashboard' : '/organizer'" class="flex items-center gap-3 group">
           <div class="w-10 h-10 bg-primary text-black rounded-xl flex items-center justify-center font-bold text-xl shadow-[0_0_20px_rgba(0,200,83,0.3)] group-hover:scale-110 transition-transform">
             <PhCrown weight="fill" v-if="role === 'admin'" />
-            <PhShieldCheck weight="fill" v-else />
+            <PhShieldCheck weight="fill" v-else-if="role === 'moderator'" />
+            <PhSuitcase weight="fill" v-else />
           </div>
           <div class="hidden xl:flex flex-col">
             <span class="font-heading font-black text-xl tracking-tight text-white uppercase leading-none">TicketHub</span>
-            <span class="text-[10px] font-bold text-primary uppercase tracking-[0.3em] mt-1">{{ role === 'admin' ? 'Admin Space' : 'Moderator' }}</span>
+            <span class="text-[10px] font-bold text-primary uppercase tracking-[0.3em] mt-1">{{ role === 'admin' ? 'Admin Space' : role === 'moderator' ? 'Moderator' : 'Partner Space' }}</span>
           </div>
         </router-link>
 
@@ -85,7 +86,7 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { adminSearch } from '../../stores/adminStore'
 import { logout as authLogout } from '../../services/auth/auth.service'
-import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin, PhList, PhX } from '@phosphor-icons/vue'
+import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin, PhList, PhX, PhSuitcase, PhPlus } from '@phosphor-icons/vue'
 
 const props = defineProps({
   role: { type: String, default: 'admin' }
@@ -111,7 +112,16 @@ const modMenuItems = [
   { label: 'Địa điểm', path: '/moderator/venues', icon: PhMapPin },
 ]
 
-const activeMenuItems = computed(() => props.role === 'admin' ? adminMenuItems : modMenuItems)
+const orgMenuItems = [
+  { label: 'Tổng quan', path: '/organizer', icon: PhSquaresFour },
+  { label: 'Tạo sự kiện', path: '/organizer/create-event', icon: PhPlus },
+]
+
+const activeMenuItems = computed(() => {
+  if (props.role === 'admin') return adminMenuItems
+  if (props.role === 'moderator') return modMenuItems
+  return orgMenuItems
+})
 
 const isRouteActive = (path) => {
   if (path.endsWith('/dashboard') || path === '/' || path === '/admin' || path === '/moderator') {
@@ -134,6 +144,6 @@ const handleInput = () => {
 
 const handleLogout = async () => {
   await authLogout()
-  router.replace(props.role === 'admin' ? '/admin/login' : '/moderator/login')
+  router.replace(props.role === 'admin' ? '/admin/login' : props.role === 'moderator' ? '/moderator/login' : '/organizer/login')
 }
 </script>

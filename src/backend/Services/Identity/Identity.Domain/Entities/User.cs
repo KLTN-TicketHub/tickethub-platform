@@ -10,13 +10,13 @@ namespace Identity.Domain.Entities
 
         public string? ImageUrl { get; set; }
 
-        public DateTime CreateAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public int? CreatedBy { get; set; }
+        public Guid? CreatedBy { get; set; }
 
-        public DateTime? UpdateAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
-        public int? UpdatedBy { get; set; }
+        public Guid? UpdatedBy { get; set; }
 
 
         private readonly List<RefreshToken> _refreshTokens = new List<RefreshToken>();
@@ -25,5 +25,17 @@ namespace Identity.Domain.Entities
 
         private readonly List<AuditLog> _auditLogs = new List<AuditLog>();
         public IReadOnlyCollection<AuditLog> AuditLogs => _auditLogs.AsReadOnly();
+
+        public virtual void SetCreated(Guid? createdBy)
+        {
+            CreatedAt = DateTime.UtcNow;
+            CreatedBy = createdBy;
+        }
+
+        public virtual void SetUpdated(Guid? updatedBy)
+        {
+            UpdatedAt = DateTime.UtcNow;
+            UpdatedBy = updatedBy;
+        }
     }
 }

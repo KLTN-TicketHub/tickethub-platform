@@ -5,9 +5,6 @@ namespace Catalog.Domain.Entities
 {
     public class Event : SoftDeleteEntity, IAggregateRoot
     {
-        public Venue? Venue { get; set; }
-        public Guid? VenueId { get; set; }
-
         public SeatMap? SeatMap { get; set; }
         public Guid? SeatMapId { get; set; }
 

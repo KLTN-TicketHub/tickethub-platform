@@ -10,7 +10,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
-namespace Identity.Application.Features.Auth.Commands.LoginOrganizer
+namespace Identity.Application.Features.Auth.Commands.Organizers.LoginOrganizer
 {
     public class LoginOrganizerCommandHandler : IRequestHandler<LoginOrganizerCommand, AuthDto>
     {

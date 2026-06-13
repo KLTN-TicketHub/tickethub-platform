@@ -15,7 +15,7 @@ namespace Identity.Application.Features.Admin.Moderators.Validators
 
             RuleFor(x => x.Password)
                 .NotEmpty().WithMessage("Mật khẩu là bắt buộc")
-                .MinimumLength(6).WithMessage("Mật khẩu phải có ít nhất 6 ký tự")
+                .MinimumLength(8).WithMessage("Mật khẩu phải có ít nhất 8 ký tự")
                 .MaximumLength(50).WithMessage("Mật khẩu không được vượt quá 50 ký tự")
                 .Matches(@"[A-Z]").WithMessage("Mật khẩu phải chứa ít nhất 1 chữ cái viết hoa")
                 .Matches(@"[a-z]").WithMessage("Mật khẩu phải chứa ít nhất 1 chữ cái viết thường")

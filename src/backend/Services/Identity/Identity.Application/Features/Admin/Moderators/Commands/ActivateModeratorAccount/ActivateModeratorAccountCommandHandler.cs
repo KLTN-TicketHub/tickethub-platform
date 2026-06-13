@@ -16,9 +16,9 @@ namespace Identity.Application.Features.Admin.Moderators.Commands.ActivateModera
             _userManager = userManager;
         }
 
-        public async Task<Unit> Handle(ActivateModeratorAccountCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(ActivateModeratorAccountCommand command, CancellationToken cancellationToken)
         {
-            await ActivateModeratorAccountAsync(request.Request, cancellationToken);
+            await ActivateModeratorAccountAsync(command.Request, cancellationToken);
 
             return Unit.Value;
         }
@@ -55,7 +55,7 @@ namespace Identity.Application.Features.Admin.Moderators.Commands.ActivateModera
                     $"Thiết lập mật khẩu thất bại: {string.Join(", ", addPasswordResult.Errors.Select(e => e.Description))}");
             }
 
-            user.UpdateAt = DateTime.UtcNow;
+            user.SetUpdated(null);
 
             IdentityResult updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)

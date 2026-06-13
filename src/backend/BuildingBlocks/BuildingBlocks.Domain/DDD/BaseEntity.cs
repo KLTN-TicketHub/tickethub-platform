@@ -6,22 +6,22 @@
 
         public virtual DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public virtual Guid? CreateBy { get; set; }
+        public virtual Guid? CreatedBy { get; set; }
 
-        public virtual DateTime? UpdateAt { get; set; }
+        public virtual DateTime? UpdatedAt { get; set; }
 
-        public virtual Guid? UpdateBy { get; set; }
+        public virtual Guid? UpdatedBy { get; set; }
 
-        public virtual void SetCreated(Guid? updatedBy)
+        public virtual void SetCreated(Guid? createdBy)
         {
             CreatedAt = DateTime.UtcNow;
-            CreateBy = updatedBy;
+            CreatedBy = createdBy;
         }
 
         public virtual void SetUpdated(Guid? updatedBy)
         {
-            UpdateAt = DateTime.UtcNow;
-            UpdateBy = updatedBy;
+            UpdatedAt = DateTime.UtcNow;
+            UpdatedBy = updatedBy;
         }
     }
 }

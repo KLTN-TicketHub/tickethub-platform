@@ -38,20 +38,26 @@ import ModeratorVenueSeatMapsPage from '../pages/moderator/ModeratorVenueSeatMap
 import ModeratorCreateSeatMapPage from '../pages/moderator/ModeratorCreateSeatMapPage.vue'
 import ModeratorSeatMapDetailPage from '../pages/moderator/ModeratorSeatMapDetailPage.vue'
 
+// Organizer
+import OrganizerLayout from '../layouts/OrganizerLayout.vue'
+import OrganizerLoginPage from '../pages/organizer/OrganizerLoginPage.vue'
+import OrganizerRegisterPage from '../pages/organizer/OrganizerRegisterPage.vue'
+
 const routes = [
   { path: '/', name: 'home', component: HomePage },
   { path: '/:type(concerts|arts|sports|experiences|workshops|others)', name: 'category', component: CategoryPage },
   { path: '/event/:id', name: 'event-detail', component: EventDetailPage },
   { path: '/my-tickets', name: 'my-tickets', component: MyTicketsPage },
   { path: '/profile', name: 'profile', component: ProfilePage },
-  { path: '/organizer', name: 'organizer', component: OrganizerPage },
-  { path: '/create-event', name: 'create-event', component: CreateEventPage },
+  { path: '/create-event', redirect: '/organizer/create-event' },
   { path: '/early-bird', name: 'early-bird', component: EarlyBirdPage },
   { path: '/stars', name: 'stars', component: StarsPage },
   { path: '/destinations', name: 'destinations', component: DestinationsPage },
   { path: '/auth/callback', name: 'auth-callback', component: AuthCallback },
   { path: '/admin/login', name: 'admin-login', component: AdminLoginPage },
   { path: '/moderator/login', name: 'moderator-login', component: ModeratorLoginPage },
+  { path: '/organizer/login', name: 'organizer-login', component: OrganizerLoginPage },
+  { path: '/organizer/register', name: 'organizer-register', component: OrganizerRegisterPage },
   { path: '/activate-account', name: 'activate-account', component: ActivateAccountPage },
   { path: '/403', name: 'forbidden', component: ForbiddenPage },
   { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFoundPage },
@@ -84,7 +90,18 @@ const routes = [
       { path: 'venues/:id/edit', name: 'moderator-venues-edit', component: ModeratorEditVenuePage },
       { path: 'venues/:id/seat-maps', name: 'moderator-venues-seatmaps', component: ModeratorVenueSeatMapsPage },
       { path: 'venues/:id/seat-maps/create', name: 'moderator-venues-seatmaps-create', component: ModeratorCreateSeatMapPage },
-      { path: 'venues/:id/seat-maps/:seatMapId', name: 'moderator-venues-seatmaps-detail', component: ModeratorSeatMapDetailPage },
+      { path: 'venues/:id/seat-maps/:seatMapId', name: 'moderator-venues-seatmaps-detail', component: ModeratorSeatMapDetailPage }
+    ]
+  },
+
+  // Organizer Routes
+  {
+    path: '/organizer',
+    component: OrganizerLayout,
+    meta: { requiresAuth: true, role: 'organizer' },
+    children: [
+      { path: '', name: 'organizer', component: OrganizerPage },
+      { path: 'create-event', name: 'organizer-create-event', component: CreateEventPage }
     ]
   }
 ]
@@ -146,7 +163,7 @@ router.beforeEach(async (to, from, next) => {
   }
 
   const expectedRole = getExpectedRole(to.path)
-  const isLoginPage = to.path === LOGIN_PATHS[expectedRole]
+  const isLoginPage = to.path === LOGIN_PATHS[expectedRole] || to.path === '/organizer/register'
 
   // 1. Nếu chưa đăng nhập
   if (!isLoggedIn()) {
@@ -168,7 +185,7 @@ router.beforeEach(async (to, from, next) => {
   const userRole = getUserRole(user)
 
   // 3. Nếu đang vào trang login khi đã đăng nhập
-  const isAnyLoginPage = Object.values(LOGIN_PATHS).includes(to.path) && to.path !== '/'
+  const isAnyLoginPage = (Object.values(LOGIN_PATHS).includes(to.path) || to.path === '/organizer/register') && to.path !== '/'
   if (isAnyLoginPage) {
     return next(DASHBOARD_PATHS[userRole])
   }

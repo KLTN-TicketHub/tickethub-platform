@@ -10,6 +10,8 @@ namespace Notification.Worker.Extensions
 
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
 
+            services.Configure<AppUrls>(configuration.GetSection("AppUrls"));
+
             return services;
         }
     }

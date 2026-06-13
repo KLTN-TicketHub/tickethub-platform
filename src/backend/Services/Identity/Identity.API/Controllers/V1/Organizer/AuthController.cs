@@ -1,6 +1,9 @@
 ﻿using BuildingBlocks.API.Extensions;
 using BuildingBlocks.Contracts.Models.Responses;
-using Identity.Application.Features.Auth.Commands.LoginOrganizer;
+using Identity.Application.Common.DTOs.Auth;
+using Identity.Application.Features.Auth.Commands.Organizers.ActivateOrganizer;
+using Identity.Application.Features.Auth.Commands.Organizers.LoginOrganizer;
+using Identity.Application.Features.Auth.Commands.Organizers.RegisterOrganizer;
 using Identity.Application.Features.Auth.Requests;
 using Identity.Common.Options;
 using MediatR;
@@ -51,6 +54,33 @@ namespace Identity.API.Controllers.V1.Organizer
                 Message = "Đăng nhập thành công",
                 AccessToken = result.AccessToken
             });
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> RegisterOrganizerAccountAsync(
+            [FromBody] RegisterOrganizerRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _sender.Send(new RegisterOrganizerCommand(request), cancellationToken);
+
+            return Ok(new ApiResponse<OrganizerDto>
+            {
+                Success = true,
+                Message = "Đăng ký tài khoản tổ chức thành công, vui lòng kiểm tra email để xác nhận tài khoản.",
+                Data = result
+            });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmailAsync(
+            [FromQuery] ActivateOrganizerAccountRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            await _sender.Send(new ActivateOrganizerCommand(request), cancellationToken);
+
+            return Redirect("http://localhost:5173/organizer/login");
         }
     }
 }

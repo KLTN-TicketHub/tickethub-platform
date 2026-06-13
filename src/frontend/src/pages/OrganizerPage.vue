@@ -9,7 +9,7 @@
         <h1 class="font-heading text-4xl lg:text-5xl font-black text-white tracking-tight uppercase">Trung tâm Tổ chức</h1>
         <p class="text-white/50 font-medium text-lg max-w-xl">Quản lý các sự kiện và theo dõi hiệu suất bán vé của bạn một cách trực quan nhất.</p>
       </div>
-      <router-link to="/create-event">
+      <router-link to="/organizer/create-event">
         <BaseButton variant="primary" size="lg" class="!px-8 !rounded-2xl shadow-[0_0_30px_rgba(0,200,83,0.3)] hover:scale-105 transition-transform flex items-center gap-2">
           <PhPlus weight="bold" /> Tạo sự kiện mới
         </BaseButton>

@@ -40,10 +40,10 @@ namespace Identity.Application.Features.Admin.Moderators.Commands.RegisterModera
         }
 
         public async Task<ModeratorDto> Handle(
-            RegisterModeratorCommand request,
+            RegisterModeratorCommand command,
             CancellationToken cancellationToken)
         {
-            return await RegisterAsync(request.Request, cancellationToken);
+            return await RegisterAsync(command.Request, cancellationToken);
         }
 
         private async Task<ModeratorDto> RegisterAsync(

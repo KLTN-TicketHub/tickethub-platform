@@ -1,6 +1,8 @@
 using BuildingBlocks.Contracts.Events.Email;
 using MassTransit;
+using Microsoft.Extensions.Options;
 using Notification.Common.Contracts.Email;
+using Notification.Common.Options;
 using Notification.Infrastructure.Factories.Email;
 
 namespace Notification.Worker.Consumers
@@ -9,13 +11,16 @@ namespace Notification.Worker.Consumers
     {
         private readonly ILogger<SendModeratorWelcomeEmailConsumer> _logger;
         private readonly MailServiceFactory _mailServiceFactory;
+        private readonly AppUrls _appUrls;
 
         public SendModeratorWelcomeEmailConsumer(
             ILogger<SendModeratorWelcomeEmailConsumer> logger,
-            MailServiceFactory mailServiceFactory)
+            MailServiceFactory mailServiceFactory,
+            IOptions<AppUrls> appUrlsOptions)
         {
             _logger = logger;
             _mailServiceFactory = mailServiceFactory;
+            _appUrls = appUrlsOptions.Value;
         }
 
         public async Task Consume(ConsumeContext<ModeratorRegisteredEvent> context)
@@ -34,7 +39,7 @@ namespace Notification.Worker.Consumers
             {
                 To = message.Email,
                 Subject = "Chào mừng bạn đến với TicketHub — Thông tin tài khoản Moderator",
-                HtmlBody = BuildWelcomeEmailBody(message)
+                HtmlBody = BuildWelcomeEmailBody(message, _appUrls.FrontendBaseUrl!)
             };
 
             try
@@ -53,10 +58,10 @@ namespace Notification.Worker.Consumers
             }
         }
 
-        private static string BuildWelcomeEmailBody(ModeratorRegisteredEvent message)
+        private static string BuildWelcomeEmailBody(ModeratorRegisteredEvent message, string feBaseUrl)
         {
             string activationUrl =
-                $"http://localhost:5173/activate-account" +
+                $"{feBaseUrl}/activate-account" +
                 $"?userId={message.UserId}" +
                 $"&token={Uri.EscapeDataString(message.ActivationToken)}";
 

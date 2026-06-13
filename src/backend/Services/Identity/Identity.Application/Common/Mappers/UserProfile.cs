@@ -21,7 +21,7 @@ namespace Identity.Application.Common.Mappers
                 .ForMember(dest => dest.ImageUrl,
                 opt => opt.MapFrom(src => src.ImageUrl))
                 .ForMember(dest => dest.CreateAt,
-                opt => opt.MapFrom(src => src.CreateAt));
+                opt => opt.MapFrom(src => src.CreatedAt));
 
             CreateMap<User, ModeratorDto>()
                 .ForMember(dest => dest.Id,
@@ -35,7 +35,21 @@ namespace Identity.Application.Common.Mappers
                 .ForMember(dest => dest.PhoneNumber,
                 opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.CreatedAt,
-                opt => opt.MapFrom(src => src.CreateAt));
+                opt => opt.MapFrom(src => src.CreatedAt));
+
+            CreateMap<User, OrganizerDto>()
+                .ForMember(dest => dest.Id,
+                opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.UserName,
+                opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.OrganizerName,
+                opt => opt.MapFrom(src => src.FullName))
+                .ForMember(dest => dest.Email,
+                opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.PhoneNumber,
+                opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.CreatedAt,
+                opt => opt.MapFrom(src => src.CreatedAt));
         }
     }
 }
