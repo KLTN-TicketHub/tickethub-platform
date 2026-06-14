@@ -34,8 +34,7 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
             builder.Property(ec => ec.RowVersion)
                 .IsRowVersion();
 
-            builder.HasMany(ec => ec.Events)
-                .WithMany(e => e.Categories);
+
         }
     }
 }

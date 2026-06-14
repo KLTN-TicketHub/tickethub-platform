@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Infrastructure.Data;
+using BuildingBlocks.Infrastructure.Data;
 using Catalog.Domain.Interfaces;
 using Catalog.Domain.Interfaces.IRepositories;
 
@@ -15,7 +15,8 @@ namespace Catalog.Infrastructure.Data.Contexts
             ISeatRepository seatRepository,
             ISeatMapRepository seatMapRepository,
             ITicketTypeRepository ticketTypeRepository,
-            IZoneRepository zoneRepository) : base(dbContext)
+            IZoneRepository zoneRepository,
+            IOrganizerSnapshotRepository organizerSnapshotRepository) : base(dbContext)
         {
             VenueRepository = venueRepository;
             EventRepository = eventRepository;
@@ -25,6 +26,7 @@ namespace Catalog.Infrastructure.Data.Contexts
             SeatMapRepository = seatMapRepository;
             TicketTypeRepository = ticketTypeRepository;
             ZoneRepository = zoneRepository;
+            OrganizerSnapshotRepository = organizerSnapshotRepository;
         }
 
         public IVenueRepository VenueRepository { get; set; }
@@ -35,5 +37,6 @@ namespace Catalog.Infrastructure.Data.Contexts
         public ISeatMapRepository SeatMapRepository { get; set; }
         public ITicketTypeRepository TicketTypeRepository { get; set; }
         public IZoneRepository ZoneRepository { get; set; }
+        public IOrganizerSnapshotRepository OrganizerSnapshotRepository { get; set; }
     }
 }

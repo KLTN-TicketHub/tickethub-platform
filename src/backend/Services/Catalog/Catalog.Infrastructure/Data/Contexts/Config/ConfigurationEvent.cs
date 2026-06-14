@@ -17,8 +17,22 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .HasForeignKey(e => e.SeatMapId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Property(e => e.OrganizerId)
+            builder.HasOne(e => e.Organizer)
+                .WithMany(e => e.Events)
+                .HasForeignKey(e => e.OrganizerId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
+
+            builder.HasOne(e => e.Category)
+                .WithMany(e => e.Events)
+                .HasForeignKey(e => e.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
+
+            builder.HasMany(e => e.TicketTypes)
+                .WithOne(tt => tt.Event)
+                .HasForeignKey(tt => tt.EventId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(e => e.Title)
                 .IsRequired()
@@ -58,9 +72,6 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
 
             builder.Property(e => e.RowVersion)
                 .IsRowVersion();
-
-            builder.HasMany(e => e.Categories)
-                .WithMany(ec => ec.Events);
 
             builder.HasOne(e => e.Location)
                 .WithOne(e => e.Event)

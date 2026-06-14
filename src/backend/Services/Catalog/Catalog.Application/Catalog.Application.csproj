@@ -25,7 +25,6 @@
 	  <Folder Include="Features\EventCategories\Validators\" />
 	  <Folder Include="Features\EventCategories\Queries\" />
 	  <Folder Include="Features\Events\Validators\" />
-	  <Folder Include="Features\Events\Requests\" />
 	  <Folder Include="Features\Events\Queries\" />
 	</ItemGroup>
 

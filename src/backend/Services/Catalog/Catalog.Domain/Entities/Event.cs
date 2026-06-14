@@ -9,6 +9,10 @@ namespace Catalog.Domain.Entities
         public Guid? SeatMapId { get; set; }
 
         public Guid OrganizerId { get; set; }
+        public OrganizerSnapshot? Organizer { get; set; }
+
+        public Guid CategoryId { get; set; }
+        public EventCategory? Category { get; set; }
 
         public string Title { get; set; }
 
@@ -24,20 +28,15 @@ namespace Catalog.Domain.Entities
 
         public DateTime SaleCloseAt { get; set; }
 
-        //Đơn vị tiền tệ (VD: 'USD', 'VND')
         public string CurrencyCode { get; set; }
 
         public string CoverImageUrl { get; set; }
 
-        //Trạng thái (VD: 'Published', 'PendingApproval')
         public EventStatus Status { get; set; }
 
         public byte[] RowVersion { get; set; } = default!;
 
         public EventLocation? Location { get; set; }
-
-        private readonly List<EventCategory> _categories = new List<EventCategory>();
-        public IReadOnlyCollection<EventCategory> Categories => _categories.AsReadOnly();
 
         private readonly List<TicketType> _ticketTypes = new List<TicketType>();
         public IReadOnlyCollection<TicketType> TicketTypes => _ticketTypes.AsReadOnly();

@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Catalog.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class IninialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -54,6 +55,28 @@ namespace Catalog.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EventCategory", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrganizerSnapshot",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrganizerName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrganizerSnapshot", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -145,6 +168,12 @@ namespace Catalog.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Event", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Event_OrganizerSnapshot_OrganizerId",
+                        column: x => x.OrganizerId,
+                        principalTable: "OrganizerSnapshot",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Event_SeatMap_SeatMapId",
                         column: x => x.SeatMapId,
@@ -385,6 +414,11 @@ namespace Catalog.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Event_OrganizerId",
+                table: "Event",
+                column: "OrganizerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Event_SeatMapId",
                 table: "Event",
                 column: "SeatMapId");
@@ -474,6 +508,9 @@ namespace Catalog.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Zone");
+
+            migrationBuilder.DropTable(
+                name: "OrganizerSnapshot");
 
             migrationBuilder.DropTable(
                 name: "SeatMap");

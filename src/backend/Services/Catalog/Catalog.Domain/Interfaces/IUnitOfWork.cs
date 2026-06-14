@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Domain.DDD;
+using BuildingBlocks.Domain.DDD;
 using Catalog.Domain.Interfaces.IRepositories;
 
 namespace Catalog.Domain.Interfaces
@@ -13,5 +13,6 @@ namespace Catalog.Domain.Interfaces
         ISeatMapRepository SeatMapRepository { get; }
         ITicketTypeRepository TicketTypeRepository { get; }
         IZoneRepository ZoneRepository { get; }
+        IOrganizerSnapshotRepository OrganizerSnapshotRepository { get; }
     }
 }

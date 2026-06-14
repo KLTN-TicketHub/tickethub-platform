@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Infrastructure.Auditing;
+using BuildingBlocks.Infrastructure.Auditing;
 using Catalog.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +21,7 @@ namespace Catalog.Infrastructure.Data.Contexts
         public DbSet<Venue> Venues { get; set; }
         public DbSet<Zone> Zones { get; set; }
         public DbSet<Row> Rows { get; set; }
+        public DbSet<OrganizerSnapshot> OrganizerSnapshots { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

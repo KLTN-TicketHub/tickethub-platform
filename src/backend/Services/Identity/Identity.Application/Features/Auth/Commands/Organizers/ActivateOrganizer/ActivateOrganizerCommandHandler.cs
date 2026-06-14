@@ -1,6 +1,9 @@
-﻿using BuildingBlocks.Domain.Exceptions;
+using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Contracts.Events.Organizer;
+using BuildingBlocks.Domain.Exceptions;
 using Identity.Application.Features.Auth.Requests;
 using Identity.Domain.Entities;
+using Identity.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -9,10 +12,17 @@ namespace Identity.Application.Features.Auth.Commands.Organizers.ActivateOrganiz
     public class ActivateOrganizerCommandHandler : IRequestHandler<ActivateOrganizerCommand, Unit>
     {
         private readonly UserManager<User> _userManager;
+        private readonly IEventPublisher _eventPublisher;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ActivateOrganizerCommandHandler(UserManager<User> userManager)
+        public ActivateOrganizerCommandHandler(
+            UserManager<User> userManager,
+            IEventPublisher eventPublisher,
+            IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
+            _eventPublisher = eventPublisher;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Unit> Handle(ActivateOrganizerCommand command, CancellationToken cancellationToken)
@@ -49,7 +59,20 @@ namespace Identity.Application.Features.Auth.Commands.Organizers.ActivateOrganiz
                     $"Cập nhật trạng thái kích hoạt thất bại: {string.Join(", ", updateResult.Errors.Select(e => e.Description))}");
             }
 
+            _eventPublisher.Publish(new OrganizerActivatedEvent
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                ImageUrl = user.ImageUrl,
+                CreatedAt = user.CreatedAt,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+            });
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
             return Unit.Value;
         }
     }
 }
+

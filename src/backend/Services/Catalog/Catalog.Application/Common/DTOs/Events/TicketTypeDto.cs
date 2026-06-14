@@ -1,15 +1,12 @@
-﻿using BuildingBlocks.Domain.DDD;
-using Catalog.Domain.Enums;
+﻿using Catalog.Domain.Enums;
 
-namespace Catalog.Domain.Entities
+namespace Catalog.Application.Common.DTOs.Events
 {
-    public class TicketType : SoftDeleteEntity, IAggregateRoot
+    public class TicketTypeDto
     {
-        public Guid EventId { get; set; }
-        public Event? Event { get; set; }
+        public Guid Id { get; set; }
 
         public Guid? ZoneId { get; set; }
-        public Zone? Zone { get; set; }
 
         public string TicketTypeName { get; set; }
 
@@ -28,8 +25,8 @@ namespace Catalog.Domain.Entities
 
         public int DisplayOrder { get; set; }
 
-        public CatalogStatus Status { get; set; }
+        public string Status { get; set; }
 
-        public byte[] RowVersion { get; set; } = default!;
+        public byte[] RowVersion { get; set; }
     }
 }

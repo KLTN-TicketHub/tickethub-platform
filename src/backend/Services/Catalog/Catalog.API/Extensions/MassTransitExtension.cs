@@ -1,4 +1,5 @@
 using Catalog.Common.Options;
+using Catalog.Infrastructure.Consumers;
 using MassTransit;
 using Microsoft.Extensions.Options;
 
@@ -10,6 +11,8 @@ namespace Catalog.API.Extensions
         {
             services.AddMassTransit(x =>
             {
+                x.AddConsumer<OrganizerActivatedConsumer>();
+
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     RabbitMqOptions rabbitMqOptions = context

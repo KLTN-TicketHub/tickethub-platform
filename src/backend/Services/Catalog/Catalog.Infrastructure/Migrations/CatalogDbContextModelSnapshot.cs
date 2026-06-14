@@ -150,6 +150,8 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("OrganizerId");
+
                     b.HasIndex("SeatMapId");
 
                     b.ToTable("Event", (string)null);
@@ -338,6 +340,55 @@ namespace Catalog.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("EventLocation", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.OrganizerSnapshot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeleteAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OrganizerName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrganizerSnapshot", (string)null);
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.Row", b =>
@@ -831,10 +882,18 @@ namespace Catalog.Infrastructure.Migrations
 
             modelBuilder.Entity("Catalog.Domain.Entities.Event", b =>
                 {
+                    b.HasOne("Catalog.Domain.Entities.OrganizerSnapshot", "Organizer")
+                        .WithMany("Events")
+                        .HasForeignKey("OrganizerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Catalog.Domain.Entities.SeatMap", "SeatMap")
                         .WithMany()
                         .HasForeignKey("SeatMapId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Organizer");
 
                     b.Navigation("SeatMap");
                 });
@@ -943,6 +1002,11 @@ namespace Catalog.Infrastructure.Migrations
                     b.Navigation("Location");
 
                     b.Navigation("TicketTypes");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.OrganizerSnapshot", b =>
+                {
+                    b.Navigation("Events");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.Row", b =>
