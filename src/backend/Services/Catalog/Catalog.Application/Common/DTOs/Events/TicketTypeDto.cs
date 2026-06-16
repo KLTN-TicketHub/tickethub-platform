@@ -1,5 +1,3 @@
-﻿using Catalog.Domain.Enums;
-
 namespace Catalog.Application.Common.DTOs.Events
 {
     public class TicketTypeDto
@@ -10,8 +8,6 @@ namespace Catalog.Application.Common.DTOs.Events
 
         public string TicketTypeName { get; set; }
 
-        public string TicketTypeCode { get; set; }
-
         public string? Description { get; set; }
 
         public decimal Price { get; set; }
@@ -20,8 +16,6 @@ namespace Catalog.Application.Common.DTOs.Events
 
         public int MinQtyQuota { get; set; }
         public int MaxQtyQuota { get; set; }
-
-        public string Color { get; set; }
 
         public int DisplayOrder { get; set; }
 

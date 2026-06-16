@@ -1,12 +1,11 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Catalog.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class IninialCreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -146,6 +145,7 @@ namespace Catalog.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SeatMapId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     OrganizerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Slug = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: false),
@@ -168,6 +168,12 @@ namespace Catalog.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Event", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Event_EventCategory_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "EventCategory",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Event_OrganizerSnapshot_OrganizerId",
                         column: x => x.OrganizerId,
@@ -255,30 +261,6 @@ namespace Catalog.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EventEventCategory",
-                columns: table => new
-                {
-                    CategoriesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EventsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EventEventCategory", x => new { x.CategoriesId, x.EventsId });
-                    table.ForeignKey(
-                        name: "FK_EventEventCategory_EventCategory_CategoriesId",
-                        column: x => x.CategoriesId,
-                        principalTable: "EventCategory",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EventEventCategory_Event_EventsId",
-                        column: x => x.EventsId,
-                        principalTable: "Event",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "EventLocation",
                 columns: table => new
                 {
@@ -345,13 +327,11 @@ namespace Catalog.Infrastructure.Migrations
                     EventId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ZoneId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     TicketTypeName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    TicketTypeCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     PublishedQuota = table.Column<int>(type: "int", nullable: false),
                     MinQtyQuota = table.Column<int>(type: "int", nullable: false),
                     MaxQtyQuota = table.Column<int>(type: "int", nullable: false),
-                    Color = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
@@ -414,6 +394,11 @@ namespace Catalog.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Event_CategoryId",
+                table: "Event",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Event_OrganizerId",
                 table: "Event",
                 column: "OrganizerId");
@@ -427,11 +412,6 @@ namespace Catalog.Infrastructure.Migrations
                 name: "IX_EventApproval_EventId",
                 table: "EventApproval",
                 column: "EventId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EventEventCategory_EventsId",
-                table: "EventEventCategory",
-                column: "EventsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventLocation_EventId",
@@ -486,9 +466,6 @@ namespace Catalog.Infrastructure.Migrations
                 name: "EventApproval");
 
             migrationBuilder.DropTable(
-                name: "EventEventCategory");
-
-            migrationBuilder.DropTable(
                 name: "EventLocation");
 
             migrationBuilder.DropTable(
@@ -498,9 +475,6 @@ namespace Catalog.Infrastructure.Migrations
                 name: "TicketType");
 
             migrationBuilder.DropTable(
-                name: "EventCategory");
-
-            migrationBuilder.DropTable(
                 name: "Row");
 
             migrationBuilder.DropTable(
@@ -508,6 +482,9 @@ namespace Catalog.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Zone");
+
+            migrationBuilder.DropTable(
+                name: "EventCategory");
 
             migrationBuilder.DropTable(
                 name: "OrganizerSnapshot");

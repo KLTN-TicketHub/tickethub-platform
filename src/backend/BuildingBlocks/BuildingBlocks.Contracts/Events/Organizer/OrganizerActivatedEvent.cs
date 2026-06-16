@@ -1,5 +1,3 @@
-using System;
-
 namespace BuildingBlocks.Contracts.Events.Organizer
 {
     public class OrganizerActivatedEvent

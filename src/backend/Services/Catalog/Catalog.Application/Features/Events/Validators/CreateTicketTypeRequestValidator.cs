@@ -1,8 +1,5 @@
-﻿using Catalog.Application.Features.Events.Requests;
+using Catalog.Application.Features.Events.Requests;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Catalog.Application.Features.Events.Validators
 {

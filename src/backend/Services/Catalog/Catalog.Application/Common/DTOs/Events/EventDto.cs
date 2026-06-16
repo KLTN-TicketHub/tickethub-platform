@@ -1,7 +1,4 @@
-﻿using Catalog.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Catalog.Application.Common.DTOs.Profiles;
 
 namespace Catalog.Application.Common.DTOs.Events
 {
@@ -29,6 +26,8 @@ namespace Catalog.Application.Common.DTOs.Events
 
         public DateTime SaleCloseAt { get; set; }
 
+        public string CurrencyCode { get; set; }
+
         public string CoverImageUrl { get; set; }
 
         public string Status { get; set; }
@@ -36,5 +35,11 @@ namespace Catalog.Application.Common.DTOs.Events
         public DateTime CreatedAt { get; set; }
 
         public byte[] RowVersion { get; set; }
-    }   
+
+        public EventLocationDto? Location { get; set; }
+
+        public List<TicketTypeDto> TicketTypes { get; set; }
+
+        public OrganizerProfileDto OrganizerProfile { get; set; }
+    }
 }

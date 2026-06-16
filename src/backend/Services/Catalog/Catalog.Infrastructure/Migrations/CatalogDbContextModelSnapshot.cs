@@ -74,6 +74,9 @@ namespace Catalog.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("CoverImageUrl")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -149,6 +152,8 @@ namespace Catalog.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("OrganizerId");
 
@@ -589,11 +594,6 @@ namespace Catalog.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Color")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -641,11 +641,6 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TicketTypeCode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("TicketTypeName")
                         .IsRequired()
@@ -865,23 +860,14 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("Zone", (string)null);
                 });
 
-            modelBuilder.Entity("EventEventCategory", b =>
-                {
-                    b.Property<Guid>("CategoriesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("EventsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("CategoriesId", "EventsId");
-
-                    b.HasIndex("EventsId");
-
-                    b.ToTable("EventEventCategory");
-                });
-
             modelBuilder.Entity("Catalog.Domain.Entities.Event", b =>
                 {
+                    b.HasOne("Catalog.Domain.Entities.EventCategory", "Category")
+                        .WithMany("Events")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Catalog.Domain.Entities.OrganizerSnapshot", "Organizer")
                         .WithMany("Events")
                         .HasForeignKey("OrganizerId")
@@ -892,6 +878,8 @@ namespace Catalog.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("SeatMapId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Category");
 
                     b.Navigation("Organizer");
 
@@ -982,26 +970,16 @@ namespace Catalog.Infrastructure.Migrations
                     b.Navigation("SeatMap");
                 });
 
-            modelBuilder.Entity("EventEventCategory", b =>
-                {
-                    b.HasOne("Catalog.Domain.Entities.EventCategory", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Catalog.Domain.Entities.Event", null)
-                        .WithMany()
-                        .HasForeignKey("EventsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Catalog.Domain.Entities.Event", b =>
                 {
                     b.Navigation("Location");
 
                     b.Navigation("TicketTypes");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.EventCategory", b =>
+                {
+                    b.Navigation("Events");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.OrganizerSnapshot", b =>

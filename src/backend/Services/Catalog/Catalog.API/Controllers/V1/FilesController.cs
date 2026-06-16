@@ -1,9 +1,9 @@
-﻿using BuildingBlocks.Application.Interfaces;
-using BuildingBlocks.Contracts.Constants;
+using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Models.Responses;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SixLabors.ImageSharp;
 
 namespace Catalog.API.Controllers.V1
 {
@@ -20,7 +20,7 @@ namespace Catalog.API.Controllers.V1
             _fileService = fileService;
         }
 
-        [Authorize(Roles = Roles.Moderator)]
+        [AllowAnonymous]
         [HttpPost("upload-svg")]
         public async Task<IActionResult> UploadSvg(IFormFile file, CancellationToken cancellation = default)
         {
@@ -45,6 +45,50 @@ namespace Catalog.API.Controllers.V1
             {
                 Success = true,
                 Message = "Tải lên tệp SVG thành công.",
+                Data = _fileService.GetAbsoluteUrl(url)
+            });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("upload-cover-image")]
+        public async Task<IActionResult> UploadCoverImage(IFormFile file, CancellationToken cancellation = default)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Ảnh bìa không được để trống."
+                });
+
+            string[] allowedContentTypes = { "image/jpeg", "image/jpg", "image/png", "image/webp" };
+            string extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
+
+            if (!allowedContentTypes.Contains(file.ContentType) ||
+                !allowedExtensions.Contains(extension))
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Ảnh bìa phải có định dạng JPG, PNG hoặc WebP."
+                });
+
+            using (var stream = file.OpenReadStream())
+            {
+                using var image = await Image.LoadAsync(stream, cancellation);
+                if (image.Width != 1280 || image.Height != 720)
+                    return BadRequest(new ApiResponse
+                    {
+                        Success = false,
+                        Message = $"Ảnh bìa phải có kích thước 1280×720 px. Kích thước hiện tại: {image.Width}×{image.Height} px."
+                    });
+            }
+
+            string url = await _fileService.SaveFileAsync(file, "events/covers", cancellation);
+
+            return Ok(new ApiResponse<string>
+            {
+                Success = true,
+                Message = "Tải lên ảnh bìa sự kiện thành công.",
                 Data = _fileService.GetAbsoluteUrl(url)
             });
         }

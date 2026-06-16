@@ -27,10 +27,6 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .IsRequired()
                 .HasMaxLength(200);
 
-            builder.Property(tt => tt.TicketTypeCode)
-                .IsRequired()
-                .HasMaxLength(50);
-
             builder.Property(tt => tt.Description)
                 .HasMaxLength(500);
 
@@ -46,10 +42,6 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
 
             builder.Property(tt => tt.MaxQtyQuota)
                 .IsRequired();
-
-            builder.Property(tt => tt.Color)
-                .IsRequired()
-                .HasMaxLength(20);
 
             builder.Property(tt => tt.DisplayOrder)
                 .IsRequired();

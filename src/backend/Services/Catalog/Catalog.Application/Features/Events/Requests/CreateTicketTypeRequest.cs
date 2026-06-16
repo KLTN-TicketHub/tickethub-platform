@@ -1,4 +1,4 @@
-﻿namespace Catalog.Application.Features.Events.Requests
+namespace Catalog.Application.Features.Events.Requests
 {
     public class CreateTicketTypeRequest
     {

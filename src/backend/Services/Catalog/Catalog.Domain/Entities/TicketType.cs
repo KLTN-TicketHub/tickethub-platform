@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Domain.DDD;
+using BuildingBlocks.Domain.DDD;
 using Catalog.Domain.Enums;
 
 namespace Catalog.Domain.Entities
@@ -13,8 +13,6 @@ namespace Catalog.Domain.Entities
 
         public string TicketTypeName { get; set; }
 
-        public string TicketTypeCode { get; set; }
-
         public string? Description { get; set; }
 
         public decimal Price { get; set; }
@@ -24,12 +22,31 @@ namespace Catalog.Domain.Entities
         public int MinQtyQuota { get; set; }
         public int MaxQtyQuota { get; set; }
 
-        public string Color { get; set; }
-
         public int DisplayOrder { get; set; }
 
         public CatalogStatus Status { get; set; }
 
         public byte[] RowVersion { get; set; } = default!;
+
+        public TicketType(
+            string ticketTypeName,
+            decimal price,
+            int publishedQuota,
+            int minQtyQuota,
+            int maxQtyQuota,
+            int displayOrder,
+            string? description = null,
+            Guid? zoneId = null)
+        {
+            TicketTypeName = ticketTypeName;
+            Price = price;
+            PublishedQuota = publishedQuota;
+            MinQtyQuota = minQtyQuota;
+            MaxQtyQuota = maxQtyQuota;
+            DisplayOrder = displayOrder;
+            Description = description;
+            ZoneId = zoneId;
+            Status = CatalogStatus.Active;
+        }
     }
 }

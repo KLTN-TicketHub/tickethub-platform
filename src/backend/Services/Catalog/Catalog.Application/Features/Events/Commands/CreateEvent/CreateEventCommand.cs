@@ -1,6 +1,8 @@
-﻿namespace Catalog.Application.Features.Events.Commands.CreateEvent
+using Catalog.Application.Common.DTOs.Events;
+using Catalog.Application.Features.Events.Requests;
+using MediatR;
+
+namespace Catalog.Application.Features.Events.Commands.CreateEvent
 {
-    public class CreateEventCommand
-    {
-    }
+    public record CreateEventCommand(Guid OrganizerId, CreateEventRequest Request) : IRequest<EventDto>;
 }
