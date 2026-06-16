@@ -1,10 +1,12 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.Contracts.Constants;
+using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Application.Common.DTOs.EventCategories;
 using Catalog.Application.Features.EventCategories.Commands.CreateEventCategory;
 using Catalog.Application.Features.EventCategories.Commands.DeleteEventCategory;
 using Catalog.Application.Features.EventCategories.Commands.UpdateEventCategory;
+using Catalog.Application.Features.EventCategories.Queries.GetEventCategories;
 using Catalog.Application.Features.EventCategories.Queries.GetEventCategoryById;
 using Catalog.Application.Features.EventCategories.Requests;
 using MediatR;
@@ -93,6 +95,22 @@ namespace Catalog.API.Controllers.V1
             {
                 Success = true,
                 Message = "Xóa danh mục sự kiện thành công"
+            });
+        }
+
+        [EnableRateLimiting(RateLimitPolicies.PerIp)]
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetEventCategoriesAsync(
+            [FromQuery] GetCategoriesRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _sender.Send(new GetEventCategoriesQuery(request), cancellationToken);
+            return Ok(new ApiResponse<PaginatedResult<EventCategoryDto>>
+            {
+                Success = true,
+                Message = "Lấy danh sách danh mục sự kiện thành công",
+                Data = result
             });
         }
     }

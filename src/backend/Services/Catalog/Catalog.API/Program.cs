@@ -59,6 +59,7 @@ app.UseRequestResponseLogging();
 await app.UseDatabaseInitialization();
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseRateLimiter();
 

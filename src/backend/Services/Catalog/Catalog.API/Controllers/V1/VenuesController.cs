@@ -31,7 +31,7 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [Authorize(Roles = Roles.Moderator)]
+        [Authorize(Roles = Roles.Moderator + "," + Roles.Organizer)]
         [HttpGet]
         public async Task<IActionResult> GetVenuesAsync(
             [FromQuery] GetVenuesRequest request,

@@ -31,3 +31,12 @@ export const UPLOAD_SVG = '/catalog/files/upload-svg'
 export const LOCATION_PROVINCES = '/p/'
 export const LOCATION_DISTRICTS = (provinceCode) => `/p/${provinceCode}`
 export const LOCATION_WARDS = (districtCode) => `/d/${districtCode}`
+
+// Event Categories
+export const EVENT_CATEGORIES = '/catalog/event-categories'
+
+// File Upload
+export const UPLOAD_COVER_IMAGE = '/catalog/files/upload-cover-image'
+
+// Organizer Events
+export const ORGANIZER_EVENT_CREATE = '/catalog/events'

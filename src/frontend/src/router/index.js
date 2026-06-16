@@ -9,7 +9,7 @@ import EventDetailPage from '../pages/EventDetailPage.vue'
 import MyTicketsPage from '../pages/MyTicketsPage.vue'
 import ProfilePage from '../pages/ProfilePage.vue'
 import OrganizerPage from '../pages/OrganizerPage.vue'
-import CreateEventPage from '../pages/CreateEventPage.vue'
+import OrganizerCreateEventPage from '../pages/organizer/OrganizerCreateEventPage.vue'
 import EarlyBirdPage from '../pages/EarlyBirdPage.vue'
 import StarsPage from '../pages/StarsPage.vue'
 import DestinationsPage from '../pages/DestinationsPage.vue'
@@ -101,7 +101,7 @@ const routes = [
     meta: { requiresAuth: true, role: 'organizer' },
     children: [
       { path: '', name: 'organizer', component: OrganizerPage },
-      { path: 'create-event', name: 'organizer-create-event', component: CreateEventPage }
+      { path: 'create-event', name: 'organizer-create-event', component: OrganizerCreateEventPage }
     ]
   }
 ]
