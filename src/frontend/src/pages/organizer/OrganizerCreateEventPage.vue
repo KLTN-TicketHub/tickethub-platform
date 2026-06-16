@@ -737,107 +737,116 @@
               <span class="text-[14px] font-medium">Sơ đồ này không có khu vực bán vé nào</span>
             </div>
 
-            <div v-else class="flex flex-col gap-4">
-              <div
-                v-for="(ticket, idx) in form.ticketTypes"
-                :key="ticket._zoneId"
-                class="p-5 rounded-2xl bg-[#0D1410] border border-white/8"
-              >
-                <!-- Zone header -->
-                <div class="flex items-center gap-3 mb-5">
-                  <div class="w-3 h-3 rounded-full" :style="{ background: ticket._zoneColor || '#00c853' }" />
-                  <span class="font-bold text-white text-[14px]">{{ ticket._zoneName }}</span>
-                  <span class="text-[11px] text-white/30 ml-auto">Zone ID: {{ ticket.zoneId?.slice(0, 8) }}...</span>
+            <div v-else class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <!-- Cột trái: Sơ đồ & Chọn khu vực -->
+              <div class="flex flex-col gap-4">
+                <!-- Sơ đồ ghế -->
+                <div class="flex flex-col gap-2">
+                  <label class="text-[12px] font-bold text-white/60 uppercase tracking-widest">Sơ đồ ghế</label>
+                  <div ref="konvaContainer" class="w-full bg-[#080D0B] border border-white/10 rounded-2xl overflow-hidden relative" style="height: 300px;">
+                    <v-stage v-if="seatMapData" :config="stageConfig">
+                      <v-layer>
+                        <v-rect :config="{ x: 0, y: 0, width: stageConfig.width, height: stageConfig.height, fill: '#0b0f19' }" />
+                        <template v-for="zone in seatMapData.zones" :key="zone.id">
+                          <template v-for="(el, eli) in zone.svgElements" :key="`${zone.id}-el-${eli}`">
+                            <v-path v-if="el.type === 'path' && el.data" :config="buildPathConfig(el)" />
+                            <v-text v-if="el.type === 'text' && el.text" :config="buildTextConfig(el)" />
+                          </template>
+                          <template v-for="row in zone.rows" :key="`${zone.id}-row-${row.id}`">
+                            <v-circle v-for="seat in row.seats" :key="seat.id" :config="buildSeatConfig(seat, zone)" />
+                          </template>
+                        </template>
+                      </v-layer>
+                    </v-stage>
+                  </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <!-- Tên loại vé -->
-                  <div class="flex flex-col gap-2 md:col-span-2">
-                    <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Tên loại vé *</label>
-                    <input
-                      v-model="ticket.ticketTypeName"
-                      type="text"
-                      :id="`ticket-name-${idx}`"
-                      placeholder="VD: Vé VIP, Vé Thường..."
-                      class="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-2.5 text-[14px] font-bold text-white placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
-                      :class="errors[`ticketTypes[${idx}].ticketTypeName`] ? 'border-danger/60' : ''"
-                    />
-                    <p v-if="errors[`ticketTypes[${idx}].ticketTypeName`]" class="text-[11px] text-danger flex items-center gap-1">
-                      <PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`ticketTypes[${idx}].ticketTypeName`] }}
-                    </p>
+                <!-- Danh sách khu vực -->
+                <div class="flex flex-col gap-2">
+                  <label class="text-[12px] font-bold text-white/60 uppercase tracking-widest">
+                    Chọn khu vực bán vé ({{ form.ticketTypes.length }}/{{ availableZones.length }})
+                  </label>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                    <button
+                      v-for="z in availableZones" :key="z.id" type="button" @click="toggleZone(z)"
+                      class="flex items-center gap-3 p-3 rounded-xl border text-left transition-colors cursor-pointer"
+                      :class="isZoneSelected(z.id) ? 'bg-primary/10 border-primary/30' : 'border-white/10 hover:bg-white/5'"
+                    >
+                      <div class="w-3 h-3 rounded-full flex-shrink-0" :style="{ background: z.color || '#00c853' }"></div>
+                      <span class="flex-1 text-[13px] font-bold text-white truncate">{{ z.zoneName }}</span>
+                      <div class="w-4 h-4 rounded border flex items-center justify-center flex-shrink-0" :class="isZoneSelected(z.id) ? 'border-primary bg-primary' : 'border-white/20'">
+                        <PhCheck v-if="isZoneSelected(z.id)" class="text-black text-[10px]" weight="bold" />
+                      </div>
+                    </button>
                   </div>
+                </div>
+              </div>
 
-                  <!-- Giá -->
-                  <div class="flex flex-col gap-2">
-                    <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Giá vé (VND) *</label>
-                    <div class="relative">
-                      <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 font-bold text-[14px]">₫</span>
-                      <input
-                        v-model.number="ticket.price"
-                        type="number"
-                        min="0"
-                        :id="`ticket-price-${idx}`"
-                        placeholder="500000"
-                        class="w-full bg-white/4 border border-white/10 rounded-xl pl-8 pr-4 py-2.5 text-[14px] font-bold text-primary placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
-                        :class="errors[`ticketTypes[${idx}].price`] ? 'border-danger/60' : ''"
-                      />
+              <!-- Cột phải: Cấu hình loại vé -->
+              <div class="flex flex-col gap-4">
+                <label class="text-[12px] font-bold text-white/60 uppercase tracking-widest">Cấu hình loại vé</label>
+                
+                <div v-if="form.ticketTypes.length === 0" class="py-12 flex flex-col items-center gap-3 text-white/30 border border-white/5 rounded-2xl bg-white/[0.02]">
+                  <PhTicket class="text-4xl" weight="duotone" />
+                  <span class="text-[13px] font-medium text-center px-4">Vui lòng chọn khu vực bên trái để cấu hình vé.</span>
+                </div>
+
+                <div v-else class="flex flex-col gap-4 max-h-[660px] overflow-y-auto pr-2 custom-scrollbar">
+                  <div
+                    v-for="(ticket, idx) in form.ticketTypes"
+                    :key="ticket._zoneId"
+                    class="p-5 rounded-2xl bg-[#0D1410] border border-white/8 relative"
+                  >
+                    <button type="button" @click="removeZoneTicket(ticket._zoneId)" class="absolute right-3 top-3 w-8 h-8 rounded-xl flex items-center justify-center text-white/40 hover:bg-white/10 hover:text-white transition-colors cursor-pointer">
+                      <PhX weight="bold" />
+                    </button>
+                    
+                    <div class="flex items-center gap-3 mb-5">
+                      <div class="w-3 h-3 rounded-full" :style="{ background: ticket._zoneColor || '#00c853' }" />
+                      <span class="font-bold text-white text-[14px]">{{ ticket._zoneName }}</span>
                     </div>
-                    <p v-if="errors[`ticketTypes[${idx}].price`]" class="text-[11px] text-danger flex items-center gap-1">
-                      <PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`ticketTypes[${idx}].price`] }}
-                    </p>
-                  </div>
 
-                  <!-- Số lượng -->
-                  <div class="flex flex-col gap-2">
-                    <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Số lượng phát hành *</label>
-                    <input
-                      v-model.number="ticket.publishedQuota"
-                      type="number"
-                      min="1"
-                      :id="`ticket-quota-${idx}`"
-                      placeholder="100"
-                      class="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-2.5 text-[14px] font-bold text-white placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
-                      :class="errors[`ticketTypes[${idx}].publishedQuota`] ? 'border-danger/60' : ''"
-                    />
-                    <p v-if="errors[`ticketTypes[${idx}].publishedQuota`]" class="text-[11px] text-danger flex items-center gap-1">
-                      <PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`ticketTypes[${idx}].publishedQuota`] }}
-                    </p>
-                  </div>
-
-                  <!-- Min / Max per order -->
-                  <div class="flex flex-col gap-2">
-                    <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Tối thiểu / đơn</label>
-                    <input
-                      v-model.number="ticket.minQtyQuota"
-                      type="number"
-                      min="1"
-                      :id="`ticket-min-${idx}`"
-                      placeholder="1"
-                      class="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-2.5 text-[14px] font-bold text-white placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
-                    />
-                  </div>
-                  <div class="flex flex-col gap-2">
-                    <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Tối đa / đơn</label>
-                    <input
-                      v-model.number="ticket.maxQtyQuota"
-                      type="number"
-                      min="1"
-                      :id="`ticket-max-${idx}`"
-                      placeholder="5"
-                      class="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-2.5 text-[14px] font-bold text-white placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
-                    />
-                  </div>
-
-                  <!-- Mô tả loại vé -->
-                  <div class="flex flex-col gap-2 md:col-span-2">
-                    <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Mô tả (tuỳ chọn)</label>
-                    <input
-                      v-model="ticket.description"
-                      type="text"
-                      :id="`ticket-desc-${idx}`"
-                      placeholder="VD: Bao gồm ghế ngồi hàng A1-A10, quà tặng..."
-                      class="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-2.5 text-[14px] text-white/80 placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
-                    />
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div class="flex flex-col gap-2 md:col-span-2">
+                        <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Tên loại vé *</label>
+                        <input v-model="ticket.ticketTypeName" type="text" placeholder="VD: Vé VIP..."
+                          class="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-2.5 text-[14px] font-bold text-white placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
+                          :class="errors[`ticketTypes[${idx}].ticketTypeName`] ? 'border-danger/60' : ''" />
+                        <p v-if="errors[`ticketTypes[${idx}].ticketTypeName`]" class="text-[11px] text-danger flex items-center gap-1"><PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`ticketTypes[${idx}].ticketTypeName`] }}</p>
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Giá vé (VND) *</label>
+                        <div class="relative">
+                          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 font-bold text-[14px]">₫</span>
+                          <input v-model.number="ticket.price" type="number" min="0" placeholder="500000"
+                            class="w-full bg-white/4 border border-white/10 rounded-xl pl-8 pr-4 py-2.5 text-[14px] font-bold text-primary placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
+                            :class="errors[`ticketTypes[${idx}].price`] ? 'border-danger/60' : ''" />
+                        </div>
+                        <p v-if="errors[`ticketTypes[${idx}].price`]" class="text-[11px] text-danger flex items-center gap-1"><PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`ticketTypes[${idx}].price`] }}</p>
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Số lượng phát hành *</label>
+                        <input v-model.number="ticket.publishedQuota" type="number" min="1" placeholder="100"
+                          class="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-2.5 text-[14px] font-bold text-white placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
+                          :class="errors[`ticketTypes[${idx}].publishedQuota`] ? 'border-danger/60' : ''" />
+                        <p v-if="errors[`ticketTypes[${idx}].publishedQuota`]" class="text-[11px] text-danger flex items-center gap-1"><PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`ticketTypes[${idx}].publishedQuota`] }}</p>
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Tối thiểu / đơn</label>
+                        <input v-model.number="ticket.minQtyQuota" type="number" min="1" placeholder="1"
+                          class="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-2.5 text-[14px] font-bold text-white placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none" />
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Tối đa / đơn</label>
+                        <input v-model.number="ticket.maxQtyQuota" type="number" min="1" placeholder="5"
+                          class="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-2.5 text-[14px] font-bold text-white placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none" />
+                      </div>
+                      <div class="flex flex-col gap-2 md:col-span-2">
+                        <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Mô tả (tuỳ chọn)</label>
+                        <input v-model="ticket.description" type="text" placeholder="VD: Bao gồm ghế ngồi..."
+                          class="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-2.5 text-[14px] text-white/80 placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1076,6 +1085,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import { Stage as VStage, Layer as VLayer, Rect as VRect, Path as VPath, Text as VText, Circle as VCircle } from 'vue-konva'
 import {
   PhArrowLeft, PhArrowRight, PhCheck, PhLightbulb, PhMapPin, PhSquaresFour,
   PhNotePencil, PhCalendarBlank, PhTicket, PhTag, PhImage, PhUpload,
@@ -1392,6 +1402,73 @@ async function selectSeatMap(sm) {
 // ── Zones (seatmap mode, step 4) ──────────────────────────────────────────
 const availableZones = ref([])
 const isLoadingZones = ref(false)
+const seatMapData = ref(null)
+const konvaContainer = ref(null)
+
+const stageConfig = computed(() => {
+  if (!seatMapData.value) return { width: 400, height: 300 }
+  const containerW = konvaContainer.value?.clientWidth || 400
+  const containerH = konvaContainer.value?.clientHeight || 300
+  const svgW = seatMapData.value.width || 800
+  const svgH = seatMapData.value.height || 600
+  const scale = Math.min(containerW / svgW, containerH / svgH, 1)
+  return {
+    width: Math.round(svgW * scale),
+    height: Math.round(svgH * scale),
+    scaleX: scale,
+    scaleY: scale
+  }
+})
+
+function buildPathConfig(el) {
+  return {
+    data: el.data || '',
+    fill: el.fill || 'transparent',
+    stroke: el.stroke || undefined,
+    strokeWidth: el.strokeWidth || 0,
+    listening: false
+  }
+}
+
+function buildTextConfig(el) {
+  return {
+    x: el.x, y: el.y, text: el.text || '',
+    fontSize: el.fontSize || 12, fontFamily: el.fontFamily || 'sans-serif',
+    fill: el.fill || '#ffffff', fontStyle: 'bold', align: 'center',
+    listening: false
+  }
+}
+
+function buildSeatConfig(seat, zone) {
+  return {
+    x: seat.x, y: seat.y, radius: seat.radius || 10,
+    fill: '#0b0f19', stroke: zone.color, strokeWidth: 2,
+    id: seat.svgElementId, listening: false
+  }
+}
+
+function isZoneSelected(zoneId) {
+  return form.ticketTypes.some(t => t._zoneId === zoneId)
+}
+
+function toggleZone(zone) {
+  const existingIdx = form.ticketTypes.findIndex(t => t._zoneId === zone.id)
+  if (existingIdx !== -1) {
+    form.ticketTypes.splice(existingIdx, 1)
+  } else {
+    form.ticketTypes.push({
+      zoneId: zone.id, _zoneId: zone.id, _zoneName: zone.zoneName, _zoneColor: zone.color,
+      ticketTypeName: zone.zoneName, description: '', price: zone.basePrice || 0,
+      publishedQuota: zone.capacity || 0, minQtyQuota: 1, maxQtyQuota: 5,
+      displayOrder: form.ticketTypes.length + 1
+    })
+  }
+}
+
+function removeZoneTicket(zoneId) {
+  const existingIdx = form.ticketTypes.findIndex(t => t._zoneId === zoneId)
+  if (existingIdx !== -1) form.ticketTypes.splice(existingIdx, 1)
+}
 
 async function loadZones() {
   if (!form.selectedVenueId || !form.seatMapId) return
@@ -1399,22 +1476,21 @@ async function loadZones() {
   try {
     const res = await getSeatMapZones(form.selectedVenueId, form.seatMapId)
     if (res.success && res.data) {
-      // Chỉ lấy zones có thể bán vé (isSalable = true)
+      seatMapData.value = res.data
       availableZones.value = (res.data.zones || []).filter(z => z.isSalable && !z.isStage)
-      // Init ticket types theo zones
-      form.ticketTypes = availableZones.value.map((z, idx) => ({
-        zoneId: z.id,
-        _zoneId: z.id,
-        _zoneName: z.zoneName,
-        _zoneColor: z.color,
-        ticketTypeName: z.zoneName,
-        description: '',
-        price: z.basePrice || 0,
-        publishedQuota: z.capacity || 0,
-        minQtyQuota: 1,
-        maxQtyQuota: 5,
-        displayOrder: idx + 1
-      }))
+      
+      // Chỉ init lần đầu
+      if (form.ticketTypes.length === 0) {
+        form.ticketTypes = availableZones.value.map((z, idx) => ({
+          zoneId: z.id, _zoneId: z.id, _zoneName: z.zoneName, _zoneColor: z.color,
+          ticketTypeName: z.zoneName, description: '', price: z.basePrice || 0,
+          publishedQuota: z.capacity || 0, minQtyQuota: 1, maxQtyQuota: 5,
+          displayOrder: idx + 1
+        }))
+      }
+
+      await nextTick()
+      konvaContainer.value?.dispatchEvent(new Event('resize'))
     }
   } catch (e) {
     console.error(e)
