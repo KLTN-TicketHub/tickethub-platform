@@ -1,9 +1,9 @@
 ﻿using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Contracts.Extensions;
+using BuildingBlocks.Domain.Exceptions;
 using Catalog.Application.Common.DTOs.Events;
 using Catalog.Domain.Interfaces;
 using MediatR;
-using BuildingBlocks.Domain.Exceptions;
-using BuildingBlocks.Contracts.Extensions;
 
 namespace Catalog.Application.Features.Events.Queries.GetByIdForOrganizer
 {

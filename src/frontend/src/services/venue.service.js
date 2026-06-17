@@ -1,5 +1,5 @@
 import api from './api/axios'
-import { VENUE_CREATE, VENUE_LIST, VENUE_DETAIL, VENUE_UPDATE, VENUE_DELETE, VENUE_SEATMAPS, VENUE_SEATMAP_CREATE, VENUE_SEATMAP_DETAIL, UPLOAD_SVG } from './api/endpoints'
+import { VENUE_CREATE, VENUE_LIST, VENUE_DETAIL, VENUE_UPDATE, VENUE_DELETE, VENUE_SEATMAPS, VENUE_SEATMAP_CREATE, VENUE_SEATMAP_DETAIL, VENUE_SEATMAP_DELETE, UPLOAD_SVG } from './api/endpoints'
 
 export async function createVenue(venueData) {
   const response = await api.post(VENUE_CREATE, venueData)
@@ -33,6 +33,11 @@ export async function getVenueSeatMaps(venueId, params) {
 
 export async function getSeatMapDetail(venueId, seatMapId) {
   const response = await api.get(VENUE_SEATMAP_DETAIL(venueId, seatMapId))
+  return response.data
+}
+
+export async function deleteSeatMap(venueId, seatMapId) {
+  const response = await api.delete(VENUE_SEATMAP_DELETE(venueId, seatMapId))
   return response.data
 }
 

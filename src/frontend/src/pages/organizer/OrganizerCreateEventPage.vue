@@ -744,9 +744,9 @@
                 <div class="flex flex-col gap-2">
                   <label class="text-[12px] font-bold text-white/60 uppercase tracking-widest">Sơ đồ ghế</label>
                   <div ref="konvaContainer" class="w-full bg-[#080D0B] border border-white/10 rounded-2xl overflow-hidden relative" style="height: 300px;">
-                    <v-stage v-if="seatMapData" :config="stageConfig">
+                    <v-stage v-if="seatMapData" :config="stageConfig" @wheel="handleWheel" @dragend="handleDragEnd">
                       <v-layer>
-                        <v-rect :config="{ x: 0, y: 0, width: stageConfig.width, height: stageConfig.height, fill: '#0b0f19' }" />
+                        <v-rect :config="{ x: 0, y: 0, width: realDimensions.width, height: realDimensions.height, fill: '#0b0f19' }" />
                         <template v-for="zone in seatMapData.zones" :key="zone.id">
                           <template v-for="(el, eli) in zone.svgElements" :key="`${zone.id}-el-${eli}`">
                             <v-path v-if="el.type === 'path' && el.data" :config="buildPathConfig(el)" />
@@ -1083,7 +1083,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Stage as VStage, Layer as VLayer, Rect as VRect, Path as VPath, Text as VText, Circle as VCircle } from 'vue-konva'
 import {
@@ -1405,20 +1405,67 @@ const isLoadingZones = ref(false)
 const seatMapData = ref(null)
 const konvaContainer = ref(null)
 
-const stageConfig = computed(() => {
-  if (!seatMapData.value) return { width: 400, height: 300 }
-  const containerW = konvaContainer.value?.clientWidth || 400
-  const containerH = konvaContainer.value?.clientHeight || 300
-  const svgW = seatMapData.value.width || 800
-  const svgH = seatMapData.value.height || 600
-  const scale = Math.min(containerW / svgW, containerH / svgH, 1)
-  return {
-    width: Math.round(svgW * scale),
-    height: Math.round(svgH * scale),
-    scaleX: scale,
-    scaleY: scale
+let resizeObserver = null
+let hasInitializedCenter = false
+
+const realDimensions = computed(() => {
+  if (!seatMapData.value) return { width: 0, height: 0 }
+  let maxX = seatMapData.value.width || 0
+  let maxY = seatMapData.value.height || 0
+  
+  if (seatMapData.value.width <= 100) {
+    seatMapData.value.zones?.forEach(zone => {
+      zone.svgElements?.forEach(el => {
+        const x = parseFloat(el.x)
+        const y = parseFloat(el.y)
+        if (!isNaN(x) && x > maxX) maxX = x
+        if (!isNaN(y) && y > maxY) maxY = y
+      })
+      // Organizer seatMapData might not have `rows` returned, so we just check svgElements
+    })
+    maxX += 100
+    maxY += 100
   }
+  return { width: maxX, height: maxY }
 })
+
+const stageConfig = reactive({
+  width: 400,
+  height: 300,
+  scaleX: 1,
+  scaleY: 1,
+  x: 0,
+  y: 0,
+  draggable: true
+})
+
+function handleWheel(e) {
+  e.evt.preventDefault()
+  const scaleBy = 1.1
+  const stage = e.target.getStage()
+  const oldScale = stage.scaleX()
+  const pointer = stage.getPointerPosition()
+
+  const mousePointTo = {
+    x: (pointer.x - stage.x()) / oldScale,
+    y: (pointer.y - stage.y()) / oldScale,
+  }
+
+  const direction = e.evt.deltaY > 0 ? -1 : 1
+  const newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy
+
+  if (newScale > 10 || newScale < 0.1) return
+
+  stageConfig.scaleX = newScale
+  stageConfig.scaleY = newScale
+  stageConfig.x = pointer.x - mousePointTo.x * newScale
+  stageConfig.y = pointer.y - mousePointTo.y * newScale
+}
+
+function handleDragEnd(e) {
+  stageConfig.x = e.target.x()
+  stageConfig.y = e.target.y()
+}
 
 function buildPathConfig(el) {
   return {
@@ -1489,8 +1536,36 @@ async function loadZones() {
         }))
       }
 
+      hasInitializedCenter = false
       await nextTick()
-      konvaContainer.value?.dispatchEvent(new Event('resize'))
+      
+      if (konvaContainer.value) {
+        if (resizeObserver) resizeObserver.disconnect()
+        
+        resizeObserver = new ResizeObserver((entries) => {
+          const entry = entries[0]
+          const containerW = entry.contentRect.width
+          const containerH = entry.contentRect.height || 300
+          
+          if (containerW > 0) {
+            stageConfig.width = containerW
+            stageConfig.height = containerH
+            
+            if (!hasInitializedCenter && seatMapData.value) {
+              const svgW = realDimensions.value.width || 800
+              const svgH = realDimensions.value.height || 600
+              const scale = Math.min(containerW / svgW, containerH / svgH) * 0.95
+              
+              stageConfig.scaleX = scale
+              stageConfig.scaleY = scale
+              stageConfig.x = (containerW - svgW * scale) / 2
+              stageConfig.y = (containerH - svgH * scale) / 2
+              hasInitializedCenter = true
+            }
+          }
+        })
+        resizeObserver.observe(konvaContainer.value)
+      }
     }
   } catch (e) {
     console.error(e)
@@ -1498,6 +1573,10 @@ async function loadZones() {
     isLoadingZones.value = false
   }
 }
+
+onUnmounted(() => {
+  if (resizeObserver) resizeObserver.disconnect()
+})
 
 // ── Tickets (manual mode) ──────────────────────────────────────────────────
 function addTicket() {

@@ -200,10 +200,10 @@
                   <div>
                     <strong class="text-white">Quy tắc đặt tên ID ghế (Figma Layer Name):</strong> Tên layer trong Figma sẽ trở thành thuộc tính <code class="bg-white/5 px-1.5 py-0.5 rounded font-mono text-primary">id="..."</code> trong mã SVG. ID này phải là duy nhất trong cùng một hàng và tuân thủ định dạng tối giản:
                     <div class="bg-black/30 border border-white/5 rounded-lg p-3 my-2 text-[12px] font-mono">
-                      <span class="text-primary font-bold">Định dạng tối giản chuẩn:</span> TênHàng_SốGhế<br/>
+                      <span class="text-primary font-bold">Định dạng chuẩn:</span> [TiềnTố]_TênHàng_SốGhế<br/>
                       <span class="text-white/40">Ví dụ:</span><br/>
-                      &bull; <span class="text-white font-bold">A_1</span>: Ghế số 1 của hàng A.<br/>
-                      &bull; <span class="text-white font-bold">B_12</span>: Ghế số 12 của hàng B.
+                      &bull; <span class="text-white font-bold">A_1</span>: Ghế 1 hàng A (nếu không sợ trùng ID trên sơ đồ).<br/>
+                      &bull; <span class="text-white font-bold">VIP_A_1</span>: Thêm tiền tố khu VIP để đảm bảo ID không trùng lặp toàn bộ sơ đồ.
                     </div>
                   </div>
                 </li>
@@ -218,8 +218,7 @@
               <div class="bg-primary/5 border border-primary/20 rounded-xl p-4 flex gap-3 text-primary/85">
                 <PhInfo class="text-base flex-shrink-0 mt-0.5" weight="fill" />
                 <div class="text-[12px] leading-relaxed">
-                  <strong class="text-white">Không cần thêm mã khu vào ID ghế:</strong> Vì các hình tròn ghế đã nằm gọn trong Group của phân khu (ví dụ: <code class="bg-white/5 px-1 rounded font-mono text-white">&lt;g id="Zone-A"&gt;</code>), trình bóc tách tự động sẽ tự liên kết ghế với phân khu tương ứng.<br/>
-                  Lập trình viên chỉ cần lấy ID ghế tách (<code class="font-mono text-primary">split('_')</code>) thành: <strong>Hàng ghế (RowLabel)</strong> là chữ phía trước dấu gạch dưới, và <strong>Số ghế (SeatName)</strong> là số ở phía sau.
+                  <strong class="text-white">Mẹo xử lý trùng lặp ID:</strong> Nếu 2 phân khu đều có ghế "A_1", việc chỉ đặt tên <code>A_1</code> sẽ bị lỗi trùng ID do quy định của SVG. Bạn nên thêm tiền tố (ví dụ <code>Slan_A_1</code> và <code>Cres_A_1</code>). Trình bóc tách thông minh của chúng tôi sẽ luôn nhận diện 2 phần tử cuối cùng sau dấu gạch dưới (<code>_</code>) làm Hàng và Số ghế.
                 </div>
               </div>
             </div>
@@ -547,11 +546,11 @@
 
       <!-- Konva Canvas Container -->
       <div class="bg-[#0A0F0D] border border-white/10 rounded-[2rem] overflow-hidden">
-        <div ref="konvaContainer" class="w-full" style="min-height: 400px; max-height: 600px; overflow: auto;">
-          <v-stage ref="stageRef" :config="stageConfig">
+        <div ref="konvaContainer" class="w-full h-[600px] cursor-grab active:cursor-grabbing">
+          <v-stage ref="stageRef" :config="stageConfig" @wheel="handleWheel" @dragend="handleDragEnd">
             <v-layer ref="layerRef">
               <!-- Background -->
-              <v-rect :config="{ x: 0, y: 0, width: stageConfig.width, height: stageConfig.height, fill: '#0b0f19' }" />
+              <v-rect :config="{ x: 0, y: 0, width: parsedData?.svgWidth || 0, height: parsedData?.svgHeight || 0, fill: '#0b0f19' }" />
 
               <!-- Zones -->
               <template v-for="zone in parsedData?.zones" :key="zone.zoneName">
@@ -563,8 +562,8 @@
                     :config="buildTextConfig(el)" />
                 </template>
                 <!-- Seats (circles) -->
-                <template v-for="row in zone.rows" :key="'row-' + row.rowLabel">
-                  <v-circle v-for="seat in row.seatRequests" :key="seat.svgElementId"
+                <template v-for="row in zone.rows" :key="'row-' + zone.zoneName + '-' + row.rowLabel">
+                  <v-circle v-for="seat in row.seatRequests" :key="zone.zoneName + '-' + seat.svgElementId"
                     :config="buildSeatConfig(seat, zone)"
                     @mouseenter="onSeatHover(seat, zone)"
                     @mouseleave="hoveredSeat = null" />
@@ -835,7 +834,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, watch, nextTick } from 'vue'
+import { ref, computed, reactive, watch, nextTick, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Stage as VStage, Layer as VLayer, Rect as VRect, Path as VPath, Text as VText, Circle as VCircle } from 'vue-konva'
 import { parseSVGFile } from '../../utils/svgParser.js'
@@ -904,20 +903,44 @@ const totalStats = computed(() => {
   }
 })
 
-// Konva stage config — scale to container width
-const stageConfig = computed(() => {
-  if (!parsedData.value) return { width: 600, height: 400 }
-  const containerW = konvaContainer.value?.clientWidth || 800
-  const svgW = parsedData.value.svgWidth || 999
-  const svgH = parsedData.value.svgHeight || 666
-  const scale = Math.min(containerW / svgW, 1)
-  return {
-    width: Math.round(svgW * scale),
-    height: Math.round(svgH * scale),
-    scaleX: scale,
-    scaleY: scale
-  }
+// Konva stage config — reactive for pan and zoom
+const stageConfig = reactive({
+  width: 800,
+  height: 600,
+  scaleX: 1,
+  scaleY: 1,
+  x: 0,
+  y: 0,
+  draggable: true
 })
+
+function handleWheel(e) {
+  e.evt.preventDefault()
+  const scaleBy = 1.1
+  const stage = e.target.getStage()
+  const oldScale = stage.scaleX()
+  const pointer = stage.getPointerPosition()
+
+  const mousePointTo = {
+    x: (pointer.x - stage.x()) / oldScale,
+    y: (pointer.y - stage.y()) / oldScale,
+  }
+
+  const direction = e.evt.deltaY > 0 ? -1 : 1
+  const newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy
+
+  if (newScale > 10 || newScale < 0.1) return
+
+  stageConfig.scaleX = newScale
+  stageConfig.scaleY = newScale
+  stageConfig.x = pointer.x - mousePointTo.x * newScale
+  stageConfig.y = pointer.y - mousePointTo.y * newScale
+}
+
+function handleDragEnd(e) {
+  stageConfig.x = e.target.x()
+  stageConfig.y = e.target.y()
+}
 
 const tooltipBgConfig = computed(() => {
   if (!hoveredSeat.value) return { visible: false }
@@ -992,14 +1015,53 @@ function onDrop(e) {
   processFile(e.dataTransfer.files[0])
 }
 
+let resizeObserver = null
+let hasInitializedCenter = false
+
 function goToStep(step) {
   currentStep.value = step
   if (step === 1) {
+    hasInitializedCenter = false
     nextTick(() => {
-      // re-init Konva with correct container size
+      if (konvaContainer.value) {
+        if (resizeObserver) resizeObserver.disconnect()
+        
+        resizeObserver = new ResizeObserver((entries) => {
+          const entry = entries[0]
+          const containerW = entry.contentRect.width
+          const containerH = entry.contentRect.height || 600
+          
+          if (containerW > 0) {
+            stageConfig.width = containerW
+            stageConfig.height = containerH
+            
+            if (!hasInitializedCenter && parsedData.value) {
+              const svgW = parsedData.value.svgWidth || 999
+              const svgH = parsedData.value.svgHeight || 666
+              const scale = Math.min(containerW / svgW, containerH / svgH) * 0.95
+              
+              stageConfig.scaleX = scale
+              stageConfig.scaleY = scale
+              stageConfig.x = (containerW - svgW * scale) / 2
+              stageConfig.y = (containerH - svgH * scale) / 2
+              hasInitializedCenter = true
+            }
+          }
+        })
+        resizeObserver.observe(konvaContainer.value)
+      }
     })
+  } else {
+    if (resizeObserver) {
+      resizeObserver.disconnect()
+      resizeObserver = null
+    }
   }
 }
+
+onUnmounted(() => {
+  if (resizeObserver) resizeObserver.disconnect()
+})
 
 function goToReview() {
   // Validate config
@@ -1050,7 +1112,7 @@ function buildSeatConfig(seat, zone) {
     fill: '#0b0f19',
     stroke: zone.color,
     strokeWidth: 2,
-    id: seat.svgElementId
+    id: `${zone.zoneName}-${seat.svgElementId}`
   }
 }
 

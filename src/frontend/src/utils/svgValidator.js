@@ -49,9 +49,9 @@ function validateZones(zones, errors, warnings) {
   }
 
   const zoneIds = new Set()
-  const allSeatIds = new Set()
 
   zones.forEach((zone, zoneIdx) => {
+    const zoneSeatIds = new Set()
     const zLabel = `Zone[${zoneIdx}] "${zone.zoneName}"`
 
     // Zone ID / name validation
@@ -143,11 +143,11 @@ function validateZones(zones, errors, warnings) {
                 errors.push(`${sLabel}: ID ghế không đúng định dạng. Cần dạng: RowLabel_SoGhe (ví dụ: A_1, B_12).`)
               }
 
-              // Unique seat ID across all zones
-              if (allSeatIds.has(seat.svgElementId)) {
-                errors.push(`ID ghế "${seat.svgElementId}" bị trùng lặp. Mỗi ghế phải có ID duy nhất trên toàn sơ đồ.`)
+              // Unique seat ID within the same zone
+              if (zoneSeatIds.has(seat.svgElementId)) {
+                errors.push(`ID ghế "${seat.svgElementId}" bị trùng lặp trong phân khu ${zone.zoneName}. Mỗi ghế phải có ID duy nhất trong cùng một phân khu.`)
               }
-              allSeatIds.add(seat.svgElementId)
+              zoneSeatIds.add(seat.svgElementId)
             }
 
             if (!seat.seatName || !seat.seatName.trim()) {

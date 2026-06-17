@@ -39,14 +39,46 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-2 flex-shrink-0">
-          <router-link
-            :to="`/moderator/venues/${venueId}/seat-maps`"
-            class="inline-flex items-center gap-2 px-4 py-2.5 text-[13px] font-bold text-white/70 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors"
-          >
-            <PhArrowLeft weight="bold" />
-            Quay lại
-          </router-link>
+        <div class="flex flex-col items-end gap-2 flex-shrink-0">
+          <div class="flex items-center gap-2">
+            <template v-if="!isConfirmingDelete">
+              <button
+                @click="isConfirmingDelete = true"
+                class="inline-flex items-center gap-2 px-4 py-2.5 text-[13px] font-bold text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl hover:bg-red-500/20 hover:text-red-300 transition-colors"
+              >
+                <PhTrash weight="bold" />
+                Xóa sơ đồ
+              </button>
+              <router-link
+                :to="`/moderator/venues/${venueId}/seat-maps`"
+                class="inline-flex items-center gap-2 px-4 py-2.5 text-[13px] font-bold text-white/70 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors"
+              >
+                <PhArrowLeft weight="bold" />
+                Quay lại
+              </router-link>
+            </template>
+            <template v-else>
+              <span class="text-[13px] font-bold text-red-400 mr-2">Bạn có chắc chắn muốn xóa?</span>
+              <button
+                @click="isConfirmingDelete = false"
+                :disabled="isDeleting"
+                class="inline-flex items-center gap-2 px-4 py-2.5 text-[13px] font-bold text-white/70 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors disabled:opacity-50"
+              >
+                Hủy
+              </button>
+              <button
+                @click="handleDelete"
+                :disabled="isDeleting"
+                class="inline-flex items-center gap-2 px-4 py-2.5 text-[13px] font-bold text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors disabled:opacity-50 active:scale-[0.98]"
+              >
+                <PhSpinner v-if="isDeleting" class="animate-spin" />
+                <span v-else>Xác nhận xóa</span>
+              </button>
+            </template>
+          </div>
+          <div v-if="deleteError" class="text-sm text-red-400 font-medium bg-red-500/10 px-3 py-1.5 rounded-lg border border-red-500/20 mt-1">
+            {{ deleteError }}
+          </div>
         </div>
       </div>
 
@@ -70,11 +102,11 @@
             </div>
 
             <!-- Konva Stage -->
-            <div ref="konvaContainer" class="w-full overflow-auto">
-              <v-stage :config="stageConfig">
+            <div ref="konvaContainer" class="w-full h-[600px] cursor-grab active:cursor-grabbing">
+              <v-stage :config="stageConfig" @wheel="handleWheel" @dragend="handleDragEnd">
                 <v-layer>
                   <!-- Background -->
-                  <v-rect :config="{ x: 0, y: 0, width: stageConfig.width, height: stageConfig.height, fill: '#0b0f19' }" />
+                  <v-rect :config="{ x: 0, y: 0, width: realDimensions.width, height: realDimensions.height, fill: '#0b0f19' }" />
 
                   <!-- Zones -->
                   <template v-for="zone in seatMap.zones" :key="zone.id">
@@ -241,21 +273,46 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, reactive, computed, onMounted, nextTick, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { Stage as VStage, Layer as VLayer, Rect as VRect, Path as VPath, Text as VText, Circle as VCircle } from 'vue-konva'
-import { getSeatMapDetail } from '../../services/venue.service.js'
-import { PhArrowLeft, PhWarningCircle, PhMapPin } from '@phosphor-icons/vue'
+import { getSeatMapDetail, deleteSeatMap } from '../../services/venue.service.js'
+import { PhArrowLeft, PhWarningCircle, PhMapPin, PhTrash, PhSpinner } from '@phosphor-icons/vue'
 
 const route = useRoute()
+const router = useRouter()
 const venueId = route.params.id
 const seatMapId = route.params.seatMapId
 
 const seatMap = ref(null)
 const isLoading = ref(true)
 const error = ref('')
+const deleteError = ref('')
 const hoveredSeat = ref(null)
 const konvaContainer = ref(null)
+const isConfirmingDelete = ref(false)
+const isDeleting = ref(false)
+
+async function handleDelete() {
+  if (isDeleting.value) return
+  isDeleting.value = true
+  deleteError.value = ''
+  try {
+    const res = await deleteSeatMap(venueId, seatMapId)
+    if (res?.success) {
+      router.push(`/moderator/venues/${venueId}/seat-maps`)
+    } else {
+      deleteError.value = res?.message || 'Xóa sơ đồ chỗ ngồi thất bại.'
+      isConfirmingDelete.value = false
+    }
+  } catch (err) {
+    deleteError.value = err.response?.data?.message || 'Lỗi kết nối máy chủ khi xóa.'
+    isConfirmingDelete.value = false
+    console.error(err)
+  } finally {
+    isDeleting.value = false
+  }
+}
 
 // ── Computed ──
 const totalSeats = computed(() =>
@@ -271,19 +328,71 @@ const totalRows = computed(() =>
   seatMap.value?.zones.reduce((sum, z) => sum + z.rows.length, 0) ?? 0
 )
 
-const stageConfig = computed(() => {
-  if (!seatMap.value) return { width: 800, height: 500 }
-  const containerW = konvaContainer.value?.clientWidth || 900
-  const svgW = seatMap.value.width || 999
-  const svgH = seatMap.value.height || 666
-  const scale = Math.min(containerW / svgW, 1)
-  return {
-    width: Math.round(svgW * scale),
-    height: Math.round(svgH * scale),
-    scaleX: scale,
-    scaleY: scale
+const realDimensions = computed(() => {
+  if (!seatMap.value) return { width: 0, height: 0 }
+  let maxX = seatMap.value.width || 0
+  let maxY = seatMap.value.height || 0
+  
+  if (seatMap.value.width <= 100) {
+    seatMap.value.zones?.forEach(zone => {
+      zone.svgElements?.forEach(el => {
+        const x = parseFloat(el.x)
+        const y = parseFloat(el.y)
+        if (!isNaN(x) && x > maxX) maxX = x
+        if (!isNaN(y) && y > maxY) maxY = y
+      })
+      zone.rows?.forEach(row => {
+        row.seatRequests?.forEach(seat => {
+          const x = parseFloat(seat.x)
+          const y = parseFloat(seat.y)
+          if (!isNaN(x) && x > maxX) maxX = x
+          if (!isNaN(y) && y > maxY) maxY = y
+        })
+      })
+    })
+    maxX += 100
+    maxY += 100
   }
+  return { width: maxX, height: maxY }
 })
+
+const stageConfig = reactive({
+  width: 800,
+  height: 600,
+  scaleX: 1,
+  scaleY: 1,
+  x: 0,
+  y: 0,
+  draggable: true
+})
+
+function handleWheel(e) {
+  e.evt.preventDefault()
+  const scaleBy = 1.1
+  const stage = e.target.getStage()
+  const oldScale = stage.scaleX()
+  const pointer = stage.getPointerPosition()
+
+  const mousePointTo = {
+    x: (pointer.x - stage.x()) / oldScale,
+    y: (pointer.y - stage.y()) / oldScale,
+  }
+
+  const direction = e.evt.deltaY > 0 ? -1 : 1
+  const newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy
+
+  if (newScale > 10 || newScale < 0.1) return
+
+  stageConfig.scaleX = newScale
+  stageConfig.scaleY = newScale
+  stageConfig.x = pointer.x - mousePointTo.x * newScale
+  stageConfig.y = pointer.y - mousePointTo.y * newScale
+}
+
+function handleDragEnd(e) {
+  stageConfig.x = e.target.x()
+  stageConfig.y = e.target.y()
+}
 
 const tooltipBg = computed(() => {
   if (!hoveredSeat.value) return { visible: false }
@@ -369,15 +478,15 @@ function formatPrice(val) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val)
 }
 
+let resizeObserver = null
+let hasInitializedCenter = false
+
 // ── Fetch ──
 onMounted(async () => {
   try {
     const res = await getSeatMapDetail(venueId, seatMapId)
     if (res?.success && res?.data) {
       seatMap.value = res.data
-      await nextTick()
-      // Force stage to re-read container width after DOM is ready
-      konvaContainer.value?.dispatchEvent(new Event('resize'))
     } else {
       error.value = res?.message || 'Không thể tải thông tin sơ đồ ghế.'
     }
@@ -386,6 +495,37 @@ onMounted(async () => {
     console.error(err)
   } finally {
     isLoading.value = false
+    await nextTick()
+    
+    if (konvaContainer.value && !resizeObserver) {
+      resizeObserver = new ResizeObserver((entries) => {
+        const entry = entries[0]
+        const containerW = entry.contentRect.width
+        const containerH = entry.contentRect.height || 600
+        
+        if (containerW > 0) {
+          stageConfig.width = containerW
+          stageConfig.height = containerH
+          
+          if (!hasInitializedCenter && seatMap.value) {
+            const svgW = realDimensions.value.width || 999
+            const svgH = realDimensions.value.height || 666
+            const scale = Math.min(containerW / svgW, containerH / svgH) * 0.95
+            
+            stageConfig.scaleX = scale
+            stageConfig.scaleY = scale
+            stageConfig.x = (containerW - svgW * scale) / 2
+            stageConfig.y = (containerH - svgH * scale) / 2
+            hasInitializedCenter = true
+          }
+        }
+      })
+      resizeObserver.observe(konvaContainer.value)
+    }
   }
+})
+
+onUnmounted(() => {
+  if (resizeObserver) resizeObserver.disconnect()
 })
 </script>

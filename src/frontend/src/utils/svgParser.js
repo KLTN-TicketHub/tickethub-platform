@@ -152,16 +152,19 @@ function parseText(el) {
 
 /**
  * Parse a <circle> to a seat request.
- * ID format: RowLabel_SeatNumber  (e.g. A_1, B_12)
- * Figma may append _2, _3 to deduplicate IDs across zones (e.g. A_2_2).
- * We take parts[0] = rowLabel, parts[last] = seatName.
+ * Handles normal format (A_1), prefixed format (Slan_A_1), and Figma deduplications (A_1_2, Slan_A_1_2).
  */
 function parseSeat(el) {
   const id    = el.getAttribute('id') || ''
   const parts = id.split('_')
   if (parts.length < 2) return null
 
-  const rowLabel = parts[0]
+  // Handle Figma dedup (e.g., A_1_2) where last two parts are numbers
+  if (parts.length >= 3 && /^\d+$/.test(parts[parts.length - 1]) && /^\d+$/.test(parts[parts.length - 2])) {
+    parts.pop()
+  }
+
+  const rowLabel = parts[parts.length - 2]
   const seatName = parts[parts.length - 1]
   const cx = parseFloat2(el.getAttribute('cx'))
   const cy = parseFloat2(el.getAttribute('cy'))
@@ -348,9 +351,15 @@ export function parseSVGString(svgText) {
   }
 
   // Dimensions — prefer explicit width/height, fall back to viewBox
-  const vb      = svgEl.getAttribute('viewBox')?.split(/[\s,]+/) ?? []
-  const svgWidth  = parseFloat2(svgEl.getAttribute('width')  || vb[2], 0)
-  const svgHeight = parseFloat2(svgEl.getAttribute('height') || vb[3], 0)
+  const vb = svgEl.getAttribute('viewBox')?.split(/[\s,]+/) ?? []
+  const widthAttr = svgEl.getAttribute('width')
+  const heightAttr = svgEl.getAttribute('height')
+  
+  const parsedWidth = widthAttr && !widthAttr.includes('%') ? parseFloat2(widthAttr, 0) : parseFloat2(vb[2], 0)
+  const parsedHeight = heightAttr && !heightAttr.includes('%') ? parseFloat2(heightAttr, 0) : parseFloat2(vb[3], 0)
+
+  const svgWidth  = parsedWidth
+  const svgHeight = parsedHeight
 
   // Discover zone groups
   const zoneGroups = findZoneGroups(svgEl)
