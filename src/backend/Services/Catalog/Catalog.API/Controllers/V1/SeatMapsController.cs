@@ -3,6 +3,7 @@ using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Application.Common.DTOs.SeatMaps;
 using Catalog.Application.Features.SeatMaps.Commands.CreateSeatMap;
+using Catalog.Application.Features.SeatMaps.Commands.DeleteSeatMap;
 using Catalog.Application.Features.SeatMaps.Queries.GetSeatMapById;
 using Catalog.Application.Features.SeatMaps.Queries.GetSeatMapsByVenueId;
 using Catalog.Application.Features.SeatMaps.Requests;
@@ -76,6 +77,23 @@ namespace Catalog.API.Controllers.V1
                 Message = "Lấy danh sách sơ đồ chỗ ngồi thành công."
             });
             throw new NotImplementedException();
+        }
+
+        [AllowAnonymous]
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeleteSeatMap(
+            [FromRoute] Guid venueId,
+            [FromRoute] Guid id,
+            CancellationToken cancellation = default)
+        {
+            await _sender.Send(new DeleteSeatMapCommand(venueId, id), cancellation);
+
+            return Ok(new ApiResponse<bool>
+            {
+                Data = true,
+                Success = true,
+                Message = "Xóa sơ đồ chỗ ngồi thành công."
+            });
         }
     }
 }

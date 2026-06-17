@@ -7,6 +7,7 @@ using Catalog.Application.Features.Events.Requests;
 using Catalog.Domain.Entities;
 using Catalog.Domain.Interfaces;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Application.Features.Events.Commands.CreateEvent
 {
@@ -76,6 +77,21 @@ namespace Catalog.Application.Features.Events.Commands.CreateEvent
                     request.Location.District,
                     request.Location.ProvinceCity,
                     request.Location.Country);
+            }
+            else
+            {
+                SeatMap? seatMap = await _unitOfWork.SeatMapRepository.GetOneUntrackedAsync<SeatMap>(
+                    filter: sm => sm.Id == request.SeatMapId && !sm.IsDeleted,
+                    include: sm => sm.Include(sm => sm.Venue),
+                    cancellation: cancellation);
+
+                newEvent.SetEventLocation(
+                    seatMap!.Venue!.VenueName,
+                    seatMap.Venue.AddressLine,
+                    seatMap.Venue.Ward,
+                    seatMap.Venue.District,
+                    seatMap.Venue.ProvinceCity,
+                    seatMap.Venue.Country);
             }
 
             if (request.TicketTypes is { Count: > 0 })
