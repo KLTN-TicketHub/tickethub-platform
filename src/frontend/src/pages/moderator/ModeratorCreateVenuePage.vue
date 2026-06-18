@@ -190,7 +190,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getProvinces, getDistricts, getWards } from '../../services/location.service'
-import { createVenue } from '../../services/venue.service'
+import { createModeratorVenue } from '../../services/venue.service'
 import { PhCircleNotch, PhCheckCircle, PhWarningCircle, PhMapPin, PhGlobeHemisphereWest } from '@phosphor-icons/vue'
 
 const router = useRouter()
@@ -298,7 +298,7 @@ const handleSubmit = async () => {
 
   try {
     isSubmitting.value = true
-    const response = await createVenue({ ...form })
+    const response = await createModeratorVenue({ ...form })
     
     if (response.success) {
       apiSuccess.value = response.message || 'Tạo địa điểm thành công.'

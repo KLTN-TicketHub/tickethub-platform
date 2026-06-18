@@ -8,7 +8,6 @@ namespace Catalog.Domain.Interfaces
         IVenueRepository VenueRepository { get; }
         IEventRepository EventRepository { get; }
         IEventCategoryRepository EventCategoryRepository { get; }
-        IEventApprovalRepository EventApprovalRepository { get; }
         ISeatRepository SeatRepository { get; }
         ISeatMapRepository SeatMapRepository { get; }
         ITicketTypeRepository TicketTypeRepository { get; }

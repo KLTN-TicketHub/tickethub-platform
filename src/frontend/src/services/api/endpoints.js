@@ -15,32 +15,47 @@ export const ORGANIZER_AUTH_REGISTER = '/auth/organizer'
 // example domain endpoints (extend as needed)
 export const EVENTS = '/events'
 export const USERS = '/users'
-export const CATALOG_EVENT_DETAIL = (id) => `/catalog/events/${id}`
+// Public Catalog
+export const CATALOG_EVENT_DETAIL = (id) => `/events/${id}`
+export const PUBLIC_VENUES = '/catalog/venues'
+export const PUBLIC_VENUE_SEATMAP_DETAIL = (venueId, seatMapId) => `/catalog/venue/${venueId}/seat-maps/${seatMapId}`
 
-// Catalog
-export const VENUE_CREATE = '/catalog/venues'
-export const VENUE_LIST = '/catalog/venues'
-export const VENUE_DETAIL = (id) => `/catalog/venues/${id}`
-export const VENUE_UPDATE = (id) => `/catalog/venues/${id}`
-export const VENUE_DELETE = (id) => `/catalog/venues/${id}`
-export const VENUE_SEATMAPS = (venueId) => `/catalog/venue/${venueId}/seat-maps`
-export const VENUE_SEATMAP_CREATE = (venueId) => `/catalog/venue/${venueId}/seat-maps`
-export const VENUE_SEATMAP_DETAIL = (venueId, seatMapId) => `/catalog/venue/${venueId}/seat-maps/${seatMapId}`
-export const VENUE_SEATMAP_DELETE = (venueId, seatMapId) => `/catalog/venue/${venueId}/seat-maps/${seatMapId}`
-export const UPLOAD_SVG = '/catalog/files/upload-svg'
+// Moderator Venues & SeatMaps
+export const MODERATOR_VENUE_LIST = '/catalog/moderator/venues'
+export const MODERATOR_VENUE_DETAIL = (id) => `/catalog/moderator/venues/${id}`
+export const MODERATOR_VENUE_CREATE = '/catalog/moderator/venues'
+export const MODERATOR_VENUE_UPDATE = (id) => `/catalog/moderator/venues/${id}`
+export const MODERATOR_VENUE_DELETE = (id) => `/catalog/moderator/venues/${id}`
+
+export const MODERATOR_VENUE_SEATMAPS = (venueId) => `/catalog/moderator/venue/${venueId}/seat-maps`
+export const MODERATOR_VENUE_SEATMAP_CREATE = (venueId) => `/catalog/moderator/venue/${venueId}/seat-maps`
+export const MODERATOR_VENUE_SEATMAP_DETAIL = (venueId, seatMapId) => `/catalog/moderator/venue/${venueId}/seat-maps/${seatMapId}`
+export const MODERATOR_VENUE_SEATMAP_DELETE = (venueId, seatMapId) => `/catalog/moderator/venue/${venueId}/seat-maps/${seatMapId}`
+
+// Moderator Events & Categories
+export const MODERATOR_EVENT_CATEGORIES = '/catalog/moderator/event-categories'
+export const MODERATOR_EVENT_CATEGORY_DETAIL = (id) => `/catalog/moderator/event-categories/${id}`
+export const MODERATOR_EVENTS_LIST = '/catalog/moderator/events'
+export const MODERATOR_EVENT_DETAIL = (id) => `/catalog/moderator/events/${id}`
+export const MODERATOR_EVENT_REVIEW = (id) => `/catalog/moderator/events/${id}/review`
+
+// Organizer Venues & SeatMaps
+export const ORGANIZER_VENUE_LIST = '/catalog/organizer/venues'
+export const ORGANIZER_VENUE_SEATMAPS = (venueId) => `/catalog/organizer/venue/${venueId}/seat-maps`
+export const ORGANIZER_VENUE_SEATMAP_DETAIL = (venueId, seatMapId) => `/catalog/organizer/venue/${venueId}/seat-maps/${seatMapId}`
+
+// Organizer Events
+export const ORGANIZER_EVENT_CREATE = '/catalog/organizer/events'
+export const ORGANIZER_EVENTS_LIST = '/catalog/organizer/events'
+export const ORGANIZER_EVENT_DETAIL = (id) => `/catalog/organizer/events/${id}`
+
+// Common Files & Lookups
+export const UPLOAD_SVG = '/catalog/common/files/upload-svg'
+export const UPLOAD_COVER_IMAGE = '/catalog/common/files/upload-cover-image'
+export const EVENT_STATUSES_LOOKUP = '/catalog/common/lookup/event-statuses'
+export const COMMON_EVENT_CATEGORIES = '/event-categories'
 
 // Locations (Vietnam Provinces API)
 export const LOCATION_PROVINCES = '/p/'
 export const LOCATION_DISTRICTS = (provinceCode) => `/p/${provinceCode}`
 export const LOCATION_WARDS = (districtCode) => `/d/${districtCode}`
-
-// Event Categories
-export const EVENT_CATEGORIES = '/catalog/event-categories'
-
-// File Upload
-export const UPLOAD_COVER_IMAGE = '/catalog/files/upload-cover-image'
-
-// Organizer Events
-export const ORGANIZER_EVENT_CREATE = '/catalog/events'
-export const ORGANIZER_EVENTS_LIST = '/catalog/events'
-export const EVENT_STATUSES_LOOKUP = '/catalog/lookup/event-statuses'

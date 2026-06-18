@@ -217,7 +217,7 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getProvinces, getDistricts, getWards } from '../../services/location.service'
-import { getVenueById, updateVenue } from '../../services/venue.service'
+import { getModeratorVenueById, updateModeratorVenue } from '../../services/venue.service'
 import { PhCircleNotch, PhCheckCircle, PhWarningCircle, PhMapPin, PhGlobeHemisphereWest, PhArrowLeft, PhSquaresFour } from '@phosphor-icons/vue'
 
 const router = useRouter()
@@ -257,7 +257,7 @@ onMounted(async () => {
 
 const fetchVenueData = async () => {
   try {
-    const res = await getVenueById(venueId)
+    const res = await getModeratorVenueById(venueId)
     if (res && res.success) {
       const data = res.data
       form.venueName = data.venueName || ''
@@ -349,7 +349,7 @@ const handleSubmit = async () => {
 
   try {
     const payload = { ...form }
-    const response = await updateVenue(venueId, payload)
+    const response = await updateModeratorVenue(venueId, payload)
     
     if (response.success) {
       apiSuccess.value = response.message || 'Cập nhật địa điểm thành công!'

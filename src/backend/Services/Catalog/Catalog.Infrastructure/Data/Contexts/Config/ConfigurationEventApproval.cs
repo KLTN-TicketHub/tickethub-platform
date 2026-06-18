@@ -13,8 +13,8 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
             builder.HasKey(ea => ea.Id);
 
             builder.HasOne(ea => ea.Event)
-                .WithMany()
-                .HasForeignKey(ea => ea.EventId)
+                .WithOne(e => e.Approval)
+                .HasForeignKey<EventApproval>(ea => ea.EventId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
 

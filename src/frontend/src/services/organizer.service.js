@@ -1,12 +1,12 @@
 import api from './api/axios'
-import { EVENT_CATEGORIES, UPLOAD_COVER_IMAGE, ORGANIZER_EVENT_CREATE, VENUE_SEATMAP_DETAIL, ORGANIZER_EVENTS_LIST, EVENT_STATUSES_LOOKUP } from './api/endpoints'
+import { COMMON_EVENT_CATEGORIES, UPLOAD_COVER_IMAGE, ORGANIZER_EVENT_CREATE, ORGANIZER_VENUE_SEATMAP_DETAIL, ORGANIZER_EVENTS_LIST, EVENT_STATUSES_LOOKUP } from './api/endpoints'
 
 /**
  * Lấy danh sách danh mục sự kiện (phân trang)
  * GET /event-categories
  */
 export async function getEventCategories(params = {}) {
-  const response = await api.get(EVENT_CATEGORIES, { params })
+  const response = await api.get(COMMON_EVENT_CATEGORIES, { params })
   return response.data
 }
 
@@ -50,7 +50,7 @@ export async function createEventWithSeatMap(payload) {
  * GET /catalog/venue/:venueId/seat-maps/:seatMapId
  */
 export async function getSeatMapZones(venueId, seatMapId) {
-  const response = await api.get(VENUE_SEATMAP_DETAIL(venueId, seatMapId))
+  const response = await api.get(ORGANIZER_VENUE_SEATMAP_DETAIL(venueId, seatMapId))
   return response.data
 }
 

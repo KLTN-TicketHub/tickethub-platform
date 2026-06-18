@@ -839,7 +839,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { Stage as VStage, Layer as VLayer, Rect as VRect, Path as VPath, Text as VText, Circle as VCircle } from 'vue-konva'
 import { parseSVGFile } from '../../utils/svgParser.js'
 import { validateSeatMap, validateZoneConfig } from '../../utils/svgValidator.js'
-import { createSeatMap, uploadSVGFile } from '../../services/venue.service.js'
+import { createModeratorSeatMap, uploadSVGFile } from '../../services/venue.service.js'
 import {
   PhArrowLeft, PhArrowRight, PhUploadSimple, PhWarningCircle, PhWarning,
   PhCheckCircle, PhCheck, PhCircleNotch, PhFloppyDisk, PhTextT, PhInfo,
@@ -1192,7 +1192,7 @@ async function handleSubmit() {
     }
 
     // Step 3: POST
-    const res = await createSeatMap(venueId, payload)
+    const res = await createModeratorSeatMap(venueId, payload)
 
     if (res.success) {
       isSuccess.value = true

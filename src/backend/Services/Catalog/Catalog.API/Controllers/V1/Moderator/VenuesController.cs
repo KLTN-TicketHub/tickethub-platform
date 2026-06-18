@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.API.Extensions;
+using BuildingBlocks.API.Extensions;
 using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
@@ -15,12 +15,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
-namespace Catalog.API.Controllers.V1
+namespace Catalog.API.Controllers.V1.Moderator
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version:apiVersion}/moderator/venues")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Roles = Roles.Moderator)]
     public class VenuesController : ControllerBase
     {
         private readonly ISender _sender;
@@ -31,7 +32,6 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [Authorize(Roles = Roles.Moderator + "," + Roles.Organizer)]
         [HttpGet]
         public async Task<IActionResult> GetVenuesAsync(
             [FromQuery] GetVenuesRequest request,
@@ -64,7 +64,6 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [Authorize(Roles = Roles.Moderator)]
         [HttpPost]
         public async Task<IActionResult> CreateVenueAsync([FromBody] CreateVenueRequest request, CancellationToken cancellationToken = default)
         {
@@ -79,7 +78,6 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [Authorize(Roles = Roles.Moderator)]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> UpdateVenueAsync(
             [FromRoute] Guid id,
@@ -97,7 +95,6 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [Authorize(Roles = Roles.Moderator)]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteVenueAsync(
             [FromRoute] Guid id,

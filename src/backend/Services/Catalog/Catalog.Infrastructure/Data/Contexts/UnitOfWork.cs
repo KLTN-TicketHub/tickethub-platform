@@ -11,7 +11,6 @@ namespace Catalog.Infrastructure.Data.Contexts
             IVenueRepository venueRepository,
             IEventRepository eventRepository,
             IEventCategoryRepository eventCategoryRepository,
-            IEventApprovalRepository eventApprovalRepository,
             ISeatRepository seatRepository,
             ISeatMapRepository seatMapRepository,
             ITicketTypeRepository ticketTypeRepository,
@@ -21,7 +20,6 @@ namespace Catalog.Infrastructure.Data.Contexts
             VenueRepository = venueRepository;
             EventRepository = eventRepository;
             EventCategoryRepository = eventCategoryRepository;
-            EventApprovalRepository = eventApprovalRepository;
             SeatRepository = seatRepository;
             SeatMapRepository = seatMapRepository;
             TicketTypeRepository = ticketTypeRepository;
@@ -32,7 +30,6 @@ namespace Catalog.Infrastructure.Data.Contexts
         public IVenueRepository VenueRepository { get; set; }
         public IEventRepository EventRepository { get; set; }
         public IEventCategoryRepository EventCategoryRepository { get; set; }
-        public IEventApprovalRepository EventApprovalRepository { get; set; }
         public ISeatRepository SeatRepository { get; set; }
         public ISeatMapRepository SeatMapRepository { get; set; }
         public ITicketTypeRepository TicketTypeRepository { get; set; }

@@ -171,7 +171,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { getVenues, deleteVenue } from '../../services/venue.service'
+import { getModeratorVenues, deleteModeratorVenue } from '../../services/venue.service'
 import { getProvinces, getDistricts } from '../../services/location.service'
 import { PhPlus, PhMagnifyingGlass, PhPencilSimple, PhTrash, PhSquaresFour, PhArrowLeft } from '@phosphor-icons/vue'
 
@@ -224,7 +224,7 @@ const onProvinceFilterChange = async () => {
 const loadVenues = async () => {
   isLoading.value = true
   try {
-    const res = await getVenues(filters)
+    const res = await getModeratorVenues(filters)
     if (res.success && res.data) {
       venues.value = res.data.data || []
       totalPages.value = res.data.totalPages || 1
@@ -255,7 +255,7 @@ const onSearchInput = () => {
     }
     
     try {
-      const res = await getVenues({ Search: filters.Search, PageNumber: 1, PageSize: 5 })
+      const res = await getModeratorVenues({ Search: filters.Search, PageNumber: 1, PageSize: 5 })
       if (res.success && res.data) {
         suggestions.value = res.data.data || []
       }
@@ -295,7 +295,7 @@ const nextPage = () => {
 const confirmDelete = async (venue) => {
   if (window.confirm(`Bạn có chắc chắn muốn xóa địa điểm "${venue.venueName}" không?`)) {
     try {
-      await deleteVenue(venue.id)
+      await deleteModeratorVenue(venue.id)
       alert('Xóa địa điểm thành công')
       loadVenues()
     } catch (error) {

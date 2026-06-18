@@ -44,6 +44,8 @@ namespace Catalog.Domain.Entities
         private readonly List<TicketType> _ticketTypes = new List<TicketType>();
         public IReadOnlyCollection<TicketType> TicketTypes => _ticketTypes.AsReadOnly();
 
+        public EventApproval? Approval { get; private set; }
+
         public Event(
             Guid organizerId,
             Guid categoryId,
@@ -80,6 +82,29 @@ namespace Catalog.Domain.Entities
         public void AddTicketType(TicketType ticketType)
         {
             _ticketTypes.Add(ticketType);
+        }
+
+        public void Review(bool isApproved, Guid reviewerUserId, string? reviewerName, string? reason)
+        {
+            Status = isApproved ? EventStatus.Published : EventStatus.Rejected;
+            if (Approval == null)
+            {
+                Approval = new EventApproval
+                {
+                    ReviewerUserId = reviewerUserId,
+                    ReviewerName = reviewerName,
+                    ReviewedAt = DateTime.UtcNow,
+                    Reason = reason,
+                    EventId = Id
+                };
+            }
+            else
+            {
+                Approval.ReviewerUserId = reviewerUserId;
+                Approval.ReviewerName = reviewerName;
+                Approval.ReviewedAt = DateTime.UtcNow;
+                Approval.Reason = reason;
+            }
         }
 
         public static string GenerateSlug(string title, int maxLen = 200)

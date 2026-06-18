@@ -276,7 +276,7 @@
 import { ref, reactive, computed, onMounted, nextTick, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Stage as VStage, Layer as VLayer, Rect as VRect, Path as VPath, Text as VText, Circle as VCircle } from 'vue-konva'
-import { getSeatMapDetail, deleteSeatMap } from '../../services/venue.service.js'
+import { getModeratorSeatMapDetail, deleteModeratorSeatMap } from '../../services/venue.service.js'
 import { PhArrowLeft, PhWarningCircle, PhMapPin, PhTrash, PhSpinner } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -298,7 +298,7 @@ async function handleDelete() {
   isDeleting.value = true
   deleteError.value = ''
   try {
-    const res = await deleteSeatMap(venueId, seatMapId)
+    const res = await deleteModeratorSeatMap(venueId, seatMapId)
     if (res?.success) {
       router.push(`/moderator/venues/${venueId}/seat-maps`)
     } else {
@@ -484,7 +484,7 @@ let hasInitializedCenter = false
 // ── Fetch ──
 onMounted(async () => {
   try {
-    const res = await getSeatMapDetail(venueId, seatMapId)
+    const res = await getModeratorSeatMapDetail(venueId, seatMapId)
     if (res?.success && res?.data) {
       seatMap.value = res.data
     } else {

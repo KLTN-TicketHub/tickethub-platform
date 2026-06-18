@@ -4,7 +4,7 @@
 // with actual fetch/axios calls. The function signatures stay the same.
 
 import api from './api/axios'
-import { CATALOG_EVENT_DETAIL } from './api/endpoints'
+import { ORGANIZER_EVENT_DETAIL, MODERATOR_EVENT_DETAIL, ORGANIZER_EVENTS_LIST, MODERATOR_EVENTS_LIST } from './api/endpoints'
 import { MOCK_EVENTS } from '../mocks/eventMock'
 
 // In-memory store that simulates a database
@@ -134,11 +134,39 @@ export async function fetchDestinations() {
 }
 
 /**
- * Lấy chi tiết sự kiện từ API Backend
+ * Lấy chi tiết sự kiện cho Customer (Public)
  * GET /catalog/events/:id
  */
 export async function getEventDetail(id) {
   const response = await api.get(CATALOG_EVENT_DETAIL(id))
+  return response.data
+}
+
+/**
+ * Lấy chi tiết sự kiện cho Organizer
+ * GET /catalog/organizer/events/:id
+ */
+export async function getOrganizerEventDetail(id) {
+  const response = await api.get(ORGANIZER_EVENT_DETAIL(id))
+  return response.data
+}
+
+/**
+ * Lấy chi tiết sự kiện cho Moderator
+ * GET /catalog/moderator/events/:id
+ */
+export async function getModeratorEventDetail(id) {
+  const response = await api.get(MODERATOR_EVENT_DETAIL(id))
+  return response.data
+}
+
+export async function getOrganizerEvents(params) {
+  const response = await api.get(ORGANIZER_EVENTS_LIST, { params })
+  return response.data
+}
+
+export async function getModeratorEvents(params) {
+  const response = await api.get(MODERATOR_EVENTS_LIST, { params })
   return response.data
 }
 

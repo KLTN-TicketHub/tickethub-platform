@@ -1093,7 +1093,7 @@ import {
   PhX, PhPlus, PhRocketLaunch, PhLink
 } from '@phosphor-icons/vue'
 import { getEventCategories, uploadCoverImage, createEventWithLocation, createEventWithSeatMap, getSeatMapZones } from '../../services/organizer.service'
-import { getVenues, getVenueSeatMaps } from '../../services/venue.service'
+import { getOrganizerVenues, getOrganizerVenueSeatMaps, getOrganizerSeatMapDetail } from '../../services/venue.service'
 import { getProvinces, getDistricts, getWards } from '../../services/location.service'
 
 const router = useRouter()
@@ -1341,7 +1341,7 @@ const venueFilters = reactive({ PageNumber: 1, PageSize: 6, Search: '' })
 async function loadVenues() {
   isLoadingVenues.value = true
   try {
-    const res = await getVenues(venueFilters)
+    const res = await getOrganizerVenues(venueFilters)
     if (res.success && res.data) {
       venues.value = res.data.data || []
       venueTotalPages.value = res.data.totalPages || 1
@@ -1379,7 +1379,7 @@ async function selectVenue(venue) {
   // Load seatmaps of this venue
   isLoadingSeatMaps.value = true
   try {
-    const res = await getVenueSeatMaps(venue.id, { PageNumber: 1, PageSize: 50 })
+    const res = await getOrganizerVenueSeatMaps(venue.id, { PageNumber: 1, PageSize: 50 })
     if (res.success && res.data) {
       seatMaps.value = res.data.data || []
     }
@@ -1521,7 +1521,7 @@ async function loadZones() {
   if (!form.selectedVenueId || !form.seatMapId) return
   isLoadingZones.value = true
   try {
-    const res = await getSeatMapZones(form.selectedVenueId, form.seatMapId)
+    const res = await getOrganizerSeatMapDetail(form.selectedVenueId, form.seatMapId)
     if (res.success && res.data) {
       seatMapData.value = res.data
       availableZones.value = (res.data.zones || []).filter(z => z.isSalable && !z.isStage)

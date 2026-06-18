@@ -12,12 +12,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Catalog.API.Controllers.V1
+namespace Catalog.API.Controllers.V1.Moderator
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/venue/{venueId:guid}/[controller]")]
+    [Route("api/v{version:apiVersion}/moderator/venue/{venueId:guid}/seat-maps")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Roles = Roles.Moderator)]
     public class SeatMapsController : ControllerBase
     {
         private readonly ISender _sender;
@@ -27,7 +28,6 @@ namespace Catalog.API.Controllers.V1
             _sender = sender;
         }
 
-        [Authorize(Roles = Roles.Moderator)]
         [HttpPost]
         public async Task<IActionResult> CreateSeatMap(
             [FromRoute] Guid venueId,
@@ -58,8 +58,6 @@ namespace Catalog.API.Controllers.V1
                 Success = true,
                 Message = "Lấy thông tin sơ đồ chỗ ngồi thành công."
             });
-
-            throw new NotImplementedException();
         }
 
         [HttpGet]
@@ -76,10 +74,8 @@ namespace Catalog.API.Controllers.V1
                 Success = true,
                 Message = "Lấy danh sách sơ đồ chỗ ngồi thành công."
             });
-            throw new NotImplementedException();
         }
 
-        [AllowAnonymous]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteSeatMap(
             [FromRoute] Guid venueId,

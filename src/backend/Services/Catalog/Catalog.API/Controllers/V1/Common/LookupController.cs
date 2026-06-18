@@ -1,12 +1,12 @@
-﻿using BuildingBlocks.API.Helpers;
+using BuildingBlocks.API.Helpers;
 using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Catalog.API.Controllers.V1
+namespace Catalog.API.Controllers.V1.Common
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version:apiVersion}/common/[controller]")]
     [ApiController]
     public class LookupController : ControllerBase
     {

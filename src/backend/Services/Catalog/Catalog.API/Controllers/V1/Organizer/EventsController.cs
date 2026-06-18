@@ -12,12 +12,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Catalog.API.Controllers.V1
+namespace Catalog.API.Controllers.V1.Organizer
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version:apiVersion}/organizer/events")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Roles = Roles.Organizer)]
     public class EventsController : ControllerBase
     {
         private readonly ISender _sender;
@@ -29,7 +30,6 @@ namespace Catalog.API.Controllers.V1
             _currentUserService = currentUserService;
         }
 
-        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateEventAsync(
             [FromBody] CreateEventRequest request,
@@ -48,7 +48,6 @@ namespace Catalog.API.Controllers.V1
             });
         }
 
-        [AllowAnonymous]
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetEventByIdForOrganizerAsync(
             Guid id,
@@ -69,19 +68,7 @@ namespace Catalog.API.Controllers.V1
             [FromQuery] GetEventsForOrganizerRequest request,
             CancellationToken cancellationToken = default)
         {
-            PaginatedResult<OrganizerEventListItemDto> result;
-            if (_currentUserService.Roles.Contains(Roles.Organizer))
-            {
-                result = await _sender.Send(new GetEventsForOrganizerQuery(request), cancellationToken);
-            }
-            else if (_currentUserService.Roles.Contains(Roles.Customer))
-            {
-                throw new NotImplementedException();
-            }
-            else
-            {
-                throw new UnauthorizedAccessException("Người dùng không có quyền truy cập.");
-            }
+            PaginatedResult<OrganizerEventListItemDto> result = await _sender.Send(new GetEventsForOrganizerQuery(request), cancellationToken);
 
             return Ok(new ApiResponse<PaginatedResult<OrganizerEventListItemDto>>
             {

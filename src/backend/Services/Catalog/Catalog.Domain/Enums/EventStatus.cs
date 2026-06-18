@@ -11,6 +11,9 @@ namespace Catalog.Domain.Enums
         Published = 2,
 
         [Display(Name = "Đã qua")]
-        Archived = 3
+        Archived = 3,
+
+        [Display(Name = "Bị từ chối")]
+        Rejected = 4
     }
 }

@@ -15,12 +15,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
-namespace Catalog.API.Controllers.V1
+namespace Catalog.API.Controllers.V1.Moderator
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version:apiVersion}/moderator/event-categories")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Roles = Roles.Moderator)]
     public class EventCategoriesController : ControllerBase
     {
         private readonly ISender _sender;
@@ -31,7 +32,6 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [Authorize(Roles = Roles.Moderator)]
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetEventCategoryByIdAsync(
             [FromRoute] Guid id,
@@ -48,7 +48,6 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateEventCategoryAsync(
             [FromBody] CreateEventCategoryRequest request,
@@ -65,7 +64,6 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [AllowAnonymous]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> UpdateEventCategoryAsync(
             [FromRoute] Guid id,
@@ -83,7 +81,6 @@ namespace Catalog.API.Controllers.V1
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
-        [AllowAnonymous]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteEventCategoryAsync(
             [FromRoute] Guid id,
@@ -98,8 +95,7 @@ namespace Catalog.API.Controllers.V1
             });
         }
 
-        [EnableRateLimiting(RateLimitPolicies.PerIp)]
-        [AllowAnonymous]
+        [EnableRateLimiting(RateLimitPolicies.PerUser)]
         [HttpGet]
         public async Task<IActionResult> GetEventCategoriesAsync(
             [FromQuery] GetCategoriesRequest request,

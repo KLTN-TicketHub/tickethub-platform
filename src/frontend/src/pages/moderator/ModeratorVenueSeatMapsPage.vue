@@ -112,7 +112,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { getVenueById, getVenueSeatMaps } from '../../services/venue.service'
+import { getModeratorVenueById, getModeratorVenueSeatMaps } from '../../services/venue.service'
 import { PhArrowLeft, PhSquaresFour, PhPlus, PhArrowSquareOut } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -137,7 +137,7 @@ onMounted(async () => {
 
 const fetchVenueInfo = async () => {
   try {
-    const res = await getVenueById(venueId)
+    const res = await getModeratorVenueById(venueId)
     if (res && res.success) {
       venue.value = res.data
     }
@@ -149,7 +149,7 @@ const fetchVenueInfo = async () => {
 const fetchSeatMaps = async () => {
   isLoading.value = true
   try {
-    const res = await getVenueSeatMaps(venueId, filters)
+    const res = await getModeratorVenueSeatMaps(venueId, filters)
     if (res && res.success && res.data) {
       seatMaps.value = res.data.data || []
       totalPages.value = res.data.totalPages || 1
