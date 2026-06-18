@@ -33,7 +33,6 @@ namespace Catalog.API.Extensions
             services.AddScoped<IVenueRepository, VenueRepository>();
             services.AddScoped<IEventRepository, EventRepository>();
             services.AddScoped<IEventCategoryRepository, EventCategoryRepository>();
-            services.AddScoped<IEventApprovalRepository, EventApprovalRepository>();
             services.AddScoped<ISeatRepository, SeatRepository>();
             services.AddScoped<ISeatMapRepository, SeatMapRepository>();
             services.AddScoped<ITicketTypeRepository, TicketTypeRepository>();

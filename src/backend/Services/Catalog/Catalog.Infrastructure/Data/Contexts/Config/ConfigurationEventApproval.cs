@@ -18,15 +18,12 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
 
-            builder.Property(ea => ea.ApprovalStatus)
-                .IsRequired()
-                .HasConversion<string>();
-
             builder.Property(ea => ea.Reason)
                 .HasMaxLength(500);
 
             builder.Property(ea => ea.ReviewerUserId)
-                .HasMaxLength(100);
+                .HasMaxLength(100)
+                .IsRequired();
 
             builder.Property(ea => ea.ReviewerName)
                 .HasMaxLength(200);
