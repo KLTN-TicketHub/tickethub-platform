@@ -15,6 +15,7 @@ export const ORGANIZER_AUTH_REGISTER = '/auth/organizer'
 // example domain endpoints (extend as needed)
 export const EVENTS = '/events'
 export const USERS = '/users'
+export const CATALOG_EVENT_DETAIL = (id) => `/catalog/events/${id}`
 
 // Catalog
 export const VENUE_CREATE = '/catalog/venues'
@@ -41,3 +42,5 @@ export const UPLOAD_COVER_IMAGE = '/catalog/files/upload-cover-image'
 
 // Organizer Events
 export const ORGANIZER_EVENT_CREATE = '/catalog/events'
+export const ORGANIZER_EVENTS_LIST = '/catalog/events'
+export const EVENT_STATUSES_LOOKUP = '/catalog/lookup/event-statuses'

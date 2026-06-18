@@ -4,19 +4,13 @@ namespace Catalog.Domain.Enums
 {
     public enum EventStatus
     {
-        [Display(Name = "Bản nháp")]
-        Draft = 1,
-
         [Display(Name = "Chờ duyệt")]
-        PendingApproval = 2,
+        PendingApproval = 1,
 
         [Display(Name = "Đã xuất bản")]
-        Published = 3,
+        Published = 2,
 
-        [Display(Name = "Đã hủy")]
-        Cancelled = 4,
-
-        [Display(Name = "Đã lưu trữ")]
-        Archived = 5
+        [Display(Name = "Đã qua")]
+        Archived = 3
     }
 }

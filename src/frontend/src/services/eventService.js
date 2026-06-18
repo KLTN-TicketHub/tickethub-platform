@@ -3,6 +3,8 @@
 // When a real backend is available, replace the body of each method
 // with actual fetch/axios calls. The function signatures stay the same.
 
+import api from './api/axios'
+import { CATALOG_EVENT_DETAIL } from './api/endpoints'
 import { MOCK_EVENTS } from '../mocks/eventMock'
 
 // In-memory store that simulates a database
@@ -130,3 +132,13 @@ export async function fetchDestinations() {
   await delay(200)
   return [...MOCK_DESTINATIONS]
 }
+
+/**
+ * Lấy chi tiết sự kiện từ API Backend
+ * GET /catalog/events/:id
+ */
+export async function getEventDetail(id) {
+  const response = await api.get(CATALOG_EVENT_DETAIL(id))
+  return response.data
+}
+

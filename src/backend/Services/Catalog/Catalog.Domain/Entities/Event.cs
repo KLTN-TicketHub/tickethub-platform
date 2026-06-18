@@ -39,7 +39,7 @@ namespace Catalog.Domain.Entities
 
         public byte[] RowVersion { get; set; } = default!;
 
-        public EventLocation? Location { get; set; }
+        public EventLocation Location { get; set; }
 
         private readonly List<TicketType> _ticketTypes = new List<TicketType>();
         public IReadOnlyCollection<TicketType> TicketTypes => _ticketTypes.AsReadOnly();

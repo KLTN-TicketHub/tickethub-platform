@@ -101,7 +101,8 @@ const routes = [
     meta: { requiresAuth: true, role: 'organizer' },
     children: [
       { path: '', name: 'organizer', component: OrganizerPage },
-      { path: 'create-event', name: 'organizer-create-event', component: OrganizerCreateEventPage }
+      { path: 'create-event', name: 'organizer-create-event', component: OrganizerCreateEventPage },
+      { path: 'events/:id', name: 'organizer-event-detail', component: () => import('../pages/organizer/OrganizerEventDetailPage.vue') }
     ]
   }
 ]

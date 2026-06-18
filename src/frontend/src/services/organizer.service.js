@@ -1,5 +1,5 @@
 import api from './api/axios'
-import { EVENT_CATEGORIES, UPLOAD_COVER_IMAGE, ORGANIZER_EVENT_CREATE, VENUE_SEATMAP_DETAIL } from './api/endpoints'
+import { EVENT_CATEGORIES, UPLOAD_COVER_IMAGE, ORGANIZER_EVENT_CREATE, VENUE_SEATMAP_DETAIL, ORGANIZER_EVENTS_LIST, EVENT_STATUSES_LOOKUP } from './api/endpoints'
 
 /**
  * Lấy danh sách danh mục sự kiện (phân trang)
@@ -53,3 +53,22 @@ export async function getSeatMapZones(venueId, seatMapId) {
   const response = await api.get(VENUE_SEATMAP_DETAIL(venueId, seatMapId))
   return response.data
 }
+
+/**
+ * Lấy danh sách sự kiện của organizer (phân trang, trạng thái, tìm kiếm)
+ * GET /catalog/events
+ */
+export async function getOrganizerEvents(params = {}) {
+  const response = await api.get(ORGANIZER_EVENTS_LIST, { params })
+  return response.data
+}
+
+/**
+ * Lấy danh sách trạng thái sự kiện (lookup enum)
+ * GET /catalog/lookup/event-statuses
+ */
+export async function getEventStatuses() {
+  const response = await api.get(EVENT_STATUSES_LOOKUP)
+  return response.data
+}
+

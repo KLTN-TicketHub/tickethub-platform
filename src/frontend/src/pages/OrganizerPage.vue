@@ -18,7 +18,7 @@
 
     <!-- Stats Grid (Bento) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 animate-fade-up [animation-delay:100ms]">
-      <div v-for="(stat, idx) in stats" :key="stat.label" class="bg-[#111916] border border-white/5 p-8 rounded-[2.5rem] hover:border-primary/30 transition-all group shadow-2xl relative overflow-hidden">
+      <div v-for="stat in computedStats" :key="stat.label" class="bg-[#111916] border border-white/5 p-8 rounded-[2.5rem] hover:border-primary/30 transition-all group shadow-2xl relative overflow-hidden">
         <div class="absolute -right-8 -top-8 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"></div>
         <div class="flex items-center justify-between mb-8 relative z-10">
           <div class="w-14 h-14 rounded-[1.25rem] bg-[#0A0F0D] border border-white/10 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-inner" :class="stat.color">
@@ -35,112 +35,386 @@
       </div>
     </div>
 
-    <!-- Events Table Section -->
-    <div class="bg-[#111916] border border-white/5 rounded-[3rem] overflow-hidden shadow-2xl animate-fade-up [animation-delay:200ms]">
-      <div class="p-8 lg:p-10 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-        <h2 class="font-heading text-2xl font-black text-white flex items-center gap-3">
-          <PhCalendarCheck weight="fill" class="text-primary" /> Sự kiện của tôi
-        </h2>
-        <div class="flex gap-3 bg-[#0A0F0D] p-1.5 rounded-2xl border border-white/5">
-          <button class="px-5 py-2.5 rounded-xl bg-white/10 text-white font-bold text-[13px] shadow-sm transition-colors">Tất cả</button>
-          <button class="px-5 py-2.5 rounded-xl hover:bg-white/5 text-white/50 hover:text-white font-bold text-[13px] transition-colors">Đang diễn ra</button>
+    <!-- Events Section -->
+    <div class="flex flex-col gap-6 animate-fade-up [animation-delay:200ms]">
+      <!-- Filter and Search Bar -->
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <!-- Search Input -->
+        <div class="flex items-center gap-3 w-full lg:max-w-md">
+          <div class="flex-1 flex items-center gap-3 bg-[#111916] border border-white/5 focus-within:border-primary/30 rounded-2xl px-4 transition-all">
+            <PhMagnifyingGlass class="text-white/30 text-lg" weight="bold" />
+            <input 
+              type="text" 
+              v-model="searchKeyword" 
+              @keyup.enter="handleSearch"
+              placeholder="Tìm kiếm sự kiện" 
+              class="flex-1 bg-transparent border-none py-3.5 text-[14px] text-white outline-none placeholder:text-white/20 font-medium"
+            />
+          </div>
+          <BaseButton 
+            variant="primary" 
+            @click="handleSearch"
+            class="!py-3.5 !px-6 !rounded-2xl font-bold text-[14px] cursor-pointer"
+          >
+            Tìm kiếm
+          </BaseButton>
+        </div>
+
+        <!-- Status Tabs -->
+        <div class="flex items-center bg-[#111916] p-1.5 rounded-2xl border border-white/5 overflow-x-auto hide-scroll">
+          <button 
+            v-for="status in eventStatuses" 
+            :key="status.id"
+            @click="selectStatus(status.id)"
+            class="px-6 py-2.5 rounded-xl font-bold text-[13px] transition-all whitespace-nowrap cursor-pointer"
+            :class="activeStatusId === status.id ? 'bg-primary text-black shadow-md' : 'text-white/50 hover:text-white hover:bg-white/5'"
+          >
+            {{ getTabLabel(status) }}
+          </button>
         </div>
       </div>
 
-      <div class="p-6">
-        <BaseTable :columns="columns" :data="myEvents">
-          <template #image="{ row }">
-            <div class="w-16 h-16 rounded-[1rem] overflow-hidden border border-white/10 shadow-md">
-              <img :src="row.image" class="w-full h-full object-cover grayscale-[0.5] hover:grayscale-0 transition-all" />
-            </div>
-          </template>
+      <!-- Warning Banner -->
+      <Transition
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="opacity-0 -translate-y-2"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div 
+          v-if="isPendingApprovalActive" 
+          class="flex items-start gap-3 p-4 bg-[#FFC107]/10 border border-[#FFC107]/20 rounded-2xl text-[#FFC107] text-[13px] font-bold leading-relaxed shadow-sm"
+        >
+          <PhWarningCircle class="text-[#FFC107] text-lg flex-shrink-0 mt-0.5" weight="fill" />
+          <span>Lưu ý: Sự kiện đang chờ duyệt. Để đảm bảo tính bảo mật cho sự kiện của bạn, quyền truy cập vào trang chỉ dành cho chủ sở hữu và quản trị viên được ủy quyền</span>
+        </div>
+      </Transition>
 
-          <template #title="{ row }">
-            <div class="flex flex-col justify-center">
-              <span class="font-bold text-[15px] text-white">{{ row.title }}</span>
-              <span class="text-[12px] text-white/40 font-medium uppercase tracking-wider mt-1">{{ row.category }}</span>
+      <!-- Events List (Card Layout) -->
+      <div v-if="isLoading" class="flex flex-col gap-6">
+        <!-- Card Skeleton Loader -->
+        <div v-for="n in 3" :key="n" class="bg-[#111916] border border-white/5 rounded-3xl p-6 animate-pulse flex flex-col md:flex-row gap-6">
+          <div class="w-full md:w-[240px] aspect-[16/9] rounded-2xl bg-white/5 flex-shrink-0"></div>
+          <div class="flex-1 flex flex-col justify-between py-1 gap-4">
+            <div class="space-y-3">
+              <div class="h-6 bg-white/5 rounded-md w-3/4"></div>
+              <div class="h-4 bg-white/5 rounded-md w-1/2"></div>
+              <div class="h-4 bg-white/5 rounded-md w-2/3"></div>
             </div>
-          </template>
+            <div class="h-10 bg-white/5 rounded-xl w-full"></div>
+          </div>
+        </div>
+      </div>
 
-          <template #date="{ row }">
-            <div class="flex items-center gap-2 text-white/70 font-medium">
-              <PhCalendarBlank class="text-white/30" />
-              {{ formatDate(row.dateStart || row.date) }}
+      <div v-else-if="events.length === 0" class="py-24 flex flex-col items-center text-center bg-[#111916]/50 border border-white/5 rounded-[3rem]">
+        <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center text-4xl mb-6 shadow-inner text-white/20">
+          <PhMagnifyingGlass weight="duotone" />
+        </div>
+        <h3 class="text-xl font-bold font-heading text-white mb-2">Không tìm thấy sự kiện</h3>
+        <p class="text-white/50 max-w-xs mb-8">Bạn chưa có sự kiện nào ở trạng thái này hoặc từ khóa tìm kiếm không khớp.</p>
+      </div>
+
+      <div v-else class="flex flex-col gap-6">
+        <!-- Event Cards -->
+        <div 
+          v-for="event in events" 
+          :key="event.id" 
+          class="bg-[#111916] border border-white/5 hover:border-primary/20 rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-300 group hover:-translate-y-0.5"
+        >
+          <div class="p-6 md:p-8 flex flex-col md:flex-row gap-6 md:gap-8">
+            <!-- Event Cover Image -->
+            <div class="w-full md:w-[240px] aspect-[16/9] rounded-2xl overflow-hidden border border-white/5 bg-[#0A0F0D] flex-shrink-0 relative">
+              <img 
+                :src="event.coverImageUrl || 'https://picsum.photos/seed/event-placeholder/400/225'" 
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                @error="handleImageError"
+              />
             </div>
-          </template>
 
-          <template #tickets="{ row }">
-            <div class="flex flex-col gap-2 min-w-[120px]">
-              <div class="w-full h-2 bg-[#0A0F0D] border border-white/5 rounded-full overflow-hidden shadow-inner">
-                <div class="h-full bg-gradient-to-r from-primary to-[#00A355]" :style="{ width: (row.sold || 45) + '%' }"></div>
+            <!-- Event Details -->
+            <div class="flex-1 flex flex-col justify-between py-1">
+              <div>
+                <h3 
+                  @click="router.push(`/organizer/events/${event.id}`)"
+                  class="font-heading text-2xl font-black text-white group-hover:text-primary transition-colors line-clamp-1 mb-4 cursor-pointer hover:underline"
+                >
+                  {{ event.title }}
+                </h3>
+                
+                <div class="flex flex-col gap-3">
+                  <!-- Date -->
+                  <div class="flex items-center gap-2.5 text-white/70 text-[14px] font-bold">
+                    <PhCalendarBlank class="text-primary text-lg" weight="bold" />
+                    <span>{{ formatEventDate(event.startAt) }}</span>
+                  </div>
+
+                  <!-- Location -->
+                  <div class="flex items-start gap-2.5 text-white/50 text-[13px] font-medium leading-normal">
+                    <PhMapPin class="text-primary text-lg mt-0.5 flex-shrink-0" weight="fill" />
+                    <div class="flex flex-col">
+                      <span class="text-white/80 font-bold text-[14px]">{{ event.location?.venueName || 'Địa điểm tự chọn' }}</span>
+                      <span class="mt-0.5 text-white/40">{{ formatLocation(event.location) }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest text-white/50">
-                <span>Đã bán: <span class="text-white">{{ row.sold || 45 }}</span></span>
-                <span>/100</span>
-              </div>
             </div>
-          </template>
+          </div>
 
-          <template #status="{ row }">
-            <BaseBadge :variant="row.status === 'upcoming' ? 'primary' : 'secondary'" size="sm" class="uppercase tracking-widest">
-              {{ row.status === 'upcoming' ? 'Sắp diễn ra' : 'Hoàn thành' }}
-            </BaseBadge>
-          </template>
+          <!-- Bottom Actions -->
+          <div class="bg-[#182019] px-6 py-4 border-t border-white/5 flex flex-wrap items-center justify-center md:justify-start gap-y-3">
+            <template v-for="(action, aIdx) in eventActions" :key="action.label">
+              <button 
+                @click="handleAction(action, event)"
+                class="px-5 py-1 text-white/50 hover:text-white transition-colors text-[13px] font-bold flex items-center gap-2 cursor-pointer"
+              >
+                <component :is="action.icon" class="text-lg" weight="bold" />
+                {{ action.label }}
+              </button>
+              <div 
+                v-if="aIdx < eventActions.length - 1" 
+                class="hidden sm:block h-4 w-px bg-white/10 mx-2"
+              ></div>
+            </template>
+          </div>
+        </div>
 
-          <template #actions="{ row }">
-            <div class="flex items-center justify-end gap-2">
-              <button class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center text-white/50 hover:text-white transition-colors cursor-pointer">
-                <PhPencilSimple weight="bold" />
-              </button>
-              <button class="w-10 h-10 rounded-xl bg-white/5 hover:bg-danger/10 border border-white/5 hover:border-danger/20 flex items-center justify-center text-white/50 hover:text-danger transition-colors cursor-pointer">
-                <PhTrash weight="bold" />
-              </button>
-            </div>
-          </template>
-        </BaseTable>
+        <!-- Custom Pagination Component -->
+        <div v-if="totalPages > 1" class="flex items-center justify-end gap-2 mt-8">
+          <!-- Previous Page Button -->
+          <button 
+            @click="changePage(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-40 disabled:hover:bg-white/5 disabled:hover:text-white/50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <PhCaretLeft weight="bold" class="text-lg" />
+          </button>
+
+          <!-- Page Number Buttons -->
+          <button 
+            v-for="page in visiblePages" 
+            :key="page"
+            @click="changePage(page)"
+            class="w-10 h-10 rounded-xl font-bold text-[14px] transition-all cursor-pointer"
+            :class="currentPage === page ? 'bg-primary text-black font-black shadow-glow' : 'bg-white/5 border border-white/5 text-white/70 hover:bg-white/10 hover:text-white'"
+          >
+            {{ page }}
+          </button>
+
+          <!-- Next Page Button -->
+          <button 
+            @click="changePage(currentPage + 1)"
+            :disabled="currentPage === totalPages"
+            class="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-40 disabled:hover:bg-white/5 disabled:hover:text-white/50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <PhCaretRight weight="bold" class="text-lg" />
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, markRaw } from 'vue'
+import { ref, computed, onMounted, markRaw } from 'vue'
+import { useRouter } from 'vue-router'
 import { store } from '../stores/eventStore'
 import BaseButton from '../components/ui/BaseButton.vue'
-import BaseTable from '../components/ui/BaseTable.vue'
-import BaseBadge from '../components/ui/BaseBadge.vue'
+import { getOrganizerEvents, getEventStatuses } from '../services/organizer.service'
 import { 
   PhSuitcase, PhPlus, PhTicket, PhTrendUp, PhCurrencyCircleDollar, 
-  PhEye, PhCalendarCheck, PhCalendarBlank, PhPencilSimple, PhTrash 
+  PhEye, PhCalendarBlank, PhPencilSimple, PhMagnifyingGlass, PhMapPin, 
+  PhChartPie, PhUsers, PhReceipt, PhArmchair, PhCaretLeft, PhCaretRight, 
+  PhWarningCircle 
 } from '@phosphor-icons/vue'
 
-const stats = [
-  { label: 'Tổng sự kiện', value: '12', icon: markRaw(PhTicket), trend: '12', color: 'text-primary' },
-  { label: 'Vé đã bán', value: '450', icon: markRaw(PhTrendUp), trend: '8', color: 'text-info' },
-  { label: 'Doanh thu', value: '67.5M', icon: markRaw(PhCurrencyCircleDollar), trend: '15', color: 'text-warning' },
-  { label: 'Lượt xem', value: '2.4K', icon: markRaw(PhEye), trend: '24', color: 'text-[#f43f5e]' },
-]
+const router = useRouter()
+const isLoading = ref(true)
+const events = ref([])
+const eventStatuses = ref([])
+const activeStatusId = ref(1) // Default to 'Chờ duyệt' (ID 1)
+const searchKeyword = ref('')
+const currentPage = ref(1)
+const totalPages = ref(1)
+const totalCount = ref(0)
+const pageSize = 12
 
-const columns = [
-  { key: 'image', label: '', class: 'w-20' },
-  { key: 'title', label: 'Tên sự kiện' },
-  { key: 'date', label: 'Thời gian' },
-  { key: 'tickets', label: 'Bán vé', class: 'hidden md:table-cell' },
-  { key: 'status', label: 'Trạng thái' },
-  { key: 'actions', label: '', class: 'text-right w-24' },
-]
-
-const myEvents = computed(() => {
-  return store.events.slice(0, 5).map(e => ({
-    ...e,
-    status: Math.random() > 0.3 ? 'upcoming' : 'completed',
-    sold: Math.floor(Math.random() * 80) + 10
-  }))
+// Dynamically fetch event statuses and initial events
+onMounted(async () => {
+  try {
+    const statusesRes = await getEventStatuses()
+    if (statusesRes && statusesRes.success && statusesRes.data) {
+      eventStatuses.value = statusesRes.data
+      if (eventStatuses.value.length > 0) {
+        const pendingStatus = eventStatuses.value.find(s => s.id === 1)
+        activeStatusId.value = pendingStatus ? pendingStatus.id : eventStatuses.value[0].id
+      }
+    } else {
+      // Fallback local status enums if API response is invalid or empty
+      eventStatuses.value = [
+        { id: 1, name: 'Chờ duyệt' },
+        { id: 2, name: 'Đã xuất bản' },
+        { id: 3, name: 'Đã qua' }
+      ]
+    }
+  } catch (err) {
+    console.error('Error fetching event statuses:', err)
+    eventStatuses.value = [
+      { id: 1, name: 'Chờ duyệt' },
+      { id: 2, name: 'Đã xuất bản' },
+      { id: 3, name: 'Đã qua' }
+    ]
+  }
+  
+  await fetchData()
 })
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+const fetchData = async () => {
+  isLoading.value = true
+  try {
+    const params = {
+      Status: activeStatusId.value,
+      PageNumber: currentPage.value,
+      PageSize: pageSize
+    }
+    if (searchKeyword.value.trim()) {
+      params.Search = searchKeyword.value.trim()
+    }
+    
+    const res = await getOrganizerEvents(params)
+    if (res && res.success && res.data) {
+      events.value = res.data.data || []
+      totalPages.value = res.data.totalPages || 1
+      totalCount.value = res.data.totalCount || 0
+      currentPage.value = res.data.pageNumber || 1
+    } else {
+      events.value = []
+      totalPages.value = 1
+      totalCount.value = 0
+    }
+  } catch (err) {
+    console.error('Error fetching events:', err)
+    events.value = []
+    totalPages.value = 1
+    totalCount.value = 0
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Stats computed dynamically
+const computedStats = computed(() => {
+  return [
+    { label: 'Tổng sự kiện', value: totalCount.value.toString(), icon: markRaw(PhTicket), trend: '12', color: 'text-primary' },
+    { label: 'Vé đã bán', value: '450', icon: markRaw(PhTrendUp), trend: '8', color: 'text-info' },
+    { label: 'Doanh thu', value: '67.5M', icon: markRaw(PhCurrencyCircleDollar), trend: '15', color: 'text-warning' },
+    { label: 'Lượt xem', value: '2.4K', icon: markRaw(PhEye), trend: '24', color: 'text-[#f43f5e]' },
+  ]
+})
+
+// Tab label mapper (maps API response status names to preferred UI names)
+const getTabLabel = (status) => {
+  if (status.id === 2) return 'Sắp tới' // Maps 'Đã xuất bản' to 'Sắp tới' to match the design
+  return status.name
+}
+
+const isPendingApprovalActive = computed(() => {
+  return activeStatusId.value === 1
+})
+
+const handleSearch = () => {
+  currentPage.value = 1
+  fetchData()
+}
+
+const selectStatus = (id) => {
+  activeStatusId.value = id
+  currentPage.value = 1
+  fetchData()
+}
+
+const changePage = (page) => {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+  fetchData()
+}
+
+// Visible pages for pagination
+const visiblePages = computed(() => {
+  const pages = []
+  for (let i = 1; i <= totalPages.value; i++) {
+    pages.push(i)
+  }
+  return pages
+})
+
+// Format Date: e.g. "00:00, Thứ 6, 15 tháng 05 2026"
+const formatEventDate = (dateStr) => {
+  if (!dateStr) return 'TBA'
+  try {
+    const date = new Date(dateStr)
+    const time = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
+    
+    // Custom weekday formatting to match Vietnamese pattern
+    const dayOfWeek = date.getDay()
+    const weekdayMap = {
+      0: 'Chủ nhật',
+      1: 'Thứ 2',
+      2: 'Thứ 3',
+      3: 'Thứ 4',
+      4: 'Thứ 5',
+      5: 'Thứ 6',
+      6: 'Thứ 7'
+    }
+    const weekday = weekdayMap[dayOfWeek]
+    
+    const day = date.getDate().toString().padStart(2, '0')
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
+    const year = date.getFullYear()
+    
+    return `${time}, ${weekday}, ${day} tháng ${month} ${year}`
+  } catch (e) {
+    return dateStr
+  }
+}
+
+// Join location info
+const formatLocation = (loc) => {
+  if (!loc) return 'Chưa xác định'
+  const parts = []
+  if (loc.addressLine) parts.push(loc.addressLine)
+  if (loc.ward) parts.push(loc.ward)
+  if (loc.district) parts.push(loc.district)
+  if (loc.provinceCity) parts.push(loc.provinceCity)
+  return parts.join(', ')
+}
+
+const handleImageError = (e) => {
+  e.target.src = 'https://picsum.photos/seed/event-placeholder/400/225'
+}
+
+// Card bottom actions
+const eventActions = [
+  { label: 'Tổng quan', icon: markRaw(PhChartPie) },
+  { label: 'Đơn hàng', icon: markRaw(PhReceipt) }
+]
+
+const handleAction = (action, event) => {
+  store.toast = { 
+    message: `Chức năng "${action.label}" cho sự kiện "${event.title}" đang được phát triển!`, 
+    icon: '✨' 
+  }
 }
 </script>
+
+<style scoped>
+.hide-scroll::-webkit-scrollbar {
+  display: none;
+}
+.hide-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>

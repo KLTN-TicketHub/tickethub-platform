@@ -36,7 +36,7 @@ namespace Catalog.Application.Common.DTOs.Events
 
         public byte[] RowVersion { get; set; }
 
-        public EventLocationDto Location { get; set; }
+        public EventLocationDto? Location { get; set; }
 
         public List<TicketTypeDto> TicketTypes { get; set; }
 

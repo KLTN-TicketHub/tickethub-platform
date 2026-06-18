@@ -27,7 +27,6 @@ namespace Catalog.Application.Features.Events.Queries.GetByIdForOrganizer
 
         private async Task<EventDto> GetEventByIdForOrganizerAsync(Guid id, CancellationToken cancellation = default)
         {
-
             return await _unitOfWork.EventRepository.GetOneUntrackedAsync(
                 filter: e => e.Id == id && e.OrganizerId == _currentUserService.UserId && !e.IsDeleted,
                 selector: e => new EventDto
@@ -35,7 +34,7 @@ namespace Catalog.Application.Features.Events.Queries.GetByIdForOrganizer
                     Id = id,
                     SeatMapId = e.SeatMapId,
                     CategoryId = e.CategoryId,
-                    CategoryName = e.Category.CategoryName,
+                    CategoryName = e.Category!.CategoryName,
                     Title = e.Title,
                     Slug = e.Slug,
                     Description = e.Description,
@@ -51,8 +50,35 @@ namespace Catalog.Application.Features.Events.Queries.GetByIdForOrganizer
                     Location = new EventLocationDto
                     {
                         VenueName = e.Location.VenueName,
-
-                    }
+                        AddressLine = e.Location.AddressLine,
+                        Ward = e.Location.Ward,
+                        District = e.Location.District,
+                        ProvinceCity = e.Location.ProvinceCity,
+                        Country = e.Location.Country
+                    },
+                    OrganizerProfile = new Common.DTOs.Profiles.OrganizerProfileDto
+                    {
+                        Id = e.Organizer!.Id,
+                        OrganizerName = e.Organizer.OrganizerName,
+                        ImageUrl = e.Organizer.ImageUrl != null ? _fileService.GetAbsoluteUrl(e.Organizer.ImageUrl) : null,
+                        Email = e.Organizer.Email,
+                        PhoneNumber = e.Organizer.PhoneNumber,
+                        CreatedAt = e.Organizer.CreatedAt
+                    },
+                    TicketTypes = e.TicketTypes.Select(tt => new TicketTypeDto
+                    {
+                        Id = tt.Id,
+                        ZoneId = tt.ZoneId,
+                        TicketTypeName = tt.TicketTypeName,
+                        Description = tt.Description,
+                        Price = tt.Price,
+                        PublishedQuota = tt.PublishedQuota,
+                        MaxQtyQuota = tt.MaxQtyQuota,
+                        MinQtyQuota = tt.MinQtyQuota,
+                        DisplayOrder = tt.DisplayOrder,
+                        Status = tt.Status.GetDisplayName(),
+                        RowVersion = tt.RowVersion,
+                    }).OrderBy(tt => tt.DisplayOrder).ToList()
                 }) ?? throw new NotFoundException($"Không tìm thấy sự kiện nòa với id {id}");
         }
     }
