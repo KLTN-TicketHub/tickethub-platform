@@ -78,7 +78,8 @@ namespace Catalog.Application.Features.Events.Queries.GetByIdForOrganizer
                         DisplayOrder = tt.DisplayOrder,
                         Status = tt.Status.GetDisplayName(),
                         RowVersion = tt.RowVersion,
-                    }).OrderBy(tt => tt.DisplayOrder).ToList()
+                    }).OrderBy(tt => tt.DisplayOrder).ToList(),
+                    ReasonForRejection = e.Status == Domain.Enums.EventStatus.Rejected ? e.Approval.Reason : null
                 }) ?? throw new NotFoundException($"Không tìm thấy sự kiện nòa với id {id}");
         }
     }

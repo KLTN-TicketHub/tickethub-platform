@@ -181,36 +181,48 @@
           </div>
         </div>
 
-        <!-- Custom Pagination Component -->
-        <div v-if="totalPages > 1" class="flex items-center justify-end gap-2 mt-8">
-          <!-- Previous Page Button -->
-          <button 
-            @click="changePage(currentPage - 1)"
-            :disabled="currentPage === 1"
-            class="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-40 disabled:hover:bg-white/5 disabled:hover:text-white/50 disabled:cursor-not-allowed cursor-pointer"
-          >
-            <PhCaretLeft weight="bold" class="text-lg" />
-          </button>
+        <!-- Premium Pagination Component -->
+        <div v-if="totalPages > 1" class="flex items-center justify-between mt-12 px-6 py-4 bg-[#111916]/80 backdrop-blur-md border border-white/5 rounded-[2rem] shadow-2xl">
+          <div class="text-[13px] font-medium text-white/40">
+            Trang <span class="text-white font-bold">{{ currentPage }}</span> / <span class="text-white font-bold">{{ totalPages }}</span>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <!-- Previous Page Button -->
+            <button 
+              @click="changePage(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-transparent hover:bg-white/5 transition-all disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer"
+            >
+              <PhCaretLeft weight="bold" class="text-[16px] text-white/50 group-hover:text-white group-hover:-translate-x-0.5 transition-all" />
+              <span class="text-[13px] font-bold text-white/50 group-hover:text-white transition-colors">Trước</span>
+            </button>
 
-          <!-- Page Number Buttons -->
-          <button 
-            v-for="page in visiblePages" 
-            :key="page"
-            @click="changePage(page)"
-            class="w-10 h-10 rounded-xl font-bold text-[14px] transition-all cursor-pointer"
-            :class="currentPage === page ? 'bg-primary text-black font-black shadow-glow' : 'bg-white/5 border border-white/5 text-white/70 hover:bg-white/10 hover:text-white'"
-          >
-            {{ page }}
-          </button>
+            <!-- Page Numbers -->
+            <div class="flex items-center gap-1.5">
+              <template v-for="(page, index) in computedVisiblePages" :key="index">
+                <span v-if="page === '...'" class="w-10 text-center text-white/30 font-bold tracking-widest">...</span>
+                <button 
+                  v-else
+                  @click="changePage(page)"
+                  class="w-10 h-10 flex items-center justify-center rounded-xl font-bold text-[14px] transition-all cursor-pointer relative"
+                  :class="currentPage === page ? 'text-black bg-primary shadow-[0_0_20px_rgba(0,200,83,0.3)] scale-110' : 'text-white/60 hover:text-white hover:bg-white/10'"
+                >
+                  {{ page }}
+                </button>
+              </template>
+            </div>
 
-          <!-- Next Page Button -->
-          <button 
-            @click="changePage(currentPage + 1)"
-            :disabled="currentPage === totalPages"
-            class="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-40 disabled:hover:bg-white/5 disabled:hover:text-white/50 disabled:cursor-not-allowed cursor-pointer"
-          >
-            <PhCaretRight weight="bold" class="text-lg" />
-          </button>
+            <!-- Next Page Button -->
+            <button 
+              @click="changePage(currentPage + 1)"
+              :disabled="currentPage === totalPages"
+              class="group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-transparent hover:bg-white/5 transition-all disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer"
+            >
+              <span class="text-[13px] font-bold text-white/50 group-hover:text-white transition-colors">Sau</span>
+              <PhCaretRight weight="bold" class="text-[16px] text-white/50 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -341,13 +353,21 @@ const changePage = (page) => {
   fetchData()
 }
 
-// Visible pages for pagination
-const visiblePages = computed(() => {
-  const pages = []
-  for (let i = 1; i <= totalPages.value; i++) {
-    pages.push(i)
+// Visible pages for pagination with ellipsis
+const computedVisiblePages = computed(() => {
+  const current = currentPage.value
+  const total = totalPages.value
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1)
   }
-  return pages
+  
+  if (current <= 4) {
+    return [1, 2, 3, 4, 5, '...', total]
+  }
+  if (current >= total - 3) {
+    return [1, '...', total - 4, total - 3, total - 2, total - 1, total]
+  }
+  return [1, '...', current - 1, current, current + 1, '...', total]
 })
 
 // Format Date: e.g. "00:00, Thứ 6, 15 tháng 05 2026"

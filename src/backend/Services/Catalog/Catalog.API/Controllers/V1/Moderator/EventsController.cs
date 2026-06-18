@@ -2,7 +2,10 @@ using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Application.Features.Events.Commands.ReviewEvent;
+using Catalog.Application.Features.Events.Queries.GetEventsForModerator;
 using Catalog.Application.Features.Events.Requests;
+using Catalog.Application.Common.DTOs.Events;
+using BuildingBlocks.Contracts.Models.Pagination;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -43,6 +46,21 @@ namespace Catalog.API.Controllers.V1.Moderator
             {
                 Success = true,
                 Message = request.IsApproved ? "Đã duyệt sự kiện thành công." : "Đã từ chối sự kiện thành công.",
+                Data = result
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEventsAsync(
+            [FromQuery] GetEventsForModeratorRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _sender.Send(new GetEventsForModeratorQuery(request), cancellationToken);
+
+            return Ok(new ApiResponse<PaginatedResult<ModeratorEventListItemDto>>
+            {
+                Success = true,
+                Message = "Lấy danh sách sự kiện thành công.",
                 Data = result
             });
         }

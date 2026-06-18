@@ -25,8 +25,16 @@
             <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/20 border border-primary/30 backdrop-blur-md shadow-[0_0_20px_rgba(0,200,83,0.15)]">
               <span class="text-[11px] font-black text-primary uppercase tracking-[0.2em]">{{ event.categoryName || 'Sự kiện' }}</span>
             </div>
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md">
-              <span class="text-[11px] font-black text-white uppercase tracking-[0.2em]">{{ event.status || 'Chờ duyệt' }}</span>
+            <div 
+              class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full backdrop-blur-md transition-colors"
+              :class="event.status === 'Bị từ chối' ? 'bg-[#ef4444]/20 border border-[#ef4444]/30 shadow-[0_0_20px_rgba(239,68,68,0.15)]' : 'bg-white/10 border border-white/20'"
+            >
+              <span 
+                class="text-[11px] font-black uppercase tracking-[0.2em]"
+                :class="event.status === 'Bị từ chối' ? 'text-[#ef4444]' : 'text-white'"
+              >
+                {{ event.status || 'Chờ duyệt' }}
+              </span>
             </div>
           </div>
 
@@ -54,6 +62,35 @@
         
         <!-- Left Column: Details & Seatmap -->
         <div class="space-y-16 min-w-0">
+          
+          <!-- Rejection Banner -->
+          <section v-if="event.status === 'Bị từ chối' && event.reasonForRejection" class="animate-fade-up [animation-delay:100ms] -mb-4">
+            <div class="relative overflow-hidden rounded-[2.5rem] p-8 border border-[#ef4444]/30 bg-[#ef4444]/5 shadow-[0_20px_40px_-15px_rgba(239,68,68,0.1)]">
+              <div class="absolute -right-12 -top-12 w-64 h-64 bg-[#ef4444]/20 blur-[80px] pointer-events-none rounded-full"></div>
+              <div class="flex flex-col sm:flex-row gap-6 items-start relative z-10">
+                <div class="w-14 h-14 rounded-2xl bg-[#ef4444]/10 flex items-center justify-center text-[#ef4444] shrink-0 border border-[#ef4444]/20 shadow-inner">
+                  <PhWarningCircle weight="fill" class="text-3xl" />
+                </div>
+                <div class="flex-1">
+                  <h3 class="font-heading text-2xl font-black text-[#ef4444] mb-2 uppercase tracking-tight">Sự kiện bị từ chối phê duyệt</h3>
+                  <p class="text-white/70 text-[15px] leading-relaxed mb-6">
+                    Rất tiếc, sự kiện của bạn đã không được đội ngũ kiểm duyệt chấp thuận. Vui lòng xem lại lý do chi tiết bên dưới, chỉnh sửa lại thông tin và gửi yêu cầu phê duyệt lại.
+                  </p>
+                  
+                  <div class="relative p-5 rounded-2xl bg-[#0A0F0D]/80 border border-[#ef4444]/10 shadow-inner overflow-hidden">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#ef4444]/50"></div>
+                    <div class="flex items-center gap-2 mb-2">
+                      <span class="text-[11px] font-black text-[#ef4444] uppercase tracking-widest">Lý do từ chối</span>
+                    </div>
+                    <p class="text-white/90 text-[15px] font-medium leading-relaxed italic">
+                      "{{ event.reasonForRejection }}"
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <!-- About Section -->
           <section class="animate-fade-up [animation-delay:200ms]">
             <div class="flex items-center gap-6 mb-8">

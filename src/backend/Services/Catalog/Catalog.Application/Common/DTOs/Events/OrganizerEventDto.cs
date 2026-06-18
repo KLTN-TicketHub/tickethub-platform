@@ -1,8 +1,11 @@
-using Catalog.Application.Common.DTOs.Profiles;
+﻿using Catalog.Application.Common.DTOs.Profiles;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Catalog.Application.Common.DTOs.Events
 {
-    public class EventDto
+    public class OrganizerEventDto
     {
         public Guid Id { get; set; }
 
@@ -42,6 +45,6 @@ namespace Catalog.Application.Common.DTOs.Events
 
         public OrganizerProfileDto OrganizerProfile { get; set; }
 
-        public string? ReasonForRejection { get; set; }
+
     }
 }

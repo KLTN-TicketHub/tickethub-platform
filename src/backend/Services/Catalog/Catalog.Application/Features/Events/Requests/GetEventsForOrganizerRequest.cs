@@ -5,6 +5,6 @@ namespace Catalog.Application.Features.Events.Requests
 {
     public class GetEventsForOrganizerRequest : PaginatedRequest
     {
-        public EventStatus Status { get; set; }
+        public EventStatus? Status { get; set; }
     }
 }
