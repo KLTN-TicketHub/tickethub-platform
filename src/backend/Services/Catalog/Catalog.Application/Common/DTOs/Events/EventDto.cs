@@ -8,6 +8,8 @@ namespace Catalog.Application.Common.DTOs.Events
 
         public Guid? SeatMapId { get; set; }
 
+        public Guid? VenueId { get; set; }
+
         public Guid CategoryId { get; set; }
 
         public string CategoryName { get; set; }

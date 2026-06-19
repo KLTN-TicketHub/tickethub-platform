@@ -10,6 +10,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Catalog.Application.Features.Events.Queries.GetByIdForModerator;
 
 namespace Catalog.API.Controllers.V1.Moderator
 {
@@ -61,6 +62,19 @@ namespace Catalog.API.Controllers.V1.Moderator
             {
                 Success = true,
                 Message = "Lấy danh sách sự kiện thành công.",
+                Data = result
+            });
+        }
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetEventByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            var result = await _sender.Send(new GetByIdForModeratorQuery(id), cancellationToken);
+
+            return Ok(new ApiResponse<EventDto>
+            {
+                Success = true,
+                Message = "Lấy thông tin sự kiện thành công.",
                 Data = result
             });
         }

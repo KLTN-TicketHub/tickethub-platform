@@ -44,6 +44,8 @@ namespace Catalog.Application.Common.Mappers
                 opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.SeatMapId,
                 opt => opt.MapFrom(src => src.SeatMapId))
+                .ForMember(dest => dest.VenueId,
+                opt => opt.MapFrom(src => src.SeatMap != null ? src.SeatMap.VenueId : (Guid?)null))
                 .ForMember(dest => dest.CategoryId,
                 opt => opt.MapFrom(src => src.CategoryId))
                 .ForMember(dest => dest.CategoryName,

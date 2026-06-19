@@ -53,6 +53,7 @@ export const ORGANIZER_EVENT_DETAIL = (id) => `/catalog/organizer/events/${id}`
 export const UPLOAD_SVG = '/catalog/common/files/upload-svg'
 export const UPLOAD_COVER_IMAGE = '/catalog/common/files/upload-cover-image'
 export const EVENT_STATUSES_LOOKUP = '/catalog/common/lookup/event-statuses'
+export const EVENT_STATUSES_FOR_MODERATOR = '/catalog/common/lookup/event-statuses-for-moderator'
 export const COMMON_EVENT_CATEGORIES = '/event-categories'
 
 // Locations (Vietnam Provinces API)

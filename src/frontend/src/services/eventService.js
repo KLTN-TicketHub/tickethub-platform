@@ -4,7 +4,7 @@
 // with actual fetch/axios calls. The function signatures stay the same.
 
 import api from './api/axios'
-import { ORGANIZER_EVENT_DETAIL, MODERATOR_EVENT_DETAIL, ORGANIZER_EVENTS_LIST, MODERATOR_EVENTS_LIST } from './api/endpoints'
+import { ORGANIZER_EVENT_DETAIL, MODERATOR_EVENT_DETAIL, ORGANIZER_EVENTS_LIST, MODERATOR_EVENTS_LIST, EVENT_STATUSES_FOR_MODERATOR, MODERATOR_EVENT_REVIEW } from './api/endpoints'
 import { MOCK_EVENTS } from '../mocks/eventMock'
 
 // In-memory store that simulates a database
@@ -170,3 +170,13 @@ export async function getModeratorEvents(params) {
   return response.data
 }
 
+export async function getEventStatusesForModerator() {
+  const response = await api.get(EVENT_STATUSES_FOR_MODERATOR)
+  return response.data
+}
+
+export async function reviewModeratorEvent(id, payload) {
+  // payload: { isApproved: boolean, reason: string }
+  const response = await api.post(MODERATOR_EVENT_REVIEW(id), payload)
+  return response.data
+}

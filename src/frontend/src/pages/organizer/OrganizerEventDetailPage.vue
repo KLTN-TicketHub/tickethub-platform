@@ -285,7 +285,7 @@ import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Stage as VStage, Layer as VLayer, Rect as VRect, Path as VPath, Text as VText, Circle as VCircle } from 'vue-konva'
 import { getOrganizerEventDetail } from '../../services/eventService'
-import { getOrganizerVenues, getOrganizerSeatMapDetail } from '../../services/venue.service'
+import { getOrganizerSeatMapDetail } from '../../services/venue.service'
 import { store } from '../../stores/eventStore'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import { 
@@ -329,15 +329,9 @@ const loadSeatMapLayout = async () => {
   isLoadingSeatMap.value = true
   seatMapError.value = ''
   try {
-    const venueName = event.value.location?.venueName
-    if (!venueName) throw new Error('Sự kiện không có cấu hình thông tin địa điểm.')
+    const venueId = event.value.venueId
+    if (!venueId) throw new Error('Sự kiện không có thông tin venueId hợp lệ.')
     
-    const venuesRes = await getOrganizerVenues({ Search: venueName, PageNumber: 1, PageSize: 10 })
-    if (!venuesRes || !venuesRes.success || !venuesRes.data || venuesRes.data.data.length === 0) {
-      throw new Error(`Địa điểm "${venueName}" chưa được cấu hình sơ đồ ghế ngồi trên hệ thống.`)
-    }
-    
-    const venueId = venuesRes.data.data[0].id
     const seatMapRes = await getOrganizerSeatMapDetail(venueId, event.value.seatMapId)
     if (seatMapRes && seatMapRes.success && seatMapRes.data) {
       seatMapData.value = seatMapRes.data

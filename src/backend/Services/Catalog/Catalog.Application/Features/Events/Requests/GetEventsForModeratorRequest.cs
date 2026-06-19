@@ -4,7 +4,7 @@ namespace Catalog.Application.Features.Events.Requests
 {
     public class GetEventsForModeratorRequest : PaginatedRequest
     {
-        public EventStatusForModerator Status { get; set; }
+        public EventStatusForModerator? Status { get; set; }
     }
     public enum EventStatusForModerator
     {

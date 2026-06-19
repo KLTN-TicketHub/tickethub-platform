@@ -5,30 +5,28 @@ using Catalog.Application.Common.DTOs.Events;
 using Catalog.Domain.Interfaces;
 using MediatR;
 
-namespace Catalog.Application.Features.Events.Queries.GetByIdForOrganizer
+namespace Catalog.Application.Features.Events.Queries.GetByIdForModerator
 {
-    public class GetByIdForOrganizerQueryHandler : IRequestHandler<GetByIdForOrganizerQuery, EventDto>
+    public class GetByIdForModeratorQueryHandler : IRequestHandler<GetByIdForModeratorQuery, EventDto>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ICurrentUserService _currentUserService;
         private readonly IFileService _fileService;
 
-        public GetByIdForOrganizerQueryHandler(IUnitOfWork unitOfWork, ICurrentUserService currentUserService, IFileService fileService)
+        public GetByIdForModeratorQueryHandler(IUnitOfWork unitOfWork, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
-            _currentUserService = currentUserService;
             _fileService = fileService;
         }
 
-        public async Task<EventDto> Handle(GetByIdForOrganizerQuery query, CancellationToken cancellationToken = default)
+        public async Task<EventDto> Handle(GetByIdForModeratorQuery query, CancellationToken cancellationToken = default)
         {
-            return await GetEventByIdForOrganizerAsync(query.Id, cancellationToken);
+            return await GetEventByIdForModeratorAsync(query.Id, cancellationToken);
         }
 
-        private async Task<EventDto> GetEventByIdForOrganizerAsync(Guid id, CancellationToken cancellation = default)
+        private async Task<EventDto> GetEventByIdForModeratorAsync(Guid id, CancellationToken cancellation = default)
         {
             return await _unitOfWork.EventRepository.GetOneUntrackedAsync(
-                filter: e => e.Id == id && e.OrganizerId == _currentUserService.UserId && !e.IsDeleted,
+                filter: e => e.Id == id && !e.IsDeleted,
                 selector: e => new EventDto
                 {
                     Id = id,
