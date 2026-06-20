@@ -1,3 +1,5 @@
+using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Contracts.Events.Email;
 using BuildingBlocks.Domain.Exceptions;
 using Catalog.Application.Features.Events.Requests;
 using Catalog.Domain.Entities;
@@ -5,17 +7,18 @@ using Catalog.Domain.Enums;
 using Catalog.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Catalog.Application.Features.Events.Commands.ReviewEvent
 {
     public class ReviewEventCommandHandler : IRequestHandler<ReviewEventCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IEventPublisher _eventPublisher;
 
-        public ReviewEventCommandHandler(IUnitOfWork unitOfWork)
+        public ReviewEventCommandHandler(IUnitOfWork unitOfWork, IEventPublisher eventPublisher)
         {
             _unitOfWork = unitOfWork;
+            _eventPublisher = eventPublisher;
         }
 
         public async Task<bool> Handle(ReviewEventCommand command, CancellationToken cancellationToken)
@@ -37,6 +40,7 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
         {
             Event eventEntity = await _unitOfWork.EventRepository.GetOneUntrackedAsync<Event>(
                 filter: e => e.Id == eventId && !e.IsDeleted,
+                include: q => q.Include(e => e.Organizer!),
                 cancellation: cancellation)
                 ?? throw new NotFoundException($"Không tìm thấy sự kiện với ID {eventId}.");
 
@@ -49,6 +53,16 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
             eventEntity.Review(request.IsApproved, reviewerUserId, reviewerName, request.Reason);
 
             await _unitOfWork.EventRepository.UpdateAsync(eventEntity, cancellation);
+
+            _eventPublisher.Publish(new EventReviewedEvent
+            {
+                EventId = eventEntity.Id,
+                EventTitle = eventEntity.Title,
+                OrganizerEmail = eventEntity.Organizer?.Email ?? string.Empty,
+                OrganizerName = eventEntity.Organizer?.OrganizerName ?? string.Empty,
+                IsApproved = request.IsApproved,
+                Reason = request.Reason
+            });
 
             return true;
         }

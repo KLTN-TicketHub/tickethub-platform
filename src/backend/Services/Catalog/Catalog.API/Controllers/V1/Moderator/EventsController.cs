@@ -1,16 +1,16 @@
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Constants;
+using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
+using Catalog.Application.Common.DTOs.Events;
 using Catalog.Application.Features.Events.Commands.ReviewEvent;
+using Catalog.Application.Features.Events.Queries.GetByIdForModerator;
 using Catalog.Application.Features.Events.Queries.GetEventsForModerator;
 using Catalog.Application.Features.Events.Requests;
-using Catalog.Application.Common.DTOs.Events;
-using BuildingBlocks.Contracts.Models.Pagination;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Catalog.Application.Features.Events.Queries.GetByIdForModerator;
 
 namespace Catalog.API.Controllers.V1.Moderator
 {
@@ -38,7 +38,7 @@ namespace Catalog.API.Controllers.V1.Moderator
         {
             Guid reviewerId = _currentUserService.UserId
                 ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người duyệt.");
-            
+
             string? reviewerName = _currentUserService.UserName;
 
             var result = await _sender.Send(new ReviewEventCommand(id, request, reviewerId, reviewerName), cancellationToken);

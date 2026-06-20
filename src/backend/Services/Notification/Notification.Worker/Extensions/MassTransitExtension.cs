@@ -14,6 +14,7 @@ namespace Notification.Worker.Extensions
                 x.AddConsumer<SendEmailCodeConsumer>();
                 x.AddConsumer<SendModeratorWelcomeEmailConsumer>();
                 x.AddConsumer<SendOrganizerWelcomeEmailConsumer>();
+                x.AddConsumer<SendEventReviewedEmailConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Catalog.Application.Common.DTOs.Events
+﻿namespace Catalog.Application.Common.DTOs.Events
 {
     public class ModeratorEventListItemDto
     {
