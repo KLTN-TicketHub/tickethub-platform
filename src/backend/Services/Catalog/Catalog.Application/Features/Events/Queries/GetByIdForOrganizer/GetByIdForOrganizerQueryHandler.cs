@@ -66,30 +66,30 @@ namespace Catalog.Application.Features.Events.Queries.GetByIdForOrganizer
                         PhoneNumber = e.Organizer.PhoneNumber,
                         CreatedAt = e.Organizer.CreatedAt
                     },
-                    TicketTypes = e.TicketTypes.Select(tt => new TicketTypeDto
-                    {
-                        Id = tt.Id,
-                        ZoneId = tt.ZoneId,
-                        TicketTypeName = tt.TicketTypeName,
-                        Description = tt.Description,
-                        Price = tt.Price,
-                        PublishedQuota = tt.PublishedQuota,
-                        MaxQtyQuota = tt.MaxQtyQuota,
-                        MinQtyQuota = tt.MinQtyQuota,
-                        DisplayOrder = tt.DisplayOrder,
-                        Status = tt.Status.GetDisplayName(),
-                        RowVersion = tt.RowVersion,
-                    }).OrderBy(tt => tt.DisplayOrder).ToList(),
                     Showtimes = e.ShowTimes.Select(st => new ShowtimeDto
                     {
                         Id = st.Id,
                         EventId = st.EventId,
                         StartAt = st.StartAt,
                         EndAt = st.EndAt,
-                        Status = st.Status.GetDisplayName()
+                        Status = st.Status.GetDisplayName(),
+                        TicketTypes = st.TicketTypes.Select(tt => new TicketTypeDto
+                        {
+                            Id = tt.Id,
+                            ZoneId = tt.ZoneId,
+                            TicketTypeName = tt.TicketTypeName,
+                            Description = tt.Description,
+                            Price = tt.Price,
+                            PublishedQuota = tt.PublishedQuota,
+                            MaxQtyQuota = tt.MaxQtyQuota,
+                            MinQtyQuota = tt.MinQtyQuota,
+                            DisplayOrder = tt.DisplayOrder,
+                            Status = tt.Status.GetDisplayName(),
+                            RowVersion = tt.RowVersion,
+                        }).OrderBy(tt => tt.DisplayOrder).ToList()
                     }).OrderBy(st => st.StartAt).ToList(),
                     ReasonForRejection = e.Status == Domain.Enums.EventStatus.Rejected ? e.Approval.Reason : null
-                }) ?? throw new NotFoundException($"Không tìm thấy sự kiện nòa với id {id}");
+                }) ?? throw new NotFoundException($"Không tìm thấy sự kiện nào với id {id}");
         }
     }
 }

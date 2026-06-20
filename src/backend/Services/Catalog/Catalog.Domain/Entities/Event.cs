@@ -41,9 +41,6 @@ namespace Catalog.Domain.Entities
 
         public EventLocation Location { get; set; }
 
-        private readonly List<TicketType> _ticketTypes = new List<TicketType>();
-        public IReadOnlyCollection<TicketType> TicketTypes => _ticketTypes.AsReadOnly();
-
         private readonly List<ShowTime> _showTimes = new List<ShowTime>();
         public IReadOnlyCollection<ShowTime> ShowTimes => _showTimes.AsReadOnly();
 
@@ -82,14 +79,14 @@ namespace Catalog.Domain.Entities
             Location = new EventLocation(venueName, addressLine, ward, district, provinceCity, country);
         }
 
-        public void AddShowTime(DateTime startAt, DateTime endAt)
+        public void AddShowTime(ShowTime showTime)
         {
-            _showTimes.Add(new ShowTime(startAt, endAt));
-        }
+            if (showTime == null) return;
+            showTime.EventId = Id;
+            _showTimes.Add(showTime);
 
-        public void AddTicketType(TicketType ticketType)
-        {
-            _ticketTypes.Add(ticketType);
+            StartAt = _showTimes.Min(s => s.StartAt);
+            EndAt = _showTimes.Max(s => s.EndAt);
         }
 
         public void Review(bool isApproved, Guid reviewerUserId, string? reviewerName, string? reason)

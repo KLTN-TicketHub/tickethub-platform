@@ -12,9 +12,9 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
 
             builder.HasKey(tt => tt.Id);
 
-            builder.HasOne(tt => tt.Event)
-                .WithMany(e => e.TicketTypes)
-                .HasForeignKey(tt => tt.EventId)
+            builder.HasOne(tt => tt.ShowTime)
+                .WithMany(st => st.TicketTypes)
+                .HasForeignKey(tt => tt.ShowTimeId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
 

@@ -5,8 +5,8 @@ namespace Catalog.Domain.Entities
 {
     public class TicketType : SoftDeleteEntity, IAggregateRoot
     {
-        public Guid EventId { get; set; }
-        public Event? Event { get; set; }
+        public Guid ShowTimeId { get; set; }
+        public ShowTime? ShowTime { get; set; }
 
         public Guid? ZoneId { get; set; }
         public Zone? Zone { get; set; }

@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Outbox;
 using BuildingBlocks.Infrastructure.Auditing;
 using Catalog.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ namespace Catalog.Infrastructure.Data.Contexts
         public DbSet<Row> Rows { get; set; }
         public DbSet<OrganizerSnapshot> OrganizerSnapshots { get; set; }
         public DbSet<ShowTime> ShowTimes { get; set; }
+        public DbSet<OutboxMessage> OutboxMessages { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

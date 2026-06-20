@@ -1,4 +1,4 @@
-﻿namespace Catalog.Application.Common.DTOs.Events
+namespace Catalog.Application.Common.DTOs.Events
 {
     public class ShowtimeDto
     {
@@ -11,5 +11,7 @@
         public DateTime EndAt { get; set; }
 
         public string Status { get; set; }
+
+        public List<TicketTypeDto> TicketTypes { get; set; } = new();
     }
 }

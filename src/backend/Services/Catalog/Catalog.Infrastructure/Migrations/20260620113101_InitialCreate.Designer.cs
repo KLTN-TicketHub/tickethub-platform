@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Catalog.Infrastructure.Migrations
 {
     [DbContext(typeof(CatalogDbContext))]
-    [Migration("20260620101359_AddShowTimeEntity")]
-    partial class AddShowTimeEntity
+    [Migration("20260620113101_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -624,8 +624,9 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<DateTime>("StartAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -665,9 +666,6 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("EventId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -690,6 +688,9 @@ namespace Catalog.Infrastructure.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
+                    b.Property<Guid>("ShowTimeId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -710,7 +711,7 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId");
+                    b.HasIndex("ShowTimeId");
 
                     b.HasIndex("ZoneId");
 
@@ -1006,9 +1007,9 @@ namespace Catalog.Infrastructure.Migrations
 
             modelBuilder.Entity("Catalog.Domain.Entities.TicketType", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.Event", "Event")
+                    b.HasOne("Catalog.Domain.Entities.ShowTime", "ShowTime")
                         .WithMany("TicketTypes")
-                        .HasForeignKey("EventId")
+                        .HasForeignKey("ShowTimeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1017,7 +1018,7 @@ namespace Catalog.Infrastructure.Migrations
                         .HasForeignKey("ZoneId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.Navigation("Event");
+                    b.Navigation("ShowTime");
 
                     b.Navigation("Zone");
                 });
@@ -1041,8 +1042,6 @@ namespace Catalog.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ShowTimes");
-
-                    b.Navigation("TicketTypes");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.EventCategory", b =>
@@ -1063,6 +1062,11 @@ namespace Catalog.Infrastructure.Migrations
             modelBuilder.Entity("Catalog.Domain.Entities.SeatMap", b =>
                 {
                     b.Navigation("Zones");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.ShowTime", b =>
+                {
+                    b.Navigation("TicketTypes");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.Venue", b =>

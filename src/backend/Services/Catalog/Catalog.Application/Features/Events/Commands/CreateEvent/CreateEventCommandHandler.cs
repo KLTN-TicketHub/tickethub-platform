@@ -49,19 +49,22 @@ namespace Catalog.Application.Features.Events.Commands.CreateEvent
                 if (!await _unitOfWork.SeatMapRepository.IsExistsAsync(nameof(SeatMap.Id), request.SeatMapId.Value))
                     throw new NotFoundException($"Không tìm thấy sơ đồ chỗ ngồi với ID {request.SeatMapId.Value}.");
 
-                foreach (var ticketTypeRequest in request.TicketTypes)
+                foreach (var showTimeRequest in request.ShowTimes)
                 {
-                    if (!ticketTypeRequest.ZoneId.HasValue)
-                        throw new ValidatorException(nameof(ticketTypeRequest.ZoneId),
-                            $"Loại vé '{ticketTypeRequest.TicketTypeName}' phải có mã khu vực khi sử dụng sơ đồ chỗ ngồi.");
+                    foreach (var ticketTypeRequest in showTimeRequest.TicketTypes)
+                    {
+                        if (!ticketTypeRequest.ZoneId.HasValue)
+                            throw new ValidatorException(nameof(ticketTypeRequest.ZoneId),
+                                $"Loại vé '{ticketTypeRequest.TicketTypeName}' phải có mã khu vực khi sử dụng sơ đồ chỗ ngồi.");
 
-                    Zone zone = await _unitOfWork.ZoneRepository.GetOneUntrackedAsync<Zone>(
-                        filter: z => z.Id == ticketTypeRequest.ZoneId && !z.IsDeleted && z.IsSalable,
-                        cancellation: cancellation) ?? throw new NotFoundException($"Không tìm thấy khu vực với ID {ticketTypeRequest.ZoneId.Value}.");
+                        Zone zone = await _unitOfWork.ZoneRepository.GetOneUntrackedAsync<Zone>(
+                            filter: z => z.Id == ticketTypeRequest.ZoneId && !z.IsDeleted && z.IsSalable,
+                            cancellation: cancellation) ?? throw new NotFoundException($"Không tìm thấy khu vực với ID {ticketTypeRequest.ZoneId.Value}.");
 
-                    if (ticketTypeRequest.PublishedQuota.HasValue && ticketTypeRequest.PublishedQuota.Value > zone.Capacity)
-                        throw new ValidatorException(nameof(ticketTypeRequest.PublishedQuota),
-                            $"Số lượng vé được xuất bản cho loại vé '{ticketTypeRequest.TicketTypeName}' không được vượt quá sức chứa của khu vực ({zone.Capacity} vé).");
+                        if (ticketTypeRequest.PublishedQuota.HasValue && ticketTypeRequest.PublishedQuota.Value > zone.Capacity)
+                            throw new ValidatorException(nameof(ticketTypeRequest.PublishedQuota),
+                                $"Số lượng vé được xuất bản cho loại vé '{ticketTypeRequest.TicketTypeName}' không được vượt quá sức chứa của khu vực ({zone.Capacity} vé).");
+                    }
                 }
             }
 
@@ -70,9 +73,24 @@ namespace Catalog.Application.Features.Events.Commands.CreateEvent
 
             if (request.ShowTimes != null)
             {
-                foreach (var st in request.ShowTimes)
+                foreach (var showTimeRequest in request.ShowTimes)
                 {
-                    newEvent.AddShowTime(st.StartAt, st.EndAt);
+                    ShowTime showTime = new ShowTime(showTimeRequest.StartAt, showTimeRequest.EndAt);
+
+                    if (showTimeRequest.TicketTypes is { Count: > 0 })
+                    {
+                        var orderedTicketTypes = showTimeRequest.TicketTypes.OrderBy(tt => tt.DisplayOrder).ToList();
+
+                        int displayOrder = 0;
+                        foreach (var ticketTypeRequest in orderedTicketTypes)
+                        {
+                            TicketType ticketType = _mapper.Map<TicketType>(ticketTypeRequest);
+                            ticketType.DisplayOrder = displayOrder++;
+                            showTime.AddTicketType(ticketType);
+                        }
+                    }
+
+                    newEvent.AddShowTime(showTime);
                 }
             }
 
@@ -100,19 +118,6 @@ namespace Catalog.Application.Features.Events.Commands.CreateEvent
                     seatMap.Venue.District,
                     seatMap.Venue.ProvinceCity,
                     seatMap.Venue.Country);
-            }
-
-            if (request.TicketTypes is { Count: > 0 })
-            {
-                request.TicketTypes = request.TicketTypes.OrderBy(tt => tt.DisplayOrder).ToList();
-
-                int displayOrder = 0;
-                foreach (var ticketTypeRequest in request.TicketTypes)
-                {
-                    TicketType ticketType = _mapper.Map<TicketType>(ticketTypeRequest);
-                    ticketType.DisplayOrder = displayOrder++;
-                    newEvent.AddTicketType(ticketType);
-                }
             }
 
             Event created = await _unitOfWork.EventRepository.CreateAsync(newEvent, cancellation);

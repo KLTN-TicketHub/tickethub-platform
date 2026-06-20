@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Domain.DDD;
+using BuildingBlocks.Domain.DDD;
 using Catalog.Domain.Enums;
 
 namespace Catalog.Domain.Entities
@@ -16,11 +16,19 @@ namespace Catalog.Domain.Entities
 
         public byte[] RowVersion { get; private set; }
 
+        private readonly List<TicketType> _ticketTypes = new List<TicketType>();
+        public IReadOnlyCollection<TicketType> TicketTypes => _ticketTypes.AsReadOnly();
+
         public ShowTime(DateTime startAt, DateTime endAt)
         {
             StartAt = startAt;
             EndAt = endAt;
             Status = CatalogStatus.Active;
+        }
+
+        public void AddTicketType(TicketType ticketType)
+        {
+            _ticketTypes.Add(ticketType);
         }
     }
 }

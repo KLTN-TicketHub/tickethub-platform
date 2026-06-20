@@ -18,8 +18,6 @@ namespace Catalog.Application.Features.Events.Requests
 
         public string CoverImageUrl { get; set; }
 
-        public List<CreateTicketTypeRequest> TicketTypes { get; set; }
-
         public CreateLocationRequest? Location { get; set; }
     }
 }

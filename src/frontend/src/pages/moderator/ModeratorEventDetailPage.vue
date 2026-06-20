@@ -77,7 +77,7 @@
         <div class="flex flex-col gap-4">
           <h2 class="text-sm font-bold text-white/40 uppercase tracking-widest px-2">Cấu hình vé</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div v-for="ticket in event.ticketTypes" :key="ticket.id" class="p-6 rounded-3xl bg-[#111916]/50 border border-white/5 flex flex-col gap-4 hover:border-white/20 transition-colors">
+            <div v-for="ticket in event.showtimes?.[selectedShowTimeIndex]?.ticketTypes" :key="ticket.id" class="p-6 rounded-3xl bg-[#111916]/50 border border-white/5 flex flex-col gap-4 hover:border-white/20 transition-colors">
               <div class="flex justify-between items-start">
                 <span class="font-bold text-lg text-white">{{ ticket.ticketTypeName }}</span>
                 <span class="px-2.5 py-1 bg-white/5 rounded-full text-xs font-bold text-white/60">{{ ticket.status }}</span>
@@ -103,7 +103,10 @@
             <div class="h-px flex-1 bg-white/10"></div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div v-for="(st, idx) in event.showtimes" :key="st.id" class="p-4 rounded-2xl bg-[#111916] border border-white/10 shadow-lg relative group overflow-hidden">
+            <div v-for="(st, idx) in event.showtimes" :key="st.id" 
+                 @click="selectedShowTimeIndex = idx"
+                 class="p-4 rounded-2xl bg-[#111916] border shadow-lg relative group overflow-hidden transition-all duration-300 cursor-pointer"
+                 :class="selectedShowTimeIndex === idx ? 'border-primary ring-1 ring-primary/50' : 'border-white/10 hover:border-primary/30'">
               <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <div class="relative z-10 flex flex-col gap-1">
                 <span class="text-primary font-bold text-[11px] uppercase tracking-widest mb-1.5">Suất {{ idx + 1 }}</span>
@@ -234,6 +237,7 @@ const router = useRouter()
 
 const event = ref(null)
 const isLoading = ref(true)
+const selectedShowTimeIndex = ref(0)
 
 const showRejectModal = ref(false)
 const rejectReason = ref('')

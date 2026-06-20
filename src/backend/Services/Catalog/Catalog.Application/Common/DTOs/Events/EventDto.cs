@@ -40,8 +40,6 @@ namespace Catalog.Application.Common.DTOs.Events
 
         public EventLocationDto? Location { get; set; }
 
-        public List<TicketTypeDto> TicketTypes { get; set; }
-
         public OrganizerProfileDto OrganizerProfile { get; set; }
 
         public List<ShowtimeDto> Showtimes { get; set; }

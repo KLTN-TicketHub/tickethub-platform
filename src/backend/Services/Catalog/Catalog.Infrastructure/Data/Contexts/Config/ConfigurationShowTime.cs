@@ -1,4 +1,4 @@
-﻿using Catalog.Domain.Entities;
+using Catalog.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -28,7 +28,13 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .IsRequired();
 
             builder.Property(st => st.Status)
-                .IsRequired();
+                .IsRequired()
+                .HasConversion<string>();
+
+            builder.HasMany(st => st.TicketTypes)
+                .WithOne(tt => tt.ShowTime)
+                .HasForeignKey(tt => tt.ShowTimeId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(st => st.RowVersion)
                 .IsRowVersion();

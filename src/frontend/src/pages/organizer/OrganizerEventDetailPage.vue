@@ -109,9 +109,12 @@
               <div class="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent"></div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div v-for="(st, idx) in event.showtimes" :key="st.id" class="p-5 rounded-2xl bg-[#111916] border border-white/10 shadow-lg relative group overflow-hidden hover:border-primary/30 transition-colors">
-                <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div class="relative z-10 flex flex-col gap-1">
+              <div v-for="(st, idx) in event.showtimes" :key="st.id" 
+                   @click="selectedShowTimeIndex = idx"
+                   class="p-5 rounded-2xl bg-[#111916] border shadow-lg relative group overflow-hidden transition-all duration-300 cursor-pointer"
+                   :class="selectedShowTimeIndex === idx ? 'border-primary ring-1 ring-primary/50' : 'border-white/10 hover:border-primary/30'">
+                <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent transition-opacity" :class="selectedShowTimeIndex === idx ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'"></div>
+                <div class="relative z-10 flex flex-col gap-2">
                   <span class="text-primary font-bold text-[12px] uppercase tracking-widest mb-2">Suất {{ idx + 1 }}</span>
                   <div class="flex items-center gap-2 text-white/80">
                     <PhCalendarBlank weight="bold" class="text-white/40" />
@@ -243,17 +246,17 @@
               <div class="flex items-center justify-between mb-8 relative z-10">
                 <h3 class="font-heading text-2xl font-black text-white uppercase tracking-tight">Cấu hình vé</h3>
                 <div class="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/50 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
-                  <PhTicket weight="fill" /> {{ event.ticketTypes?.length || 0 }} loại vé
+                  <PhTicket weight="fill" /> {{ event.showtimes?.[selectedShowTimeIndex]?.ticketTypes?.length || 0 }} loại vé
                 </div>
               </div>
 
               <!-- Ticket Types List -->
               <div class="space-y-4 relative z-10 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
-                <div v-if="!event.ticketTypes || event.ticketTypes.length === 0" class="py-8 text-center border border-dashed border-white/10 rounded-2xl text-white/30 text-[13px] font-medium">
+                <div v-if="!event.showtimes?.[selectedShowTimeIndex]?.ticketTypes || event.showtimes[selectedShowTimeIndex].ticketTypes.length === 0" class="py-8 text-center border border-dashed border-white/10 rounded-2xl text-white/30 text-[13px] font-medium">
                   Chưa có thông tin hạng vé.
                 </div>
                 
-                <div v-for="tier in event.ticketTypes" :key="tier.id" class="p-5 rounded-2xl bg-white/5 border border-white/5 flex flex-col gap-3 hover:border-primary/30 transition-colors">
+                <div v-for="tier in event.showtimes?.[selectedShowTimeIndex]?.ticketTypes" :key="tier.id" class="p-5 rounded-2xl bg-white/5 border border-white/5 flex flex-col gap-3 hover:border-primary/30 transition-colors">
                   <div class="flex justify-between items-start">
                     <div class="flex flex-col">
                       <span class="font-bold text-[15px] text-white">{{ tier.ticketTypeName }}</span>
@@ -323,6 +326,7 @@ const router = useRouter()
 const event = ref(null)
 const isLoading = ref(true)
 const error = ref('')
+const selectedShowTimeIndex = ref(0)
 
 const seatMapData = ref(null)
 const isLoadingSeatMap = ref(false)
@@ -545,8 +549,8 @@ function buildTextConfig(el) {
 }
 
 function getZonePrice(zoneId) {
-  if (!event.value || !event.value.ticketTypes) return 0
-  const tt = event.value.ticketTypes.find(t => t.zoneId === zoneId)
+  if (!event.value || !event.value.showtimes?.[selectedShowTimeIndex.value]?.ticketTypes) return 0
+  const tt = event.value.showtimes[selectedShowTimeIndex.value].ticketTypes.find(t => t.zoneId === zoneId)
   return tt ? tt.price : 0
 }
 

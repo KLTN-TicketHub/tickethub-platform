@@ -89,8 +89,11 @@
               <div class="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent"></div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div v-for="(st, idx) in event.showtimes" :key="st.id" class="p-5 rounded-3xl bg-[#111916] border border-white/5 shadow-lg relative group overflow-hidden hover:border-primary/50 transition-all duration-500 hover:-translate-y-1">
-                <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div v-for="(st, idx) in event.showtimes" :key="st.id" 
+                   @click="selectedShowTimeIndex = idx"
+                   class="p-5 rounded-3xl bg-[#111916] border shadow-lg relative group overflow-hidden transition-all duration-300 cursor-pointer"
+                   :class="selectedShowTimeIndex === idx ? 'border-primary ring-1 ring-primary/50 -translate-y-1' : 'border-white/5 hover:border-primary/50 hover:-translate-y-1'">
+                <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent transition-opacity" :class="selectedShowTimeIndex === idx ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'"></div>
                 <div class="relative z-10 flex flex-col gap-2">
                   <span class="text-primary font-bold text-[13px] uppercase tracking-widest mb-1">Suất {{ idx + 1 }}</span>
                   <div class="flex items-center gap-2.5 text-white/80">
@@ -287,7 +290,7 @@
               <!-- Tiers Selection -->
               <div class="space-y-3 mb-8 relative z-10">
                 <button
-                  v-for="(tier, i) in event.ticketTypes"
+                  v-for="(tier, i) in event.showtimes?.[selectedShowTimeIndex]?.ticketTypes || []"
                   :key="tier.id"
                   @click="selectTierIndex(i)"
                   class="group relative w-full p-5 text-left rounded-2xl border-2 transition-all duration-300 overflow-hidden cursor-pointer"
@@ -383,7 +386,7 @@
                   :disabled="isCheckoutDisabled"
                   @click="handleBuyTicket"
                 >
-                  <PhTicket weight="fill" />
+                  <PhTicket weight="fill" /> {{ event.showtimes?.[selectedShowTimeIndex]?.ticketTypes?.length || 0 }} loại vé
                   Đặt vé ngay
                 </BaseButton>
               </div>
@@ -462,8 +465,8 @@ const isLoadingSeatMap = ref(false)
 const seatMapError = ref('')
 const hoveredSeat = ref(null)
 const selectedSeats = ref([])
-
 const selectedTier = ref(0)
+const selectedShowTimeIndex = ref(0)
 const qty = ref(1)
 
 const konvaContainer = ref(null)
@@ -526,8 +529,8 @@ const loadSeatMapLayout = async () => {
 
 // Compute active tier details
 const activeTier = computed(() => {
-  if (event.value && event.value.ticketTypes && event.value.ticketTypes.length > 0) {
-    return event.value.ticketTypes[selectedTier.value]
+  if (event.value && event.value.showtimes?.[selectedShowTimeIndex.value]?.ticketTypes && event.value.showtimes[selectedShowTimeIndex.value].ticketTypes.length > 0) {
+    return event.value.showtimes[selectedShowTimeIndex.value].ticketTypes[selectedTier.value]
   }
   return null
 })
@@ -559,8 +562,8 @@ const isReservedTier = (tier) => {
 
 // Get minimum ticket price for the event
 const getMinPrice = () => {
-  if (!event.value || !event.value.ticketTypes || event.value.ticketTypes.length === 0) return 0
-  return Math.min(...event.value.ticketTypes.map(t => t.price))
+  if (!event.value || !event.value.showtimes?.[selectedShowTimeIndex.value]?.ticketTypes || event.value.showtimes[selectedShowTimeIndex.value].ticketTypes.length === 0) return 0
+  return Math.min(...event.value.showtimes[selectedShowTimeIndex.value].ticketTypes.map(t => t.price))
 }
 
 const selectTierIndex = (idx) => {
@@ -718,14 +721,14 @@ function buildTextConfig(el) {
 }
 
 function getZonePrice(zoneId) {
-  if (!event.value || !event.value.ticketTypes) return 0
-  const tt = event.value.ticketTypes.find(t => t.zoneId === zoneId)
+  if (!event.value || !event.value.showtimes?.[selectedShowTimeIndex.value]?.ticketTypes) return 0
+  const tt = event.value.showtimes[selectedShowTimeIndex.value].ticketTypes.find(t => t.zoneId === zoneId)
   return tt ? tt.price : 0
 }
 
 function getZoneTicketTypeName(zoneId) {
-  if (!event.value || !event.value.ticketTypes) return 'Vé'
-  const tt = event.value.ticketTypes.find(t => t.zoneId === zoneId)
+  if (!event.value || !event.value.showtimes?.[selectedShowTimeIndex.value]?.ticketTypes) return 'Vé'
+  const tt = event.value.showtimes[selectedShowTimeIndex.value].ticketTypes.find(t => t.zoneId === zoneId)
   return tt ? tt.ticketTypeName : 'Vé'
 }
 
@@ -783,7 +786,7 @@ function onSeatClick(seat, zone, row) {
     const ticketTypeName = getZoneTicketTypeName(zone.id)
     
     // Select seat and automatically focus selected tier index
-    const tierIndex = event.value.ticketTypes.findIndex(t => t.zoneId === zone.id)
+    const tierIndex = event.value.showtimes?.[selectedShowTimeIndex.value]?.ticketTypes?.findIndex(t => t.zoneId === zone.id) ?? -1
     if (tierIndex !== -1 && selectedTier.value !== tierIndex) {
       selectedTier.value = tierIndex
     }

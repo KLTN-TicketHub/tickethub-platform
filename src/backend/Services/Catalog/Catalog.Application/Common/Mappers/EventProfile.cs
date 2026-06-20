@@ -23,8 +23,6 @@ namespace Catalog.Application.Common.Mappers
                     src.CoverImageUrl,
                     "VND",
                     src.SeatMapId))
-                .ForMember(dest => dest.TicketTypes,
-                opt => opt.Ignore())
                 .ForMember(dest => dest.Location,
                 opt => opt.Ignore())
                 .ForMember(dest => dest.ShowTimes,
@@ -78,14 +76,14 @@ namespace Catalog.Application.Common.Mappers
                 opt => opt.MapFrom(src => src.RowVersion))
                 .ForMember(dest => dest.Location,
                 opt => opt.MapFrom(src => src.Location))
-                .ForMember(dest => dest.TicketTypes,
-                opt => opt.MapFrom(src => src.TicketTypes))
                 .ForMember(dest => dest.Showtimes,
                 opt => opt.MapFrom(src => src.ShowTimes));
 
             CreateMap<ShowTime, ShowtimeDto>()
                 .ForMember(dest => dest.Status,
-                opt => opt.MapFrom(src => src.Status.GetDisplayName()));
+                opt => opt.MapFrom(src => src.Status.GetDisplayName()))
+                .ForMember(dest => dest.TicketTypes,
+                opt => opt.MapFrom(src => src.TicketTypes));
 
             CreateMap<EventLocation, EventLocationDto>()
                 .ForMember(dest => dest.VenueName,

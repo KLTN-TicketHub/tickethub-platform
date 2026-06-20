@@ -759,6 +759,18 @@
             </div>
           </div>
 
+          <!-- Tab chọn suất chiếu -->
+          <div class="flex items-center gap-2 mb-2 overflow-x-auto custom-scrollbar pb-2">
+            <button
+              v-for="(st, idx) in form.showTimes" :key="idx"
+              @click="activeShowTimeIndex = idx"
+              class="px-5 py-2.5 rounded-xl text-[13px] font-bold whitespace-nowrap transition-all border"
+              :class="activeShowTimeIndex === idx ? 'bg-primary border-primary text-black' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white'"
+            >
+              Suất {{ idx + 1 }}
+            </button>
+          </div>
+
           <!-- SeatMap mode: load zones từ seatmap đã chọn -->
           <div v-if="form.mode === 'seatmap'">
             <div v-if="isLoadingZones" class="py-8 flex items-center justify-center gap-3 text-white/40">
@@ -798,7 +810,7 @@
                 <!-- Danh sách khu vực -->
                 <div class="flex flex-col gap-2">
                   <label class="text-[12px] font-bold text-white/60 uppercase tracking-widest">
-                    Chọn khu vực bán vé ({{ form.ticketTypes.length }}/{{ availableZones.length }})
+                    Chọn khu vực bán vé ({{ form.showTimes[activeShowTimeIndex]?.ticketTypes?.length || 0 }}/{{ availableZones.length }})
                   </label>
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                     <button
@@ -820,14 +832,14 @@
               <div class="flex flex-col gap-4">
                 <label class="text-[12px] font-bold text-white/60 uppercase tracking-widest">Cấu hình loại vé</label>
                 
-                <div v-if="form.ticketTypes.length === 0" class="py-12 flex flex-col items-center gap-3 text-white/30 border border-white/5 rounded-2xl bg-white/[0.02]">
+                <div v-if="!form.showTimes[activeShowTimeIndex]?.ticketTypes?.length" class="py-12 flex flex-col items-center gap-3 text-white/30 border border-white/5 rounded-2xl bg-white/[0.02]">
                   <PhTicket class="text-4xl" weight="duotone" />
                   <span class="text-[13px] font-medium text-center px-4">Vui lòng chọn khu vực bên trái để cấu hình vé.</span>
                 </div>
 
                 <div v-else class="flex flex-col gap-4 max-h-[660px] overflow-y-auto pr-2 custom-scrollbar">
                   <div
-                    v-for="(ticket, idx) in form.ticketTypes"
+                    v-for="(ticket, idx) in form.showTimes[activeShowTimeIndex].ticketTypes"
                     :key="ticket._zoneId"
                     class="p-5 rounded-2xl bg-[#0D1410] border border-white/8 relative"
                   >
@@ -845,8 +857,8 @@
                         <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Tên loại vé *</label>
                         <input v-model="ticket.ticketTypeName" type="text" placeholder="VD: Vé VIP..."
                           class="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-2.5 text-[14px] font-bold text-white placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
-                          :class="errors[`ticketTypes[${idx}].ticketTypeName`] ? 'border-danger/60' : ''" />
-                        <p v-if="errors[`ticketTypes[${idx}].ticketTypeName`]" class="text-[11px] text-danger flex items-center gap-1"><PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`ticketTypes[${idx}].ticketTypeName`] }}</p>
+                          :class="errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].ticketTypeName`] ? 'border-danger/60' : ''" />
+                        <p v-if="errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].ticketTypeName`]" class="text-[11px] text-danger flex items-center gap-1"><PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].ticketTypeName`] }}</p>
                       </div>
                       <div class="flex flex-col gap-2">
                         <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Giá vé (VND) *</label>
@@ -854,16 +866,16 @@
                           <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 font-bold text-[14px]">₫</span>
                           <input v-model.number="ticket.price" type="number" min="0" placeholder="500000"
                             class="w-full bg-white/4 border border-white/10 rounded-xl pl-8 pr-4 py-2.5 text-[14px] font-bold text-primary placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
-                            :class="errors[`ticketTypes[${idx}].price`] ? 'border-danger/60' : ''" />
+                            :class="errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].price`] ? 'border-danger/60' : ''" />
                         </div>
-                        <p v-if="errors[`ticketTypes[${idx}].price`]" class="text-[11px] text-danger flex items-center gap-1"><PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`ticketTypes[${idx}].price`] }}</p>
+                        <p v-if="errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].price`]" class="text-[11px] text-danger flex items-center gap-1"><PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].price`] }}</p>
                       </div>
                       <div class="flex flex-col gap-2">
                         <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Số lượng phát hành *</label>
                         <input v-model.number="ticket.publishedQuota" type="number" min="1" placeholder="100"
                           class="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-2.5 text-[14px] font-bold text-white placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
-                          :class="errors[`ticketTypes[${idx}].publishedQuota`] ? 'border-danger/60' : ''" />
-                        <p v-if="errors[`ticketTypes[${idx}].publishedQuota`]" class="text-[11px] text-danger flex items-center gap-1"><PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`ticketTypes[${idx}].publishedQuota`] }}</p>
+                          :class="errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].publishedQuota`] ? 'border-danger/60' : ''" />
+                        <p v-if="errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].publishedQuota`]" class="text-[11px] text-danger flex items-center gap-1"><PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].publishedQuota`] }}</p>
                       </div>
                       <div class="flex flex-col gap-2">
                         <label class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Tối thiểu / đơn</label>
@@ -890,12 +902,12 @@
           <!-- Manual mode: thêm/xoá loại vé tự do -->
           <div v-else class="flex flex-col gap-4">
             <div
-              v-for="(ticket, idx) in form.ticketTypes"
+              v-for="(ticket, idx) in form.showTimes[activeShowTimeIndex].ticketTypes"
               :key="idx"
               class="relative group p-5 rounded-2xl bg-[#0D1410] border border-white/8 hover:border-white/15 transition-all"
             >
               <button
-                v-if="form.ticketTypes.length > 1"
+                v-if="form.showTimes[activeShowTimeIndex].ticketTypes.length > 1"
                 type="button"
                 @click="removeTicket(idx)"
                 class="absolute -right-2 -top-2 w-7 h-7 rounded-full bg-danger text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:scale-110 cursor-pointer"
@@ -912,10 +924,10 @@
                     :id="`ticket-name-manual-${idx}`"
                     placeholder="VD: Vé VIP, Vé Thường, Early Bird..."
                     class="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-2.5 text-[14px] font-bold text-white placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
-                    :class="errors[`ticketTypes[${idx}].ticketTypeName`] ? 'border-danger/60' : ''"
+                    :class="errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].ticketTypeName`] ? 'border-danger/60' : ''"
                   />
-                  <p v-if="errors[`ticketTypes[${idx}].ticketTypeName`]" class="text-[11px] text-danger flex items-center gap-1">
-                    <PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`ticketTypes[${idx}].ticketTypeName`] }}
+                  <p v-if="errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].ticketTypeName`]" class="text-[11px] text-danger flex items-center gap-1">
+                    <PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].ticketTypeName`] }}
                   </p>
                 </div>
 
@@ -930,11 +942,11 @@
                       :id="`ticket-price-manual-${idx}`"
                       placeholder="500000"
                       class="w-full bg-white/4 border border-white/10 rounded-xl pl-8 pr-4 py-2.5 text-[14px] font-bold text-primary placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
-                      :class="errors[`ticketTypes[${idx}].price`] ? 'border-danger/60' : ''"
+                      :class="errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].price`] ? 'border-danger/60' : ''"
                     />
                   </div>
-                  <p v-if="errors[`ticketTypes[${idx}].price`]" class="text-[11px] text-danger flex items-center gap-1">
-                    <PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`ticketTypes[${idx}].price`] }}
+                  <p v-if="errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].price`]" class="text-[11px] text-danger flex items-center gap-1">
+                    <PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].price`] }}
                   </p>
                 </div>
 
@@ -947,10 +959,10 @@
                     :id="`ticket-quota-manual-${idx}`"
                     placeholder="100"
                     class="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-2.5 text-[14px] font-bold text-white placeholder-white/20 focus:border-primary/50 focus:bg-white/6 transition-all focus:outline-none"
-                    :class="errors[`ticketTypes[${idx}].publishedQuota`] ? 'border-danger/60' : ''"
+                    :class="errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].publishedQuota`] ? 'border-danger/60' : ''"
                   />
-                  <p v-if="errors[`ticketTypes[${idx}].publishedQuota`]" class="text-[11px] text-danger flex items-center gap-1">
-                    <PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`ticketTypes[${idx}].publishedQuota`] }}
+                  <p v-if="errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].publishedQuota`]" class="text-[11px] text-danger flex items-center gap-1">
+                    <PhWarningCircle weight="fill" class="flex-shrink-0 text-[10px]" />{{ errors[`showTimes[${activeShowTimeIndex}].ticketTypes[${idx}].publishedQuota`] }}
                   </p>
                 </div>
 
@@ -1030,12 +1042,12 @@
 
               <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="flex flex-col gap-1">
-                  <span class="text-[11px] text-white/30 font-bold uppercase tracking-widest">Bắt đầu</span>
-                  <span class="text-[13px] font-bold text-white">{{ formatDateTimeDisplay(form.startAt) }}</span>
+                  <span class="text-[11px] text-white/30 font-bold uppercase tracking-widest">Số suất chiếu</span>
+                  <span class="text-[13px] font-bold text-white">{{ form.showTimes.length }} suất chiếu</span>
                 </div>
                 <div class="flex flex-col gap-1">
-                  <span class="text-[11px] text-white/30 font-bold uppercase tracking-widest">Kết thúc</span>
-                  <span class="text-[13px] font-bold text-white">{{ formatDateTimeDisplay(form.endAt) }}</span>
+                  <span class="text-[11px] text-white/30 font-bold uppercase tracking-widest">Tổng loại vé</span>
+                  <span class="text-[13px] font-bold text-white">{{ form.showTimes.reduce((acc, st) => acc + (st.ticketTypes?.length || 0), 0) }} loại vé</span>
                 </div>
                 <div class="flex flex-col gap-1">
                   <span class="text-[11px] text-white/30 font-bold uppercase tracking-widest">Mở bán</span>
@@ -1059,7 +1071,7 @@
                 <PhSquaresFour weight="fill" class="text-[#818cf8] flex-shrink-0 mt-0.5" />
                 <div>
                   <p class="font-bold text-white text-[14px]">{{ selectedSeatMapName }}</p>
-                  <p class="text-white/40 text-[13px]">{{ form.ticketTypes.length }} khu vực / loại vé</p>
+                  <p class="text-white/40 text-[13px]">{{ form.showTimes.reduce((acc, st) => acc + (st.ticketTypes?.length || 0), 0) }} khu vực / loại vé được phân bổ</p>
                 </div>
               </div>
             </div>
@@ -1067,20 +1079,38 @@
 
           <!-- Ticket types summary -->
           <div class="bg-[#111916]/60 border border-white/8 rounded-[2rem] p-7 md:p-9">
-            <h3 class="font-heading text-[17px] font-black text-white mb-5">Loại vé ({{ form.ticketTypes.length }})</h3>
-            <div class="flex flex-col gap-3">
-              <div
-                v-for="(ticket, idx) in form.ticketTypes"
-                :key="idx"
-                class="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/8"
-              >
-                <div class="flex flex-col gap-0.5">
-                  <span class="font-bold text-white text-[14px]">{{ ticket.ticketTypeName || `Loại vé ${idx + 1}` }}</span>
-                  <span class="text-white/30 text-[12px]">{{ ticket.publishedQuota || 0 }} vé</span>
+            <h3 class="font-heading text-[17px] font-black text-white mb-5">Danh sách Suất chiếu & Vé</h3>
+            <div class="flex flex-col gap-6">
+              <div v-for="(st, stIdx) in form.showTimes" :key="stIdx" class="flex flex-col gap-3">
+                <div class="flex items-center gap-3">
+                  <span class="px-2 py-1 bg-primary/10 text-primary text-[10px] font-black uppercase rounded-md">Suất {{ stIdx + 1 }}</span>
+                  <span class="text-[13px] font-bold text-white/80">
+                    {{ formatDateTimeDisplay(st.startAt) }} - {{ formatDateTimeDisplay(st.endAt) }}
+                  </span>
                 </div>
-                <span class="font-heading font-black text-primary text-[17px]">
-                  {{ ticket.price === 0 ? 'Miễn phí' : formatPrice(ticket.price) }}
-                </span>
+                
+                <div v-if="!st.ticketTypes || st.ticketTypes.length === 0" class="text-white/30 text-[12px] italic px-2">
+                  Chưa cấu hình loại vé nào.
+                </div>
+                
+                <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div
+                    v-for="(ticket, idx) in st.ticketTypes"
+                    :key="idx"
+                    class="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/8"
+                  >
+                    <div class="flex flex-col gap-0.5">
+                      <div class="flex items-center gap-2">
+                        <div v-if="ticket._zoneColor" class="w-2.5 h-2.5 rounded-full" :style="{ backgroundColor: ticket._zoneColor }"></div>
+                        <span class="font-bold text-white text-[14px]">{{ ticket.ticketTypeName || `Loại vé ${idx + 1}` }}</span>
+                      </div>
+                      <span class="text-white/30 text-[12px] pl-[18px]">{{ ticket.publishedQuota || 0 }} vé</span>
+                    </div>
+                    <span class="font-heading font-black text-primary text-[17px]">
+                      {{ ticket.price === 0 ? 'Miễn phí' : formatPrice(ticket.price) }}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1143,6 +1173,7 @@ const steps = [
 ]
 const currentStep = ref(0)
 const maxReachedStep = ref(0)
+const activeShowTimeIndex = ref(0)
 
 function goToStep(idx) {
   if (idx <= maxReachedStep.value) currentStep.value = idx
@@ -1169,7 +1200,7 @@ const form = reactive({
   categoryId: '',
   description: '',
   showTimes: [
-    { startAt: '', endAt: '' }
+    { startAt: '', endAt: '', ticketTypes: [] }
   ],
   saleOpenAt: '',
   saleCloseAt: '',
@@ -1186,8 +1217,7 @@ const form = reactive({
   },
   // Mode: seatmap
   selectedVenueId: '',
-  seatMapId: '',
-  ticketTypes: []
+  seatMapId: ''
 })
 
 const errors = ref({})
@@ -1530,26 +1560,29 @@ function buildSeatConfig(seat, zone) {
 }
 
 function isZoneSelected(zoneId) {
-  return form.ticketTypes.some(t => t._zoneId === zoneId)
+  const tts = form.showTimes[activeShowTimeIndex.value]?.ticketTypes || []
+  return tts.some(t => t._zoneId === zoneId)
 }
 
 function toggleZone(zone) {
-  const existingIdx = form.ticketTypes.findIndex(t => t._zoneId === zone.id)
+  const tts = form.showTimes[activeShowTimeIndex.value].ticketTypes
+  const existingIdx = tts.findIndex(t => t._zoneId === zone.id)
   if (existingIdx !== -1) {
-    form.ticketTypes.splice(existingIdx, 1)
+    tts.splice(existingIdx, 1)
   } else {
-    form.ticketTypes.push({
+    tts.push({
       zoneId: zone.id, _zoneId: zone.id, _zoneName: zone.zoneName, _zoneColor: zone.color,
       ticketTypeName: zone.zoneName, description: '', price: zone.basePrice || 0,
       publishedQuota: zone.capacity || 0, minQtyQuota: 1, maxQtyQuota: 5,
-      displayOrder: form.ticketTypes.length + 1
+      displayOrder: tts.length + 1
     })
   }
 }
 
 function removeZoneTicket(zoneId) {
-  const existingIdx = form.ticketTypes.findIndex(t => t._zoneId === zoneId)
-  if (existingIdx !== -1) form.ticketTypes.splice(existingIdx, 1)
+  const tts = form.showTimes[activeShowTimeIndex.value].ticketTypes
+  const existingIdx = tts.findIndex(t => t._zoneId === zoneId)
+  if (existingIdx !== -1) tts.splice(existingIdx, 1)
 }
 
 async function loadZones() {
@@ -1561,15 +1594,17 @@ async function loadZones() {
       seatMapData.value = res.data
       availableZones.value = (res.data.zones || []).filter(z => z.isSalable && !z.isStage)
       
-      // Chỉ init lần đầu
-      if (form.ticketTypes.length === 0) {
-        form.ticketTypes = availableZones.value.map((z, idx) => ({
-          zoneId: z.id, _zoneId: z.id, _zoneName: z.zoneName, _zoneColor: z.color,
-          ticketTypeName: z.zoneName, description: '', price: z.basePrice || 0,
-          publishedQuota: z.capacity || 0, minQtyQuota: 1, maxQtyQuota: 5,
-          displayOrder: idx + 1
-        }))
-      }
+      // Chỉ init lần đầu cho tất cả suất chiếu
+      form.showTimes.forEach((st) => {
+        if (!st.ticketTypes || st.ticketTypes.length === 0) {
+          st.ticketTypes = availableZones.value.map((z, idx) => ({
+            zoneId: z.id, _zoneId: z.id, _zoneName: z.zoneName, _zoneColor: z.color,
+            ticketTypeName: z.zoneName, description: '', price: z.basePrice || 0,
+            publishedQuota: z.capacity || 0, minQtyQuota: 1, maxQtyQuota: 5,
+            displayOrder: idx + 1
+          }))
+        }
+      })
 
       hasInitializedCenter = false
       await nextTick()
@@ -1615,28 +1650,32 @@ onUnmounted(() => {
 
 // ── Tickets (manual mode) ──────────────────────────────────────────────────
 function addTicket() {
-  form.ticketTypes.push({
+  const tts = form.showTimes[activeShowTimeIndex.value].ticketTypes
+  tts.push({
     ticketTypeName: '',
     description: '',
     price: 0,
     publishedQuota: 0,
     minQtyQuota: 1,
     maxQtyQuota: 5,
-    displayOrder: form.ticketTypes.length + 1
+    displayOrder: tts.length + 1
   })
 }
 
 function removeTicket(idx) {
-  form.ticketTypes.splice(idx, 1)
+  form.showTimes[activeShowTimeIndex.value].ticketTypes.splice(idx, 1)
 }
 
 // ── ShowTimes ──────────────────────────────────────────────────────────────
 function addShowTime() {
-  form.showTimes.push({ startAt: '', endAt: '' })
+  form.showTimes.push({ startAt: '', endAt: '', ticketTypes: [] })
 }
 
 function removeShowTime(idx) {
   form.showTimes.splice(idx, 1)
+  if (activeShowTimeIndex.value >= form.showTimes.length) {
+    activeShowTimeIndex.value = Math.max(0, form.showTimes.length - 1)
+  }
 }
 
 // ── Mode select ────────────────────────────────────────────────────────────
@@ -1646,10 +1685,16 @@ function selectMode(mode) {
   if (mode === 'manual') {
     form.selectedVenueId = ''
     form.seatMapId = ''
-    if (form.ticketTypes.length === 0) addTicket()
+    form.showTimes.forEach((st) => {
+      if (!st.ticketTypes || st.ticketTypes.length === 0) {
+        st.ticketTypes = [{
+          ticketTypeName: '', description: '', price: 0, publishedQuota: 0,
+          minQtyQuota: 1, maxQtyQuota: 5, displayOrder: 1
+        }]
+      }
+    })
   } else {
     form.location = { venueName: '', addressLine: '', ward: '', district: '', provinceCity: '', country: 'Việt Nam' }
-    form.ticketTypes = []
   }
 }
 
@@ -1682,7 +1727,7 @@ function validateCurrentStep() {
         }
       })
       if (!hasShowTimeErr && form.saleCloseAt && latestEnd && new Date(form.saleCloseAt) >= latestEnd) {
-        errors.value.saleCloseAt = 'Đóng bán vé phải trước thời gian kết thúc của sự kiện (suất chiếu muộn nhất).'
+        errors.value.saleCloseAt = 'Thời gian đóng bán vé không thể sau thời gian kết thúc của sự kiện.'
       }
     }
     if (!form.saleOpenAt) errors.value.saleOpenAt = 'Vui lòng chọn thời gian mở bán.'
@@ -1711,24 +1756,26 @@ function validateCurrentStep() {
 
   if (currentStep.value === 4) {
     let hasErr = false
-    form.ticketTypes.forEach((t, idx) => {
-      if (!t.ticketTypeName.trim()) {
-        errors.value[`ticketTypes[${idx}].ticketTypeName`] = 'Tên loại vé không được để trống.'
+    form.showTimes.forEach((st, stIdx) => {
+      if (!st.ticketTypes || st.ticketTypes.length === 0) {
+        apiError.value = `Vui lòng thêm ít nhất một loại vé cho Suất chiếu ${stIdx + 1}.`
         hasErr = true
       }
-      if (t.price === null || t.price === undefined || t.price === '' || isNaN(t.price) || t.price < 0) {
-        errors.value[`ticketTypes[${idx}].price`] = 'Giá vé không hợp lệ.'
-        hasErr = true
-      }
-      if (!t.publishedQuota || t.publishedQuota < 1) {
-        errors.value[`ticketTypes[${idx}].publishedQuota`] = 'Số lượng phải lớn hơn 0.'
-        hasErr = true
-      }
+      st.ticketTypes.forEach((t, idx) => {
+        if (!t.ticketTypeName?.trim()) {
+          errors.value[`showTimes[${stIdx}].ticketTypes[${idx}].ticketTypeName`] = 'Tên loại vé không được để trống.'
+          hasErr = true
+        }
+        if (t.price === null || t.price === undefined || t.price === '' || isNaN(t.price) || t.price < 0) {
+          errors.value[`showTimes[${stIdx}].ticketTypes[${idx}].price`] = 'Giá vé không hợp lệ.'
+          hasErr = true
+        }
+        if (!t.publishedQuota || t.publishedQuota < 1) {
+          errors.value[`showTimes[${stIdx}].ticketTypes[${idx}].publishedQuota`] = 'Số lượng phải lớn hơn 0.'
+          hasErr = true
+        }
+      })
     })
-    if (form.ticketTypes.length === 0) {
-      apiError.value = 'Vui lòng thêm ít nhất một loại vé.'
-      hasErr = true
-    }
     if (hasErr) return false
   }
 
@@ -1749,27 +1796,25 @@ async function handleSubmit() {
       showTimes: form.showTimes.map(st => ({
         startAt: new Date(st.startAt).toISOString(),
         endAt: new Date(st.endAt).toISOString(),
+        ticketTypes: (st.ticketTypes || []).map((t, idx) => ({
+          ...(form.mode === 'seatmap' ? { zoneId: t.zoneId } : {}),
+          ticketTypeName: t.ticketTypeName,
+          description: t.description,
+          price: t.price,
+          publishedQuota: t.publishedQuota,
+          minQtyQuota: t.minQtyQuota || 1,
+          maxQtyQuota: t.maxQtyQuota || 5,
+          displayOrder: t.displayOrder || idx + 1
+        }))
       })),
       saleOpenAt: new Date(form.saleOpenAt).toISOString(),
       saleCloseAt: new Date(form.saleCloseAt).toISOString(),
       coverImageUrl: form.coverImageUrl || null,
     }
 
-    const ticketTypesPayload = form.ticketTypes.map((t, idx) => ({
-      ...(form.mode === 'seatmap' ? { zoneId: t.zoneId } : {}),
-      ticketTypeName: t.ticketTypeName,
-      description: t.description,
-      price: t.price,
-      publishedQuota: t.publishedQuota,
-      minQtyQuota: t.minQtyQuota || 1,
-      maxQtyQuota: t.maxQtyQuota || 5,
-      displayOrder: t.displayOrder || idx + 1
-    }))
-
     if (form.mode === 'manual') {
       payload = {
         ...commonFields,
-        ticketTypes: ticketTypesPayload,
         location: {
           venueName: form.location.venueName,
           addressLine: form.location.addressLine,
@@ -1784,7 +1829,6 @@ async function handleSubmit() {
       payload = {
         ...commonFields,
         seatMapId: form.seatMapId,
-        ticketTypes: ticketTypesPayload,
       }
       await createEventWithSeatMap(payload)
     }

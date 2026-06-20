@@ -29,10 +29,6 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
 
-            builder.HasMany(e => e.TicketTypes)
-                .WithOne(tt => tt.Event)
-                .HasForeignKey(tt => tt.EventId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(e => e.Title)
                 .IsRequired()

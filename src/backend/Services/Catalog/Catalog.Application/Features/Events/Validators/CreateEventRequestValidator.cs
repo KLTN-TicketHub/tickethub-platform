@@ -39,11 +39,11 @@ public class CreateEventRequestValidator : AbstractValidator<CreateEventRequest>
             .Must(showTimes =>
             {
                 if (showTimes == null || showTimes.Count < 2) return true;
-                
+
                 var sorted = showTimes.OrderBy(s => s.StartAt).ToList();
                 for (int i = 0; i < sorted.Count - 1; i++)
                 {
-                    if (sorted[i].EndAt > sorted[i+1].StartAt)
+                    if (sorted[i].EndAt > sorted[i + 1].StartAt)
                     {
                         return false;
                     }
@@ -73,58 +73,11 @@ public class CreateEventRequestValidator : AbstractValidator<CreateEventRequest>
             .MaximumLength(500)
             .WithMessage("URL ảnh bìa không được vượt quá 500 ký tự.");
 
-        RuleFor(x => x.TicketTypes)
-            .Cascade(CascadeMode.Stop)
-            .NotNull()
-            .WithMessage("Danh sách loại vé không được để trống.")
-            .NotEmpty()
-            .WithMessage("Danh sách loại vé không được để trống.");
-
-        RuleFor(x => x.TicketTypes)
-            .Must(ticketTypes =>
-                ticketTypes == null ||
-                ticketTypes.Select(t => t.TicketTypeName)
-                           .Distinct(StringComparer.OrdinalIgnoreCase)
-                           .Count() == ticketTypes.Count)
-            .WithMessage("Tên loại vé phải là duy nhất trong danh sách.");
-
         RuleFor(x => x.Location)
             .Must((request, location) =>
                 (request.SeatMapId == null && location != null) ||
                 (request.SeatMapId != null && location == null))
             .WithMessage("Phải cung cấp Location hoặc SeatMapId, không được đồng thời cả hai.");
-
-        RuleFor(x => x.TicketTypes)
-            .Must(ticketTypes =>
-                ticketTypes == null ||
-                ticketTypes.All(t => t.ZoneId != null))
-            .When(x => x.SeatMapId != null)
-            .WithMessage("Mỗi loại vé phải có mã khu vực khi sử dụng sơ đồ chỗ ngồi.");
-
-        RuleFor(x => x.TicketTypes)
-            .Must(ticketTypes =>
-            {
-                if (ticketTypes == null) return true;
-
-                List<Guid?> allZoneIds = ticketTypes
-                    .Where(t => t.ZoneId != null)
-                    .Select(t => t.ZoneId!)
-                    .ToList();
-
-                return allZoneIds.Distinct().Count() == allZoneIds.Count;
-            }).WithMessage("Một ZoneId không được phép xuất hiện ở nhiều loại vé khác nhau.");
-
-        RuleFor(x => x.TicketTypes)
-            .Must((request, ticketTypes) =>
-            {
-                if (request.SeatMapId != null) return true;
-
-                return ticketTypes == null ||
-                    ticketTypes.All(t => t.ZoneId == null);
-            }).WithMessage("Không được phép cung cấp ZoneId khi sự kiện không sử dụng sơ đồ chỗ ngồi (SeatMap).");
-
-        RuleForEach(x => x.TicketTypes)
-            .SetValidator(new CreateTicketTypeRequestValidator());
 
         RuleFor(x => x.Location)
             .SetValidator(new CreateLocationRequestValidator()!)
