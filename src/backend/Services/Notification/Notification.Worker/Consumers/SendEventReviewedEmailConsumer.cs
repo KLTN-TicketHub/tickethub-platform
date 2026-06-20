@@ -66,9 +66,9 @@ namespace Notification.Worker.Consumers
         {
             // baseUrl format e.g. http://localhost:5173
             string eventDetailUrl = $"{frontendBaseUrl.TrimEnd('/')}/organizer/events/{message.EventId}";
-            
-            string statusHtml = message.IsApproved 
-                ? "<span style='color:#28a745; font-weight:bold;'>Đã được phê duyệt</span>" 
+
+            string statusHtml = message.IsApproved
+                ? "<span style='color:#28a745; font-weight:bold;'>Đã được phê duyệt</span>"
                 : "<span style='color:#dc3545; font-weight:bold;'>Bị từ chối</span>";
 
             string reasonHtml = string.Empty;
@@ -81,7 +81,7 @@ namespace Notification.Worker.Consumers
                 </div>";
             }
 
-            string actionMessage = message.IsApproved 
+            string actionMessage = message.IsApproved
                 ? "Bạn có thể tiếp tục xem chi tiết và quản lý bán vé cho sự kiện của mình."
                 : "Vui lòng xem lại lý do từ chối, chỉnh sửa lại thông tin và gửi yêu cầu phê duyệt lại.";
 
