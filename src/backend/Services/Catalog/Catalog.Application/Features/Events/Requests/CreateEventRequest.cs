@@ -1,4 +1,4 @@
-﻿namespace Catalog.Application.Features.Events.Requests
+namespace Catalog.Application.Features.Events.Requests
 {
     public class CreateEventRequest
     {
@@ -10,9 +10,7 @@
 
         public string Description { get; set; }
 
-        public DateTime StartAt { get; set; }
-
-        public DateTime EndAt { get; set; }
+        public List<CreateShowTimeRequest> ShowTimes { get; set; } = new();
 
         public DateTime SaleOpenAt { get; set; }
 

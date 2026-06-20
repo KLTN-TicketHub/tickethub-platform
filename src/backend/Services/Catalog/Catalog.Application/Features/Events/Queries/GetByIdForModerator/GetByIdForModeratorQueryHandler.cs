@@ -78,6 +78,14 @@ namespace Catalog.Application.Features.Events.Queries.GetByIdForModerator
                         Status = tt.Status.GetDisplayName(),
                         RowVersion = tt.RowVersion,
                     }).OrderBy(tt => tt.DisplayOrder).ToList(),
+                    Showtimes = e.ShowTimes.Select(st => new ShowtimeDto
+                    {
+                        Id = st.Id,
+                        EventId = st.EventId,
+                        StartAt = st.StartAt,
+                        EndAt = st.EndAt,
+                        Status = st.Status.GetDisplayName()
+                    }).OrderBy(st => st.StartAt).ToList(),
                     ReasonForRejection = e.Status == Domain.Enums.EventStatus.Rejected ? e.Approval.Reason : null
                 }) ?? throw new NotFoundException($"Không tìm thấy sự kiện nòa với id {id}");
         }

@@ -1,4 +1,4 @@
-﻿using Catalog.Application.Features.Events.Requests;
+using Catalog.Application.Features.Events.Requests;
 using FluentValidation;
 
 namespace Catalog.Application.Features.Events.Validators;
@@ -25,31 +25,46 @@ public class CreateEventRequestValidator : AbstractValidator<CreateEventRequest>
             .MaximumLength(5000)
             .WithMessage("Mô tả sự kiện không được vượt quá 5000 ký tự.");
 
-        RuleFor(x => x.StartAt)
+        RuleFor(x => x.ShowTimes)
+            .Cascade(CascadeMode.Stop)
+            .NotNull()
+            .WithMessage("Danh sách suất chiếu không được để trống.")
             .NotEmpty()
-            .WithMessage("Thời gian bắt đầu không được để trống.")
-            .Must(startAt => startAt > DateTime.UtcNow)
-            .WithMessage("Thời gian bắt đầu phải lớn hơn thời điểm hiện tại.");
+            .WithMessage("Sự kiện phải có ít nhất một suất chiếu.");
 
-        RuleFor(x => x.EndAt)
-            .NotEmpty()
-            .WithMessage("Thời gian kết thúc không được để trống.")
-            .GreaterThan(x => x.StartAt)
-            .WithMessage("Thời gian kết thúc phải lớn hơn thời gian bắt đầu.");
+        RuleForEach(x => x.ShowTimes)
+            .SetValidator(new CreateShowTimeRequestValidator());
+
+        RuleFor(x => x.ShowTimes)
+            .Must(showTimes =>
+            {
+                if (showTimes == null || showTimes.Count < 2) return true;
+                
+                var sorted = showTimes.OrderBy(s => s.StartAt).ToList();
+                for (int i = 0; i < sorted.Count - 1; i++)
+                {
+                    if (sorted[i].EndAt > sorted[i+1].StartAt)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            })
+            .WithMessage("Thời gian của các suất chiếu không được trùng lặp hoặc đè lên nhau.");
 
         RuleFor(x => x.SaleOpenAt)
             .NotEmpty()
             .WithMessage("Thời gian mở bán không được để trống.")
-            .LessThan(x => x.StartAt)
-            .WithMessage("Thời gian mở bán phải nhỏ hơn thời gian bắt đầu sự kiện.");
+            .Must((request, saleOpenAt) => request.ShowTimes == null || !request.ShowTimes.Any() || saleOpenAt < request.ShowTimes.Min(s => s.StartAt))
+            .WithMessage("Thời gian mở bán phải nhỏ hơn thời gian bắt đầu suất chiếu sớm nhất.");
 
         RuleFor(x => x.SaleCloseAt)
             .NotEmpty()
             .WithMessage("Thời gian đóng bán không được để trống.")
             .GreaterThan(x => x.SaleOpenAt)
             .WithMessage("Thời gian đóng bán phải lớn hơn thời gian mở bán.")
-            .LessThan(x => x.EndAt)
-            .WithMessage("Thời gian đóng bán phải nhỏ hơn thời gian kết thúc sự kiện.");
+            .Must((request, saleCloseAt) => request.ShowTimes == null || !request.ShowTimes.Any() || saleCloseAt < request.ShowTimes.Max(s => s.EndAt))
+            .WithMessage("Thời gian đóng bán phải nhỏ hơn thời gian kết thúc suất chiếu muộn nhất.");
 
         RuleFor(x => x.CoverImageUrl)
             .Cascade(CascadeMode.Stop)

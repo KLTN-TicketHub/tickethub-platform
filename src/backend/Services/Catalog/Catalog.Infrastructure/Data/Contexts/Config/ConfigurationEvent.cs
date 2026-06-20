@@ -77,6 +77,16 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
                 .WithOne(e => e.Event)
                 .HasForeignKey<EventLocation>(el => el.EventId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(e => e.ShowTimes)
+                .WithOne(st => st.Event)
+                .HasForeignKey(st => st.EventId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(e => e.Approval)
+               .WithOne(a => a.Event)
+               .HasForeignKey<EventApproval>(ea => ea.EventId)
+               .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

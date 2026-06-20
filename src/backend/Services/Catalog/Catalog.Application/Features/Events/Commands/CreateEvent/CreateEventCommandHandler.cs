@@ -68,6 +68,14 @@ namespace Catalog.Application.Features.Events.Commands.CreateEvent
             Event newEvent = _mapper.Map<Event>(request);
             newEvent.OrganizerId = organizerId;
 
+            if (request.ShowTimes != null)
+            {
+                foreach (var st in request.ShowTimes)
+                {
+                    newEvent.AddShowTime(st.StartAt, st.EndAt);
+                }
+            }
+
             if (request.SeatMapId == null && request.Location != null)
             {
                 newEvent.SetEventLocation(

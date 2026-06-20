@@ -186,44 +186,78 @@
             </p>
           </div>
 
-          <!-- Thời gian: 2 cột -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="flex flex-col gap-2">
+          <!-- Các suất chiếu -->
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center justify-between">
               <label class="text-[12px] font-bold text-white/60 uppercase tracking-widest">
-                Bắt đầu <span class="text-danger">*</span>
+                Các suất chiếu <span class="text-danger">*</span>
               </label>
-              <div class="relative group">
-                <PhCalendarBlank weight="bold" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none group-focus-within:text-primary transition-colors" />
-                <input
-                  v-model="form.startAt"
-                  type="datetime-local"
-                  id="event-start"
-                  class="w-full bg-white/4 border rounded-xl pl-10 pr-4 py-3 text-[14px] font-bold text-white focus:outline-none transition-all focus:bg-white/6 [color-scheme:dark]"
-                  :class="errors.startAt ? 'border-danger/60 focus:border-danger/80' : 'border-white/10 focus:border-primary/50'"
-                />
-              </div>
-              <p v-if="errors.startAt" class="text-[12px] text-danger flex items-center gap-1.5">
-                <PhWarningCircle weight="fill" class="flex-shrink-0" />{{ errors.startAt }}
-              </p>
+              <button
+                type="button"
+                @click="addShowTime"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-[12px] font-bold hover:bg-primary/20 transition-colors"
+              >
+                <PhPlus weight="bold" /> Thêm suất chiếu
+              </button>
             </div>
-            <div class="flex flex-col gap-2">
-              <label class="text-[12px] font-bold text-white/60 uppercase tracking-widest">
-                Kết thúc <span class="text-danger">*</span>
-              </label>
-              <div class="relative group">
-                <PhCalendarBlank weight="bold" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none group-focus-within:text-primary transition-colors" />
-                <input
-                  v-model="form.endAt"
-                  type="datetime-local"
-                  id="event-end"
-                  class="w-full bg-white/4 border rounded-xl pl-10 pr-4 py-3 text-[14px] font-bold text-white focus:outline-none transition-all focus:bg-white/6 [color-scheme:dark]"
-                  :class="errors.endAt ? 'border-danger/60 focus:border-danger/80' : 'border-white/10 focus:border-primary/50'"
-                />
+
+            <div class="flex flex-col gap-3">
+              <div
+                v-for="(st, idx) in form.showTimes"
+                :key="idx"
+                class="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/5 relative group transition-all hover:border-white/20"
+              >
+                <!-- Nút xóa -->
+                <button
+                  v-if="form.showTimes.length > 1"
+                  type="button"
+                  @click="removeShowTime(idx)"
+                  class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-danger text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10 cursor-pointer hover:bg-danger/80"
+                >
+                  <PhX weight="bold" class="text-[10px]" />
+                </button>
+
+                <div class="flex-1 w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- Start At -->
+                  <div class="flex flex-col gap-2">
+                    <label class="text-[11px] font-bold text-white/40 uppercase">Bắt đầu</label>
+                    <div class="relative">
+                      <PhCalendarBlank weight="bold" class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+                      <input
+                        v-model="st.startAt"
+                        type="datetime-local"
+                        class="w-full bg-white/5 border rounded-lg pl-9 pr-3 py-2.5 text-[13px] font-bold text-white focus:outline-none transition-colors [color-scheme:dark]"
+                        :class="errors[`showTimes[${idx}].startAt`] ? 'border-danger/60 focus:border-danger/80' : 'border-white/10 focus:border-primary/50'"
+                      />
+                    </div>
+                    <p v-if="errors[`showTimes[${idx}].startAt`]" class="text-[11px] text-danger mt-1">
+                      {{ errors[`showTimes[${idx}].startAt`] }}
+                    </p>
+                  </div>
+
+                  <!-- End At -->
+                  <div class="flex flex-col gap-2">
+                    <label class="text-[11px] font-bold text-white/40 uppercase">Kết thúc</label>
+                    <div class="relative">
+                      <PhCalendarBlank weight="bold" class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+                      <input
+                        v-model="st.endAt"
+                        type="datetime-local"
+                        class="w-full bg-white/5 border rounded-lg pl-9 pr-3 py-2.5 text-[13px] font-bold text-white focus:outline-none transition-colors [color-scheme:dark]"
+                        :class="errors[`showTimes[${idx}].endAt`] ? 'border-danger/60 focus:border-danger/80' : 'border-white/10 focus:border-primary/50'"
+                      />
+                    </div>
+                    <p v-if="errors[`showTimes[${idx}].endAt`]" class="text-[11px] text-danger mt-1">
+                      {{ errors[`showTimes[${idx}].endAt`] }}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <p v-if="errors.endAt" class="text-[12px] text-danger flex items-center gap-1.5">
-                <PhWarningCircle weight="fill" class="flex-shrink-0" />{{ errors.endAt }}
-              </p>
             </div>
+            
+            <p v-if="errors.showTimes" class="text-[12px] text-danger flex items-center gap-1.5">
+              <PhWarningCircle weight="fill" /> {{ errors.showTimes }}
+            </p>
           </div>
 
           <!-- Thời gian bán vé -->
@@ -1134,8 +1168,9 @@ const form = reactive({
   title: '',
   categoryId: '',
   description: '',
-  startAt: '',
-  endAt: '',
+  showTimes: [
+    { startAt: '', endAt: '' }
+  ],
   saleOpenAt: '',
   saleCloseAt: '',
   coverImageUrl: '',   // pathname - gửi lên API
@@ -1595,6 +1630,15 @@ function removeTicket(idx) {
   form.ticketTypes.splice(idx, 1)
 }
 
+// ── ShowTimes ──────────────────────────────────────────────────────────────
+function addShowTime() {
+  form.showTimes.push({ startAt: '', endAt: '' })
+}
+
+function removeShowTime(idx) {
+  form.showTimes.splice(idx, 1)
+}
+
 // ── Mode select ────────────────────────────────────────────────────────────
 function selectMode(mode) {
   form.mode = mode
@@ -1620,12 +1664,31 @@ function validateCurrentStep() {
   if (currentStep.value === 1) {
     if (!form.title.trim()) errors.value.title = 'Tên sự kiện không được để trống.'
     if (!form.categoryId) errors.value.categoryId = 'Vui lòng chọn danh mục.'
-    if (!form.startAt) errors.value.startAt = 'Vui lòng chọn thời gian bắt đầu.'
-    if (!form.endAt) errors.value.endAt = 'Vui lòng chọn thời gian kết thúc.'
+    if (form.showTimes.length === 0) {
+      errors.value.showTimes = 'Vui lòng thêm ít nhất một suất chiếu.'
+    } else {
+      let hasShowTimeErr = false
+      let latestEnd = null
+      form.showTimes.forEach((st, idx) => {
+        if (!st.startAt) { errors.value[`showTimes[${idx}].startAt`] = 'Bắt buộc'; hasShowTimeErr = true }
+        if (!st.endAt) { errors.value[`showTimes[${idx}].endAt`] = 'Bắt buộc'; hasShowTimeErr = true }
+        if (st.startAt && st.endAt && new Date(st.endAt) <= new Date(st.startAt)) {
+          errors.value[`showTimes[${idx}].endAt`] = 'Phải sau bắt đầu'
+          hasShowTimeErr = true
+        }
+        if (st.endAt) {
+          const stDate = new Date(st.endAt)
+          if (!latestEnd || stDate > latestEnd) latestEnd = stDate
+        }
+      })
+      if (!hasShowTimeErr && form.saleCloseAt && latestEnd && new Date(form.saleCloseAt) >= latestEnd) {
+        errors.value.saleCloseAt = 'Đóng bán vé phải trước thời gian kết thúc của sự kiện (suất chiếu muộn nhất).'
+      }
+    }
     if (!form.saleOpenAt) errors.value.saleOpenAt = 'Vui lòng chọn thời gian mở bán.'
     if (!form.saleCloseAt) errors.value.saleCloseAt = 'Vui lòng chọn thời gian đóng bán.'
-    if (form.startAt && form.endAt && new Date(form.endAt) <= new Date(form.startAt)) {
-      errors.value.endAt = 'Thời gian kết thúc phải sau thời gian bắt đầu.'
+    if (form.saleOpenAt && form.saleCloseAt && new Date(form.saleCloseAt) <= new Date(form.saleOpenAt)) {
+      errors.value.saleCloseAt = 'Thời gian đóng bán phải sau thời gian mở bán.'
     }
     if (Object.keys(errors.value).length > 0) return false
   }
@@ -1683,8 +1746,10 @@ async function handleSubmit() {
       categoryId: form.categoryId,
       title: form.title,
       description: form.description,
-      startAt: new Date(form.startAt).toISOString(),
-      endAt: new Date(form.endAt).toISOString(),
+      showTimes: form.showTimes.map(st => ({
+        startAt: new Date(st.startAt).toISOString(),
+        endAt: new Date(st.endAt).toISOString(),
+      })),
       saleOpenAt: new Date(form.saleOpenAt).toISOString(),
       saleCloseAt: new Date(form.saleCloseAt).toISOString(),
       coverImageUrl: form.coverImageUrl || null,

@@ -44,6 +44,8 @@ namespace Catalog.Application.Common.DTOs.Events
 
         public OrganizerProfileDto OrganizerProfile { get; set; }
 
+        public List<ShowtimeDto> Showtimes { get; set; }
+
         public string? ReasonForRejection { get; set; }
     }
 }

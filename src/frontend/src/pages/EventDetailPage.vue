@@ -82,6 +82,34 @@
             </div>
           </section>
 
+          <!-- Showtimes Section -->
+          <section v-if="event.showtimes && event.showtimes.length > 0" class="animate-fade-up [animation-delay:350ms] scroll-mt-24">
+            <div class="flex items-center gap-6 mb-8">
+              <h2 class="font-heading text-3xl font-black text-white uppercase tracking-widest whitespace-nowrap">Các suất chiếu</h2>
+              <div class="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent"></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div v-for="(st, idx) in event.showtimes" :key="st.id" class="p-5 rounded-3xl bg-[#111916] border border-white/5 shadow-lg relative group overflow-hidden hover:border-primary/50 transition-all duration-500 hover:-translate-y-1">
+                <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="relative z-10 flex flex-col gap-2">
+                  <span class="text-primary font-bold text-[13px] uppercase tracking-widest mb-1">Suất {{ idx + 1 }}</span>
+                  <div class="flex items-center gap-2.5 text-white/80">
+                    <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0">
+                      <PhCalendarBlank weight="duotone" class="text-white/60 text-lg group-hover:text-primary transition-colors" />
+                    </div>
+                    <span class="text-[14px] font-bold">{{ formatEventDate(st.startAt).split(', N')[0] }}</span>
+                  </div>
+                  <div class="flex items-center gap-2.5 text-white/50 mt-1">
+                    <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0">
+                      <PhClock weight="duotone" class="text-white/60 text-lg group-hover:text-primary transition-colors" />
+                    </div>
+                    <span class="text-[13px] font-medium">{{ formatTimeOnly(st.startAt) }} - {{ formatTimeOnly(st.endAt) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <!-- Interactive SeatMap / Venue Map Section -->
           <section id="venue" class="animate-fade-up [animation-delay:400ms] scroll-mt-24">
             <div class="flex items-center gap-6 mb-8">
@@ -419,7 +447,7 @@ import {
   PhMinus, PhPlus, PhProhibit, PhShieldCheck, PhEnvelopeSimple,
   PhLightning, PhHeart, PhShareNetwork, PhMagnifyingGlass,
   PhMusicNotes, PhCamera, PhBeerBottle, PhGift, PhCrown, PhCompass, 
-  PhSuitcaseRolling, PhSpinner, PhWarningCircle, PhX
+  PhSuitcaseRolling, PhSpinner, PhWarningCircle, PhX, PhClock
 } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -817,6 +845,16 @@ const formatEventDate = (dateStr) => {
     const month = (date.getMonth() + 1).toString().padStart(2, '0')
     const year = date.getFullYear()
     return `${time}, ${weekday}, Ngày ${day}/${month}/${year}`
+  } catch (e) {
+    return dateStr
+  }
+}
+
+const formatTimeOnly = (dateStr) => {
+  if (!dateStr) return '--:--'
+  try {
+    const date = new Date(dateStr)
+    return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
   } catch (e) {
     return dateStr
   }

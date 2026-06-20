@@ -16,8 +16,8 @@ namespace Catalog.Application.Common.Mappers
                     src.CategoryId,
                     src.Title,
                     src.Description,
-                    src.StartAt,
-                    src.EndAt,
+                    src.ShowTimes.Any() ? src.ShowTimes.Min(s => s.StartAt) : DateTime.UtcNow,
+                    src.ShowTimes.Any() ? src.ShowTimes.Max(s => s.EndAt) : DateTime.UtcNow,
                     src.SaleOpenAt,
                     src.SaleCloseAt,
                     src.CoverImageUrl,
@@ -26,6 +26,8 @@ namespace Catalog.Application.Common.Mappers
                 .ForMember(dest => dest.TicketTypes,
                 opt => opt.Ignore())
                 .ForMember(dest => dest.Location,
+                opt => opt.Ignore())
+                .ForMember(dest => dest.ShowTimes,
                 opt => opt.Ignore());
 
             CreateMap<CreateTicketTypeRequest, TicketType>()
@@ -77,7 +79,13 @@ namespace Catalog.Application.Common.Mappers
                 .ForMember(dest => dest.Location,
                 opt => opt.MapFrom(src => src.Location))
                 .ForMember(dest => dest.TicketTypes,
-                opt => opt.MapFrom(src => src.TicketTypes));
+                opt => opt.MapFrom(src => src.TicketTypes))
+                .ForMember(dest => dest.Showtimes,
+                opt => opt.MapFrom(src => src.ShowTimes));
+
+            CreateMap<ShowTime, ShowtimeDto>()
+                .ForMember(dest => dest.Status,
+                opt => opt.MapFrom(src => src.Status.GetDisplayName()));
 
             CreateMap<EventLocation, EventLocationDto>()
                 .ForMember(dest => dest.VenueName,

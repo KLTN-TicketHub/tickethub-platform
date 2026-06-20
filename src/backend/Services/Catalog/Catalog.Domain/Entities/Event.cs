@@ -44,6 +44,9 @@ namespace Catalog.Domain.Entities
         private readonly List<TicketType> _ticketTypes = new List<TicketType>();
         public IReadOnlyCollection<TicketType> TicketTypes => _ticketTypes.AsReadOnly();
 
+        private readonly List<ShowTime> _showTimes = new List<ShowTime>();
+        public IReadOnlyCollection<ShowTime> ShowTimes => _showTimes.AsReadOnly();
+
         public EventApproval? Approval { get; private set; }
 
         public Event(
@@ -77,6 +80,11 @@ namespace Catalog.Domain.Entities
         public void SetEventLocation(string venueName, string addressLine, string ward, string district, string provinceCity, string country)
         {
             Location = new EventLocation(venueName, addressLine, ward, district, provinceCity, country);
+        }
+
+        public void AddShowTime(DateTime startAt, DateTime endAt)
+        {
+            _showTimes.Add(new ShowTime(startAt, endAt));
         }
 
         public void AddTicketType(TicketType ticketType)

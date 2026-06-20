@@ -96,6 +96,30 @@
           </div>
         </div>
 
+      <!-- Showtimes -->
+        <div v-if="event.showtimes && event.showtimes.length > 0" class="flex flex-col gap-5">
+          <div class="flex items-center gap-4">
+            <h2 class="text-xl font-black text-white uppercase tracking-wider">Các suất chiếu</h2>
+            <div class="h-px flex-1 bg-white/10"></div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div v-for="(st, idx) in event.showtimes" :key="st.id" class="p-4 rounded-2xl bg-[#111916] border border-white/10 shadow-lg relative group overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div class="relative z-10 flex flex-col gap-1">
+                <span class="text-primary font-bold text-[11px] uppercase tracking-widest mb-1.5">Suất {{ idx + 1 }}</span>
+                <div class="flex items-center gap-2 text-white/80">
+                  <PhCalendarStar weight="bold" class="text-white/40" />
+                  <span class="text-[13px] font-medium">{{ formatDateString(st.startAt).split(' - ')[0] || formatDateString(st.startAt) }}</span>
+                </div>
+                <div class="flex items-center gap-2 text-white/50 mt-1">
+                  <PhClock weight="bold" class="text-white/30" />
+                  <span class="text-[12px]">{{ formatTimeOnly(st.startAt) }} - {{ formatTimeOnly(st.endAt) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- Right Column: Meta Info -->
@@ -203,7 +227,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getModeratorEventDetail, reviewModeratorEvent } from '../../services/eventService'
-import { PhArrowLeft, PhCheckCircle, PhWarningCircle, PhClockClockwise, PhCheck, PhCalendarStar, PhMapPin, PhEnvelope, PhPhone, PhTicket, PhMapTrifold } from '@phosphor-icons/vue'
+import { PhArrowLeft, PhCheckCircle, PhWarningCircle, PhClockClockwise, PhCheck, PhCalendarStar, PhMapPin, PhEnvelope, PhPhone, PhTicket, PhMapTrifold, PhClock } from '@phosphor-icons/vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -312,6 +336,16 @@ const submitReject = async () => {
   } catch (e) {
     console.error(e)
     alert("Đã có lỗi xảy ra. Vui lòng thử lại sau.")
+  }
+}
+
+const formatTimeOnly = (dateStr) => {
+  if (!dateStr) return '--:--'
+  try {
+    const date = new Date(dateStr)
+    return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
+  } catch (e) {
+    return dateStr
   }
 }
 </script>
