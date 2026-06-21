@@ -34,5 +34,12 @@ namespace Catalog.API.Controllers.V1.Public
                 Data = result,
             });
         }
+
+        [AllowAnonymous]
+        [HttpGet("{eventId:guid}")]
+        public async Task<IActionResult> GetEventAsync(Guid eventId, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

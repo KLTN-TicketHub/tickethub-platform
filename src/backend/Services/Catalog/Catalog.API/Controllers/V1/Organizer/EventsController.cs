@@ -4,7 +4,7 @@ using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Application.Common.DTOs.Events;
 using Catalog.Application.Features.Events.Commands.CreateEvent;
-using Catalog.Application.Features.Events.Queries.GetByIdForOrganizer;
+using Catalog.Application.Features.Events.Queries.GetEventByIdForOrganizer;
 using Catalog.Application.Features.Events.Queries.GetEventsForOrganizer;
 using Catalog.Application.Features.Events.Requests;
 using MediatR;

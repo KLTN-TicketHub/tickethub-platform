@@ -1,29 +1,40 @@
-using System;
-using Inventory.Common.Enums;
+﻿using BuildingBlocks.Domain.DDD;
+using System.ComponentModel.DataAnnotations;
 
 namespace Inventory.Infrastructure.Entities
 {
-    public class ShowtimeSeat
+    public class ShowtimeSeat : BaseEntity, IAggregateRoot
     {
-        public Guid Id { get; set; }
-        public Guid ShowtimeId { get; set; }
+        public Guid ShowTimeId { get; set; }
+
         public Guid SeatId { get; set; }
+
         public Guid? OrderId { get; set; }
-        public string? UserId { get; set; }
-        
-        // Denormalized fields for quick ticket rendering & check-in scanning
+
+        public Guid UserId { get; set; }
+
         public decimal Price { get; set; }
-        public string RowName { get; set; } = default!;
-        public int SeatNumber { get; set; }
-        
-        // Seating transaction status
-        public ShowtimeSeatStatus Status { get; set; } = ShowtimeSeatStatus.Sold;
-        
-        // Fields for check-in gates
-        public bool IsCheckedIn { get; set; } = false;
+
+        public string Row { get; set; }
+
+        public string SeatName { get; set; }
+
+        public SeatStatus SeatStatus { get; set; }
+
+        public bool IsCheckedIn { get; set; }
+
         public DateTime? CheckedInAt { get; set; }
-        
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+    }
+
+    public enum SeatStatus
+    {
+        [Display(Name = "Đã bán")]
+        Sold = 1,
+
+        [Display(Name = "Đã đặt")]
+        Reserved = 2,
+
+        [Display(Name = "Đã hủy")]
+        Cancelled = 3
     }
 }

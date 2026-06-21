@@ -5,20 +5,20 @@ using Catalog.Application.Common.DTOs.Events;
 using Catalog.Domain.Interfaces;
 using MediatR;
 
-namespace Catalog.Application.Features.Events.Queries.GetByIdForModerator
+namespace Catalog.Application.Features.Events.Queries.GetEventByIdForModerator
 {
-    public class GetByIdForModeratorQueryHandler : IRequestHandler<GetByIdForModeratorQuery, EventDto>
+    public class GetEventByIdForModeratorQueryHandler : IRequestHandler<GetEventByIdForModeratorQuery, EventDto>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFileService _fileService;
 
-        public GetByIdForModeratorQueryHandler(IUnitOfWork unitOfWork, IFileService fileService)
+        public GetEventByIdForModeratorQueryHandler(IUnitOfWork unitOfWork, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
             _fileService = fileService;
         }
 
-        public async Task<EventDto> Handle(GetByIdForModeratorQuery query, CancellationToken cancellationToken = default)
+        public async Task<EventDto> Handle(GetEventByIdForModeratorQuery query, CancellationToken cancellationToken = default)
         {
             return await GetEventByIdForModeratorAsync(query.Id, cancellationToken);
         }

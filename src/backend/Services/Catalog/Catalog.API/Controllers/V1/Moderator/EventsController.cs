@@ -4,7 +4,7 @@ using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Application.Common.DTOs.Events;
 using Catalog.Application.Features.Events.Commands.ReviewEvent;
-using Catalog.Application.Features.Events.Queries.GetByIdForModerator;
+using Catalog.Application.Features.Events.Queries.GetEventByIdForModerator;
 using Catalog.Application.Features.Events.Queries.GetEventsForModerator;
 using Catalog.Application.Features.Events.Requests;
 using MediatR;
@@ -69,7 +69,7 @@ namespace Catalog.API.Controllers.V1.Moderator
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetEventByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var result = await _sender.Send(new GetByIdForModeratorQuery(id), cancellationToken);
+            var result = await _sender.Send(new GetEventByIdForModeratorQuery(id), cancellationToken);
 
             return Ok(new ApiResponse<EventDto>
             {

@@ -5,7 +5,7 @@ using Catalog.Application.Common.DTOs.Events;
 using Catalog.Domain.Interfaces;
 using MediatR;
 
-namespace Catalog.Application.Features.Events.Queries.GetByIdForOrganizer
+namespace Catalog.Application.Features.Events.Queries.GetEventByIdForOrganizer
 {
     public class GetByIdForOrganizerQueryHandler : IRequestHandler<GetByIdForOrganizerQuery, EventDto>
     {
