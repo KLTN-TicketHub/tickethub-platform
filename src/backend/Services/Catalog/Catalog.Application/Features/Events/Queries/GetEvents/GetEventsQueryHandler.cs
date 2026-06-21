@@ -29,10 +29,12 @@ namespace Catalog.Application.Features.Events.Queries.GetEvents
         private async Task<PaginatedResult<EventListItemDto>> GetEventsAsync(GetEventsRequest request, CancellationToken cancellationToken)
         {
             var search = request.Search?.Trim();
+            var now = DateTime.UtcNow;
 
             Expression<Func<Event, bool>> filter = e =>
                 !e.IsDeleted &&
                 e.Status == EventStatus.Published &&
+                e.EndAt >= now &&
                 (string.IsNullOrEmpty(search) || e.Title.Contains(search)) &&
                 (request.CategoryId == Guid.Empty || e.CategoryId == request.CategoryId) &&
                 (!request.FromDate.HasValue || e.StartAt >= request.FromDate.Value) &&

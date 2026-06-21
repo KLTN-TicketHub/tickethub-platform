@@ -1,6 +1,7 @@
-﻿using BuildingBlocks.Contracts.Models.Pagination;
+using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Application.Common.DTOs.Events;
+using Catalog.Application.Features.Events.Queries.GetEventById;
 using Catalog.Application.Features.Events.Queries.GetEvents;
 using Catalog.Application.Features.Events.Requests;
 using MediatR;
@@ -39,7 +40,14 @@ namespace Catalog.API.Controllers.V1.Public
         [HttpGet("{eventId:guid}")]
         public async Task<IActionResult> GetEventAsync(Guid eventId, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var result = await _sender.Send(new GetEventByIdQuery(eventId), cancellationToken);
+
+            return Ok(new ApiResponse<EventDto>
+            {
+                Success = true,
+                Message = "Lấy chi tiết sự kiện thành công",
+                Data = result,
+            });
         }
     }
 }

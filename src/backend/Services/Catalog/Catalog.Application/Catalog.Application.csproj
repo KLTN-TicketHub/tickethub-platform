@@ -22,7 +22,6 @@
 	<ItemGroup>
 	  <Folder Include="Features\EventCategories\Commands\CreateEventCategory\" />
 	  <Folder Include="Features\EventCategories\Validators\" />
-	  <Folder Include="Features\Events\Queries\GetById\" />
 	</ItemGroup>
 
 </Project>
