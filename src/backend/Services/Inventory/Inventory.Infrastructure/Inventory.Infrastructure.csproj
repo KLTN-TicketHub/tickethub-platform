@@ -23,8 +23,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Data\Contexts\" />
-		<Folder Include="Entities\" />
+		<Folder Include="Interfaces\IServices\" />
+		<Folder Include="Migrations\" />
+		<Folder Include="Services\" />
 	</ItemGroup>
 
 	<ItemGroup>

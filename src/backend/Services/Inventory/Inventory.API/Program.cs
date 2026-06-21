@@ -2,10 +2,10 @@ using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
 using BuildingBlocks.Infrastructure.Outbox;
-using Inventory.API.Extensions;
-using Inventory.Infrastructure.Data.Contexts;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Inventory.API.Extensions;
+using Inventory.Infrastructure.Data.Contexts;
 
 var builder = WebApplication.CreateBuilder(args);
 

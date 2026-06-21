@@ -2,6 +2,8 @@ using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Infrastructure.Auditing;
 using BuildingBlocks.Infrastructure.Services;
 using Inventory.Infrastructure.Data.Contexts;
+using Inventory.Infrastructure.Data.Repositories;
+using Inventory.Infrastructure.Interfaces.IRepositories;
 
 namespace Inventory.API.Extensions
 {
@@ -27,6 +29,9 @@ namespace Inventory.API.Extensions
         public static IServiceCollection RegisterRepositories(IServiceCollection services)
         {
             services.AddScoped<AuditInterceptor>();
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+            services.AddScoped<IShowtimeTicketInventoryRepository, ShowtimeTicketInventoryRepository>();
+            services.AddScoped<IShowtimeSeatRepository, ShowtimeSeatRepository>();
             return services;
         }
     }

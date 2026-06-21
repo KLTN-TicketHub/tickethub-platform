@@ -1,5 +1,6 @@
 using BuildingBlocks.Domain.Outbox;
 using BuildingBlocks.Infrastructure.Auditing;
+using Inventory.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Infrastructure.Data.Contexts
@@ -13,6 +14,8 @@ namespace Inventory.Infrastructure.Data.Contexts
         #region DbSet Section
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<OutboxMessage> OutboxMessages { get; set; }
+        public DbSet<ShowtimeSeat> ShowtimeSeats { get; set; }
+        public DbSet<ShowtimeTicketInventory> ShowtimeTicketInventories { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
