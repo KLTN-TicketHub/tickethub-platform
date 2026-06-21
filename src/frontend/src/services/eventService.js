@@ -4,7 +4,11 @@
 // with actual fetch/axios calls. The function signatures stay the same.
 
 import api from './api/axios'
-import { ORGANIZER_EVENT_DETAIL, MODERATOR_EVENT_DETAIL, ORGANIZER_EVENTS_LIST, MODERATOR_EVENTS_LIST, EVENT_STATUSES_FOR_MODERATOR, MODERATOR_EVENT_REVIEW } from './api/endpoints'
+import { 
+  ORGANIZER_EVENT_DETAIL, MODERATOR_EVENT_DETAIL, ORGANIZER_EVENTS_LIST, 
+  MODERATOR_EVENTS_LIST, EVENT_STATUSES_FOR_MODERATOR, MODERATOR_EVENT_REVIEW,
+  PUBLIC_EVENTS, CATALOG_EVENT_DETAIL, COMMON_EVENT_CATEGORIES
+} from './api/endpoints'
 import { MOCK_EVENTS } from '../mocks/eventMock'
 
 // In-memory store that simulates a database
@@ -131,6 +135,24 @@ export async function fetchStars() {
 export async function fetchDestinations() {
   await delay(200)
   return [...MOCK_DESTINATIONS]
+}
+
+/**
+ * Lấy danh sách sự kiện cho Customer (Public) có phân trang và tìm kiếm
+ * GET /catalog/events
+ */
+export async function getPublicEvents(params) {
+  const response = await api.get(PUBLIC_EVENTS, { params })
+  return response.data
+}
+
+/**
+ * Lấy danh sách danh mục sự kiện (Public)
+ * GET /catalog/event-categories
+ */
+export async function getPublicEventCategories() {
+  const response = await api.get(COMMON_EVENT_CATEGORIES)
+  return response.data
 }
 
 /**

@@ -4,6 +4,7 @@ import { tryRefresh } from '../services/auth/auth.service'
 import { store } from '../stores/eventStore'
 
 import HomePage from '../pages/HomePage.vue'
+import SearchPage from '../pages/SearchPage.vue'
 import CategoryPage from '../pages/CategoryPage.vue'
 import EventDetailPage from '../pages/EventDetailPage.vue'
 import MyTicketsPage from '../pages/MyTicketsPage.vue'
@@ -47,6 +48,7 @@ import OrganizerRegisterPage from '../pages/organizer/OrganizerRegisterPage.vue'
 
 const routes = [
   { path: '/', name: 'home', component: HomePage },
+  { path: '/search', name: 'search', component: SearchPage },
   { path: '/:type(concerts|arts|sports|experiences|workshops|others)', name: 'category', component: CategoryPage },
   { path: '/event/:id', name: 'event-detail', component: EventDetailPage },
   { path: '/my-tickets', name: 'my-tickets', component: MyTicketsPage },

@@ -39,6 +39,7 @@
             v-model="searchQuery"
             @input="handleSearch"
             @focus="handleSearch(); showSearch = true"
+            @keyup.enter="handleSearchEnter"
             class="w-full bg-[#111916]/80 backdrop-blur-md border border-white/10 rounded-full py-2.5 pl-12 pr-6 text-[13px] text-white font-medium outline-none focus:border-primary/50 focus:bg-white/10 transition-all placeholder:text-white/40"
           />
         </div>
@@ -230,6 +231,13 @@ const handleSearch = () => {
     (e.location?.name?.toLowerCase().includes(q))
   ).slice(0, 6)
   showSearch.value = true
+}
+
+const handleSearchEnter = () => {
+  if (searchQuery.value.trim()) {
+    showSearch.value = false
+    router.push({ path: '/search', query: { Search: searchQuery.value.trim() } })
+  }
 }
 
 const formatDate = (dateStr) => {

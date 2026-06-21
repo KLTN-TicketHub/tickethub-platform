@@ -51,7 +51,8 @@ namespace Catalog.Application.Features.Events.Queries.GetEvents
                         StartAt = e.StartAt,
                         EndAt = e.EndAt,
                         CoverImageUrl = _fileService.GetAbsoluteUrl(e.CoverImageUrl),
-                        CategoryName = e.Category.CategoryName,
+                        CategoryName = e.Category!.CategoryName,
+                        MinPrice = e.ShowTimes.SelectMany(st => st.TicketTypes).Min(tt => tt.Price),
                         ProvinceCity = e.Location.ProvinceCity
                     },
                     pageNumber: request.PageNumber,

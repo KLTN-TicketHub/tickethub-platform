@@ -86,7 +86,7 @@
           <h2 class="text-4xl lg:text-5xl font-black font-heading text-white mb-3">Đang Thịnh Hành</h2>
           <p class="text-white/50 text-lg font-medium">Những sự kiện nóng hổi nhất không thể bỏ qua</p>
         </div>
-        <router-link to="/concerts" class="text-sm font-bold text-primary hover:text-white flex items-center gap-2 group transition-all hidden md:flex">
+        <router-link to="/search" class="text-sm font-bold text-primary hover:text-white flex items-center gap-2 group transition-all hidden md:flex">
           Xem tất cả <PhArrowRight weight="bold" class="group-hover:translate-x-1 transition-transform" />
         </router-link>
       </div>
@@ -201,7 +201,7 @@
           {{ cat.label }}
         </h2>
         <div class="flex items-center gap-4">
-          <router-link :to="'/' + cat.key" class="text-sm font-bold text-white/50 hover:text-white hidden md:flex items-center gap-2 transition-colors">
+          <router-link to="/search" class="text-sm font-bold text-white/50 hover:text-white hidden md:flex items-center gap-2 transition-colors">
             Khám phá <PhArrowRight weight="bold" />
           </router-link>
           <div class="flex gap-2">

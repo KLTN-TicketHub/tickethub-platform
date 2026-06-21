@@ -16,7 +16,8 @@ export const ORGANIZER_AUTH_REGISTER = '/auth/organizer'
 export const EVENTS = '/events'
 export const USERS = '/users'
 // Public Catalog
-export const CATALOG_EVENT_DETAIL = (id) => `/events/${id}`
+export const PUBLIC_EVENTS = '/catalog/events'
+export const CATALOG_EVENT_DETAIL = (id) => `/catalog/events/${id}`
 export const PUBLIC_VENUES = '/catalog/venues'
 export const PUBLIC_VENUE_SEATMAP_DETAIL = (venueId, seatMapId) => `/catalog/venue/${venueId}/seat-maps/${seatMapId}`
 
@@ -54,9 +55,12 @@ export const UPLOAD_SVG = '/catalog/common/files/upload-svg'
 export const UPLOAD_COVER_IMAGE = '/catalog/common/files/upload-cover-image'
 export const EVENT_STATUSES_LOOKUP = '/catalog/common/lookup/event-statuses'
 export const EVENT_STATUSES_FOR_MODERATOR = '/catalog/common/lookup/event-statuses-for-moderator'
-export const COMMON_EVENT_CATEGORIES = 'catalog/event-categories'
+export const COMMON_EVENT_CATEGORIES = '/catalog/event-categories'
 
-// Locations (Vietnam Provinces API)
-export const LOCATION_PROVINCES = '/p/'
-export const LOCATION_DISTRICTS = (provinceCode) => `/p/${provinceCode}`
-export const LOCATION_WARDS = (districtCode) => `/d/${districtCode}`
+// Locations API
+export const LOCATION_PROVINCES = '/catalog/locations/provinces'
+export const LOCATION_DISTRICTS = (provinceCode) => `/catalog/locations/provinces/${provinceCode}/districts`
+export const LOCATION_WARDS = (districtCode) => `/catalog/locations/districts/${districtCode}/wards`
+
+
+

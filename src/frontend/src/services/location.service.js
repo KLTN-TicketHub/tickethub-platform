@@ -1,21 +1,43 @@
-const BASE_URL = 'https://provinces.open-api.vn/api/v1'
+import api from './api/axios'
+import { LOCATION_PROVINCES, LOCATION_DISTRICTS, LOCATION_WARDS } from './api/endpoints'
 
 export async function getProvinces() {
-  const response = await fetch(`${BASE_URL}/p/`)
-  const data = await response.json()
-  return data || []
+  try {
+    const response = await api.get(LOCATION_PROVINCES)
+    if (response.data && response.data.success) {
+      return response.data.data || []
+    }
+    return []
+  } catch (error) {
+    console.error('Failed to get provinces:', error)
+    return []
+  }
 }
 
 export async function getDistricts(provinceCode) {
   if (!provinceCode) return []
-  const response = await fetch(`${BASE_URL}/p/${provinceCode}?depth=2`)
-  const data = await response.json()
-  return data?.districts || []
+  try {
+    const response = await api.get(LOCATION_DISTRICTS(provinceCode))
+    if (response.data && response.data.success) {
+      return response.data.data || []
+    }
+    return []
+  } catch (error) {
+    console.error('Failed to get districts:', error)
+    return []
+  }
 }
 
 export async function getWards(districtCode) {
   if (!districtCode) return []
-  const response = await fetch(`${BASE_URL}/d/${districtCode}?depth=2`)
-  const data = await response.json()
-  return data?.wards || []
+  try {
+    const response = await api.get(LOCATION_WARDS(districtCode))
+    if (response.data && response.data.success) {
+      return response.data.data || []
+    }
+    return []
+  } catch (error) {
+    console.error('Failed to get wards:', error)
+    return []
+  }
 }

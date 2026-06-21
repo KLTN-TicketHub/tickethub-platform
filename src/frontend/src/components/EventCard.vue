@@ -7,7 +7,7 @@
     <div class="relative w-full aspect-[4/5] overflow-hidden bg-[#0A0F0D]">
       <img 
         class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 group-hover:opacity-80" 
-        :src="event.image" 
+        :src="event.coverImageUrl || event.image" 
         :alt="event.title" 
         loading="lazy" 
       />
@@ -75,10 +75,10 @@
 
       <div class="mt-auto pt-3 border-t border-white/5 flex items-center justify-between text-[13px] text-muted font-medium">
         <div class="flex items-center gap-2">
-          <span class="text-lg">📅</span> {{ formatDate(event.dateStart) }}
+          <span class="text-lg">📅</span> {{ formatDate(event.startAt || event.dateStart) }}
         </div>
         <div class="flex items-center gap-2 max-w-[50%] truncate">
-          <span class="text-lg">📍</span> <span class="truncate">{{ event.location?.name || 'Đang cập nhật' }}</span>
+          <span class="text-lg">📍</span> <span class="truncate">{{ event.location?.name || event.provinceCity || 'Đang cập nhật' }}</span>
         </div>
       </div>
     </div>
