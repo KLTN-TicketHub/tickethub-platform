@@ -1,4 +1,5 @@
 using BuildingBlocks.API.Extensions;
+using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
@@ -25,10 +26,12 @@ namespace Catalog.API.Controllers.V1.Moderator
     public class VenuesController : ControllerBase
     {
         private readonly ISender _sender;
+        private readonly ICacheService _cacheService;
 
-        public VenuesController(ISender sender)
+        public VenuesController(ISender sender, ICacheService cacheService)
         {
             _sender = sender;
+            _cacheService = cacheService;
         }
 
         [EnableRateLimiting(RateLimitPolicies.PerUser)]
@@ -53,7 +56,14 @@ namespace Catalog.API.Controllers.V1.Moderator
             [FromRoute] Guid id,
             CancellationToken cancellationToken = default)
         {
-            VenueDto result = await _sender.Send(new GetVenueByIdQuery(id), cancellationToken);
+            string cacheKey = $"catalog:venue:id:{id}";
+
+            VenueDto? result = await _cacheService.GetAsync<VenueDto>(cacheKey, cancellationToken);
+            if (result == null)
+            {
+                result = await _sender.Send(new GetVenueByIdQuery(id), cancellationToken);
+                await _cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(10), cancellationToken);
+            }
 
             return Ok(new ApiResponse<VenueDto>
             {
@@ -86,6 +96,9 @@ namespace Catalog.API.Controllers.V1.Moderator
         {
             var result = await _sender.Send(new UpdateVenueCommand(id, request), cancellationToken);
 
+            // Invalidate specific venue details cache
+            await _cacheService.RemoveAsync($"catalog:venue:id:{id}", cancellationToken);
+
             return Ok(new ApiResponse<VenueDto>
             {
                 Success = true,
@@ -101,6 +114,9 @@ namespace Catalog.API.Controllers.V1.Moderator
             CancellationToken cancellationToken = default)
         {
             await _sender.Send(new DeleteVenueCommand(id), cancellationToken);
+
+            // Invalidate specific venue details cache
+            await _cacheService.RemoveAsync($"catalog:venue:id:{id}", cancellationToken);
 
             return Ok(new ApiResponse
             {

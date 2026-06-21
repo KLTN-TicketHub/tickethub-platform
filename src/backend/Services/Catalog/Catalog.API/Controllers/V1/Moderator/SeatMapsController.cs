@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
@@ -22,10 +23,12 @@ namespace Catalog.API.Controllers.V1.Moderator
     public class SeatMapsController : ControllerBase
     {
         private readonly ISender _sender;
+        private readonly ICacheService _cacheService;
 
-        public SeatMapsController(ISender sender)
+        public SeatMapsController(ISender sender, ICacheService cacheService)
         {
             _sender = sender;
+            _cacheService = cacheService;
         }
 
         [HttpPost]
@@ -50,7 +53,14 @@ namespace Catalog.API.Controllers.V1.Moderator
             [FromRoute] Guid id,
             CancellationToken cancellation = default)
         {
-            var result = await _sender.Send(new GetSeatMapByIdQuery(venueId, id), cancellation);
+            string cacheKey = $"catalog:seatmap:id:{id}";
+
+            var result = await _cacheService.GetAsync<SeatMapDto>(cacheKey, cancellation);
+            if (result == null)
+            {
+                result = await _sender.Send(new GetSeatMapByIdQuery(venueId, id), cancellation);
+                await _cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(10), cancellation);
+            }
 
             return Ok(new ApiResponse<SeatMapDto>
             {
@@ -83,6 +93,9 @@ namespace Catalog.API.Controllers.V1.Moderator
             CancellationToken cancellation = default)
         {
             await _sender.Send(new DeleteSeatMapCommand(venueId, id), cancellation);
+
+            // Remove specific seatmap details cache
+            await _cacheService.RemoveAsync($"catalog:seatmap:id:{id}", cancellation);
 
             return Ok(new ApiResponse<bool>
             {

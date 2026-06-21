@@ -25,6 +25,11 @@
     <Project Path="Services/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj" />
     <Project Path="Services/Identity/Identity.UnitTest/Identity.UnitTest.csproj" />
   </Folder>
+  <Folder Name="/Services/Inventory/">
+    <Project Path="Services/Inventory/Inventory.API/Inventory.API.csproj" />
+    <Project Path="Services/Inventory/Inventory.Common/Inventory.Common.csproj" />
+    <Project Path="Services/Inventory/Inventory.Infrastructure/Inventory.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Services/Notification/">
     <Project Path="Services/Notification/Notification.Common/Notification.Common.csproj" />
     <Project Path="Services/Notification/Notification.Infrastructure/Notification.Infrastructure.csproj" />
