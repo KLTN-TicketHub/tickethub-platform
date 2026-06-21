@@ -1,3 +1,8 @@
+﻿using BuildingBlocks.Contracts.Models.Pagination;
+using BuildingBlocks.Contracts.Models.Responses;
+using Catalog.Application.Common.DTOs.Events;
+using Catalog.Application.Features.Events.Queries.GetEvents;
+using Catalog.Application.Features.Events.Requests;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,9 +23,16 @@ namespace Catalog.API.Controllers.V1.Public
 
         [AllowAnonymous]
         [HttpGet]
-        public Task<IActionResult> GetEventsAsync(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetEventsAsync([FromQuery] GetEventsRequest request, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var result = await _sender.Send(new GetEventsQuery(request), cancellationToken);
+
+            return Ok(new ApiResponse<PaginatedResult<EventListItemDto>>
+            {
+                Success = true,
+                Message = "Lấy danh sách sự kiện thành công",
+                Data = result,
+            });
         }
     }
 }
