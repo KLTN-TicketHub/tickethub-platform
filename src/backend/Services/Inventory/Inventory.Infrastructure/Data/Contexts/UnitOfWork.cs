@@ -8,11 +8,14 @@ namespace Inventory.Infrastructure.Data.Contexts
     {
         public UnitOfWork(
             InventoryDbContext dbContext,
-            IAuditLogRepository auditLogRepository) : base(dbContext)
+            IAuditLogRepository auditLogRepository,
+            IShowtimeSeatRepository showtimeSeatRepository) : base(dbContext)
         {
             AuditLogRepository = auditLogRepository;
+            ShowtimeSeatRepository = showtimeSeatRepository;
         }
 
         public IAuditLogRepository AuditLogRepository { get; }
+        public IShowtimeSeatRepository ShowtimeSeatRepository { get; }
     }
 }

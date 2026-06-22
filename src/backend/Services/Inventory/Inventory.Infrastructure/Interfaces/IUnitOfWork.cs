@@ -6,5 +6,6 @@ namespace Inventory.Infrastructure.Interfaces
     public interface IUnitOfWork : IBaseUnitOfWork
     {
         IAuditLogRepository AuditLogRepository { get; }
+        IShowtimeSeatRepository ShowtimeSeatRepository { get; }
     }
 }

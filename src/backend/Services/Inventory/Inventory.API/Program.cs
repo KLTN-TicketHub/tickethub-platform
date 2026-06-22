@@ -5,6 +5,7 @@ using BuildingBlocks.Infrastructure.Outbox;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Inventory.API.Extensions;
+using Inventory.API.Hubs;
 using Inventory.API.Services;
 using Inventory.Infrastructure.Data.Contexts;
 
@@ -39,6 +40,7 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.AddCustomFluentValidation();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSignalR();
 builder.Services.AddGrpc();
 
 var app = builder.Build();
@@ -62,6 +64,7 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHub<SeatMapHub>("/hubs/seatmap");
 app.MapControllers();
 
 app.Run();

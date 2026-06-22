@@ -3,9 +3,11 @@ using BuildingBlocks.Infrastructure.Auditing;
 using BuildingBlocks.Infrastructure.Services;
 using Inventory.Infrastructure.Data.Contexts;
 using Inventory.Infrastructure.Data.Repositories;
+using Inventory.Infrastructure.Interfaces;
 using Inventory.Infrastructure.Interfaces.IRepositories;
 using Inventory.Infrastructure.Interfaces.IServices;
 using Inventory.Infrastructure.Services;
+using Inventory.API.Services;
 
 namespace Inventory.API.Extensions
 {
@@ -25,6 +27,8 @@ namespace Inventory.API.Extensions
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IRedisLockService, RedisLockService>();
+            services.AddScoped<ISeatStateService, SeatStateService>();
+            services.AddScoped<ISeatHubNotificationService, SeatHubNotificationService>();
 
             return services;
         }
@@ -35,6 +39,7 @@ namespace Inventory.API.Extensions
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
             services.AddScoped<IShowtimeTicketInventoryRepository, ShowtimeTicketInventoryRepository>();
             services.AddScoped<IShowtimeSeatRepository, ShowtimeSeatRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
     }
