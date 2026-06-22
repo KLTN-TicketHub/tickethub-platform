@@ -4,6 +4,8 @@ using BuildingBlocks.Infrastructure.Services;
 using Inventory.Infrastructure.Data.Contexts;
 using Inventory.Infrastructure.Data.Repositories;
 using Inventory.Infrastructure.Interfaces.IRepositories;
+using Inventory.Infrastructure.Interfaces.IServices;
+using Inventory.Infrastructure.Services;
 
 namespace Inventory.API.Extensions
 {
@@ -22,6 +24,7 @@ namespace Inventory.API.Extensions
             services.AddScoped<IEventPublisher, MassTransitEventPublisher<InventoryDbContext>>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFileService, FileService>();
+            services.AddScoped<IRedisLockService, RedisLockService>();
 
             return services;
         }

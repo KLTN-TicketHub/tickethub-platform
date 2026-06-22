@@ -38,6 +38,7 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.AddCustomFluentValidation();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddGrpc();
 
 var app = builder.Build();
 
