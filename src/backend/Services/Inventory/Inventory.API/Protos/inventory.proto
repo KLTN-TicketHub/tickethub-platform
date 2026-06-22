@@ -6,6 +6,8 @@ package inventory;
 
 service InventoryGrpc {
   rpc UpgradeSeatLocks (UpgradeSeatLocksRequest) returns (UpgradeSeatLocksResponse);
+  rpc LockTicketQuantities (LockTicketQuantitiesRequest) returns (LockTicketQuantitiesResponse);
+  rpc UnlockTicketQuantities (UnlockTicketQuantitiesRequest) returns (UnlockTicketQuantitiesResponse);
 }
 
 message UpgradeSeatLocksRequest {
@@ -15,6 +17,33 @@ message UpgradeSeatLocksRequest {
 }
 
 message UpgradeSeatLocksResponse {
+  bool isSuccess = 1;
+  string message = 2;
+}
+
+message LockTicketQuantitiesRequest {
+  string showtimeId = 1;
+  string userId = 2;
+  repeated TicketQuantityDto ticketQuantities = 3;
+}
+
+message TicketQuantityDto {
+  string ticketTypeId = 1;
+  int32 quantity = 2;
+}
+
+message LockTicketQuantitiesResponse {
+  bool isSuccess = 1;
+  string message = 2;
+}
+
+message UnlockTicketQuantitiesRequest {
+  string showtimeId = 1;
+  string userId = 2;
+  repeated string ticketTypeIds = 3;
+}
+
+message UnlockTicketQuantitiesResponse {
   bool isSuccess = 1;
   string message = 2;
 }

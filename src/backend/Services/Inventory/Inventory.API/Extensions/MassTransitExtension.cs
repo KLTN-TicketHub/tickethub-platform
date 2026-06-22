@@ -1,4 +1,5 @@
 using Inventory.Common.Options;
+using Inventory.Infrastructure.Consumers;
 using MassTransit;
 using Microsoft.Extensions.Options;
 
@@ -10,6 +11,8 @@ namespace Inventory.API.Extensions
         {
             services.AddMassTransit(x =>
             {
+                x.AddConsumer<EventPublishedConsumer>();
+
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     RabbitMqOptions rabbitMqOptions = context

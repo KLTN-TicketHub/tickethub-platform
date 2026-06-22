@@ -7,5 +7,6 @@ namespace Inventory.Infrastructure.Interfaces
     {
         IAuditLogRepository AuditLogRepository { get; }
         IShowtimeSeatRepository ShowtimeSeatRepository { get; }
+        IShowtimeTicketInventoryRepository ShowtimeTicketInventoryRepository { get; }
     }
 }

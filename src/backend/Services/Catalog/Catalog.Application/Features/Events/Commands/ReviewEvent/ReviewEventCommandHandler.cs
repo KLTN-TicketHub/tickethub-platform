@@ -1,5 +1,6 @@
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Events.Email;
+using BuildingBlocks.Contracts.Events.Event;
 using BuildingBlocks.Domain.Exceptions;
 using Catalog.Application.Features.Events.Requests;
 using Catalog.Domain.Entities;
@@ -40,7 +41,10 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
         {
             Event eventEntity = await _unitOfWork.EventRepository.GetOneUntrackedAsync<Event>(
                 filter: e => e.Id == eventId && !e.IsDeleted,
-                include: q => q.Include(e => e.Organizer!),
+                include: q => q.Include(e => e.Organizer!)
+                               .Include(e => e.ShowTimes)
+                               .ThenInclude(s => s.TicketTypes)
+                               .ThenInclude(t => t.Zone),
                 cancellation: cancellation)
                 ?? throw new NotFoundException($"Không tìm thấy sự kiện với ID {eventId}.");
 
@@ -63,6 +67,27 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
                 IsApproved = request.IsApproved,
                 Reason = request.Reason
             });
+
+            if (request.IsApproved)
+            {
+                var eventPublished = new EventPublishedEvent
+                {
+                    EventId = eventEntity.Id,
+                    Showtimes = eventEntity.ShowTimes.Select(s => new ShowtimePublishedDto
+                    {
+                        ShowTimeId = s.Id,
+                        TicketTypes = s.TicketTypes.Select(t => new TicketTypePublishedDto
+                        {
+                            TicketTypeId = t.Id,
+                            Capacity = t.PublishedQuota,
+                            Price = t.Price,
+                            IsReservingSeat = t.Zone?.IsReservingSeat ?? false
+                        }).ToList()
+                    }).ToList()
+                };
+
+                _eventPublisher.Publish(eventPublished);
+            }
 
             return true;
         }

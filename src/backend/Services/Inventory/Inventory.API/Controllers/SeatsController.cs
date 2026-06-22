@@ -23,20 +23,14 @@ namespace Inventory.API.Controllers
             _currentUserService = currentUserService;
         }
 
-        /// <summary>
-        /// API 1: Lấy danh sách các ghế không khả dụng (Đã bán vĩnh viễn hoặc đang bị khóa tạm thời)
-        /// </summary>
         [HttpGet("showtimes/{showtimeId}/seats")]
-        [AllowAnonymous] // Cho phép tất cả mọi người (kể cả chưa đăng nhập) xem sơ đồ ghế
+        [AllowAnonymous]
         public async Task<IActionResult> GetSeatStates(Guid showtimeId)
         {
             var result = await _seatStateService.GetSeatStatesAsync(showtimeId);
             return Ok(result);
         }
 
-        /// <summary>
-        /// API 2: Khóa tạm thời 60 giây khi Khách hàng click chọn ghế trên sơ đồ
-        /// </summary>
         [HttpPost("seats/lock")]
         public async Task<IActionResult> LockSeat([FromBody] LockSeatRequest request)
         {
@@ -54,9 +48,6 @@ namespace Inventory.API.Controllers
             return Ok(new { success = true, message = "Khóa ghế thành công." });
         }
 
-        /// <summary>
-        /// API 3: Hủy khóa khi Khách hàng click bỏ chọn ghế
-        /// </summary>
         [HttpPost("seats/unlock")]
         public async Task<IActionResult> UnlockSeat([FromBody] LockSeatRequest request)
         {

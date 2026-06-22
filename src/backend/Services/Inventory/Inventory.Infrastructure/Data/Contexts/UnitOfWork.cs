@@ -9,13 +9,16 @@ namespace Inventory.Infrastructure.Data.Contexts
         public UnitOfWork(
             InventoryDbContext dbContext,
             IAuditLogRepository auditLogRepository,
-            IShowtimeSeatRepository showtimeSeatRepository) : base(dbContext)
+            IShowtimeSeatRepository showtimeSeatRepository,
+            IShowtimeTicketInventoryRepository showtimeTicketInventoryRepository) : base(dbContext)
         {
             AuditLogRepository = auditLogRepository;
             ShowtimeSeatRepository = showtimeSeatRepository;
+            ShowtimeTicketInventoryRepository = showtimeTicketInventoryRepository;
         }
 
         public IAuditLogRepository AuditLogRepository { get; }
         public IShowtimeSeatRepository ShowtimeSeatRepository { get; }
+        public IShowtimeTicketInventoryRepository ShowtimeTicketInventoryRepository { get; }
     }
 }

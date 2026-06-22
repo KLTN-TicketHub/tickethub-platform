@@ -1,0 +1,93 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Inventory.Infrastructure.Dtos;
+using Inventory.Infrastructure.Entities;
+using Inventory.Infrastructure.Interfaces;
+using Inventory.Infrastructure.Interfaces.IServices;
+
+namespace Inventory.Infrastructure.Services
+{
+    public class TicketInventoryService : ITicketInventoryService
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IRedisLockService _redisLockService;
+
+        public TicketInventoryService(
+            IUnitOfWork unitOfWork,
+            IRedisLockService redisLockService)
+        {
+            _unitOfWork = unitOfWork;
+            _redisLockService = redisLockService;
+        }
+
+        public async Task<TicketInventoryStateDto?> GetTicketInventoryStateAsync(Guid showtimeId, Guid ticketTypeId, CancellationToken cancellationToken = default)
+        {
+            ShowtimeTicketInventory? inventory = await _unitOfWork.ShowtimeTicketInventoryRepository.GetOneAsync<ShowtimeTicketInventory>(
+                filter: x => x.ShowTimeId == showtimeId && x.TicketTypeId == ticketTypeId,
+                cancellation: cancellationToken
+            );
+
+            if (inventory == null)
+            {
+                return null;
+            }
+
+            int lockedQty = await _redisLockService.GetLockedTicketsQuantityAsync(showtimeId, ticketTypeId);
+
+            int available = inventory.Capacity - inventory.SoldQuantity - inventory.ReservedQuantity - lockedQty;
+            if (available < 0) available = 0;
+
+            return new TicketInventoryStateDto
+            {
+                ShowTimeId = inventory.ShowTimeId,
+                TicketTypeId = inventory.TicketTypeId,
+                Capacity = inventory.Capacity,
+                SoldQuantity = inventory.SoldQuantity,
+                ReservedQuantity = inventory.ReservedQuantity,
+                LockedQuantity = lockedQty,
+                AvailableQuantity = available
+            };
+        }
+
+        public async Task<bool> LockTicketsAsync(Guid showtimeId, Guid ticketTypeId, Guid userId, int quantity, TimeSpan ttl, CancellationToken cancellationToken = default)
+        {
+            if (quantity < 0) return false;
+
+            if (quantity == 0)
+            {
+                return await UnlockTicketsAsync(showtimeId, ticketTypeId, userId, cancellationToken);
+            }
+
+            ShowtimeTicketInventory? inventory = await _unitOfWork.ShowtimeTicketInventoryRepository.GetOneAsync<ShowtimeTicketInventory>(
+                filter: x => x.ShowTimeId == showtimeId && x.TicketTypeId == ticketTypeId,
+                cancellation: cancellationToken
+            );
+
+            if (inventory == null)
+            {
+                return false;
+            }
+
+            int totalLocked = await _redisLockService.GetLockedTicketsQuantityAsync(showtimeId, ticketTypeId);
+            int userLocked = await _redisLockService.GetUserLockedTicketsQuantityAsync(showtimeId, ticketTypeId, userId);
+
+            int otherLocked = totalLocked - userLocked;
+            if (otherLocked < 0) otherLocked = 0;
+
+            int available = inventory.Capacity - inventory.SoldQuantity - inventory.ReservedQuantity - otherLocked;
+
+            if (quantity > available)
+            {
+                return false;
+            }
+
+            return await _redisLockService.LockTicketsAsync(showtimeId, ticketTypeId, userId, quantity, ttl);
+        }
+
+        public async Task<bool> UnlockTicketsAsync(Guid showtimeId, Guid ticketTypeId, Guid userId, CancellationToken cancellationToken = default)
+        {
+            return await _redisLockService.UnlockTicketsAsync(showtimeId, ticketTypeId, userId);
+        }
+    }
+}

@@ -29,6 +29,7 @@ namespace Inventory.API.Extensions
             services.AddScoped<IRedisLockService, RedisLockService>();
             services.AddScoped<ISeatStateService, SeatStateService>();
             services.AddScoped<ISeatHubNotificationService, SeatHubNotificationService>();
+            services.AddScoped<ITicketInventoryService, TicketInventoryService>();
 
             return services;
         }
