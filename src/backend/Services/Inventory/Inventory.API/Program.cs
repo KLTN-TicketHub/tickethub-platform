@@ -5,6 +5,7 @@ using BuildingBlocks.Infrastructure.Outbox;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Inventory.API.Extensions;
+using Inventory.API.Services;
 using Inventory.Infrastructure.Data.Contexts;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,6 +55,7 @@ await app.UseDatabaseInitialization();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.MapGrpcService<InventoryGrpcService>();
 
 app.UseRateLimiter();
 

@@ -37,7 +37,7 @@ namespace Inventory.Infrastructure.Services
                 return await _redisDb.KeyDeleteAsync(key);
             }
 
-            return false; 
+            return false;
         }
 
         public async Task<Dictionary<string, string>> GetLockedSeatsAsync(Guid showtimeId)

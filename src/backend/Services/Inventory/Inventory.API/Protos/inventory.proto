@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option csharp_namespace = "Inventory.API.Protos";
+
+package inventory;
+
+service InventoryGrpc {
+  rpc UpgradeSeatLocks (UpgradeSeatLocksRequest) returns (UpgradeSeatLocksResponse);
+}
+
+message UpgradeSeatLocksRequest {
+  string showtimeId = 1;
+  repeated string seatIds = 2;
+  string userId = 3;
+}
+
+message UpgradeSeatLocksResponse {
+  bool isSuccess = 1;
+  string message = 2;
+}
