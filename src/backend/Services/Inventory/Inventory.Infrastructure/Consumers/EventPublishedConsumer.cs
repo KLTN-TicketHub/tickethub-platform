@@ -32,14 +32,12 @@ namespace Inventory.Infrastructure.Consumers
             {
                 foreach (var ticketType in showtime.TicketTypes)
                 {
-                    // Only process/create inventories for ticket types that DO NOT reserve seats (standing area or non-seatmap events)
                     if (ticketType.IsReservingSeat)
                     {
                         _logger.LogInformation("Skipping seating ticket type: {TicketTypeId} for Showtime: {ShowtimeId}", ticketType.TicketTypeId, showtime.ShowTimeId);
                         continue;
                     }
 
-                    // Check if ShowtimeTicketInventory already exists
                     var existingInventory = await _unitOfWork.ShowtimeTicketInventoryRepository.GetOneAsync<ShowtimeTicketInventory>(
                         filter: x => x.ShowTimeId == showtime.ShowTimeId && x.TicketTypeId == ticketType.TicketTypeId,
                         cancellation: context.CancellationToken
