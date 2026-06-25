@@ -39,7 +39,7 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
             string? reviewerName,
             CancellationToken cancellation = default)
         {
-            Event eventEntity = await _unitOfWork.EventRepository.GetOneUntrackedAsync<Event>(
+            Event eventEntity = await _unitOfWork.EventRepository.GetOneAsync<Event>(
                 filter: e => e.Id == eventId && !e.IsDeleted,
                 include: q => q.Include(e => e.Organizer!)
                                .Include(e => e.ShowTimes)
@@ -56,7 +56,7 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
 
             eventEntity.Review(request.IsApproved, reviewerUserId, reviewerName, request.Reason);
 
-            await _unitOfWork.EventRepository.UpdateAsync(eventEntity, cancellation);
+            await _unitOfWork.EventRepository.SaveChangeAsync(cancellation);
 
             _eventPublisher.Publish(new EventReviewedEvent
             {

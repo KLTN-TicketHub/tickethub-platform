@@ -18,27 +18,43 @@ namespace Inventory.Infrastructure.Services
         public async Task<bool> LockSeatAsync(Guid showtimeId, Guid seatId, Guid userId, TimeSpan ttl)
         {
             string key = $"seat_lock:{showtimeId}:{seatId}";
+            string value = $"{userId}:Selecting";
 
-            return await _redisDb.StringSetAsync(key, $"{userId}:Selecting", ttl, When.NotExists);
+            string luaScript = @"
+                local val = redis.call('GET', KEYS[1])
+                if not val or string.sub(val, 1, string.len(ARGV[1])) == ARGV[1] then
+                    redis.call('SET', KEYS[1], ARGV[2], 'EX', tonumber(ARGV[3]))
+                    return 1
+                else
+                    return 0
+                end";
+
+            var result = await _redisDb.ScriptEvaluateAsync(luaScript,
+                new RedisKey[] { key },
+                new RedisValue[] { userId.ToString(), value, (int)ttl.TotalSeconds });
+
+            return (int)result == 1;
         }
 
         public async Task<bool> UnlockSeatAsync(Guid showtimeId, Guid seatId, Guid userId)
         {
             string key = $"seat_lock:{showtimeId}:{seatId}";
-            RedisValue currentValue = await _redisDb.StringGetAsync(key);
 
-            if (currentValue.IsNullOrEmpty) return true;
+            string luaScript = @"
+                local val = redis.call('GET', KEYS[1])
+                if not val then
+                    return 1
+                elseif string.sub(val, 1, string.len(ARGV[1])) == ARGV[1] then
+                    return redis.call('DEL', KEYS[1])
+                else
+                    return 0
+                end";
 
-            string[] parts = currentValue.ToString().Split(':');
+            var result = await _redisDb.ScriptEvaluateAsync(luaScript,
+                new RedisKey[] { key },
+                new RedisValue[] { userId.ToString() });
 
-            Guid lockedUser = Guid.Parse(parts[0]);
-
-            if (lockedUser == userId)
-            {
-                return await _redisDb.KeyDeleteAsync(key);
-            }
-
-            return false;
+            return (int)result == 1;
         }
 
         public async Task<Dictionary<string, string>> GetLockedSeatsAsync(Guid showtimeId)

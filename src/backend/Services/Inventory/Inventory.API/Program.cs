@@ -35,6 +35,7 @@ builder.Services.AddCustomApiVersioning();
 
 builder.Services.AddCustomRedis(builder.Configuration);
 builder.Services.AddHostedService<OutboxProcessor<InventoryDbContext>>();
+builder.Services.AddHostedService<RedisKeyspaceNotificationHostedService>();
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);

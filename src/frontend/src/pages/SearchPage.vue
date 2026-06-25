@@ -1,16 +1,18 @@
 <template>
-  <div class="min-h-screen bg-[#000000] pt-28 pb-20">
+  <div class="min-h-screen pt-6 pb-20">
     <div class="max-w-[1440px] mx-auto px-6 md:px-10">
       
-      <!-- Header Row: Title & Filters -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <!-- Header Row: Title & Filters (Title on Left, Filters & Search on Right) -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-6 border-b border-white/5">
         
         <!-- Left: Title -->
-        <h1 class="text-primary font-bold text-lg">
-          Kết quả tìm kiếm: <span v-if="filters.Search" class="text-white">{{ filters.Search }}</span>
+        <h1 class="text-white/50 font-bold text-xs tracking-wide flex items-center gap-1.5">
+          Kết quả tìm kiếm: 
+          <span v-if="filters.Search" class="text-white text-base font-black font-heading">"{{ filters.Search }}"</span>
+          <span v-else class="text-white text-base font-black font-heading">Tất cả sự kiện</span>
         </h1>
 
-        <!-- Right: Filters -->
+        <!-- Right: Search & Filters Group -->
         <div class="flex flex-wrap items-center gap-3">
           
           <!-- Search Input -->
@@ -18,12 +20,12 @@
             <input 
               type="text" 
               v-model="searchInput"
-              placeholder="Tìm kiếm..." 
-              class="w-48 lg:w-64 bg-[#1f1f1f] border border-transparent hover:border-[#333] rounded-full py-2 pl-4 pr-10 text-sm text-white focus:border-primary focus:bg-[#2a2a2a] transition-all outline-none"
+              placeholder="Tìm kiếm trong kết quả..." 
+              class="w-44 lg:w-56 bg-surface border border-white/5 hover:border-white/20 rounded-full py-2.5 pl-4 pr-10 text-xs text-white focus:border-primary focus:bg-card transition-all outline-none"
               @keyup.enter="applySearch"
             />
-            <button @click="applySearch" class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors">
-              <PhMagnifyingGlass weight="bold" />
+            <button @click="applySearch" class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors cursor-pointer">
+              <PhMagnifyingGlass class="text-xs" weight="bold" />
             </button>
           </div>
 
@@ -31,7 +33,7 @@
           <div class="relative" ref="dateFilterRef">
             <button 
               @click="showDateFilter = !showDateFilter"
-              class="flex items-center gap-2 px-4 py-2 bg-[#1f1f1f] hover:bg-[#2a2a2a] rounded-full text-white/90 text-sm font-bold transition-colors"
+              class="flex items-center gap-2 px-4 py-2.5 bg-surface hover:bg-card border border-white/5 hover:border-white/10 rounded-full text-white/90 text-xs font-bold transition-all cursor-pointer"
             >
               <PhCalendarBlank weight="bold" /> 
               {{ dateLabel }}
@@ -47,18 +49,18 @@
               leave-from-class="opacity-100 translate-y-0"
               leave-to-class="opacity-0 translate-y-2"
             >
-              <div v-if="showDateFilter" class="absolute right-0 top-full mt-2 w-72 bg-[#1a1a1a] border border-[#333] rounded-xl p-4 shadow-2xl z-50">
+              <div v-if="showDateFilter" class="absolute right-0 top-full mt-2 w-72 bg-card border border-border-main rounded-xl p-4 shadow-2xl z-50">
                 <div class="space-y-4">
                   <div class="space-y-1">
                     <label class="text-[11px] text-white/50 uppercase font-bold tracking-wider">Từ ngày</label>
-                    <input type="date" v-model="tempDate.FromDate" class="w-full bg-[#2a2a2a] border border-transparent rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-primary" />
+                    <input type="date" v-model="tempDate.FromDate" class="w-full bg-card-2 border border-white/5 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-primary focus:bg-surface transition-colors" />
                   </div>
                   <div class="space-y-1">
                     <label class="text-[11px] text-white/50 uppercase font-bold tracking-wider">Đến ngày</label>
-                    <input type="date" v-model="tempDate.ToDate" class="w-full bg-[#2a2a2a] border border-transparent rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-primary" />
+                    <input type="date" v-model="tempDate.ToDate" class="w-full bg-card-2 border border-white/5 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-primary focus:bg-surface transition-colors" />
                   </div>
                   <div class="flex gap-2 pt-2">
-                    <button @click="clearDates" class="flex-1 py-2 rounded-lg text-white/70 hover:text-white bg-[#2a2a2a] hover:bg-[#333] text-sm font-bold transition-colors">Xóa</button>
+                    <button @click="clearDates" class="flex-1 py-2 rounded-lg text-white/70 hover:text-white bg-card-2 hover:bg-surface text-sm font-bold transition-colors">Xóa</button>
                     <button @click="applyDates" class="flex-1 py-2 rounded-lg bg-primary text-black text-sm font-bold hover:brightness-110 transition-colors">Áp dụng</button>
                   </div>
                 </div>
@@ -70,11 +72,11 @@
           <div class="relative" ref="generalFilterRef">
             <button 
               @click="showGeneralFilter = !showGeneralFilter"
-              class="flex items-center gap-2 px-4 py-2 bg-primary hover:brightness-110 rounded-full text-black text-sm font-bold transition-all"
+              class="flex items-center gap-2 px-4 py-2.5 bg-primary hover:brightness-115 rounded-full text-black text-xs font-bold transition-all cursor-pointer shadow-glow"
             >
               <PhFunnel weight="fill" /> 
               Bộ lọc
-              <PhCaretDown weight="bold" class="text-xs ml-1" />
+              <PhCaretDown weight="bold" class="text-[10px] ml-1" />
             </button>
 
             <!-- Dropdown Filter -->
@@ -86,26 +88,26 @@
               leave-from-class="opacity-100 translate-y-0"
               leave-to-class="opacity-0 translate-y-2"
             >
-              <div v-if="showGeneralFilter" class="absolute right-0 top-full mt-2 w-64 bg-[#1a1a1a] border border-[#333] rounded-xl p-4 shadow-2xl z-50">
+              <div v-if="showGeneralFilter" class="absolute right-0 top-full mt-2 w-64 bg-card border border-border-main rounded-xl p-4 shadow-2xl z-50">
                 <div class="space-y-4">
                   <!-- Category -->
                   <div class="space-y-1">
                     <label class="text-[11px] text-white/50 uppercase font-bold tracking-wider">Danh mục</label>
-                    <select v-model="tempFilter.CategoryId" class="w-full bg-[#2a2a2a] border border-transparent rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-primary">
-                      <option value="" class="bg-[#2a2a2a] text-white">Tất cả danh mục</option>
-                      <option v-for="cat in categories" :key="cat.id" :value="cat.id" class="bg-[#2a2a2a] text-white">{{ cat.categoryName }}</option>
+                    <select v-model="tempFilter.CategoryId" class="w-full bg-card-2 border border-white/5 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-primary focus:bg-surface transition-colors">
+                      <option value="" class="bg-card text-white">Tất cả danh mục</option>
+                      <option v-for="cat in categories" :key="cat.id" :value="cat.id" class="bg-card text-white">{{ cat.categoryName }}</option>
                     </select>
                   </div>
                   <!-- Location -->
                   <div class="space-y-1">
                     <label class="text-[11px] text-white/50 uppercase font-bold tracking-wider">Địa điểm</label>
-                    <select v-model="tempFilter.ProvinceCity" class="w-full bg-[#2a2a2a] border border-transparent rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-primary">
-                      <option value="" class="bg-[#2a2a2a] text-white">Toàn quốc</option>
-                      <option v-for="city in availableCities" :key="city.code" :value="city.name" class="bg-[#2a2a2a] text-white">{{ city.name }}</option>
+                    <select v-model="tempFilter.ProvinceCity" class="w-full bg-card-2 border border-white/5 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-primary focus:bg-surface transition-colors">
+                      <option value="" class="bg-card text-white">Toàn quốc</option>
+                      <option v-for="city in availableCities" :key="city.code" :value="city.name" class="bg-card text-white">{{ city.name }}</option>
                     </select>
                   </div>
                   <div class="flex gap-2 pt-2">
-                    <button @click="clearGeneral" class="flex-1 py-2 rounded-lg text-white/70 hover:text-white bg-[#2a2a2a] hover:bg-[#333] text-sm font-bold transition-colors">Xóa</button>
+                    <button @click="clearGeneral" class="flex-1 py-2 rounded-lg text-white/70 hover:text-white bg-card-2 hover:bg-surface text-sm font-bold transition-colors">Xóa</button>
                     <button @click="applyGeneral" class="flex-1 py-2 rounded-lg bg-primary text-black text-sm font-bold hover:brightness-110 transition-colors">Áp dụng</button>
                   </div>
                 </div>
@@ -114,8 +116,8 @@
           </div>
 
           <!-- Active Category Tag -->
-          <div v-if="activeCategoryName" class="flex items-center gap-2 px-4 py-2 bg-[#00c853]/20 text-[#00c853] border border-[#00c853]/30 rounded-full text-sm font-bold">
-            <PhXCircle weight="fill" class="cursor-pointer hover:text-white transition-colors" @click="clearCategory" />
+          <div v-if="activeCategoryName" class="flex items-center gap-2 px-4 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-full text-xs font-bold transition-all">
+            <PhXCircle weight="fill" class="cursor-pointer text-sm hover:text-white transition-colors" @click="clearCategory" />
             {{ activeCategoryName }}
           </div>
 
@@ -146,7 +148,7 @@
 
       <!-- Pagination -->
       <div v-if="totalPages > 1 && !isLoading" class="mt-16 flex justify-center">
-        <div class="flex items-center gap-2 bg-[#1f1f1f] rounded-full p-2 border border-white/5">
+        <div class="flex items-center gap-2 bg-surface rounded-full p-2 border border-white/5">
           <button 
             :disabled="!hasPreviousPage"
             @click="goToPage(pageNumber - 1)"
