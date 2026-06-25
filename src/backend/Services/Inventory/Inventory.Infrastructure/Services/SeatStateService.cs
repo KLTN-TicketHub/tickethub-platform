@@ -58,10 +58,7 @@ namespace Inventory.Infrastructure.Services
                 cancellation: cancellationToken
             ) > 0;
 
-            if (isSold)
-            {
-                return false;
-            }
+            if (isSold) return false;
 
             bool success = await _redisLockService.LockSeatAsync(showtimeId, seatId, userId, TimeSpan.FromSeconds(60));
             if (!success)

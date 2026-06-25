@@ -1,5 +1,3 @@
-using System;
-
 namespace Inventory.Infrastructure.Dtos
 {
     public class TicketInventoryStateDto

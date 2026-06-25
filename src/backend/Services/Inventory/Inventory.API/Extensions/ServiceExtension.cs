@@ -1,13 +1,13 @@
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Infrastructure.Auditing;
 using BuildingBlocks.Infrastructure.Services;
+using Inventory.API.Services;
 using Inventory.Infrastructure.Data.Contexts;
 using Inventory.Infrastructure.Data.Repositories;
 using Inventory.Infrastructure.Interfaces;
 using Inventory.Infrastructure.Interfaces.IRepositories;
 using Inventory.Infrastructure.Interfaces.IServices;
 using Inventory.Infrastructure.Services;
-using Inventory.API.Services;
 
 namespace Inventory.API.Extensions
 {

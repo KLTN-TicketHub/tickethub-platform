@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using BuildingBlocks.Application.Interfaces;
 using Inventory.Infrastructure.Interfaces.IServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

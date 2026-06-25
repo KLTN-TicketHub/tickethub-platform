@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace BuildingBlocks.Contracts.Events.Event
 {
     public class EventPublishedEvent
