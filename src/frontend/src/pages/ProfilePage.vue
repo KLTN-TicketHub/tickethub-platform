@@ -9,10 +9,10 @@
 
         <div class="flex flex-col sm:flex-row items-center sm:items-start gap-8 relative z-10">
           <div class="relative">
-            <div class="w-32 h-32 lg:w-40 lg:h-40 rounded-[2.5rem] bg-gradient-to-br from-[#00E676] to-[#00A355] text-black flex items-center justify-center text-6xl font-black shadow-[0_0_40px_rgba(0,200,83,0.4)] border-4 border-[#050807]">
+            <div class="w-32 h-32 lg:w-40 lg:h-40 rounded-[2.5rem] bg-gradient-to-br from-[#00E676] to-[#00A355] text-black flex items-center justify-center text-6xl font-black shadow-[0_0_40px_rgba(0,200,83,0.4)] border-4 border-[#0A0F0D]">
               {{ store.user?.initial || 'T' }}
             </div>
-            <div class="absolute -bottom-4 -right-4 w-12 h-12 bg-[#050807] rounded-full flex items-center justify-center">
+            <div class="absolute -bottom-4 -right-4 w-12 h-12 bg-[#0A0F0D] rounded-full flex items-center justify-center">
               <div class="w-10 h-10 bg-[#111916] border border-white/10 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:border-primary transition-all cursor-pointer shadow-inner">
                 <PhCamera weight="fill" />
               </div>

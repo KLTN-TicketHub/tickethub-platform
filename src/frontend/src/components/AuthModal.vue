@@ -2,7 +2,7 @@
   <Transition name="modal">
     <div class="fixed inset-0 z-[1000] flex items-center justify-center p-4">
       <!-- Backdrop -->
-      <div class="absolute inset-0 bg-[#050807]/80 backdrop-blur-md transition-opacity duration-300" @click="$emit('close')"></div>
+      <div class="absolute inset-0 bg-[#0A0F0D]/80 backdrop-blur-md transition-opacity duration-300" @click="$emit('close')"></div>
       
       <!-- Modal Content -->
       <div class="relative bg-[#0A0F0D] border border-white/10 rounded-[2.5rem] w-full max-w-[440px] shadow-[0_30px_100px_-20px_rgba(0,0,0,1)] overflow-hidden transition-all duration-300 modal-content" @click.stop>

@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen bg-[#050807]">
+  <div class="min-h-screen bg-[#0A0F0D]">
     <!-- Premium Editorial Hero Section -->
     <section class="relative pt-32 pb-20 overflow-hidden min-h-[90vh] flex items-center">
       <div class="absolute top-0 left-0 w-full h-full">
-        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-[#050807]/80 to-[#050807] opacity-80"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-[#0A0F0D]/80 to-[#0A0F0D] opacity-80"></div>
         <div class="absolute -top-24 -right-24 w-[500px] h-[500px] bg-primary/20 blur-[150px] rounded-full mix-blend-screen pointer-events-none"></div>
       </div>
 
@@ -118,7 +118,7 @@
     <!-- Success Modal -->
     <Transition name="fade">
       <div v-if="submitted" class="fixed inset-0 z-[2000] flex items-center justify-center p-6">
-        <div class="absolute inset-0 bg-[#050807]/90 backdrop-blur-2xl" @click="submitted = false"></div>
+        <div class="absolute inset-0 bg-[#0A0F0D]/90 backdrop-blur-2xl" @click="submitted = false"></div>
         <div class="relative bg-[#111916] border border-primary/30 rounded-[3rem] p-12 max-w-lg w-full text-center space-y-8 animate-scale-in shadow-[0_0_100px_rgba(0,200,83,0.2)] overflow-hidden">
           <div class="absolute -top-32 -left-32 w-64 h-64 bg-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
           

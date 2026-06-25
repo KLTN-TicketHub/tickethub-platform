@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-[#050807] text-white">
+  <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-[#0A0F0D] text-white">
     <!-- Left: Form -->
     <div class="flex items-center justify-center p-8 sm:p-12 lg:p-24 relative overflow-hidden order-2 lg:order-1">
       <!-- Background glow -->

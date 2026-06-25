@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@microsoft/signalr": "^10.0.0",
     "@phosphor-icons/vue": "^2.2.1",
     "axios": "^1.16.1",
     "konva": "^10.3.0",

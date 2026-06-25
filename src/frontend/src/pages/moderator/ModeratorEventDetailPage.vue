@@ -10,39 +10,88 @@
 
       <div v-if="isLoading" class="h-10 w-1/3 bg-white/5 animate-pulse rounded-lg"></div>
       
-      <div v-else-if="event" class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl border bg-[#111916]/80 backdrop-blur-md" :class="getBannerClass(event.status)">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-full flex items-center justify-center bg-black/20" :class="getIconColorClass(event.status)">
-            <PhCheckCircle v-if="event.status === 'Đã xuất bản' || event.status === 'Published'" weight="fill" class="text-2xl" />
-            <PhWarningCircle v-else-if="event.status === 'Bị từ chối' || event.status === 'Rejected'" weight="fill" class="text-2xl" />
-            <PhClockClockwise v-else weight="fill" class="text-2xl" />
+      <template v-else-if="event">
+        <!-- Ticket-Style Hero Header -->
+        <div class="relative bg-[#111916] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col md:flex-row min-h-[380px] md:h-[400px] group">
+          
+          <!-- Left Column: Details -->
+          <div class="flex-1 p-8 lg:p-10 flex flex-col justify-between relative z-10">
+            <div class="space-y-4">
+              <!-- Badges -->
+              <div class="flex flex-wrap items-center gap-3">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/20 border border-primary/30 backdrop-blur-md shadow-[0_0_20px_rgba(0,200,83,0.15)]">
+                  <span class="text-[11px] font-black text-primary uppercase tracking-[0.2em]">{{ event.categoryName || 'Sự kiện' }}</span>
+                </div>
+                <div 
+                  class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full backdrop-blur-md border transition-colors"
+                  :class="event.status === 'Bị từ chối' || event.status === 'Rejected' ? 'bg-danger/20 border-danger/30 text-danger' : 
+                          event.status === 'Đã xuất bản' || event.status === 'Published' ? 'bg-primary/20 border-primary/30 text-primary' : 
+                          'bg-white/5 border-white/10 text-white/60'"
+                >
+                  <span class="text-[11px] font-black uppercase tracking-[0.2em]">
+                    {{ event.status }}
+                  </span>
+                </div>
+              </div>
+
+              <h1 class="text-3xl lg:text-5xl font-black font-heading text-white leading-[1.2] uppercase tracking-tight line-clamp-2">
+                {{ event.title }}
+              </h1>
+
+              <div class="space-y-3 pt-3">
+                <div class="flex items-center gap-3 text-white/70 text-[14px]">
+                  <PhCalendarStar weight="bold" class="text-primary text-xl flex-shrink-0" />
+                  <span class="font-bold">{{ formatDateString(event.startAt) }}</span>
+                </div>
+                <div class="flex items-start gap-3 text-white/70 text-[14px]">
+                  <PhMapPin weight="bold" class="text-primary text-xl flex-shrink-0 mt-0.5" />
+                  <span class="font-bold line-clamp-2">{{ event.location?.venueName || 'Địa điểm chưa cập nhật' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions (Moderation Buttons) -->
+            <div v-if="isPending" class="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center gap-4 mt-6">
+              <button @click="openRejectModal" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-danger/10 text-danger border border-danger/20 font-bold hover:bg-danger hover:text-white transition-all shadow-[0_0_15px_rgba(255,0,0,0.1)] cursor-pointer">
+                Từ chối
+              </button>
+              <button @click="approveEvent" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-primary text-black font-black hover:scale-105 transition-all shadow-[0_0_20px_rgba(0,200,83,0.2)] flex items-center justify-center gap-2 cursor-pointer">
+                <PhCheck weight="bold" />
+                Phê duyệt
+              </button>
+            </div>
           </div>
-          <div class="flex flex-col">
-            <span class="text-sm font-bold text-black/60 dark:text-white/60">Trạng thái hiện tại</span>
-            <span class="text-xl font-black">{{ event.status }}</span>
+
+          <!-- Ticket Divider (Dashed vertical line with circular cutouts at top/bottom) -->
+          <div class="hidden md:flex flex-col justify-between items-center relative w-px h-full bg-transparent z-20 shrink-0">
+            <!-- Top cutout -->
+            <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[#0A0F0D] border-b border-white/5 z-30"></div>
+            <!-- Dashed Line -->
+            <div class="h-full border-l border-dashed border-white/10 my-4"></div>
+            <!-- Bottom cutout -->
+            <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[#0A0F0D] border-t border-white/5 z-30"></div>
+          </div>
+
+          <!-- Right Column: Banner Cover -->
+          <div class="w-full md:w-[45%] lg:w-[50%] h-[240px] md:h-full relative overflow-hidden shrink-0">
+            <img 
+              :src="event.coverImageUrl || event.image || 'https://picsum.photos/seed/event-hero/1200/800'" 
+              :alt="event.title" 
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent md:bg-gradient-to-r md:from-black/20 md:via-transparent md:to-transparent"></div>
           </div>
         </div>
 
-        <!-- Actions for Pending -->
-        <div v-if="isPending" class="flex items-center gap-3 mt-4 md:mt-0">
-          <button @click="openRejectModal" class="px-6 py-3 rounded-xl bg-danger/10 text-danger border border-danger/20 font-bold hover:bg-danger hover:text-white transition-all shadow-[0_0_15px_rgba(255,0,0,0.1)] hover:shadow-[0_0_20px_rgba(255,0,0,0.3)]">
-            Từ chối
-          </button>
-          <button @click="approveEvent" class="px-6 py-3 rounded-xl bg-primary text-black font-black hover:scale-105 transition-all shadow-[0_0_20px_rgba(0,200,83,0.2)] hover:shadow-[0_0_30px_rgba(0,200,83,0.4)] flex items-center gap-2">
-            <PhCheck weight="bold" />
-            Phê duyệt
-          </button>
+        <!-- Rejection Reason Notice -->
+        <div v-if="event.status === 'Bị từ chối' && event.reasonForRejection" class="p-5 rounded-2xl bg-danger/10 border border-danger/20 flex gap-4">
+          <PhWarningCircle class="text-danger text-2xl shrink-0" weight="fill" />
+          <div class="flex flex-col gap-1">
+            <span class="font-bold text-danger text-sm">Lý do từ chối</span>
+            <p class="text-white/80 leading-relaxed">{{ event.reasonForRejection }}</p>
+          </div>
         </div>
-      </div>
-      
-      <!-- Rejection Reason Notice -->
-      <div v-if="event?.status === 'Bị từ chối' && event.reasonForRejection" class="p-5 rounded-2xl bg-danger/10 border border-danger/20 flex gap-4">
-        <PhWarningCircle class="text-danger text-2xl shrink-0" weight="fill" />
-        <div class="flex flex-col gap-1">
-          <span class="font-bold text-danger text-sm">Lý do từ chối</span>
-          <p class="text-white/80 leading-relaxed">{{ event.reasonForRejection }}</p>
-        </div>
-      </div>
+      </template>
     </div>
 
     <!-- Main Content -->
@@ -50,22 +99,6 @@
       
       <!-- Left Column: Details -->
       <div class="lg:col-span-8 flex flex-col gap-8">
-        
-        <!-- Hero Image & Title -->
-        <div class="flex flex-col gap-6">
-          <div class="w-full aspect-[21/9] rounded-3xl overflow-hidden bg-white/5 border border-white/10 relative">
-            <img :src="event.coverImageUrl" :alt="event.title" class="w-full h-full object-cover" />
-            <div class="absolute top-4 left-4 flex gap-2">
-              <span class="px-4 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-xs font-bold text-white uppercase tracking-wider">
-                {{ event.categoryName || 'Chưa phân loại' }}
-              </span>
-            </div>
-          </div>
-          <div class="flex flex-col gap-2">
-            <h1 class="font-heading text-4xl md:text-5xl font-black text-white leading-tight">{{ event.title }}</h1>
-            <p class="text-white/40 font-mono text-sm">Slug: {{ event.slug }}</p>
-          </div>
-        </div>
 
         <!-- Description -->
         <div class="bg-[#111916]/50 border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col gap-4">

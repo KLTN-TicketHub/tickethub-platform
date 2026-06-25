@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#050807]">
+  <div class="min-h-screen bg-[#0A0F0D]">
     <!-- Header Section -->
     <section class="relative pt-32 pb-20 overflow-hidden">
       <div class="absolute inset-0">

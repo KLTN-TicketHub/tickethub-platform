@@ -66,8 +66,8 @@
         <!-- Middle: Information Layer -->
         <div class="flex-1 p-8 lg:p-10 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-dashed border-white/10 relative bg-[#0A0F0D]/40">
           <!-- Ticket Notches for physical feel -->
-          <div class="hidden lg:block absolute -right-[16px] -top-[16px] w-8 h-8 rounded-full bg-[#050807] border border-white/5 z-10 shadow-inner"></div>
-          <div class="hidden lg:block absolute -right-[16px] -bottom-[16px] w-8 h-8 rounded-full bg-[#050807] border border-white/5 z-10 shadow-inner"></div>
+          <div class="hidden lg:block absolute -right-[16px] -top-[16px] w-8 h-8 rounded-full bg-[#0A0F0D] border border-white/5 z-10 shadow-inner"></div>
+          <div class="hidden lg:block absolute -right-[16px] -bottom-[16px] w-8 h-8 rounded-full bg-[#0A0F0D] border border-white/5 z-10 shadow-inner"></div>
 
           <div class="space-y-8">
             <div class="space-y-3">

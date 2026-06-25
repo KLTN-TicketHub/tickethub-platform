@@ -25,6 +25,8 @@ app.UseAuthorization();
 
 app.UseCors(CorsExtension.GetPolicyName());
 
+app.UseWebSockets();
+
 app.MapReverseProxy();
 
 app.MapControllers();

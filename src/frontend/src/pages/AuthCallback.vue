@@ -1,5 +1,5 @@
 <template>
-  <section class="min-h-screen flex items-center justify-center bg-[#050807] px-6 relative overflow-hidden">
+  <section class="min-h-screen flex items-center justify-center bg-[#0A0F0D] px-6 relative overflow-hidden">
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-60"></div>
 
     <div class="max-w-md w-full rounded-[2.5rem] border border-white/5 bg-[#111916]/80 backdrop-blur-xl p-10 shadow-[0_30px_100px_-20px_rgba(0,0,0,1)] text-center animate-fade-up relative z-10">

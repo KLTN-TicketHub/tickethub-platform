@@ -1,7 +1,7 @@
 <template>
   <Transition name="modal">
     <div v-if="event" class="fixed inset-0 z-[2000] flex items-center justify-center p-4 lg:p-6">
-      <div class="absolute inset-0 bg-[#050807]/90 backdrop-blur-xl transition-opacity duration-300" @click="$emit('close')"></div>
+      <div class="absolute inset-0 bg-[#0A0F0D]/90 backdrop-blur-xl transition-opacity duration-300" @click="$emit('close')"></div>
       
       <div class="relative bg-[#0A0F0D] border border-white/10 rounded-[2.5rem] w-full max-w-[600px] max-h-[90vh] overflow-hidden shadow-[0_30px_100px_-20px_rgba(0,0,0,1)] flex flex-col modal-content" @click.stop>
         

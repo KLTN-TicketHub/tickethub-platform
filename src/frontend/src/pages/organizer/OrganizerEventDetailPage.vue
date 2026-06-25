@@ -1,63 +1,90 @@
 <template>
-  <div v-if="isLoading" class="flex flex-col pb-20 bg-[#050807] min-h-[80vh] items-center justify-center">
+  <div v-if="isLoading" class="flex flex-col pb-20 bg-[#0A0F0D] min-h-[80vh] items-center justify-center">
     <div class="flex flex-col items-center gap-4">
       <PhSpinner class="animate-spin text-primary text-5xl" weight="bold" />
       <span class="text-white/50 text-sm font-bold uppercase tracking-widest">Đang tải thông tin sự kiện...</span>
     </div>
   </div>
 
-  <div v-else-if="event" class="flex flex-col pb-20 bg-[#050807] min-h-screen">
-    <!-- Hero Section -->
-    <div class="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
-      <div class="absolute inset-0 z-0">
-        <img 
-          :src="event.coverImageUrl || 'https://picsum.photos/seed/event-hero/1200/800'" 
-          :alt="event.title" 
-          class="w-full h-full object-cover scale-105"
-        />
-        <div class="absolute inset-0 bg-gradient-to-t from-[#050807] via-[#050807]/80 to-transparent"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-[#050807]/90 via-[#050807]/50 to-transparent"></div>
-      </div>
-
-      <div class="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 h-full flex flex-col justify-end pb-12">
-        <div class="max-w-4xl space-y-6 animate-fade-up">
-          <div class="flex items-center gap-3">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/20 border border-primary/30 backdrop-blur-md shadow-[0_0_20px_rgba(0,200,83,0.15)]">
-              <span class="text-[11px] font-black text-primary uppercase tracking-[0.2em]">{{ event.categoryName || 'Sự kiện' }}</span>
-            </div>
-            <div 
-              class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full backdrop-blur-md transition-colors"
-              :class="event.status === 'Bị từ chối' ? 'bg-[#ef4444]/20 border border-[#ef4444]/30 shadow-[0_0_20px_rgba(239,68,68,0.15)]' : 'bg-white/10 border border-white/20'"
-            >
-              <span 
-                class="text-[11px] font-black uppercase tracking-[0.2em]"
-                :class="event.status === 'Bị từ chối' ? 'text-[#ef4444]' : 'text-white'"
+  <div v-else-if="event" class="flex flex-col pb-20 bg-[#0A0F0D] min-h-screen">
+    <!-- Ticket-Style Hero Header -->
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10 pt-8 animate-fade-up">
+      <div class="relative bg-[#111916] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col md:flex-row min-h-[380px] md:h-[400px] group">
+        
+        <!-- Left Column: Details -->
+        <div class="flex-1 p-8 lg:p-10 flex flex-col justify-between relative z-10">
+          <div class="space-y-4">
+            <!-- Badges -->
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/20 border border-primary/30 backdrop-blur-md shadow-[0_0_20px_rgba(0,200,83,0.15)]">
+                <span class="text-[11px] font-black text-primary uppercase tracking-[0.2em]">{{ event.categoryName || 'Sự kiện' }}</span>
+              </div>
+              <div 
+                class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full backdrop-blur-md border transition-colors"
+                :class="event.status === 'Bị từ chối' ? 'bg-[#ef4444]/20 border-[#ef4444]/30' : 'bg-white/5 border-white/10'"
               >
-                {{ event.status || 'Chờ duyệt' }}
-              </span>
+                <span 
+                  class="text-[11px] font-black uppercase tracking-[0.2em]"
+                  :class="event.status === 'Bị từ chối' ? 'text-[#ef4444]' : 'text-white/60'"
+                >
+                  {{ event.status || 'Chờ duyệt' }}
+                </span>
+              </div>
+            </div>
+
+            <h1 class="text-3xl lg:text-5xl font-black font-heading text-white leading-[1.2] uppercase tracking-tight line-clamp-3">
+              {{ event.title }}
+            </h1>
+
+            <div class="space-y-3 pt-3">
+              <div class="flex items-center gap-3 text-white/70 text-[14px]">
+                <PhCalendarBlank weight="bold" class="text-primary text-xl flex-shrink-0" />
+                <span class="font-bold">{{ formatEventDate(event.startAt) }}</span>
+              </div>
+              <div class="flex items-start gap-3 text-white/70 text-[14px]">
+                <PhMapPin weight="bold" class="text-primary text-xl flex-shrink-0 mt-0.5" />
+                <span class="font-bold line-clamp-2">{{ event.location?.venueName || 'Địa điểm chưa cập nhật' }}</span>
+              </div>
             </div>
           </div>
 
-          <h1 class="text-4xl md:text-6xl font-black font-heading text-white leading-[1.1] tracking-tight uppercase">
-            {{ event.title }}
-          </h1>
-
-          <div class="flex flex-wrap items-center gap-4 text-[14px]">
-            <div class="flex items-center gap-2.5 px-5 py-2.5 bg-white/5 backdrop-blur-md rounded-full border border-white/10">
-              <PhCalendarBlank weight="bold" class="text-primary text-xl" />
-              <span class="font-bold text-white">{{ formatEventDate(event.startAt) }}</span>
-            </div>
-            <div class="flex items-center gap-2.5 px-5 py-2.5 bg-white/5 backdrop-blur-md rounded-full border border-white/10">
-              <PhMapPin weight="bold" class="text-primary text-xl" />
-              <span class="font-bold text-white">{{ event.location?.venueName || 'Địa điểm chưa cập nhật' }}</span>
-            </div>
+          <!-- Actions -->
+          <div class="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center gap-4 mt-6">
+            <BaseButton variant="outline" class="w-full sm:w-auto !rounded-xl !py-3.5 !px-8 flex items-center justify-center gap-2" @click="handleEdit">
+              <PhPencilSimple weight="bold" />
+              Chỉnh sửa sự kiện
+            </BaseButton>
+            <BaseButton variant="primary" class="w-full sm:w-auto !rounded-xl !py-3.5 !px-8 flex items-center justify-center gap-2" @click="handleOrders">
+              <PhReceipt weight="bold" />
+              Xem đơn hàng
+            </BaseButton>
           </div>
+        </div>
+
+        <!-- Ticket Divider (Dashed vertical line with circular cutouts at top/bottom) -->
+        <div class="hidden md:flex flex-col justify-between items-center relative w-px h-full bg-transparent z-20 shrink-0">
+          <!-- Top cutout -->
+          <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[#0A0F0D] border-b border-white/5 z-30"></div>
+          <!-- Dashed Line -->
+          <div class="h-full border-l border-dashed border-white/10 my-4"></div>
+          <!-- Bottom cutout -->
+          <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[#0A0F0D] border-t border-white/5 z-30"></div>
+        </div>
+
+        <!-- Right Column: Banner Cover -->
+        <div class="w-full md:w-[45%] lg:w-[50%] h-[240px] md:h-full relative overflow-hidden shrink-0">
+          <img 
+            :src="event.coverImageUrl || event.image || 'https://picsum.photos/seed/event-hero/1200/800'" 
+            :alt="event.title" 
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent md:bg-gradient-to-r md:from-black/20 md:via-transparent md:to-transparent"></div>
         </div>
       </div>
     </div>
 
     <!-- Main Content -->
-    <div class="max-w-[1400px] mx-auto px-6 md:px-10 relative z-20 mt-8 w-full">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10 relative z-20 mt-12 w-full">
       <div class="grid grid-cols-1 lg:grid-cols-[1fr_440px] gap-12 xl:gap-16 items-start">
         
         <!-- Left Column: Details & Seatmap -->
@@ -297,7 +324,7 @@
   </div>
 
   <!-- Error State -->
-  <div v-else class="flex flex-col items-center justify-center py-32 px-6 text-center min-h-[80vh] bg-[#050807]">
+  <div v-else class="flex flex-col items-center justify-center py-32 px-6 text-center min-h-[80vh] bg-[#0A0F0D]">
     <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center text-5xl text-white/20 mb-6 shadow-inner">
       <PhWarningCircle weight="duotone" />
     </div>

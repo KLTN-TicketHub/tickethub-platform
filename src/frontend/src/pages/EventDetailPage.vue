@@ -1,59 +1,77 @@
 <template>
-  <div v-if="isLoading" class="flex flex-col pb-20 bg-[#050807] min-h-screen items-center justify-center">
+  <div v-if="isLoading" class="flex flex-col pb-20 bg-[#0A0F0D] min-h-screen items-center justify-center">
     <div class="flex flex-col items-center gap-4">
       <PhSpinner class="animate-spin text-primary text-5xl" weight="bold" />
       <span class="text-white/50 text-sm font-bold uppercase tracking-widest">Đang tải thông tin sự kiện...</span>
     </div>
   </div>
 
-  <div v-else-if="event" class="flex flex-col pb-20 bg-[#050807] min-h-screen">
-    <!-- Premium Edge-to-Edge Hero Section -->
-    <div class="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
-      <!-- Background Image -->
-      <div class="absolute inset-0 z-0">
-        <img 
-          :src="event.coverImageUrl || 'https://picsum.photos/seed/event-hero/1200/800'" 
-          :alt="event.title" 
-          class="w-full h-full object-cover scale-105"
-        />
-        <!-- Multi-layer Gradient Overlay -->
-        <div class="absolute inset-0 bg-gradient-to-t from-[#050807] via-[#050807]/60 to-transparent"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-[#050807]/80 via-[#050807]/40 to-transparent"></div>
-      </div>
-
-      <!-- Hero Content -->
-      <div class="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 h-full flex flex-col justify-end pb-16">
-        <div class="max-w-4xl space-y-6 animate-fade-up">
-          <!-- Category Badge -->
-          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/20 border border-primary/30 backdrop-blur-md shadow-[0_0_20px_rgba(0,200,83,0.15)]">
-            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-            <span class="text-[11px] font-black text-primary uppercase tracking-[0.2em]">{{ event.categoryName || 'Sự kiện' }}</span>
-          </div>
-
-          <h1 class="text-4xl md:text-7xl font-black font-heading text-white leading-[1.1] tracking-tight uppercase">
-            {{ event.title }}
-          </h1>
-
-          <div class="flex flex-wrap items-center gap-4 text-[14px]">
-            <div class="flex items-center gap-2.5 px-5 py-2.5 bg-white/5 backdrop-blur-md rounded-full border border-white/10 shadow-inner">
-              <PhCalendarBlank weight="bold" class="text-primary text-xl" />
-              <span class="font-bold text-white">{{ formatEventDate(event.startAt) }}</span>
+  <div v-else-if="event" class="flex flex-col pb-20 bg-[#0A0F0D] min-h-screen">
+    <!-- Ticket-Style Hero Header -->
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10 pt-8 animate-fade-up">
+      <div class="relative bg-[#111916] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col md:flex-row min-h-[380px] md:h-[400px] group">
+        
+        <!-- Left Column: Details -->
+        <div class="flex-1 p-8 lg:p-10 flex flex-col justify-between relative z-10">
+          <div class="space-y-4">
+            <!-- Category Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/20 border border-primary/30 backdrop-blur-md shadow-[0_0_20px_rgba(0,200,83,0.15)]">
+              <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+              <span class="text-[11px] font-black text-primary uppercase tracking-[0.2em]">{{ event.categoryName || 'Sự kiện' }}</span>
             </div>
-            <div class="flex items-center gap-2.5 px-5 py-2.5 bg-white/5 backdrop-blur-md rounded-full border border-white/10 shadow-inner">
-              <PhMapPin weight="bold" class="text-primary text-xl" />
-              <span class="font-bold text-white">{{ event.location?.venueName }}</span>
-            </div>
-            <div class="flex items-center gap-2.5 px-5 py-2.5 bg-white/5 backdrop-blur-md rounded-full border border-white/10 shadow-inner">
-              <PhTicket weight="bold" class="text-primary text-xl" />
-              <span class="font-bold text-white">Từ {{ formatCurrency(getMinPrice()) }}</span>
+
+            <h1 class="text-3xl lg:text-5xl font-black font-heading text-white leading-[1.2] uppercase tracking-tight line-clamp-3">
+              {{ event.title }}
+            </h1>
+
+            <div class="space-y-3 pt-3">
+              <div class="flex items-center gap-3 text-white/70 text-[14px]">
+                <PhCalendarBlank weight="bold" class="text-primary text-xl flex-shrink-0" />
+                <span class="font-bold">{{ formatEventDate(event.startAt) }}</span>
+              </div>
+              <div class="flex items-start gap-3 text-white/70 text-[14px]">
+                <PhMapPin weight="bold" class="text-primary text-xl flex-shrink-0 mt-0.5" />
+                <span class="font-bold line-clamp-2">{{ event.location?.venueName || event.location?.name }}</span>
+              </div>
             </div>
           </div>
+
+          <div class="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6 mt-6">
+            <div class="flex flex-col">
+              <span class="text-white/40 text-[11px] font-bold uppercase tracking-widest mb-1">Giá vé từ</span>
+              <span class="text-3xl font-heading font-black text-primary leading-none">{{ formatCurrency(getMinPrice()) }}</span>
+            </div>
+            
+            <button @click="scrollToSelect" class="w-full sm:w-auto px-10 py-4 bg-primary hover:bg-primary-dark text-black font-black rounded-xl transition-all hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(0,200,83,0.2)] text-[14px] flex items-center justify-center gap-2 cursor-pointer">
+              <PhTicket weight="fill" /> Mua vé ngay
+            </button>
+          </div>
+        </div>
+
+        <!-- Ticket Divider (Dashed vertical line with circular cutouts at top/bottom) -->
+        <div class="hidden md:flex flex-col justify-between items-center relative w-px h-full bg-transparent z-20 shrink-0">
+          <!-- Top cutout -->
+          <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[#0A0F0D] border-b border-white/5 z-30"></div>
+          <!-- Dashed Line -->
+          <div class="h-full border-l border-dashed border-white/10 my-4"></div>
+          <!-- Bottom cutout -->
+          <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[#0A0F0D] border-t border-white/5 z-30"></div>
+        </div>
+
+        <!-- Right Column: Banner Cover -->
+        <div class="w-full md:w-[45%] lg:w-[50%] h-[240px] md:h-full relative overflow-hidden shrink-0">
+          <img 
+            :src="event.coverImageUrl || event.image || 'https://picsum.photos/seed/event-hero/1200/800'" 
+            :alt="event.title" 
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent md:bg-gradient-to-r md:from-black/20 md:via-transparent md:to-transparent"></div>
         </div>
       </div>
     </div>
 
     <!-- Main Content Layout -->
-    <div class="max-w-[1400px] mx-auto px-6 md:px-10 relative z-20 -mt-12">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10 relative z-20 mt-12">
       <div class="grid grid-cols-1 lg:grid-cols-[1fr_440px] gap-12 xl:gap-16">
         
         <!-- Left Column: Details -->
@@ -83,7 +101,7 @@
           </section>
 
           <!-- Showtimes Section -->
-          <section v-if="event.showtimes && event.showtimes.length > 0" class="animate-fade-up [animation-delay:350ms] scroll-mt-24">
+          <section id="showtimes" v-if="event.showtimes && event.showtimes.length > 0" class="animate-fade-up [animation-delay:350ms] scroll-mt-24">
             <div class="flex items-center gap-6 mb-8">
               <h2 class="font-heading text-3xl font-black text-white uppercase tracking-widest whitespace-nowrap">Các suất chiếu</h2>
               <div class="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent"></div>
@@ -424,7 +442,7 @@
   </div>
 
   <!-- Error / Not Found State -->
-  <div v-else class="flex flex-col items-center justify-center py-32 px-6 text-center animate-fade-up min-h-screen bg-[#050807]">
+  <div v-else class="flex flex-col items-center justify-center py-32 px-6 text-center animate-fade-up min-h-screen bg-[#0A0F0D]">
     <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center text-5xl text-white/20 mb-6 shadow-inner">
       <PhWarningCircle weight="duotone" />
     </div>
@@ -437,11 +455,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted, nextTick, markRaw } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, nextTick, markRaw, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Stage as VStage, Layer as VLayer, Rect as VRect, Path as VPath, Text as VText, Circle as VCircle } from 'vue-konva'
 import { getEventDetail } from '../services/eventService'
 import { getVenues, getSeatMapDetail } from '../services/venue.service'
+import { getSeatStates, lockSeat, unlockSeat } from '../services/seat.service'
+import { HubConnectionBuilder, HttpTransportType } from '@microsoft/signalr'
+import { getToken } from '../services/auth/token.service'
 import { store } from '../stores/eventStore'
 import BaseButton from '../components/ui/BaseButton.vue'
 import { 
@@ -468,11 +489,259 @@ const selectedSeats = ref([])
 const selectedTier = ref(0)
 const selectedShowTimeIndex = ref(0)
 const qty = ref(1)
+// Map seatId -> timeoutId for client-side 58s auto-release safety net
+const seatLockTimers = new Map()
+// Tracks seats being actively locked (between API call and push to selectedSeats)
+// Prevents race condition where SignalR 'Selecting' arrives before selectedSeats is updated
+const pendingLocks = new Set()
+
+const selectedShowtimeId = computed(() => {
+  return event.value?.showtimes?.[selectedShowTimeIndex.value]?.id
+})
+
+const getHubUrl = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || 'https://localhost:7044/api/v1'
+  return apiUrl.replace('/api/v1', '/hubs/seatmap')
+}
+
+// ── Seat State Loading & Merging ──
+const loadSeatStates = async () => {
+  const showtimeId = selectedShowtimeId.value
+  if (!showtimeId || !seatMapData.value) return
+
+  try {
+    const res = await getSeatStates(showtimeId)
+
+    // Backend returns a plain array directly (no success wrapper)
+    // Support both formats: direct array or { success, data } wrapper
+    let seatStates = null
+    if (Array.isArray(res)) {
+      seatStates = res
+    } else if (res && res.success && Array.isArray(res.data)) {
+      seatStates = res.data
+    } else if (res && Array.isArray(res.data)) {
+      seatStates = res.data
+    }
+
+    if (!seatStates) {
+      console.warn('[SeatStates] Không thể parse response:', res)
+      return
+    }
+
+    console.log(`[SeatStates] Đã tải ${seatStates.length} trạng thái ghế.`)
+
+    const stateMap = {}
+    seatStates.forEach(s => {
+      // Support both camelCase (seatId) and PascalCase (SeatId)
+      const id = s.seatId ?? s.SeatId
+      const status = s.status ?? s.Status
+      if (id) stateMap[id] = status
+    })
+
+    // Reset all seats to 'Trống' first, then apply fetched states
+    seatMapData.value.zones?.forEach(zone => {
+      zone.rows?.forEach(row => {
+        row.seats?.forEach(seat => {
+          const status = stateMap[seat.id]
+          if (status === 'Sold') {
+            seat.layoutStatus = 'Đã bán'
+          } else if (status === 'Selecting') {
+            // Only mark as 'Đang giữ' if this seat is NOT selected by current user
+            const isMine = selectedSeats.value.some(s => s.id === seat.id)
+            if (!isMine) {
+              seat.layoutStatus = 'Đang giữ'
+            }
+            // If it's mine, leave it — getSeatFillColor handles it via selectedSeats
+          } else {
+            seat.layoutStatus = 'Trống'
+          }
+        })
+      })
+    })
+  } catch (err) {
+    console.error('[SeatStates] Lỗi khi tải trạng thái ghế từ Inventory:', err)
+  }
+}
+
+// ── SignalR Hub Real-time Setup ──
+let hubConnection = null
+const localUnlocks = new Set()
+
+// Start a 58s client-side safety timer per seat.
+// If SignalR doesn’t fire the Available event in time (e.g. keyspace events disabled),
+// the client auto-removes the seat from its local selection.
+const startSeatTimer = (seatId, showtimeId) => {
+  clearSeatTimer(seatId) // clear existing timer if any
+  const timerId = setTimeout(async () => {
+    const idx = selectedSeats.value.findIndex(s => s.id === seatId)
+    if (idx !== -1) {
+      const seat = selectedSeats.value[idx]
+      updateSeatStateLocally(seatId, 'Available')
+      store.toast = { message: `Ghế ${seat.rowName}-${seat.seatName} đã hết thời gian giữ chỗ (60 giây).`, icon: '⏰' }
+    }
+    seatLockTimers.delete(seatId)
+  }, 58000) // 58s — 2s before Redis 60s TTL expires
+  seatLockTimers.set(seatId, timerId)
+}
+
+const clearSeatTimer = (seatId) => {
+  const timerId = seatLockTimers.get(seatId)
+  if (timerId !== undefined) {
+    clearTimeout(timerId)
+    seatLockTimers.delete(seatId)
+  }
+}
+
+const clearAllSeatTimers = () => {
+  seatLockTimers.forEach((timerId) => clearTimeout(timerId))
+  seatLockTimers.clear()
+}
+
+const startHubConnection = async (showtimeId) => {
+  if (hubConnection) {
+    await stopHubConnection()
+  }
+
+  if (!getToken()) {
+    console.warn('[SignalR] Không có token xác thực, bỏ qua kết nối Real-time.')
+    return
+  }
+
+  const hubUrl = getHubUrl()
+  console.log(`[SignalR] Kết nối tới: ${hubUrl} cho suất chiếu: ${showtimeId}`)
+
+  hubConnection = new HubConnectionBuilder()
+    .withUrl(hubUrl, {
+      // Always call getToken() dynamically so reconnects get a fresh token
+      accessTokenFactory: () => getToken()
+    })
+    .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
+    .build()
+
+  hubConnection.on('SeatStateChanged', (data) => {
+    console.log('[SignalR] SeatStateChanged received:', data)
+    if (data && data.seatId) {
+      updateSeatStateLocally(data.seatId, data.status)
+    }
+  })
+
+  // Re-join the showtime group after automatic reconnect
+  hubConnection.onreconnected(async () => {
+    console.log('[SignalR] Reconnected. Re-joining showtime group:', showtimeId)
+    try {
+      await hubConnection.invoke('JoinShowtime', showtimeId)
+    } catch (err) {
+      console.error('[SignalR] Failed to re-join showtime after reconnect:', err)
+    }
+  })
+
+  hubConnection.onclose((err) => {
+    console.warn('[SignalR] Connection closed:', err)
+  })
+
+  try {
+    await hubConnection.start()
+    console.log(`[SignalR] ✓ Kết nối thành công, state: ${hubConnection.state}`)
+    await hubConnection.invoke('JoinShowtime', showtimeId)
+    console.log(`[SignalR] ✓ Đã join group showtime_${showtimeId}`)
+  } catch (err) {
+    console.error('[SignalR] ✗ Không thể kết nối hoặc join group:', err)
+    hubConnection = null
+  }
+}
+
+const stopHubConnection = async () => {
+  if (hubConnection) {
+    try {
+      const showtimeId = selectedShowtimeId.value
+      if (showtimeId && hubConnection.state === 'Connected') {
+        await hubConnection.invoke('LeaveShowtime', showtimeId)
+      }
+      await hubConnection.stop()
+      console.log('Đã đóng kết nối SignalR.')
+    } catch (err) {
+      console.error('Lỗi khi đóng kết nối SignalR:', err)
+    } finally {
+      hubConnection = null
+    }
+  }
+}
+
+const updateSeatStateLocally = (seatId, status) => {
+  if (!seatMapData.value) return
+
+  seatMapData.value.zones?.forEach(zone => {
+    zone.rows?.forEach(row => {
+      row.seats?.forEach(seat => {
+        if (seat.id === seatId) {
+          if (status === 'Available') {
+            clearSeatTimer(seatId) // cancel safety timer
+            const idx = selectedSeats.value.findIndex(s => s.id === seatId)
+            if (idx !== -1) {
+              selectedSeats.value.splice(idx, 1)
+              if (!localUnlocks.has(seatId)) {
+                store.toast = { message: `Ghế ${row.rowName}-${seat.seatName} đã hết hạn giữ chỗ và được giải phóng.`, icon: '⏰' }
+              }
+            }
+            seat.layoutStatus = 'Trống'
+          } else if (status === 'Selecting') {
+            // Do NOT mark as 'Đang giữ' if:
+            // - The seat is already in our selectedSeats (we locked it, SignalR echo)
+            // - The seat is in pendingLocks (we just called lockSeat, SignalR arrived before push)
+            const isMine = selectedSeats.value.some(s => s.id === seatId) || pendingLocks.has(seatId)
+            if (!isMine) {
+              seat.layoutStatus = 'Đang giữ'
+            }
+          } else if (status === 'Sold') {
+            const idx = selectedSeats.value.findIndex(s => s.id === seatId)
+            if (idx !== -1) {
+              selectedSeats.value.splice(idx, 1)
+              store.toast = { message: `Ghế ${row.rowName}-${seat.seatName} đã được mua bởi người khác.`, icon: '⚠️' }
+            }
+            seat.layoutStatus = 'Đã bán'
+          }
+        }
+      })
+    })
+  })
+}
 
 const konvaContainer = ref(null)
 
+// Function to unlock all selected seats proactively on refresh / close
+const unlockAllSeatsProactively = () => {
+  if (selectedSeats.value.length === 0 || !selectedShowtimeId.value) return
+  
+  const token = getToken()
+  if (!token) return
+  
+  const apiUrl = import.meta.env.VITE_API_URL || 'https://localhost:7044/api/v1'
+  const url = `${apiUrl}/inventory/Seats/seats/unlock`
+  
+  selectedSeats.value.forEach(seat => {
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        showtimeId: selectedShowtimeId.value,
+        seatId: seat.id
+      }),
+      keepalive: true
+    }).catch(err => console.error('Failed proactive unlock:', err))
+  })
+}
+
+const handleUnloadEvents = () => {
+  unlockAllSeatsProactively()
+}
+
 // Load Event details and conditionally fetch SeatMap layout
 onMounted(async () => {
+  window.addEventListener('beforeunload', handleUnloadEvents)
+  window.addEventListener('pagehide', handleUnloadEvents)
   try {
     const res = await getEventDetail(route.params.id)
     if (res && res.success && res.data) {
@@ -493,29 +762,26 @@ onMounted(async () => {
   }
 })
 
-// Dynamically resolve venueId from location venueName, then fetch seatmap details
+// Fetch seatmap details using the venueId and seatMapId from the event
 const loadSeatMapLayout = async () => {
   isLoadingSeatMap.value = true
   seatMapError.value = ''
   try {
-    const venueName = event.value.location?.venueName
-    if (!venueName) {
-      throw new Error('Sự kiện không có cấu hình thông tin địa điểm.')
+    const venueId = event.value?.venueId
+    const seatMapId = event.value?.seatMapId
+    if (!venueId || !seatMapId) {
+      throw new Error('Sự kiện không có cấu hình thông tin địa điểm hoặc sơ đồ ghế.')
     }
     
-    // Resolve Venue ID by searching for venue name
-    const venuesRes = await getVenues({ Search: venueName, PageNumber: 1, PageSize: 10 })
-    if (!venuesRes || !venuesRes.success || !venuesRes.data || venuesRes.data.data.length === 0) {
-      throw new Error(`Địa điểm "${venueName}" chưa được cấu hình sơ đồ ghế ngồi trên hệ thống.`)
-    }
-    
-    const venueId = venuesRes.data.data[0].id
-    
-    // Fetch SeatMap details
-    const seatMapRes = await getSeatMapDetail(venueId, event.value.seatMapId)
+    // Fetch SeatMap details directly using venueId and seatMapId
+    const seatMapRes = await getSeatMapDetail(venueId, seatMapId)
     if (seatMapRes && seatMapRes.success && seatMapRes.data) {
       seatMapData.value = seatMapRes.data
       initKonvaResize()
+      await loadSeatStates()
+      if (selectedShowtimeId.value) {
+        await startHubConnection(selectedShowtimeId.value)
+      }
     } else {
       throw new Error(seatMapRes?.message || 'Tải dữ liệu sơ đồ ghế ngồi thất bại.')
     }
@@ -571,9 +837,34 @@ const selectTierIndex = (idx) => {
   qty.value = 1
 }
 
-const removeSelectedSeat = (id) => {
-  const index = selectedSeats.value.findIndex(s => s.id === id)
-  if (index !== -1) selectedSeats.value.splice(index, 1)
+const removeSelectedSeat = async (id) => {
+  const showtimeId = selectedShowtimeId.value
+  if (!showtimeId) return
+
+  localUnlocks.add(id)
+  clearSeatTimer(id)
+  try {
+    const res = await unlockSeat(showtimeId, id)
+    if (res && res.success) {
+      const index = selectedSeats.value.findIndex(s => s.id === id)
+      if (index !== -1) selectedSeats.value.splice(index, 1)
+      // Also update seat's layoutStatus back to Trống
+      seatMapData.value?.zones?.forEach(zone => {
+        zone.rows?.forEach(row => {
+          row.seats?.forEach(seat => {
+            if (seat.id === id) seat.layoutStatus = 'Trống'
+          })
+        })
+      })
+    } else {
+      store.toast = { message: res?.message || 'Không thể hủy khóa ghế.', icon: '⚠️' }
+    }
+  } catch (err) {
+    console.error(err)
+    store.toast = { message: 'Lỗi khi hủy khóa ghế.', icon: '⚠️' }
+  } finally {
+    setTimeout(() => localUnlocks.delete(id), 2000)
+  }
 }
 
 // ── Konva Resizing Logic ──
@@ -676,8 +967,57 @@ function initKonvaResize() {
   })
 }
 
-onUnmounted(() => {
+onUnmounted(async () => {
+  window.removeEventListener('beforeunload', handleUnloadEvents)
+  window.removeEventListener('pagehide', handleUnloadEvents)
+  clearAllSeatTimers()
   if (resizeObserver) resizeObserver.disconnect()
+  
+  // Unlock any selected seats
+  if (selectedSeats.value.length > 0 && selectedShowtimeId.value) {
+    for (const seat of selectedSeats.value) {
+      localUnlocks.add(seat.id)
+      try {
+        await unlockSeat(selectedShowtimeId.value, seat.id)
+      } catch (e) {
+        console.error(e)
+      } finally {
+        setTimeout(() => localUnlocks.delete(seat.id), 2000)
+      }
+    }
+  }
+  
+  await stopHubConnection()
+})
+
+watch(selectedShowtimeId, async (newShowtimeId, oldShowtimeId) => {
+  if (!seatMapData.value) return // Wait until seatMapData is loaded
+  
+  if (newShowtimeId) {
+    // Clear selected seats first and unlock them
+    if (selectedSeats.value.length > 0 && oldShowtimeId) {
+      for (const seat of selectedSeats.value) {
+        localUnlocks.add(seat.id)
+        try {
+          await unlockSeat(oldShowtimeId, seat.id)
+        } catch (e) {
+          console.error(e)
+        } finally {
+          setTimeout(() => localUnlocks.delete(seat.id), 2000)
+        }
+      }
+    }
+    selectedSeats.value = []
+    clearAllSeatTimers()
+    
+    await stopHubConnection()
+    await loadSeatStates()
+    await startHubConnection(newShowtimeId)
+  } else {
+    selectedSeats.value = []
+    clearAllSeatTimers()
+    await stopHubConnection()
+  }
 })
 
 // ── Tooltip and Seat styling helper ──
@@ -769,38 +1109,89 @@ function onSeatLeave() {
   hoveredSeat.value = null
 }
 
-function onSeatClick(seat, zone, row) {
-  if (seat.layoutStatus === 'Đã bán' || seat.layoutStatus === 'Đã đặt' || seat.layoutStatus === 'Đang giữ') {
-    return // occupied seats cannot be clicked
+async function onSeatClick(seat, zone, row) {
+  const isMySelection = selectedSeats.value.some(s => s.id === seat.id)
+
+  // Block only if seat is locked/sold by someone else (not by current user)
+  if (!isMySelection) {
+    if (seat.layoutStatus === 'Đã bán' || seat.layoutStatus === 'Đã đặt' || seat.layoutStatus === 'Đang giữ') {
+      return
+    }
+  }
+  
+  const token = getToken()
+  if (!token) {
+    store.toast = { message: 'Vui lòng đăng nhập để thực hiện chọn ghế.', icon: '🔑' }
+    store.showAuth = true
+    return
+  }
+
+  const showtimeId = selectedShowtimeId.value
+  if (!showtimeId) {
+    store.toast = { message: 'Không tìm thấy thông tin suất chiếu.', icon: '⚠️' }
+    return
   }
   
   const idx = selectedSeats.value.findIndex(s => s.id === seat.id)
   if (idx !== -1) {
-    selectedSeats.value.splice(idx, 1)
+    localUnlocks.add(seat.id)
+    clearSeatTimer(seat.id)
+    try {
+      const res = await unlockSeat(showtimeId, seat.id)
+      if (res && res.success) {
+        selectedSeats.value.splice(idx, 1)
+        // Update seat's layoutStatus back to Trống
+        seat.layoutStatus = 'Trống'
+      } else {
+        store.toast = { message: res?.message || 'Không thể hủy khóa ghế.', icon: '⚠️' }
+      }
+    } catch (err) {
+      console.error(err)
+      store.toast = { message: 'Lỗi khi hủy khóa ghế.', icon: '⚠️' }
+    } finally {
+      setTimeout(() => localUnlocks.delete(seat.id), 2000)
+    }
   } else {
     if (selectedSeats.value.length >= 5) {
       store.toast = { message: 'Bạn chỉ được phép chọn tối đa 5 vé ghế ngồi.', icon: '⚠️' }
       return
     }
-    const price = getZonePrice(zone.id)
-    const ticketTypeName = getZoneTicketTypeName(zone.id)
     
-    // Select seat and automatically focus selected tier index
-    const tierIndex = event.value.showtimes?.[selectedShowTimeIndex.value]?.ticketTypes?.findIndex(t => t.zoneId === zone.id) ?? -1
-    if (tierIndex !== -1 && selectedTier.value !== tierIndex) {
-      selectedTier.value = tierIndex
+    pendingLocks.add(seat.id)
+    try {
+      const res = await lockSeat(showtimeId, seat.id)
+      if (res && res.success) {
+        const price = getZonePrice(zone.id)
+        const ticketTypeName = getZoneTicketTypeName(zone.id)
+        
+        // Select seat and automatically focus selected tier index
+        const tierIndex = event.value.showtimes?.[selectedShowTimeIndex.value]?.ticketTypes?.findIndex(t => t.zoneId === zone.id) ?? -1
+        if (tierIndex !== -1 && selectedTier.value !== tierIndex) {
+          selectedTier.value = tierIndex
+        }
+        
+        selectedSeats.value.push({
+          id: seat.id,
+          seatName: seat.seatName,
+          seatCode: seat.seatCode,
+          zoneId: zone.id,
+          zoneName: zone.zoneName,
+          rowName: row.rowName,
+          price: price,
+          ticketTypeName: ticketTypeName
+        })
+        // Start client-side 58s safety auto-release timer
+        startSeatTimer(seat.id, showtimeId)
+      } else {
+        store.toast = { message: res?.message || 'Ghế đã bị người khác chọn hoặc khóa.', icon: '⚠️' }
+        await loadSeatStates()
+      }
+    } catch (err) {
+      console.error(err)
+      store.toast = { message: 'Lỗi khi chọn khóa ghế.', icon: '⚠️' }
+    } finally {
+      pendingLocks.delete(seat.id)
     }
-    
-    selectedSeats.value.push({
-      id: seat.id,
-      seatName: seat.seatName,
-      seatCode: seat.seatCode,
-      zoneId: zone.id,
-      zoneName: zone.zoneName,
-      rowName: row.rowName,
-      price: price,
-      ticketTypeName: ticketTypeName
-    })
   }
 }
 
@@ -895,6 +1286,13 @@ const handleBuyTicket = () => {
       icon: '🎉'
     }
     qty.value = 1
+  }
+}
+
+const scrollToSelect = () => {
+  const el = document.getElementById('showtimes') || document.getElementById('venue')
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth' })
   }
 }
 </script>

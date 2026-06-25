@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-[#050807] text-white">
+  <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-[#0A0F0D] text-white">
     <!-- Right: Form -->
     <div class="flex items-center justify-center p-8 sm:p-12 lg:p-24 relative overflow-hidden order-2 lg:order-1">
       <!-- Mobile decor -->
@@ -90,7 +90,7 @@
     </div>
 
     <!-- Left: Brand / Image -->
-    <div class="relative hidden lg:flex flex-col justify-between p-12 bg-[#0A0C14] overflow-hidden border-l border-white/5 order-1 lg:order-2">
+    <div class="relative hidden lg:flex flex-col justify-between p-12 bg-[#0A0F0D] overflow-hidden border-l border-white/5 order-1 lg:order-2">
       <!-- Decor -->
       <div class="absolute top-[-20%] left-[-10%] w-[80%] h-[80%] bg-indigo-600/20 blur-[120px] rounded-full mix-blend-screen pointer-events-none"></div>
       <div class="absolute bottom-[-10%] right-[-20%] w-[60%] h-[60%] bg-purple-500/10 blur-[100px] rounded-full mix-blend-screen pointer-events-none"></div>

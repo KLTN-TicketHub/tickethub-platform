@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#050807] flex items-center justify-center p-6 relative overflow-hidden">
+  <div class="min-h-screen bg-[#0A0F0D] flex items-center justify-center p-6 relative overflow-hidden">
     <!-- Animated background -->
     <div class="absolute inset-0 pointer-events-none z-0">
       <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-60"></div>

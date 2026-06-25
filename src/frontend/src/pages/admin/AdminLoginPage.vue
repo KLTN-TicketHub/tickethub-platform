@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-[#050807] text-white">
+  <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-[#0A0F0D] text-white">
     <!-- Left: Brand / Image -->
     <div class="relative hidden lg:flex flex-col justify-between p-12 bg-[#0A0F0D] overflow-hidden border-r border-white/5">
       <!-- Decor -->
