@@ -1,6 +1,6 @@
-using Payment.Common.Options;
 using MassTransit;
 using Microsoft.Extensions.Options;
+using Payment.Common.Options;
 
 namespace Payment.API.Extensions
 {

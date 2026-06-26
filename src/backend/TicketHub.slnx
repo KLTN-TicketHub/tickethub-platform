@@ -19,6 +19,8 @@
   </Folder>
   <Folder Name="/Services/Finance/">
     <Project Path="Services/Finance/Finance.API/Finance.API.csproj" />
+    <Project Path="Services/Finance/Finance.Common/Finance.Common.csproj" />
+    <Project Path="Services/Finance/Finance.Infrastructure/Finance.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Services/Identity/">
     <Project Path="Services/Identity/Identity.API/Identity.API.csproj" />
@@ -45,6 +47,8 @@
   </Folder>
   <Folder Name="/Services/Ordering/">
     <Project Path="Services/Ordering/Ordering.API/Ordering.API.csproj" />
+    <Project Path="Services/Ordering/Ordering.Common/Ordering.Common.csproj" />
+    <Project Path="Services/Ordering/Ordering.Infrastructure/Ordering.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Services/Payment/">
     <Project Path="Services/Payment/Payment.API/Payment.API.csproj" />

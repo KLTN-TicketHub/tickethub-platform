@@ -1,5 +1,5 @@
-using BuildingBlocks.Infrastructure.Auditing;
 using BuildingBlocks.Domain.DDD;
+using BuildingBlocks.Infrastructure.Auditing;
 using Payment.Infrastructure.Data.Contexts;
 
 namespace Payment.Infrastructure.Interfaces.IRepositories

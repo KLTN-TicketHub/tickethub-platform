@@ -1,5 +1,5 @@
-using Payment.Infrastructure.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
+using Payment.Infrastructure.Data.Contexts;
 
 namespace Payment.API.Extensions
 {
