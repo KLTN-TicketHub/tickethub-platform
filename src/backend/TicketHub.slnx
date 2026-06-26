@@ -17,6 +17,9 @@
     <Project Path="Services/Catalog/Catalog.Domain/Catalog.Domain.csproj" />
     <Project Path="Services/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/Services/Finance/">
+    <Project Path="Services/Finance/Finance.API/Finance.API.csproj" />
+  </Folder>
   <Folder Name="/Services/Identity/">
     <Project Path="Services/Identity/Identity.API/Identity.API.csproj" />
     <Project Path="Services/Identity/Identity.Application/Identity.Application.csproj" />
@@ -39,5 +42,13 @@
    <File Path="docker/infra/docker-compose.yml" />
    <File Path="docker/infra/.env.example" />
    <File Path="docker/infra/README.md" />
+  </Folder>
+  <Folder Name="/Services/Ordering/">
+    <Project Path="Services/Ordering/Ordering.API/Ordering.API.csproj" />
+  </Folder>
+  <Folder Name="/Services/Payment/">
+    <Project Path="Services/Payment/Payment.API/Payment.API.csproj" />
+    <Project Path="Services/Payment/Payment.Common/Payment.Common.csproj" />
+    <Project Path="Services/Payment/Payment.Infrastructure/Payment.Infrastructure.csproj" />
   </Folder>
 </Solution>
