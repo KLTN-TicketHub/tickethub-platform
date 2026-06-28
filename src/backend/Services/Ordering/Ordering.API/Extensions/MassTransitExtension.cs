@@ -1,6 +1,6 @@
-using Ordering.Common.Options;
 using MassTransit;
 using Microsoft.Extensions.Options;
+using Ordering.Common.Options;
 
 namespace Ordering.API.Extensions
 {

@@ -1,5 +1,5 @@
-using Ordering.Infrastructure.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
+using Ordering.Infrastructure.Data.Contexts;
 
 namespace Ordering.API.Extensions
 {
