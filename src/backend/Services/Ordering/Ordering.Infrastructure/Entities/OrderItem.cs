@@ -21,5 +21,17 @@ namespace Ordering.Infrastructure.Entities
         public int Quantity { get; set; }
 
         public Order? Order { get; set; }
+
+        public OrderItem(Guid? seatId, string? seatName, string? rowName, Guid ticketTypeId, string ticketTypeName, decimal price, int quantity)
+        {
+            Id = Guid.NewGuid();
+            SeatId = seatId;
+            SeatName = seatName;
+            RowName = rowName;
+            TicketTypeId = ticketTypeId;
+            TicketTypeName = ticketTypeName;
+            Price = price;
+            Quantity = quantity;
+        }
     }
 }
