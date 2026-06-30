@@ -12,7 +12,22 @@ namespace Payment.Infrastructure.Data.Contexts.Config
 
             builder.HasKey(t => t.Id);
 
+            builder.Property(t => t.OrderId)
+                .IsRequired();
 
+            builder.Property(t => t.MerchantOrderNo)
+                .IsRequired();
+
+            builder.Property(t => t.Amount)
+                .IsRequired()
+                .HasPrecision(18, 2);
+
+            builder.Property(t => t.Gateway)
+                .IsRequired();
+
+            builder.Property(t => t.Status)
+                .IsRequired()
+                .HasConversion<string>();
         }
     }
 }
