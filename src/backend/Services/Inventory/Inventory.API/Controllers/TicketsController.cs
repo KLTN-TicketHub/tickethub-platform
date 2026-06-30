@@ -1,4 +1,3 @@
-using BuildingBlocks.Application.Interfaces;
 using Inventory.Infrastructure.Interfaces.IServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

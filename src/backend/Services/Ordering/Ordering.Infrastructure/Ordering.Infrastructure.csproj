@@ -21,6 +21,7 @@
 		<PackageReference Include="FluentValidation" Version="12.0.0" />
 		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
+		<PackageReference Include="Grpc.AspNetCore" Version="2.80.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -29,6 +30,10 @@
 		<ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
 		<ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
 		<ProjectReference Include="..\Ordering.Common\Ordering.Common.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="Protos\inventory.proto" GrpcServices="Client" />
 	</ItemGroup>
 
 </Project>

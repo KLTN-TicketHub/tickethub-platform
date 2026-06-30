@@ -5,6 +5,8 @@ using Ordering.Infrastructure.Data.Contexts;
 using Ordering.Infrastructure.Data.Repositories;
 using Ordering.Infrastructure.Interfaces;
 using Ordering.Infrastructure.Interfaces.IRepositories;
+using Ordering.Infrastructure.Interfaces.IServices;
+using Ordering.Infrastructure.Services;
 
 namespace Ordering.API.Extensions
 {
@@ -23,6 +25,7 @@ namespace Ordering.API.Extensions
             services.AddScoped<IEventPublisher, MassTransitEventPublisher<OrderingDbContext>>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFileService, FileService>();
+            services.AddScoped<IInventoryService, InventoryService>();
 
             return services;
         }
