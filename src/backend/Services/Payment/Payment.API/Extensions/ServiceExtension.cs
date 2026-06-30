@@ -31,6 +31,7 @@ namespace Payment.API.Extensions
         {
             services.AddScoped<AuditInterceptor>();
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+            services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }

@@ -1,0 +1,36 @@
+﻿using BuildingBlocks.Domain.DDD;
+
+namespace Finance.Infrastructure.Entities
+{
+    public class Wallet : BaseEntity, IAggregateRoot
+    {
+        public Guid OrganizerId { get; set; }
+
+        public decimal Balance { get; private set; }
+
+        public byte[] RowVersion { get; private set; } = default!;
+
+        public Wallet() { }
+        public Wallet(Guid organizerId)
+        {
+            Id = Guid.NewGuid();
+            OrganizerId = organizerId;
+            Balance = 0;
+            CreatedAt = DateTime.UtcNow;
+        }
+
+        public void Credit(decimal amount)
+        {
+            Balance += amount;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        public bool Debit(decimal amount)
+        {
+            if (Balance < amount) return false;
+            Balance -= amount;
+            UpdatedAt = DateTime.UtcNow;
+            return true;
+        }
+    }
+}

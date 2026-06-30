@@ -31,6 +31,8 @@ namespace Finance.API.Extensions
         {
             services.AddScoped<AuditInterceptor>();
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+            services.AddScoped<IWalletRepository, WalletRepository>();
+            services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }

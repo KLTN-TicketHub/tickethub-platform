@@ -8,11 +8,17 @@ namespace Finance.Infrastructure.Data.Contexts
     {
         public UnitOfWork(
             FinanceDbContext dbContext,
-            IAuditLogRepository auditLogRepository) : base(dbContext)
+            IAuditLogRepository auditLogRepository,
+            IWalletRepository walletRepository,
+            IWalletTransactionRepository walletTransactionRepository) : base(dbContext)
         {
             AuditLogRepository = auditLogRepository;
+            WalletRepository = walletRepository;
+            WalletTransactionRepository = walletTransactionRepository;
         }
 
         public IAuditLogRepository AuditLogRepository { get; }
+        public IWalletRepository WalletRepository { get; }
+        public IWalletTransactionRepository WalletTransactionRepository { get; }
     }
 }

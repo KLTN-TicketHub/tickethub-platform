@@ -6,5 +6,6 @@ namespace Payment.Infrastructure.Interfaces
     public interface IUnitOfWork : IBaseUnitOfWork
     {
         IAuditLogRepository AuditLogRepository { get; }
+        IPaymentTransactionRepository PaymentTransactionRepository { get; }
     }
 }

@@ -6,5 +6,7 @@ namespace Finance.Infrastructure.Interfaces
     public interface IUnitOfWork : IBaseUnitOfWork
     {
         IAuditLogRepository AuditLogRepository { get; }
+        IWalletRepository WalletRepository { get; }
+        IWalletTransactionRepository WalletTransactionRepository { get; }
     }
 }

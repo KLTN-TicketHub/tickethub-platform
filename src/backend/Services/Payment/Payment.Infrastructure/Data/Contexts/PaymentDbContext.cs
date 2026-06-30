@@ -1,6 +1,7 @@
 using BuildingBlocks.Domain.Outbox;
 using BuildingBlocks.Infrastructure.Auditing;
 using Microsoft.EntityFrameworkCore;
+using Payment.Infrastructure.Entities;
 
 namespace Payment.Infrastructure.Data.Contexts
 {
@@ -13,6 +14,7 @@ namespace Payment.Infrastructure.Data.Contexts
         #region DbSet Section
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<OutboxMessage> OutboxMessages { get; set; }
+        public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

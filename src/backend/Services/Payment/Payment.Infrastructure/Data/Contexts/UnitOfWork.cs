@@ -8,11 +8,14 @@ namespace Payment.Infrastructure.Data.Contexts
     {
         public UnitOfWork(
             PaymentDbContext dbContext,
-            IAuditLogRepository auditLogRepository) : base(dbContext)
+            IAuditLogRepository auditLogRepository,
+            IPaymentTransactionRepository paymentTransactionRepository) : base(dbContext)
         {
             AuditLogRepository = auditLogRepository;
+            PaymentTransactionRepository = paymentTransactionRepository;
         }
 
         public IAuditLogRepository AuditLogRepository { get; }
+        public IPaymentTransactionRepository PaymentTransactionRepository { get; }
     }
 }

@@ -6,5 +6,6 @@ namespace Ordering.Infrastructure.Interfaces
     public interface IUnitOfWork : IBaseUnitOfWork
     {
         IAuditLogRepository AuditLogRepository { get; }
+        IOrderRepository OrderRepository { get; }
     }
 }

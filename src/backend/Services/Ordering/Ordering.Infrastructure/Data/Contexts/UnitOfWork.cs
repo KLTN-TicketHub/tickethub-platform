@@ -8,11 +8,14 @@ namespace Ordering.Infrastructure.Data.Contexts
     {
         public UnitOfWork(
             OrderingDbContext dbContext,
-            IAuditLogRepository auditLogRepository) : base(dbContext)
+            IAuditLogRepository auditLogRepository,
+            IOrderRepository orderRepository) : base(dbContext)
         {
             AuditLogRepository = auditLogRepository;
+            OrderRepository = orderRepository;
         }
 
         public IAuditLogRepository AuditLogRepository { get; }
+        public IOrderRepository OrderRepository { get; }
     }
 }
