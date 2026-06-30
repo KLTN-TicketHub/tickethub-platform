@@ -13,14 +13,10 @@ namespace Inventory.API.Controllers
     public class TicketsController : ControllerBase
     {
         private readonly ITicketInventoryService _ticketInventoryService;
-        private readonly ICurrentUserService _currentUserService;
 
-        public TicketsController(
-            ITicketInventoryService ticketInventoryService,
-            ICurrentUserService currentUserService)
+        public TicketsController(ITicketInventoryService ticketInventoryService)
         {
             _ticketInventoryService = ticketInventoryService;
-            _currentUserService = currentUserService;
         }
 
         [HttpGet("showtimes/{showtimeId}/types/{ticketTypeId}")]
