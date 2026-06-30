@@ -26,6 +26,7 @@ namespace Ordering.API.Extensions
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IInventoryService, InventoryService>();
+            services.AddScoped<ICatalogService, CatalogService>();
             services.AddScoped<IOrderService, OrderService>();
 
             return services;

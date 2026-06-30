@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+option csharp_namespace = "Catalog.API.Protos";
+
+package catalog;
+
+service CatalogGrpc {
+  rpc ValidateCheckout (ValidateCheckoutRequest) returns (ValidateCheckoutResponse);
+  rpc ValidateSeatLock (ValidateSeatLockRequest) returns (ValidateSeatLockResponse);
+  rpc ValidateTicketTypes (ValidateTicketTypesRequest) returns (ValidateTicketTypesResponse);
+}
+
+message ValidateCheckoutRequest {
+  string eventId = 1;
+  string showtimeId = 2;
+  repeated string seatIds = 3;
+  repeated CheckoutTicketItem ticketItems = 4;
+}
+
+message CheckoutTicketItem {
+  string ticketTypeId = 1;
+  int32 quantity = 2;
+}
+
+message ValidateCheckoutResponse {
+  bool isSuccess = 1;
+  string message = 2;
+}
+
+message ValidateSeatLockRequest {
+  string showtimeId = 1;
+  repeated string seatIds = 2;
+}
+
+message ValidateSeatLockResponse {
+  bool isSuccess = 1;
+  string message = 2;
+}
+
+message ValidateTicketTypesRequest {
+  string showtimeId = 1;
+  repeated TicketTypeQuantityItem ticketItems = 2;
+}
+
+message TicketTypeQuantityItem {
+  string ticketTypeId = 1;
+  int32 quantity = 2;
+}
+
+message ValidateTicketTypesResponse {
+  bool isSuccess = 1;
+  string message = 2;
+}

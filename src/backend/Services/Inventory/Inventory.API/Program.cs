@@ -43,6 +43,7 @@ builder.Services.AddCustomFluentValidation();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSignalR();
 builder.Services.AddGrpc();
+builder.Services.AddCustomGrpcClients(builder.Configuration);
 
 var app = builder.Build();
 

@@ -48,6 +48,7 @@ builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(CatalogProfile).Assembly);
 builder.Services.AddCustomFluentValidation();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddGrpc();
 
 var app = builder.Build();
 
@@ -63,6 +64,8 @@ await app.UseDatabaseInitialization();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.MapGrpcService<Catalog.API.Services.CatalogGrpcService>();
 
 app.UseRateLimiter();
 

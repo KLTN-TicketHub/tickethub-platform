@@ -8,13 +8,16 @@ namespace Inventory.API.Services
     {
         private readonly IRedisLockService _cache;
         private readonly ITicketInventoryService _ticketInventoryService;
+        private readonly ICatalogService _catalogService;
 
         public InventoryGrpcService(
             IRedisLockService cache,
-            ITicketInventoryService ticketInventoryService)
+            ITicketInventoryService ticketInventoryService,
+            ICatalogService catalogService)
         {
             _cache = cache;
             _ticketInventoryService = ticketInventoryService;
+            _catalogService = catalogService;
         }
 
         public override async Task<UpgradeSeatLocksResponse> UpgradeSeatLocks(
@@ -39,25 +42,51 @@ namespace Inventory.API.Services
                         Message = "UserId không đúng định dạng Guid."
                     };
                 }
+
+                var seatIdsParsed = new List<Guid>();
                 foreach (var seatIdStr in request.SeatIds)
                 {
-                    if (Guid.TryParse(seatIdStr, out var seatId))
+                    if (!Guid.TryParse(seatIdStr, out var seatId))
                     {
-                        var locked = await _cache.LockSeatAsync(
-                            showtimeId,
-                            seatId,
-                            userId,
-                            TimeSpan.FromMinutes(10));
-                        if (!locked)
+                        return new UpgradeSeatLocksResponse
                         {
-                            return new UpgradeSeatLocksResponse
-                            {
-                                IsSuccess = false,
-                                Message = $"Ghế {seatIdStr} không thể nâng cấp khóa (có thể đã hết hạn giữ chỗ hoặc bị người khác chọn)."
-                            };
-                        }
+                            IsSuccess = false,
+                            Message = $"SeatId '{seatIdStr}' không đúng định dạng Guid."
+                        };
+                    }
+                    seatIdsParsed.Add(seatId);
+                }
+
+                var (isValidCatalog, catalogMessage) = await _catalogService.ValidateSeatLockAsync(
+                    showtimeId, seatIdsParsed);
+
+                if (!isValidCatalog)
+                {
+                    return new UpgradeSeatLocksResponse
+                    {
+                        IsSuccess = false,
+                        Message = $"Catalog validation thất bại: {catalogMessage}"
+                    };
+                }
+
+                foreach (var seatId in seatIdsParsed)
+                {
+                    var locked = await _cache.LockSeatAsync(
+                        showtimeId,
+                        seatId,
+                        userId,
+                        TimeSpan.FromMinutes(10));
+
+                    if (!locked)
+                    {
+                        return new UpgradeSeatLocksResponse
+                        {
+                            IsSuccess = false,
+                            Message = $"Ghế '{seatId}' không thể nâng cấp khóa (có thể đã hết hạn giữ chỗ hoặc bị người khác chọn)."
+                        };
                     }
                 }
+
                 return new UpgradeSeatLocksResponse { IsSuccess = true };
             }
             catch (Exception ex)
@@ -93,37 +122,45 @@ namespace Inventory.API.Services
                     };
                 }
 
-                List<Guid> lockedTicketTypeIds = new List<Guid>();
-
+                var ticketItems = new List<(Guid TicketTypeId, int Quantity)>();
                 foreach (var tq in request.TicketQuantities)
                 {
-                    if (Guid.TryParse(tq.TicketTypeId, out var ticketTypeId))
+                    if (!Guid.TryParse(tq.TicketTypeId, out var ticketTypeId))
                     {
-                        bool success = await _ticketInventoryService.LockTicketsAsync(
-                            showtimeId,
-                            ticketTypeId,
-                            userId,
-                            tq.Quantity,
-                            TimeSpan.FromMinutes(10),
-                            context.CancellationToken);
-
-                        if (!success)
+                        return new LockTicketQuantitiesResponse
                         {
-                            foreach (var lockedId in lockedTicketTypeIds)
-                            {
-                                await _ticketInventoryService.UnlockTicketsAsync(showtimeId, lockedId, userId, context.CancellationToken);
-                            }
-
-                            return new LockTicketQuantitiesResponse
-                            {
-                                IsSuccess = false,
-                                Message = $"Không đủ số lượng vé khả dụng cho loại vé {tq.TicketTypeId}."
-                            };
-                        }
-
-                        lockedTicketTypeIds.Add(ticketTypeId);
+                            IsSuccess = false,
+                            Message = $"TicketTypeId '{tq.TicketTypeId}' không đúng định dạng Guid."
+                        };
                     }
-                    else
+                    ticketItems.Add((ticketTypeId, tq.Quantity));
+                }
+
+                var (isValidCatalog, catalogMessage) = await _catalogService.ValidateTicketTypesAsync(
+                    showtimeId, ticketItems);
+
+                if (!isValidCatalog)
+                {
+                    return new LockTicketQuantitiesResponse
+                    {
+                        IsSuccess = false,
+                        Message = $"Catalog validation thất bại: {catalogMessage}"
+                    };
+                }
+
+                List<Guid> lockedTicketTypeIds = new List<Guid>();
+
+                foreach (var (ticketTypeId, quantity) in ticketItems)
+                {
+                    bool success = await _ticketInventoryService.LockTicketsAsync(
+                        showtimeId,
+                        ticketTypeId,
+                        userId,
+                        quantity,
+                        TimeSpan.FromMinutes(10),
+                        context.CancellationToken);
+
+                    if (!success)
                     {
                         foreach (var lockedId in lockedTicketTypeIds)
                         {
@@ -133,9 +170,11 @@ namespace Inventory.API.Services
                         return new LockTicketQuantitiesResponse
                         {
                             IsSuccess = false,
-                            Message = $"TicketTypeId {tq.TicketTypeId} không đúng định dạng Guid."
+                            Message = $"Không đủ số lượng vé khả dụng cho loại vé '{ticketTypeId}'."
                         };
                     }
+
+                    lockedTicketTypeIds.Add(ticketTypeId);
                 }
 
                 return new LockTicketQuantitiesResponse { IsSuccess = true };

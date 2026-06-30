@@ -1,4 +1,5 @@
-﻿using Inventory.API.Protos;
+using Catalog.API.Protos;
+using Inventory.API.Protos;
 
 namespace Ordering.API.Extensions
 {
@@ -9,6 +10,11 @@ namespace Ordering.API.Extensions
             services.AddGrpcClient<InventoryGrpc.InventoryGrpcClient>(o =>
             {
                 o.Address = new Uri(configuration["GrpcSettings:InventoryUrl"]!);
+            });
+
+            services.AddGrpcClient<CatalogGrpc.CatalogGrpcClient>(o =>
+            {
+                o.Address = new Uri(configuration["GrpcSettings:CatalogUrl"]!);
             });
 
             return services;

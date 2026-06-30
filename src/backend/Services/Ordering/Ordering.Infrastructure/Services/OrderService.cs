@@ -11,15 +11,18 @@ namespace Ordering.Infrastructure.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IInventoryService _inventoryService;
+        private readonly ICatalogService _catalogService;
         private readonly IEventPublisher _eventPublisher;
 
         public OrderService(
             IUnitOfWork unitOfWork,
             IInventoryService inventoryService,
+            ICatalogService catalogService,
             IEventPublisher eventPublisher)
         {
             _unitOfWork = unitOfWork;
             _inventoryService = inventoryService;
+            _catalogService = catalogService;
             _eventPublisher = eventPublisher;
         }
 
@@ -30,14 +33,29 @@ namespace Ordering.Infrastructure.Services
                 .Select(x => x.SeatId!.Value)
                 .ToList();
 
+            var ticketValidationItems = request.Items
+                .GroupBy(x => x.TicketTypeId)
+                .Select(g => new CheckoutTicketValidationItem
+                {
+                    TicketTypeId = g.Key,
+                    Quantity = g.Sum(x => x.Quantity)
+                })
+                .ToList();
+
+            var (isValidCatalog, catalogMessage) = await _catalogService.ValidateCheckoutAsync(
+                eventId: request.EventId,
+                showtimeId: request.ShowtimeId,
+                seatIds: seatIds,
+                ticketItems: ticketValidationItems);
+
+            if (!isValidCatalog)
+                return (false, Guid.Empty, $"Dữ liệu không hợp lệ từ Catalog: {catalogMessage}");
+
             if (seatIds.Any())
             {
-
-                (bool isLockSuccess, string lockMessage) = await _inventoryService.UpgradeSeatLocksAsync(request.ShowtimeId, seatIds, userId);
+                var (isLockSuccess, lockMessage) = await _inventoryService.UpgradeSeatLocksAsync(request.ShowtimeId, seatIds, userId);
                 if (!isLockSuccess)
-                {
                     return (false, Guid.Empty, $"Khóa ghế thất bại: {lockMessage}");
-                }
             }
 
             decimal totalPrice = request.Items.Sum(x => x.Price * x.Quantity);

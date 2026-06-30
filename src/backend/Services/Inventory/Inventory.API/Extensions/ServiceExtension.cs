@@ -30,6 +30,7 @@ namespace Inventory.API.Extensions
             services.AddScoped<ISeatStateService, SeatStateService>();
             services.AddScoped<ISeatHubNotificationService, SeatHubNotificationService>();
             services.AddScoped<ITicketInventoryService, TicketInventoryService>();
+            services.AddScoped<ICatalogService, Inventory.Infrastructure.Services.CatalogService>();
 
             return services;
         }
