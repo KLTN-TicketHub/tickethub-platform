@@ -18,6 +18,7 @@ builder.Services.AddCustomOptions(builder.Configuration);
 builder.Services.AddCustomDb(builder.Configuration);
 
 builder.Services.AddMassTransitWithRabbitMq();
+builder.Services.AddCustomGrpc(builder.Configuration);
 
 builder.Services.AddCustomRateLimit(
     builder.Configuration.GetSection("AppSettings:RateLimit").Get<RateLimitConfig>());
