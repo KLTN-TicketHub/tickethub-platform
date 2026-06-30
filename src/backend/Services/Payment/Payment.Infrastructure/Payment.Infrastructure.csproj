@@ -31,4 +31,8 @@
 		<ProjectReference Include="..\Payment.Common\Payment.Common.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Migrations\" />
+	</ItemGroup>
+
 </Project>
