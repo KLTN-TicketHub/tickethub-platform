@@ -1,7 +1,7 @@
-using BuildingBlocks.Domain.Outbox;
 using BuildingBlocks.Infrastructure.Auditing;
 using Microsoft.EntityFrameworkCore;
 using Payment.Infrastructure.Entities;
+using MassTransit;
 
 namespace Payment.Infrastructure.Data.Contexts
 {
@@ -13,7 +13,6 @@ namespace Payment.Infrastructure.Data.Contexts
 
         #region DbSet Section
         public DbSet<AuditLog> AuditLogs { get; set; }
-        public DbSet<OutboxMessage> OutboxMessages { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         #endregion
 
@@ -21,6 +20,9 @@ namespace Payment.Infrastructure.Data.Contexts
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(PaymentDbContext).Assembly);
+            modelBuilder.AddInboxStateEntity();
+            modelBuilder.AddOutboxMessageEntity();
+            modelBuilder.AddOutboxStateEntity();
         }
     }
 }

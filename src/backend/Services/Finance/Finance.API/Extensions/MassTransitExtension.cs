@@ -2,6 +2,8 @@ using Finance.Common.Options;
 using MassTransit;
 using Microsoft.Extensions.Options;
 
+using Finance.Infrastructure.Data.Contexts;
+
 namespace Finance.API.Extensions
 {
     public static class MassTransitExtension
@@ -10,7 +12,11 @@ namespace Finance.API.Extensions
         {
             services.AddMassTransit(x =>
             {
-                // Add consumers here when needed
+                x.AddEntityFrameworkOutbox<FinanceDbContext>(o =>
+                {
+                    o.UseSqlServer();
+                    o.UseBusOutbox();
+                });
 
                 x.UsingRabbitMq((context, cfg) =>
                 {

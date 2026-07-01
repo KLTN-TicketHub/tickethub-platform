@@ -2,6 +2,8 @@ using MassTransit;
 using Microsoft.Extensions.Options;
 using Ordering.Common.Options;
 
+using Ordering.Infrastructure.Data.Contexts;
+
 namespace Ordering.API.Extensions
 {
     public static class MassTransitExtension
@@ -10,7 +12,11 @@ namespace Ordering.API.Extensions
         {
             services.AddMassTransit(x =>
             {
-                // Add consumers here when needed
+                x.AddEntityFrameworkOutbox<OrderingDbContext>(o =>
+                {
+                    o.UseSqlServer();
+                    o.UseBusOutbox();
+                });
 
                 x.UsingRabbitMq((context, cfg) =>
                 {

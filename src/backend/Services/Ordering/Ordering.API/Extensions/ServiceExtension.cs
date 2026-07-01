@@ -22,7 +22,7 @@ namespace Ordering.API.Extensions
         public static IServiceCollection RegisterServices(IServiceCollection services)
         {
             services.AddScoped<ICacheService, RedisCacheService>();
-            services.AddScoped<IEventPublisher, MassTransitEventPublisher<OrderingDbContext>>();
+            services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IInventoryService, InventoryService>();

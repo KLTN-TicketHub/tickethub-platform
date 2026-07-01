@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Infrastructure.Auditing;
 using BuildingBlocks.Infrastructure.Services;
 using Identity.Application.Common.Interfaces.IBackgroundJobs;
@@ -32,7 +32,7 @@ namespace Identity.API.Extensions
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IGoogleAuthService, GoogleAuthService>();
             services.AddScoped<ICacheService, RedisCacheService>();
-            services.AddScoped<IEventPublisher, MassTransitEventPublisher<IdentityDbContext>>();
+            services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
             services.AddScoped<IBackgroundJobService, HangfireJobService>();
             services.AddScoped<IFileService, FileService>();
 

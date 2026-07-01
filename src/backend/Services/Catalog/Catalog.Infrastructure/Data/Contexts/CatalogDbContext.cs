@@ -1,7 +1,7 @@
-using BuildingBlocks.Domain.Outbox;
 using BuildingBlocks.Infrastructure.Auditing;
 using Catalog.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using MassTransit;
 
 namespace Catalog.Infrastructure.Data.Contexts
 {
@@ -13,7 +13,7 @@ namespace Catalog.Infrastructure.Data.Contexts
 
         #region DbSet Section
         public DbSet<AuditLog> AuditLogs { get; set; }
-        public DbSet<Event> Events { get; set; }
+        public DbSet<Catalog.Domain.Entities.Event> Events { get; set; }
         public DbSet<EventApproval> EventApprovals { get; set; }
         public DbSet<EventCategory> EventCategories { get; set; }
         public DbSet<EventLocation> EventLocations { get; set; }
@@ -24,13 +24,15 @@ namespace Catalog.Infrastructure.Data.Contexts
         public DbSet<Row> Rows { get; set; }
         public DbSet<OrganizerSnapshot> OrganizerSnapshots { get; set; }
         public DbSet<ShowTime> ShowTimes { get; set; }
-        public DbSet<OutboxMessage> OutboxMessages { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(CatalogDbContext).Assembly);
+            modelBuilder.AddInboxStateEntity();
+            modelBuilder.AddOutboxMessageEntity();
+            modelBuilder.AddOutboxStateEntity();
         }
     }
 }

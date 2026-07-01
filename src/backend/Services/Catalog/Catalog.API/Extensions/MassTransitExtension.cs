@@ -3,6 +3,8 @@ using Catalog.Infrastructure.Consumers;
 using MassTransit;
 using Microsoft.Extensions.Options;
 
+using Catalog.Infrastructure.Data.Contexts;
+
 namespace Catalog.API.Extensions
 {
     public static class MassTransitExtension
@@ -11,6 +13,12 @@ namespace Catalog.API.Extensions
         {
             services.AddMassTransit(x =>
             {
+                x.AddEntityFrameworkOutbox<CatalogDbContext>(o =>
+                {
+                    o.UseSqlServer();
+                    o.UseBusOutbox();
+                });
+
                 x.AddConsumer<OrganizerActivatedConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>

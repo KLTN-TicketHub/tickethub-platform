@@ -79,7 +79,7 @@ namespace Identity.Application.Features.Auth.Commands.LoginAdmin.Initiate
 
             try
             {
-                _eventPublisher.Publish(@event);
+                await _eventPublisher.PublishAsync(@event, cancellationToken);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
             catch (Exception ex)

@@ -76,11 +76,12 @@ namespace Identity.Application.Features.Admin.Moderators.Commands.RegisterModera
 
             await _userManager.AddToRoleAsync(user, Roles.Moderator);
 
-            PublishActivationEventAsync(user, activationToken);
+            await PublishActivationEventAsync(user, activationToken);
             _backgroundJobService.ScheduleDeletePendingUser(user, TimeSpan.FromMinutes(15));
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             ModeratorDto result = _mapper.Map<ModeratorDto>(user);
+
             result.ImageUrl = user.ImageUrl != null ? _fileService.GetAbsoluteUrl(user.ImageUrl) : null;
 
             return result;
@@ -114,7 +115,7 @@ namespace Identity.Application.Features.Admin.Moderators.Commands.RegisterModera
             return await _fileService.SaveFileAsync(request.Avatar, "moderators", cancellationToken);
         }
 
-        private void PublishActivationEventAsync(
+        private async Task PublishActivationEventAsync(
             User user,
             string activationToken)
         {
@@ -128,7 +129,7 @@ namespace Identity.Application.Features.Admin.Moderators.Commands.RegisterModera
                 ExpiredAt = DateTime.UtcNow.AddMinutes(15)
             };
 
-            _eventPublisher.Publish(@event);
+            await _eventPublisher.PublishAsync(@event);
         }
     }
 }

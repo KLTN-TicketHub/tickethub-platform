@@ -3,6 +3,8 @@ using Inventory.Infrastructure.Consumers;
 using MassTransit;
 using Microsoft.Extensions.Options;
 
+using Inventory.Infrastructure.Data.Contexts;
+
 namespace Inventory.API.Extensions
 {
     public static class MassTransitExtension
@@ -11,6 +13,12 @@ namespace Inventory.API.Extensions
         {
             services.AddMassTransit(x =>
             {
+                x.AddEntityFrameworkOutbox<InventoryDbContext>(o =>
+                {
+                    o.UseSqlServer();
+                    o.UseBusOutbox();
+                });
+
                 x.AddConsumer<EventPublishedConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>

@@ -1,7 +1,6 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
-using BuildingBlocks.Infrastructure.Outbox;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Inventory.API.Extensions;
@@ -34,7 +33,6 @@ builder.Services.AddCustomSwagger();
 builder.Services.AddCustomApiVersioning();
 
 builder.Services.AddCustomRedis(builder.Configuration);
-builder.Services.AddHostedService<OutboxProcessor<InventoryDbContext>>();
 builder.Services.AddHostedService<RedisKeyspaceNotificationHostedService>();
 
 builder.Services.AddFluentValidationAutoValidation();

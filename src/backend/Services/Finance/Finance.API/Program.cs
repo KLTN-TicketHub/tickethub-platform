@@ -1,7 +1,6 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
-using BuildingBlocks.Infrastructure.Outbox;
 using Finance.API.Extensions;
 using Finance.Infrastructure.Data.Contexts;
 using FluentValidation;
@@ -32,7 +31,6 @@ builder.Services.AddCustomSwagger();
 builder.Services.AddCustomApiVersioning();
 
 builder.Services.AddCustomRedis(builder.Configuration);
-builder.Services.AddHostedService<OutboxProcessor<FinanceDbContext>>();
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);

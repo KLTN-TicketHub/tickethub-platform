@@ -1,7 +1,7 @@
-using BuildingBlocks.Domain.Outbox;
 using BuildingBlocks.Infrastructure.Auditing;
 using Inventory.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
+using MassTransit;
 
 namespace Inventory.Infrastructure.Data.Contexts
 {
@@ -13,7 +13,6 @@ namespace Inventory.Infrastructure.Data.Contexts
 
         #region DbSet Section
         public DbSet<AuditLog> AuditLogs { get; set; }
-        public DbSet<OutboxMessage> OutboxMessages { get; set; }
         public DbSet<ShowtimeSeat> ShowtimeSeats { get; set; }
         public DbSet<ShowtimeTicketInventory> ShowtimeTicketInventories { get; set; }
         #endregion
@@ -22,6 +21,9 @@ namespace Inventory.Infrastructure.Data.Contexts
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(InventoryDbContext).Assembly);
+            modelBuilder.AddInboxStateEntity();
+            modelBuilder.AddOutboxMessageEntity();
+            modelBuilder.AddOutboxStateEntity();
         }
     }
 }

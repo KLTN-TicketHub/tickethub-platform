@@ -1,6 +1,8 @@
-﻿using Identity.Common.Options;
+using Identity.Common.Options;
 using MassTransit;
 using Microsoft.Extensions.Options;
+
+using Identity.Infrastructure.Data.Contexts;
 
 namespace Identity.API.Extensions
 {
@@ -10,6 +12,12 @@ namespace Identity.API.Extensions
         {
             services.AddMassTransit(x =>
             {
+                x.AddEntityFrameworkOutbox<IdentityDbContext>(o =>
+                {
+                    o.UseSqlServer();
+                    o.UseBusOutbox();
+                });
+
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     RabbitMqOptions rabbitMqOptions = context

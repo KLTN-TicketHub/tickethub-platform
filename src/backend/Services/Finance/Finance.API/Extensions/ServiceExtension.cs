@@ -20,7 +20,7 @@ namespace Finance.API.Extensions
         public static IServiceCollection RegisterServices(IServiceCollection services)
         {
             services.AddScoped<ICacheService, RedisCacheService>();
-            services.AddScoped<IEventPublisher, MassTransitEventPublisher<FinanceDbContext>>();
+            services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFileService, FileService>();
 

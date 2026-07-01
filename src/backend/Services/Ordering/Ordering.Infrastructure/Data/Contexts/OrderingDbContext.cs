@@ -1,7 +1,7 @@
-using BuildingBlocks.Domain.Outbox;
 using BuildingBlocks.Infrastructure.Auditing;
 using Microsoft.EntityFrameworkCore;
 using Ordering.Infrastructure.Entities;
+using MassTransit;
 
 namespace Ordering.Infrastructure.Data.Contexts
 {
@@ -13,7 +13,6 @@ namespace Ordering.Infrastructure.Data.Contexts
 
         #region DbSet Section
         public DbSet<AuditLog> AuditLogs { get; set; }
-        public DbSet<OutboxMessage> OutboxMessages { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<OrderBookingState> OrderBookingStates { get; set; }
@@ -23,6 +22,9 @@ namespace Ordering.Infrastructure.Data.Contexts
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(OrderingDbContext).Assembly);
+            modelBuilder.AddInboxStateEntity();
+            modelBuilder.AddOutboxMessageEntity();
+            modelBuilder.AddOutboxStateEntity();
         }
     }
 }

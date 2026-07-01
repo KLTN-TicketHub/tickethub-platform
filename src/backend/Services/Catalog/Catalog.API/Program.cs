@@ -1,7 +1,6 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
-using BuildingBlocks.Infrastructure.Outbox;
 using Catalog.API.Extensions;
 using Catalog.Application.Common.Mappers;
 using Catalog.Infrastructure.Data.Contexts;
@@ -37,7 +36,6 @@ builder.Services.AddCustomSwagger();
 builder.Services.AddCustomApiVersioning();
 
 builder.Services.AddCustomRedis(builder.Configuration);
-builder.Services.AddHostedService<OutboxProcessor<CatalogDbContext>>();
 
 #region AutoMapper
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(CatalogProfile).Assembly));

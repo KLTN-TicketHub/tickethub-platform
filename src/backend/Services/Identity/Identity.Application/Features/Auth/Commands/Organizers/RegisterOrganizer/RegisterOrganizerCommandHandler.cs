@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Events.Email;
@@ -63,8 +63,7 @@ namespace Identity.Application.Features.Auth.Commands.Organizers.RegisterOrganiz
 
             await _userManager.AddToRoleAsync(user, Roles.Organizer);
 
-            PublishActivationEventAsync(user, activationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await PublishActivationEventAsync(user, activationToken);
 
             OrganizerDto result = _mapper.Map<OrganizerDto>(user);
 
@@ -87,7 +86,7 @@ namespace Identity.Application.Features.Auth.Commands.Organizers.RegisterOrganiz
                 throw new BusinessRuleException($"Username '{userName}' đã tồn tại.");
         }
 
-        private void PublishActivationEventAsync(
+        private async Task PublishActivationEventAsync(
             User user,
             string activationToken)
         {
@@ -101,7 +100,7 @@ namespace Identity.Application.Features.Auth.Commands.Organizers.RegisterOrganiz
                 ExpiresAt = DateTime.UtcNow.AddMinutes(15)
             };
 
-            _eventPublisher.Publish(@event);
+            await _eventPublisher.PublishAsync(@event);
         }
     }
 }

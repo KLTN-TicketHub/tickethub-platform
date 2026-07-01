@@ -59,7 +59,7 @@ namespace Identity.Application.Features.Auth.Commands.Organizers.ActivateOrganiz
                     $"Cập nhật trạng thái kích hoạt thất bại: {string.Join(", ", updateResult.Errors.Select(e => e.Description))}");
             }
 
-            _eventPublisher.Publish(new OrganizerActivatedEvent
+            await _eventPublisher.PublishAsync(new OrganizerActivatedEvent
             {
                 Id = user.Id,
                 FullName = user.FullName,
@@ -67,9 +67,7 @@ namespace Identity.Application.Features.Auth.Commands.Organizers.ActivateOrganiz
                 CreatedAt = user.CreatedAt,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
-            });
-
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }, cancellationToken);
 
             return Unit.Value;
         }

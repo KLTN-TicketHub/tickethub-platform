@@ -1,6 +1,5 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
-using BuildingBlocks.Infrastructure.Outbox;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
@@ -46,7 +45,6 @@ builder.Services.AddAuthorization();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(LoginRequestValidator).Assembly);
 builder.Services.AddCustomFluentValidation();
-builder.Services.AddHostedService<OutboxProcessor<IdentityDbContext>>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(UserProfile).Assembly));

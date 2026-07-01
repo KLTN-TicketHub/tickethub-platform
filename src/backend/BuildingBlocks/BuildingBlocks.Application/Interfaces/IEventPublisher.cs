@@ -1,8 +1,8 @@
-﻿namespace BuildingBlocks.Application.Interfaces
+namespace BuildingBlocks.Application.Interfaces
 {
     public interface IEventPublisher
     {
-        void Publish<TEvent>(TEvent @event)
+        Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
             where TEvent : class;
     }
 }

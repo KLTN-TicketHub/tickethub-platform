@@ -1,6 +1,6 @@
-using BuildingBlocks.Domain.Outbox;
 using BuildingBlocks.Infrastructure.Auditing;
 using Microsoft.EntityFrameworkCore;
+using MassTransit;
 
 namespace Finance.Infrastructure.Data.Contexts
 {
@@ -12,13 +12,15 @@ namespace Finance.Infrastructure.Data.Contexts
 
         #region DbSet Section
         public DbSet<AuditLog> AuditLogs { get; set; }
-        public DbSet<OutboxMessage> OutboxMessages { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(FinanceDbContext).Assembly);
+            modelBuilder.AddInboxStateEntity();
+            modelBuilder.AddOutboxMessageEntity();
+            modelBuilder.AddOutboxStateEntity();
         }
     }
 }

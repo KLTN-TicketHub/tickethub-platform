@@ -58,7 +58,7 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
 
             await _unitOfWork.EventRepository.SaveChangeAsync(cancellation);
 
-            _eventPublisher.Publish(new EventReviewedEvent
+            await _eventPublisher.PublishAsync(new EventReviewedEvent
             {
                 EventId = eventEntity.Id,
                 EventTitle = eventEntity.Title,
@@ -66,7 +66,7 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
                 OrganizerName = eventEntity.Organizer?.OrganizerName ?? string.Empty,
                 IsApproved = request.IsApproved,
                 Reason = request.Reason
-            });
+            }, cancellationToken: cancellation);
 
             if (request.IsApproved)
             {
@@ -86,7 +86,7 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
                     }).ToList()
                 };
 
-                _eventPublisher.Publish(eventPublished);
+                await _eventPublisher.PublishAsync(eventPublished, cancellationToken: cancellation);
             }
 
             return true;

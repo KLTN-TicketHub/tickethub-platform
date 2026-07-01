@@ -2,6 +2,8 @@ using MassTransit;
 using Microsoft.Extensions.Options;
 using Payment.Common.Options;
 
+using Payment.Infrastructure.Data.Contexts;
+
 namespace Payment.API.Extensions
 {
     public static class MassTransitExtension
@@ -10,7 +12,11 @@ namespace Payment.API.Extensions
         {
             services.AddMassTransit(x =>
             {
-                // Add consumers here when needed
+                x.AddEntityFrameworkOutbox<PaymentDbContext>(o =>
+                {
+                    o.UseSqlServer();
+                    o.UseBusOutbox();
+                });
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
