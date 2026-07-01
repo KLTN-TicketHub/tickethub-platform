@@ -62,7 +62,7 @@ namespace Ordering.Infrastructure.Services
 
             Order order = new Order(
                 userId: userId,
-                showtimeId: request.ShowtimeId,
+                showTimeId: request.ShowtimeId,
                 eventId: request.EventId,
                 eventTitle: request.EventTitle,
                 showtimeStartAt: request.ShowtimeStartAt,

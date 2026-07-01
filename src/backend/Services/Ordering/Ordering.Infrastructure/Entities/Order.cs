@@ -6,6 +6,12 @@ namespace Ordering.Infrastructure.Entities
     {
         public Guid UserId { get; set; }
 
+        public string CustomerName { get; set; }
+
+        public string CustomerEmail { get; set; }
+
+        public string CustomerPhone { get; set; }
+
         public Guid ShowTimeId { get; set; }
 
         public Guid EventId { get; set; }
@@ -25,11 +31,21 @@ namespace Ordering.Infrastructure.Entities
         private readonly List<OrderItem> _orderItems = new List<OrderItem>();
         public IReadOnlyCollection<OrderItem> OrderItems => _orderItems.AsReadOnly();
 
-        public Order(Guid userId, Guid showtimeId, Guid eventId, string eventTitle, DateTime showtimeStartAt, decimal totalPrice, string paymentMethod)
+        public Order(
+            Guid userId,
+            string customerName, 
+            string customerEmail, 
+            string customerPhone,
+            Guid showTimeId,
+            Guid eventId, 
+            string eventTitle,
+            DateTime showtimeStartAt,
+            decimal totalPrice, 
+            string paymentMethod)
         {
             Id = Guid.NewGuid();
             UserId = userId;
-            ShowTimeId = showtimeId;
+            ShowTimeId = showTimeId;
             EventId = eventId;
             EventTitle = eventTitle;
             ShowtimeStartAt = showtimeStartAt;

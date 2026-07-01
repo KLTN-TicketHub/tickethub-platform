@@ -15,6 +15,18 @@ namespace Ordering.Infrastructure.Data.Contexts.Config
             builder.Property(o => o.UserId)
                 .IsRequired();
 
+            builder.Property(o => o.CustomerName)
+                .HasMaxLength(200)
+                .IsRequired();
+
+            builder.Property(o => o.CustomerEmail)
+                .HasMaxLength(200)
+                .IsRequired();
+
+            builder.Property(o => o.CustomerPhone)
+                .HasMaxLength(20)
+                .IsRequired();
+
             builder.Property(o => o.ShowTimeId)
                 .IsRequired();
 
