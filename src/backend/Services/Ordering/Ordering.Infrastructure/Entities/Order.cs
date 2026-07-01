@@ -33,14 +33,14 @@ namespace Ordering.Infrastructure.Entities
 
         public Order(
             Guid userId,
-            string customerName, 
-            string customerEmail, 
+            string customerName,
+            string customerEmail,
             string customerPhone,
             Guid showTimeId,
-            Guid eventId, 
+            Guid eventId,
             string eventTitle,
             DateTime showtimeStartAt,
-            decimal totalPrice, 
+            decimal totalPrice,
             string paymentMethod)
         {
             Id = Guid.NewGuid();

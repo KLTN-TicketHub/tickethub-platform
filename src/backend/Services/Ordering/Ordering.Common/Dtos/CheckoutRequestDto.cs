@@ -6,10 +6,14 @@ namespace Ordering.Common.Dtos
         public Guid EventId { get; set; }
         public string EventTitle { get; set; } = default!;
         public DateTime ShowtimeStartAt { get; set; }
+
+        public string CustomerName { get; set; } = default!;
+        public string CustomerEmail { get; set; } = default!;
+        public string CustomerPhone { get; set; } = default!;
         public string PaymentMethod { get; set; } = default!;
+
         public List<CheckoutItemDto> Items { get; set; } = new();
     }
-
     public class CheckoutItemDto
     {
         public Guid? SeatId { get; set; }

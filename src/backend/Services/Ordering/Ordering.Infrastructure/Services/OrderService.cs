@@ -62,6 +62,9 @@ namespace Ordering.Infrastructure.Services
 
             Order order = new Order(
                 userId: userId,
+                customerName: request.CustomerName,
+                customerEmail: request.CustomerEmail,
+                customerPhone: request.CustomerPhone,
                 showTimeId: request.ShowtimeId,
                 eventId: request.EventId,
                 eventTitle: request.EventTitle,
@@ -90,6 +93,9 @@ namespace Ordering.Infrastructure.Services
             {
                 OrderId = order.Id,
                 UserId = userId,
+                CustomerName = request.CustomerName,
+                CustomerEmail = request.CustomerEmail,
+                CustomerPhone = request.CustomerPhone,
                 ShowtimeId = request.ShowtimeId,
                 TotalPrice = totalPrice,
                 PaymentMethod = request.PaymentMethod,

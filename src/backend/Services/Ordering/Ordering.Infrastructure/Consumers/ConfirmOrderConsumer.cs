@@ -4,9 +4,6 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Ordering.Infrastructure.Entities;
 using Ordering.Infrastructure.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Ordering.Infrastructure.Consumers
 {
