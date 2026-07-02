@@ -1,8 +1,7 @@
 using Finance.Common.Options;
+using Finance.Infrastructure.Data.Contexts;
 using MassTransit;
 using Microsoft.Extensions.Options;
-
-using Finance.Infrastructure.Data.Contexts;
 
 namespace Finance.API.Extensions
 {

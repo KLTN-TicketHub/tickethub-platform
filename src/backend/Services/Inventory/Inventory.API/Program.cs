@@ -6,7 +6,6 @@ using FluentValidation.AspNetCore;
 using Inventory.API.Extensions;
 using Inventory.API.Hubs;
 using Inventory.API.Services;
-using Inventory.Infrastructure.Data.Contexts;
 
 var builder = WebApplication.CreateBuilder(args);
 

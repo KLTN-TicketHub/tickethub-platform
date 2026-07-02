@@ -56,8 +56,6 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
 
             eventEntity.Review(request.IsApproved, reviewerUserId, reviewerName, request.Reason);
 
-            await _unitOfWork.EventRepository.SaveChangeAsync(cancellation);
-
             await _eventPublisher.PublishAsync(new EventReviewedEvent
             {
                 EventId = eventEntity.Id,
@@ -88,6 +86,8 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
 
                 await _eventPublisher.PublishAsync(eventPublished, cancellationToken: cancellation);
             }
+
+            await _unitOfWork.EventRepository.SaveChangeAsync(cancellation);
 
             return true;
         }

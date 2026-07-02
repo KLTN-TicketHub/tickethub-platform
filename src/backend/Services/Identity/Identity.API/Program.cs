@@ -9,7 +9,6 @@ using Identity.Application.Common.Mappers;
 using Identity.Application.Features.Auth.Commands.LoginAdmin.Initiate;
 using Identity.Application.Features.Auth.Validators;
 using Identity.Common.Options;
-using Identity.Infrastructure.Data.Contexts;
 
 var builder = WebApplication.CreateBuilder(args);
 

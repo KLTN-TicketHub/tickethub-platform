@@ -4,7 +4,6 @@ using BuildingBlocks.Contracts.Options;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Payment.API.Extensions;
-using Payment.Infrastructure.Data.Contexts;
 
 var builder = WebApplication.CreateBuilder(args);
 

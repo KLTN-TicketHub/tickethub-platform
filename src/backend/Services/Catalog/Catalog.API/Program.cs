@@ -3,7 +3,6 @@ using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
 using Catalog.API.Extensions;
 using Catalog.Application.Common.Mappers;
-using Catalog.Infrastructure.Data.Contexts;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 

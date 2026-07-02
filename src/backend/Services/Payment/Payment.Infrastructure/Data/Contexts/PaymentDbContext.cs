@@ -1,7 +1,7 @@
 using BuildingBlocks.Infrastructure.Auditing;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Payment.Infrastructure.Entities;
-using MassTransit;
 
 namespace Payment.Infrastructure.Data.Contexts
 {

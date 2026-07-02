@@ -4,7 +4,6 @@ using BuildingBlocks.Contracts.Options;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Ordering.API.Extensions;
-using Ordering.Infrastructure.Data.Contexts;
 
 var builder = WebApplication.CreateBuilder(args);
 

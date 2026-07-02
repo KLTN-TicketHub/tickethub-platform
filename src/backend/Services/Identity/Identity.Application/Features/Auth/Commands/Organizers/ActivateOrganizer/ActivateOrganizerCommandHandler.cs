@@ -69,6 +69,8 @@ namespace Identity.Application.Features.Auth.Commands.Organizers.ActivateOrganiz
                 PhoneNumber = user.PhoneNumber,
             }, cancellationToken);
 
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
             return Unit.Value;
         }
     }

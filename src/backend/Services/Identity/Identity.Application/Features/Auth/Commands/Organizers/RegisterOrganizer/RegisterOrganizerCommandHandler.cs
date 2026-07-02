@@ -64,6 +64,7 @@ namespace Identity.Application.Features.Auth.Commands.Organizers.RegisterOrganiz
             await _userManager.AddToRoleAsync(user, Roles.Organizer);
 
             await PublishActivationEventAsync(user, activationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             OrganizerDto result = _mapper.Map<OrganizerDto>(user);
 

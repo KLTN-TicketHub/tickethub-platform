@@ -1,7 +1,7 @@
 using BuildingBlocks.Infrastructure.Auditing;
 using Catalog.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Infrastructure.Data.Contexts
 {

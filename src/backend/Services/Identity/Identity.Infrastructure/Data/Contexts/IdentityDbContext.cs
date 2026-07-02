@@ -1,8 +1,8 @@
 using BuildingBlocks.Infrastructure.Auditing;
 using Identity.Domain.Entities;
+using MassTransit;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using MassTransit;
 
 namespace Identity.Infrastructure.Data.Contexts
 {

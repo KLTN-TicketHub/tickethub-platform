@@ -109,6 +109,8 @@ namespace Ordering.Infrastructure.Services
 
             await _eventPublisher.PublishAsync(checkoutEvent);
 
+            await _unitOfWork.SaveChangesAsync();
+
             return (true, order.Id, "Đơn hàng đã được tạo thành công.");
         }
     }

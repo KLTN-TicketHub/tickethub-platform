@@ -1,7 +1,7 @@
 using BuildingBlocks.Infrastructure.Auditing;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Ordering.Infrastructure.Entities;
-using MassTransit;
 
 namespace Ordering.Infrastructure.Data.Contexts
 {

@@ -1,9 +1,8 @@
 using Inventory.Common.Options;
 using Inventory.Infrastructure.Consumers;
+using Inventory.Infrastructure.Data.Contexts;
 using MassTransit;
 using Microsoft.Extensions.Options;
-
-using Inventory.Infrastructure.Data.Contexts;
 
 namespace Inventory.API.Extensions
 {

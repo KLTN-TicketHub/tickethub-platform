@@ -1,8 +1,7 @@
 using Identity.Common.Options;
+using Identity.Infrastructure.Data.Contexts;
 using MassTransit;
 using Microsoft.Extensions.Options;
-
-using Identity.Infrastructure.Data.Contexts;
 
 namespace Identity.API.Extensions
 {

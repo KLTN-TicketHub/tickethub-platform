@@ -1,7 +1,7 @@
 using BuildingBlocks.Infrastructure.Auditing;
 using Inventory.Infrastructure.Entities;
-using Microsoft.EntityFrameworkCore;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Infrastructure.Data.Contexts
 {

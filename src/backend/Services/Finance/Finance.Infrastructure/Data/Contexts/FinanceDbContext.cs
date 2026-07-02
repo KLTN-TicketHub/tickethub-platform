@@ -1,6 +1,6 @@
 using BuildingBlocks.Infrastructure.Auditing;
-using Microsoft.EntityFrameworkCore;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Infrastructure.Data.Contexts
 {

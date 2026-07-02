@@ -1,9 +1,8 @@
 using Catalog.Common.Options;
 using Catalog.Infrastructure.Consumers;
+using Catalog.Infrastructure.Data.Contexts;
 using MassTransit;
 using Microsoft.Extensions.Options;
-
-using Catalog.Infrastructure.Data.Contexts;
 
 namespace Catalog.API.Extensions
 {
