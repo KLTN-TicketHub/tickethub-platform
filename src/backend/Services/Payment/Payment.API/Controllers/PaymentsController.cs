@@ -10,7 +10,7 @@ using Payment.Infrastructure.Interfaces.IServices;
 namespace Payment.API.Controllers
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PaymentsController : ControllerBase
