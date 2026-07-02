@@ -676,10 +676,11 @@ const updateSeatStateLocally = (seatId, status) => {
         if (seat.id === seatId) {
           if (status === 'Available') {
             clearSeatTimer(seatId) // cancel safety timer
-            const idx = selectedSeats.value.findIndex(s => s.id === seatId)
-            if (idx !== -1) {
-              selectedSeats.value.splice(idx, 1)
-              if (!localUnlocks.has(seatId)) {
+            // If we already handled unlock via HTTP response, skip — avoid double-removal
+            if (!localUnlocks.has(seatId)) {
+              const idx = selectedSeats.value.findIndex(s => s.id === seatId)
+              if (idx !== -1) {
+                selectedSeats.value.splice(idx, 1)
                 store.toast = { message: `Ghế ${row.rowName}-${seat.seatName} đã hết hạn giữ chỗ và được giải phóng.`, icon: '⏰' }
               }
             }

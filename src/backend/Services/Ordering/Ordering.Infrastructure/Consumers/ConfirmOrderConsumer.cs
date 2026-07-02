@@ -27,7 +27,7 @@ namespace Ordering.Infrastructure.Consumers
                 order.MarkAsPaid();
                 await _unitOfWork.OrderRepository.UpdateAsync(order);
 
-                var eventItems = order.OrderItems.Select(x => new OrderPaidItemDto
+                List<OrderPaidItemDto> eventItems = order.OrderItems.Select(x => new OrderPaidItemDto
                 {
                     SeatId = x.SeatId,
                     SeatName = x.SeatName,

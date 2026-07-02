@@ -33,7 +33,7 @@ namespace Ordering.Infrastructure.Services
                 .Select(x => x.SeatId!.Value)
                 .ToList();
 
-            var ticketValidationItems = request.Items
+            List<CheckoutTicketValidationItem> ticketValidationItems = request.Items
                 .GroupBy(x => x.TicketTypeId)
                 .Select(g => new CheckoutTicketValidationItem
                 {

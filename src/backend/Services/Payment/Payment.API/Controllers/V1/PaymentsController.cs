@@ -7,7 +7,7 @@ using Payment.Infrastructure.Entities;
 using Payment.Infrastructure.Interfaces;
 using Payment.Infrastructure.Interfaces.IServices;
 
-namespace Payment.API.Controllers
+namespace Payment.API.Controllers.V1
 {
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
