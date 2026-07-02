@@ -1,0 +1,113 @@
+﻿using BuildingBlocks.Contracts.Events.Payment;
+using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Payment.Infrastructure.Entities;
+using Payment.Infrastructure.Interfaces;
+using Payment.Infrastructure.Interfaces.IServices;
+
+namespace Payment.API.Controllers
+{
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}")]
+    [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public class PaymentsController : ControllerBase
+    {
+        private readonly IVnpayService _vnpayService;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IPublishEndpoint _publishEndpoint;
+
+        public PaymentsController(
+            IVnpayService vnpayService,
+            IUnitOfWork unitOfWork,
+            IPublishEndpoint publishEndpoint)
+        {
+            _vnpayService = vnpayService;
+            _unitOfWork = unitOfWork;
+            _publishEndpoint = publishEndpoint;
+        }
+
+        [HttpGet("vnpay-ipn")]
+        public async Task<IActionResult> VnpayIpn()
+        {
+            Dictionary<string, string> vnpayParams = new Dictionary<string, string>();
+
+            string secureHash = string.Empty;
+            foreach (var key in Request.Query.Keys)
+            {
+                string value = Request.Query[key]!;
+
+                if (key == "vnp_SecureHash")
+                {
+                    secureHash = value;
+                }
+                else if (key.StartsWith("vnp_"))
+                {
+                    vnpayParams.Add(key, value);
+                }
+            }
+
+            bool isValid = _vnpayService.ValidateSignature(vnpayParams, secureHash);
+
+            if (!isValid)
+            {
+                return BadRequest(new { RspCode = "97", Message = "Invalid signature" });
+            }
+
+            string txnRef = Request.Query["vnp_TxnRef"]!;
+            var orderId = Guid.Parse(txnRef);
+            var transaction = await _unitOfWork.PaymentTransactionRepository.GetOneAsync<PaymentTransaction>(
+                filter: t => t.OrderId == orderId
+            );
+
+            if (transaction == null)
+            {
+                return NotFound(new { RspCode = "01", Message = "Order not found" });
+            }
+            if (transaction.Status != PaymentStatus.Pending)
+            {
+                return Ok(new { RspCode = "02", Message = "Order already confirmed" });
+            }
+
+            string responseCode = Request.Query["vnp_ResponseCode"]!;
+            string transactionStatus = Request.Query["vnp_TransactionStatus"]!;
+            string vnpayTranId = Request.Query["vnp_TransactionNo"]!;
+            string rawResponse = string.Join("&", Request.Query.Select(q => $"{q.Key}={q.Value}"));
+
+            if (responseCode == "00" && transactionStatus == "00")
+            {
+                transaction.MarkAsSuccess(vnpayTranId, rawResponse);
+                await _unitOfWork.PaymentTransactionRepository.UpdateAsync(transaction);
+                await _unitOfWork.SaveChangesAsync();
+
+                await _publishEndpoint.Publish(new PaymentCompletedEvent
+                {
+                    OrderId = transaction.OrderId,
+                    TransactionId = vnpayTranId,
+                    Amount = transaction.Amount,
+                    Gateway = transaction.Gateway,
+                    CompletedAt = DateTime.UtcNow
+                });
+            }
+
+            else
+            {
+                transaction.MarkAsFailed(vnpayTranId, rawResponse);
+                await _unitOfWork.PaymentTransactionRepository.UpdateAsync(transaction);
+                await _unitOfWork.SaveChangesAsync();
+                await _publishEndpoint.Publish(new PaymentFailedEvent
+                {
+                    OrderId = transaction.OrderId,
+                    Reason = $"Thanh toán thất bại tại VNPay. Mã lỗi: {responseCode}",
+                    CompletedAt = DateTime.UtcNow
+                });
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return Ok(new { RspCode = "00", Message = "Confirm success" });
+        }
+    }
+}

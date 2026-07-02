@@ -5,6 +5,8 @@ using Payment.Infrastructure.Data.Contexts;
 using Payment.Infrastructure.Data.Repositories;
 using Payment.Infrastructure.Interfaces;
 using Payment.Infrastructure.Interfaces.IRepositories;
+using Payment.Infrastructure.Interfaces.IServices;
+using Payment.Infrastructure.Services;
 
 namespace Payment.API.Extensions
 {
@@ -23,6 +25,7 @@ namespace Payment.API.Extensions
             services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFileService, FileService>();
+            services.AddScoped<IVnpayService, VnpayService>();
 
             return services;
         }

@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace Identity.API.Controllers.V1.Admin
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/admin/moderators")]
+    [Route("api/v{version:apiVersion}/admin/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public class ModeratorsController : ControllerBase

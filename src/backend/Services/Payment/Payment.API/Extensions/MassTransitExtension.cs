@@ -1,7 +1,7 @@
 using MassTransit;
 using Microsoft.Extensions.Options;
 using Payment.Common.Options;
-
+using Payment.Infrastructure.Consumers;
 using Payment.Infrastructure.Data.Contexts;
 
 namespace Payment.API.Extensions
@@ -17,6 +17,8 @@ namespace Payment.API.Extensions
                     o.UseSqlServer();
                     o.UseBusOutbox();
                 });
+
+                x.AddConsumer<GeneratePaymentLinkConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
