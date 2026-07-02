@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Contracts.Events.Payment;
+using BuildingBlocks.Contracts.Events.Payment;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -108,6 +108,66 @@ namespace Payment.API.Controllers.V1
             await _unitOfWork.SaveChangesAsync();
 
             return Ok(new { RspCode = "00", Message = "Confirm success" });
+        }
+
+        [HttpGet("vnpay-return")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VnpayReturn()
+        {
+            Dictionary<string, string> vnpayParams = new Dictionary<string, string>();
+            string secureHash = string.Empty;
+
+            foreach (var key in Request.Query.Keys)
+            {
+                string value = Request.Query[key]!;
+
+                if (key == "vnp_SecureHash")
+                {
+                    secureHash = value;
+                }
+                else if (key.StartsWith("vnp_"))
+                {
+                    vnpayParams.Add(key, value);
+                }
+            }
+
+            bool isValid = _vnpayService.ValidateSignature(vnpayParams, secureHash);
+            string responseCode = Request.Query["vnp_ResponseCode"]!;
+            string txnRef = Request.Query["vnp_TxnRef"]!;
+            bool success = isValid && responseCode == "00";
+
+            // If success, we can also check/confirm transaction here to be safe (fallback in case IPN is slow)
+            if (success && Guid.TryParse(txnRef, out var orderId))
+            {
+                var transaction = await _unitOfWork.PaymentTransactionRepository.GetOneAsync<PaymentTransaction>(
+                    filter: t => t.OrderId == orderId
+                );
+
+                if (transaction != null && transaction.Status == PaymentStatus.Pending)
+                {
+                    string vnpayTranId = Request.Query["vnp_TransactionNo"]!;
+                    string rawResponse = string.Join("&", Request.Query.Select(q => $"{q.Key}={q.Value}"));
+
+                    transaction.MarkAsSuccess(vnpayTranId, rawResponse);
+                    await _unitOfWork.PaymentTransactionRepository.UpdateAsync(transaction);
+                    await _unitOfWork.SaveChangesAsync();
+
+                    await _publishEndpoint.Publish(new PaymentCompletedEvent
+                    {
+                        OrderId = transaction.OrderId,
+                        TransactionId = vnpayTranId,
+                        Amount = transaction.Amount,
+                        Gateway = transaction.Gateway,
+                        CompletedAt = DateTime.UtcNow
+                    });
+                    
+                    await _unitOfWork.SaveChangesAsync();
+                }
+            }
+
+            // Redirect back to frontend page
+            string redirectUrl = $"http://localhost:5173/my-tickets?success={success.ToString().ToLower()}&orderId={txnRef}";
+            return Redirect(redirectUrl);
         }
     }
 }
