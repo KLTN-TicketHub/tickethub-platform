@@ -39,7 +39,16 @@
             <div class="space-y-3 pt-3">
               <div class="flex items-center gap-3 text-white/70 text-[14px]">
                 <PhCalendarBlank weight="bold" class="text-primary text-xl flex-shrink-0" />
-                <span class="font-bold">{{ formatEventDate(event.startAt) }}</span>
+                <span class="font-bold">
+                  Bắt đầu: {{ formatEventDate(event.startAt) }}
+                  <span v-if="event.endAt" class="text-white/40 font-medium"> — Kết thúc: {{ formatEventDate(event.endAt) }}</span>
+                </span>
+              </div>
+              <div v-if="event.saleCloseAt" class="flex items-center gap-3 text-white/70 text-[14px]">
+                <PhClock weight="bold" class="text-warning text-xl flex-shrink-0" />
+                <span class="font-bold">
+                  Hạn bán vé: <span class="text-warning">{{ formatEventDate(event.saleCloseAt) }}</span>
+                </span>
               </div>
               <div class="flex items-start gap-3 text-white/70 text-[14px]">
                 <PhMapPin weight="bold" class="text-primary text-xl flex-shrink-0 mt-0.5" />
@@ -142,14 +151,13 @@
                    :class="selectedShowTimeIndex === idx ? 'border-primary ring-1 ring-primary/50' : 'border-white/10 hover:border-primary/30'">
                 <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent transition-opacity" :class="selectedShowTimeIndex === idx ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'"></div>
                 <div class="relative z-10 flex flex-col gap-2">
-                  <span class="text-primary font-bold text-[12px] uppercase tracking-widest mb-2">Suất {{ idx + 1 }}</span>
-                  <div class="flex items-center gap-2 text-white/80">
-                    <PhCalendarBlank weight="bold" class="text-white/40" />
-                    <span class="text-[14px] font-medium">{{ formatEventDate(st.startAt) }}</span>
-                  </div>
-                  <div class="flex items-center gap-2 text-white/50 mt-1">
-                    <PhClock weight="bold" class="text-white/30" />
-                    <span class="text-[12px]">{{ formatTimeOnly(st.startAt) }} - {{ formatTimeOnly(st.endAt) }}</span>
+                  <span class="text-primary font-bold text-[12px] uppercase tracking-widest mb-1.5">Suất {{ idx + 1 }}</span>
+                  <div class="flex items-start gap-2.5 text-white/80">
+                    <PhCalendarBlank weight="bold" class="text-white/40 mt-0.5 flex-shrink-0" />
+                    <div class="flex flex-col gap-1 text-[13px] font-medium">
+                      <span>Bắt đầu: <span class="font-bold text-white">{{ formatEventDate(st.startAt) }}</span></span>
+                      <span v-if="st.endAt">Kết thúc: <span class="font-bold text-white/60">{{ formatEventDate(st.endAt) }}</span></span>
+                    </div>
                   </div>
                 </div>
               </div>

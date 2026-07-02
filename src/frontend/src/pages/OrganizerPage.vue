@@ -328,7 +328,7 @@ const computedStats = computed(() => {
 
 // Tab label mapper (maps API response status names to preferred UI names)
 const getTabLabel = (status) => {
-  if (status.id === 2) return 'Sắp tới' // Maps 'Đã xuất bản' to 'Sắp tới' to match the design
+  if (status.id === 2) return 'Đã duyệt' // Maps 'Đã xuất bản' to 'Đã duyệt'
   return status.name
 }
 
