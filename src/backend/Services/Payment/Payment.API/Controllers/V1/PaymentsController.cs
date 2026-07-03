@@ -136,7 +136,6 @@ namespace Payment.API.Controllers.V1
             string txnRef = Request.Query["vnp_TxnRef"]!;
             bool success = isValid && responseCode == "00";
 
-            // If success, we can also check/confirm transaction here to be safe (fallback in case IPN is slow)
             if (success && Guid.TryParse(txnRef, out var orderId))
             {
                 var transaction = await _unitOfWork.PaymentTransactionRepository.GetOneAsync<PaymentTransaction>(
@@ -160,12 +159,11 @@ namespace Payment.API.Controllers.V1
                         Gateway = transaction.Gateway,
                         CompletedAt = DateTime.UtcNow
                     });
-                    
+
                     await _unitOfWork.SaveChangesAsync();
                 }
             }
 
-            // Redirect back to frontend page
             string redirectUrl = $"http://localhost:5173/my-tickets?success={success.ToString().ToLower()}&orderId={txnRef}";
             return Redirect(redirectUrl);
         }
