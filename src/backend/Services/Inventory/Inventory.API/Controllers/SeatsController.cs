@@ -1,8 +1,10 @@
 using BuildingBlocks.Application.Interfaces;
 using Inventory.Infrastructure.Interfaces.IServices;
+using Inventory.Infrastructure.Dtos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using BuildingBlocks.Contracts.Models.Responses;
 
 namespace Inventory.API.Controllers
 {
@@ -28,7 +30,7 @@ namespace Inventory.API.Controllers
         public async Task<IActionResult> GetSeatStates(Guid showtimeId)
         {
             var result = await _seatStateService.GetSeatStatesAsync(showtimeId);
-            return Ok(result);
+            return Ok(new ApiResponse<IEnumerable<SeatStateDto>>(true, "Lấy trạng thái ghế thành công.", result));
         }
 
         [HttpPost("seats/lock")]
@@ -36,16 +38,16 @@ namespace Inventory.API.Controllers
         {
             if (_currentUserService.UserId == null)
             {
-                return Unauthorized(new { message = "Bạn cần đăng nhập để thực hiện chức năng này." });
+                return Unauthorized(new ApiResponse(false, "Bạn cần đăng nhập để thực hiện chức năng này."));
             }
 
             var success = await _seatStateService.LockSeatAsync(request.ShowtimeId, request.SeatId, _currentUserService.UserId.Value);
             if (!success)
             {
-                return BadRequest(new { message = "Ghế đang được chọn bởi người khác hoặc đã bán." });
+                return BadRequest(new ApiResponse(false, "Ghế đang được chọn bởi người khác hoặc đã bán."));
             }
 
-            return Ok(new { success = true, message = "Khóa ghế thành công." });
+            return Ok(new ApiResponse(true, "Khóa ghế thành công."));
         }
 
         [HttpPost("seats/unlock")]
@@ -53,16 +55,16 @@ namespace Inventory.API.Controllers
         {
             if (_currentUserService.UserId == null)
             {
-                return Unauthorized(new { message = "Bạn cần đăng nhập để thực hiện chức năng này." });
+                return Unauthorized(new ApiResponse(false, "Bạn cần đăng nhập để thực hiện chức năng này."));
             }
 
             var success = await _seatStateService.UnlockSeatAsync(request.ShowtimeId, request.SeatId, _currentUserService.UserId.Value);
             if (!success)
             {
-                return BadRequest(new { message = "Bạn không thể hủy khóa ghế của người khác." });
+                return BadRequest(new ApiResponse(false, "Bạn không thể hủy khóa ghế của người khác."));
             }
 
-            return Ok(new { success = true, message = "Hủy khóa ghế thành công." });
+            return Ok(new ApiResponse(true, "Hủy khóa ghế thành công."));
         }
     }
 

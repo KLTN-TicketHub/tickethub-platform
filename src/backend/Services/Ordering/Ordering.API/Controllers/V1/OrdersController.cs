@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ordering.Common.Dtos;
 using Ordering.Infrastructure.Interfaces.IServices;
 using System.Security.Claims;
+using BuildingBlocks.Contracts.Models.Responses;
 
 namespace Ordering.API.Controllers.V1
 {
@@ -28,10 +29,10 @@ namespace Ordering.API.Controllers.V1
 
             if (!isSuccess)
             {
-                return BadRequest(new { message });
+                return BadRequest(new ApiResponse(false, message));
             }
 
-            return Ok(new { orderId, message });
+            return Ok(new ApiResponse<Guid>(true, message, orderId));
         }
     }
 }

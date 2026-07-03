@@ -1,7 +1,9 @@
 using Inventory.Infrastructure.Interfaces.IServices;
+using Inventory.Infrastructure.Dtos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using BuildingBlocks.Contracts.Models.Responses;
 
 namespace Inventory.API.Controllers
 {
@@ -25,9 +27,9 @@ namespace Inventory.API.Controllers
             var result = await _ticketInventoryService.GetTicketInventoryStateAsync(showtimeId, ticketTypeId);
             if (result == null)
             {
-                return NotFound(new { message = "Không tìm thấy cấu hình tồn kho cho loại vé này." });
+                return NotFound(new ApiResponse(false, "Không tìm thấy cấu hình tồn kho cho loại vé này."));
             }
-            return Ok(result);
+            return Ok(new ApiResponse<TicketInventoryStateDto>(true, "Lấy thông tin tồn kho thành công.", result));
         }
     }
 }

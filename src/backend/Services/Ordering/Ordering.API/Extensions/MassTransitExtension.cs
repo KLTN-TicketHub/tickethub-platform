@@ -1,8 +1,10 @@
 using MassTransit;
 using Microsoft.Extensions.Options;
 using Ordering.Common.Options;
-
 using Ordering.Infrastructure.Data.Contexts;
+using Ordering.Infrastructure.Consumers;
+using Ordering.Infrastructure.Sagas;
+using Ordering.Infrastructure.Entities;
 
 namespace Ordering.API.Extensions
 {
@@ -17,6 +19,16 @@ namespace Ordering.API.Extensions
                     o.UseSqlServer();
                     o.UseBusOutbox();
                 });
+
+                x.AddConsumer<ConfirmOrderConsumer>();
+                x.AddConsumer<CancelOrderConsumer>();
+
+                x.AddSagaStateMachine<OrderBookingStateMachine, OrderBookingState>()
+                    .EntityFrameworkRepository(r =>
+                    {
+                        r.ConcurrencyMode = ConcurrencyMode.Optimistic;
+                        r.ExistingDbContext<OrderingDbContext>();
+                    });
 
                 x.UsingRabbitMq((context, cfg) =>
                 {

@@ -19,6 +19,8 @@ namespace Inventory.API.Extensions
                 });
 
                 x.AddConsumer<EventPublishedConsumer>();
+                x.AddConsumer<ReserveSeatsConsumer>();
+                x.AddConsumer<ReleaseSeatsConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
