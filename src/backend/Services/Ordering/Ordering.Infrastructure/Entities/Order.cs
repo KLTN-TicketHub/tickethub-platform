@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Domain.DDD;
+using BuildingBlocks.Domain.DDD;
 
 namespace Ordering.Infrastructure.Entities
 {
@@ -45,6 +45,9 @@ namespace Ordering.Infrastructure.Entities
         {
             Id = Guid.NewGuid();
             UserId = userId;
+            CustomerName = customerName;
+            CustomerEmail = customerEmail;
+            CustomerPhone = customerPhone;
             ShowTimeId = showTimeId;
             EventId = eventId;
             EventTitle = eventTitle;

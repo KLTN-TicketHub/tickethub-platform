@@ -8,7 +8,8 @@ namespace Ordering.Common.Dtos
         public DateTime ShowtimeStartAt { get; set; }
 
         public string CustomerName { get; set; } = default!;
-        public string CustomerEmail { get; set; } = default!;
+        /// <summary>Email lấy từ JWT claim, không cần FE truyền lên. Set tại Controller.</summary>
+        public string CustomerEmail { get; set; } = string.Empty;
         public string CustomerPhone { get; set; } = default!;
         public string PaymentMethod { get; set; } = default!;
 

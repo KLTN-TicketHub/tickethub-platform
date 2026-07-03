@@ -18,6 +18,8 @@ import AuthCallback from '../pages/AuthCallback.vue'
 import ForbiddenPage from '../pages/ForbiddenPage.vue'
 import ActivateAccountPage from '../pages/ActivateAccountPage.vue'
 import NotFoundPage from '../pages/NotFoundPage.vue'
+import PaymentPage from '../pages/PaymentPage.vue'
+import PaymentResultPage from '../pages/PaymentResultPage.vue'
 
 // Admin
 import AdminLayout from '../layouts/AdminLayout.vue'
@@ -64,6 +66,9 @@ const routes = [
   { path: '/organizer/register', name: 'organizer-register', component: OrganizerRegisterPage },
   { path: '/activate-account', name: 'activate-account', component: ActivateAccountPage },
   { path: '/403', name: 'forbidden', component: ForbiddenPage },
+  // Payment flow
+  { path: '/payment', name: 'payment', component: PaymentPage },
+  { path: '/payment/result', name: 'payment-result', component: PaymentResultPage },
   { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFoundPage },
   
   // Admin Routes

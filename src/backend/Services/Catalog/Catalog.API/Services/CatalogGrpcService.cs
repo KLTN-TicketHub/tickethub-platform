@@ -28,7 +28,7 @@ namespace Catalog.API.Services
                 if (!Guid.TryParse(request.ShowtimeId, out var showtimeId))
                     return new ValidateCheckoutResponse { IsSuccess = false, Message = "ShowtimeId không đúng định dạng Guid." };
 
-                var seatIds = new List<Guid>();
+                List<Guid> seatIds = new List<Guid>();
                 foreach (var seatIdStr in request.SeatIds)
                 {
                     if (!Guid.TryParse(seatIdStr, out var seatId))
@@ -36,7 +36,7 @@ namespace Catalog.API.Services
                     seatIds.Add(seatId);
                 }
 
-                var ticketItems = new List<(Guid TicketTypeId, int Quantity)>();
+                List<(Guid TicketTypeId, int Quantity)> ticketItems = new List<(Guid TicketTypeId, int Quantity)>();
                 foreach (var item in request.TicketItems)
                 {
                     if (!Guid.TryParse(item.TicketTypeId, out var ticketTypeId))

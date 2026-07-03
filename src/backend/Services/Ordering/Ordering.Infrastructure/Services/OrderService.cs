@@ -89,7 +89,7 @@ namespace Ordering.Infrastructure.Services
 
             await _unitOfWork.OrderRepository.CreateAsync(order);
 
-            var checkoutEvent = new CheckoutStartedEvent
+            CheckoutStartedEvent checkoutEvent = new CheckoutStartedEvent
             {
                 OrderId = order.Id,
                 UserId = userId,

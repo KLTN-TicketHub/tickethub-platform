@@ -1,9 +1,9 @@
-using Inventory.Infrastructure.Interfaces.IServices;
+using BuildingBlocks.Contracts.Models.Responses;
 using Inventory.Infrastructure.Dtos;
+using Inventory.Infrastructure.Interfaces.IServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using BuildingBlocks.Contracts.Models.Responses;
 
 namespace Inventory.API.Controllers
 {

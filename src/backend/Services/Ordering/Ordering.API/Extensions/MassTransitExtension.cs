@@ -1,10 +1,10 @@
 using MassTransit;
 using Microsoft.Extensions.Options;
 using Ordering.Common.Options;
-using Ordering.Infrastructure.Data.Contexts;
 using Ordering.Infrastructure.Consumers;
-using Ordering.Infrastructure.Sagas;
+using Ordering.Infrastructure.Data.Contexts;
 using Ordering.Infrastructure.Entities;
+using Ordering.Infrastructure.Sagas;
 
 namespace Ordering.API.Extensions
 {
@@ -45,6 +45,16 @@ namespace Ordering.API.Extensions
                             h.Username(rabbitMqOptions.Username);
                             h.Password(rabbitMqOptions.Password);
                         });
+
+                    cfg.ReceiveEndpoint("ordering-confirm-order", e =>
+                    {
+                        e.ConfigureConsumer<ConfirmOrderConsumer>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("ordering-cancel-order", e =>
+                    {
+                        e.ConfigureConsumer<CancelOrderConsumer>(context);
+                    });
 
                     cfg.ConfigureEndpoints(context);
                 });

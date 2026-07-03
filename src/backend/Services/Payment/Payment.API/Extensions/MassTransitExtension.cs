@@ -36,6 +36,11 @@ namespace Payment.API.Extensions
                             h.Password(rabbitMqOptions.Password);
                         });
 
+                    cfg.ReceiveEndpoint("payment-generate-link", e =>
+                    {
+                        e.ConfigureConsumer<GeneratePaymentLinkConsumer>(context);
+                    });
+
                     cfg.ConfigureEndpoints(context);
                 });
             });

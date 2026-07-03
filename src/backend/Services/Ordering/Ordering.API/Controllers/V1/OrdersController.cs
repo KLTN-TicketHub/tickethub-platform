@@ -1,10 +1,13 @@
+using BuildingBlocks.Contracts.Models.Responses;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Ordering.Common.Dtos;
+using Ordering.Infrastructure.Data.Contexts;
 using Ordering.Infrastructure.Interfaces.IServices;
 using System.Security.Claims;
-using BuildingBlocks.Contracts.Models.Responses;
 
 namespace Ordering.API.Controllers.V1
 {
@@ -15,15 +18,26 @@ namespace Ordering.API.Controllers.V1
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
-        public OrdersController(IOrderService orderService)
+        private readonly OrderingDbContext _dbContext;
+
+        public OrdersController(IOrderService orderService, OrderingDbContext dbContext)
         {
             _orderService = orderService;
+            _dbContext = dbContext;
         }
 
         [HttpPost("checkout")]
         public async Task<IActionResult> Checkout([FromBody] CheckoutRequestDto request)
         {
             string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            string? emailFromJwt =
+                User.FindFirst(JwtRegisteredClaimNames.Email)?.Value
+                ?? User.FindFirst("email")?.Value
+                ?? User.FindFirst(ClaimTypes.Email)?.Value
+                ?? User.FindFirst("emailaddress")?.Value;
+
+            request.CustomerEmail = emailFromJwt ?? string.Empty;
 
             (bool isSuccess, Guid orderId, string message) = await _orderService.CheckoutAsync(request, Guid.Parse(userIdClaim!));
 
@@ -33,6 +47,38 @@ namespace Ordering.API.Controllers.V1
             }
 
             return Ok(new ApiResponse<Guid>(true, message, orderId));
+        }
+
+        [HttpGet("{orderId}/payment-link")]
+        public async Task<IActionResult> GetPaymentLink(Guid orderId)
+        {
+            var sagaState = await _dbContext.OrderBookingStates
+                .FirstOrDefaultAsync(x => x.CorrelationId == orderId);
+
+            if (sagaState == null)
+            {
+                return NotFound(new ApiResponse(false, "Không tìm thấy thông tin thanh toán cho đơn hàng này."));
+            }
+
+            if (string.IsNullOrEmpty(sagaState.PaymentLink))
+            {
+                if (sagaState.CurrentState == "Failed")
+                {
+                    return BadRequest(new ApiResponse(false, "Đơn hàng đã bị hủy hoặc hết hạn thanh toán."));
+                }
+
+                return Ok(new ApiResponse<object>(true, "Đang khởi tạo liên kết thanh toán, vui lòng đợi...", new
+                {
+                    status = sagaState.CurrentState,
+                    paymentLink = (string?)null
+                }));
+            }
+
+            return Ok(new ApiResponse<object>(true, "Lấy liên kết thanh toán thành công.", new
+            {
+                status = sagaState.CurrentState,
+                paymentLink = sagaState.PaymentLink
+            }));
         }
     }
 }

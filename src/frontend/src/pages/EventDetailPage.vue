@@ -330,7 +330,7 @@
                       </span>
                     </div>
                     <span class="text-[11px] font-bold uppercase tracking-wider" :class="selectedTier === i ? 'text-primary/70' : 'text-white/30'">
-                      {{ isReservedTier(tier) ? 'Bản đồ ghế' : 'Vé GA / Tự do' }} · Còn lại {{ tier.publishedQuota }} vé
+                      {{ isReservedTier(tier) ? 'Bản đồ ghế' : 'Vé GA / Tự do' }} · Còn lại {{ tierRemainingQuotas[tier.id] ?? tier.publishedQuota }} vé
                     </span>
                   </div>
                 </button>
@@ -401,11 +401,12 @@
                   variant="primary" 
                   size="lg" 
                   class="w-full !rounded-2xl !py-4.5 shadow-[0_0_40px_rgba(0,200,83,0.2)] hover:shadow-[0_0_60px_rgba(0,200,83,0.4)] text-[16px] font-black flex justify-center items-center gap-2 cursor-pointer disabled:opacity-40 disabled:hover:shadow-none"
-                  :disabled="isCheckoutDisabled"
+                  :disabled="isCheckoutDisabled || isCheckingOut"
                   @click="handleBuyTicket"
                 >
-                  <PhTicket weight="fill" /> {{ event.showtimes?.[selectedShowTimeIndex]?.ticketTypes?.length || 0 }} loại vé
-                  Đặt vé ngay
+                  <PhSpinner v-if="isCheckingOut" class="animate-spin" weight="bold"/>
+                  <PhTicket v-else weight="fill"/>
+                  {{ isCheckingOut ? 'Đang xử lý...' : 'Đặt vé ngay' }}
                 </BaseButton>
               </div>
 
@@ -449,9 +450,114 @@
     <h2 class="font-heading text-4xl font-black text-white mb-3">Không tìm thấy sự kiện</h2>
     <p class="text-white/50 max-w-md mx-auto mb-10 font-medium">{{ error || 'Sự kiện này có thể đã bị xóa hoặc không tồn tại trong hệ thống.' }}</p>
     <BaseButton variant="primary" size="lg" @click="router.push('/')">
-      Quay về trang chủ
+      <PhArrowLeft weight="bold"/> Quay lại trang sự kiện
     </BaseButton>
   </div>
+
+  <!-- Checkout Info Modal -->
+  <Teleport to="body">
+    <Transition name="modal-fade">
+      <div
+        v-if="showCheckoutModal"
+        class="fixed inset-0 z-[9999] flex items-center justify-center px-4"
+        @click.self="showCheckoutModal = false"
+      >
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-md"></div>
+
+        <!-- Modal Card -->
+        <div class="relative z-10 w-full max-w-md bg-[#111916] border border-white/10 rounded-[2.5rem] p-8 shadow-[0_40px_120px_rgba(0,0,0,0.8)]">
+          <!-- Glow -->
+          <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-32 bg-primary/10 blur-[80px] rounded-full pointer-events-none"></div>
+
+          <!-- Header -->
+          <div class="flex items-center justify-between mb-8">
+            <div>
+              <h3 class="text-xl font-black text-white font-heading">Thông tin người nhận vé</h3>
+              <p class="text-white/40 text-[12px] font-medium mt-1">Kiểm tra và bổ sung thông tin để nhận vé</p>
+            </div>
+            <button @click="showCheckoutModal = false" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/50 hover:text-white transition-all cursor-pointer">
+              <PhX weight="bold" class="text-sm"/>
+            </button>
+          </div>
+
+          <!-- Summary -->
+          <div class="mb-6 p-4 bg-white/3 border border-white/5 rounded-2xl space-y-2">
+            <div class="flex justify-between text-[12px]">
+              <span class="text-white/40 font-bold uppercase tracking-wider">Sự kiện</span>
+              <span class="text-white font-bold text-right max-w-[60%] line-clamp-1">{{ event?.title }}</span>
+            </div>
+            <div class="flex justify-between text-[12px]">
+              <span class="text-white/40 font-bold uppercase tracking-wider">Số lượng</span>
+              <span class="text-white font-bold">{{ checkoutSummaryText }}</span>
+            </div>
+            <div class="flex justify-between text-[12px]">
+              <span class="text-white/40 font-bold uppercase tracking-wider">Tổng tiền</span>
+              <span class="text-primary font-black font-heading">{{ formatCurrency(totalPrice) }}</span>
+            </div>
+          </div>
+
+          <!-- Form Fields -->
+          <div class="space-y-4">
+            <!-- Customer Name -->
+            <div>
+              <label class="block text-[11px] font-bold text-white/50 uppercase tracking-widest mb-2">Tên người nhận vé <span class="text-primary">*</span></label>
+              <input
+                v-model="checkoutForm.customerName"
+                type="text"
+                placeholder="Nhập họ và tên đầy đủ..."
+                class="w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder-white/20 text-[14px] font-medium outline-none transition-all"
+                :class="formErrors.customerName ? 'border-red-500/60 focus:border-red-500' : 'border-white/10 focus:border-primary'"
+              />
+              <p v-if="formErrors.customerName" class="text-red-400 text-[11px] mt-1 font-medium">{{ formErrors.customerName }}</p>
+            </div>
+
+            <!-- Customer Phone -->
+            <div>
+              <label class="block text-[11px] font-bold text-white/50 uppercase tracking-widest mb-2">Số điện thoại <span class="text-primary">*</span></label>
+              <input
+                v-model="checkoutForm.customerPhone"
+                type="tel"
+                placeholder="VD: 0901234567"
+                class="w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder-white/20 text-[14px] font-medium outline-none transition-all"
+                :class="formErrors.customerPhone ? 'border-red-500/60 focus:border-red-500' : 'border-white/10 focus:border-primary'"
+                @keyup.enter="submitCheckout"
+              />
+              <p v-if="formErrors.customerPhone" class="text-red-400 text-[11px] mt-1 font-medium">{{ formErrors.customerPhone }}</p>
+            </div>
+
+            <!-- Payment Method (display only) -->
+            <div class="p-4 bg-primary/5 border border-primary/15 rounded-xl flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <PhCreditCard weight="duotone" class="text-primary text-lg"/>
+              </div>
+              <div>
+                <div class="text-white font-bold text-[13px]">Thanh toán qua VNPay</div>
+                <div class="text-white/40 text-[11px] mt-0.5">Thẻ ATM / Visa / QR Code</div>
+              </div>
+              <PhCheckCircle class="ml-auto text-primary text-xl" weight="fill"/>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="mt-8 flex flex-col gap-3">
+            <button
+              @click="submitCheckout"
+              :disabled="isCheckingOut"
+              class="w-full py-4 bg-primary hover:bg-primary-dark text-black font-black rounded-2xl transition-all hover:scale-[1.02] active:scale-95 text-[15px] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:hover:scale-100"
+            >
+              <PhSpinner v-if="isCheckingOut" class="animate-spin" weight="bold"/>
+              <PhArrowRight v-else weight="bold"/>
+              {{ isCheckingOut ? 'Đang xử lý...' : 'Xác nhận & Thanh toán' }}
+            </button>
+            <button @click="showCheckoutModal = false" class="w-full py-3 text-white/30 font-bold text-[13px] hover:text-white transition-colors cursor-pointer">
+              Hủy bỏ
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup>
@@ -460,7 +566,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { Stage as VStage, Layer as VLayer, Rect as VRect, Path as VPath, Text as VText, Circle as VCircle } from 'vue-konva'
 import { getEventDetail } from '../services/eventService'
 import { getVenues, getSeatMapDetail } from '../services/venue.service'
-import { getSeatStates, lockSeat, unlockSeat } from '../services/seat.service'
+import { getSeatStates, lockSeat, unlockSeat, getTicketInventoryState } from '../services/seat.service'
+import { checkout } from '../services/order.service'
 import { HubConnectionBuilder, HttpTransportType } from '@microsoft/signalr'
 import { getToken } from '../services/auth/token.service'
 import { store } from '../stores/eventStore'
@@ -471,7 +578,8 @@ import {
   PhMinus, PhPlus, PhProhibit, PhShieldCheck, PhEnvelopeSimple,
   PhLightning, PhHeart, PhShareNetwork, PhMagnifyingGlass,
   PhMusicNotes, PhCamera, PhBeerBottle, PhGift, PhCrown, PhCompass, 
-  PhSuitcaseRolling, PhSpinner, PhWarningCircle, PhX, PhClock
+  PhSuitcaseRolling, PhSpinner, PhWarningCircle, PhX, PhClock,
+  PhCreditCard, PhCheckCircle
 } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -489,12 +597,37 @@ const selectedSeats = ref([])
 const selectedTier = ref(0)
 const selectedShowTimeIndex = ref(0)
 const qty = ref(1)
+const isCheckingOut = ref(false)
+// Checkout modal state
+const showCheckoutModal = ref(false)
+const checkoutForm = reactive({ customerName: '', customerPhone: '' })
+const formErrors = reactive({ customerName: '', customerPhone: '' })
 // Map seatId -> timeoutId for client-side 58s auto-release safety net
 const seatLockTimers = new Map()
 // Tracks seats being actively locked (between API call and push to selectedSeats)
 // Prevents race condition where SignalR 'Selecting' arrives before selectedSeats is updated
 const pendingLocks = new Set()
+const tierRemainingQuotas = reactive({})
 
+const loadTicketInventoryStates = async (showtimeId) => {
+  if (!event.value || !event.value.showtimes) return;
+  const showtime = event.value.showtimes.find(s => s.id === showtimeId);
+  if (!showtime || !showtime.ticketTypes) return;
+  
+  for (const tier of showtime.ticketTypes) {
+    if (!isReservedTier(tier)) {
+      try {
+        const res = await getTicketInventoryState(showtimeId, tier.id);
+        // Note: API returns success=true/false structure
+        if (res && res.success && res.data) {
+          tierRemainingQuotas[tier.id] = res.data.availableQuantity;
+        }
+      } catch (err) {
+        console.error('Lỗi khi tải số lượng vé còn lại:', err);
+      }
+    }
+  }
+}
 const selectedShowtimeId = computed(() => {
   return event.value?.showtimes?.[selectedShowTimeIndex.value]?.id
 })
@@ -752,6 +885,10 @@ onMounted(async () => {
       if (event.value.seatMapId) {
         await loadSeatMapLayout()
       }
+      
+      if (selectedShowtimeId.value) {
+        await loadTicketInventoryStates(selectedShowtimeId.value)
+      }
     } else {
       error.value = res?.message || 'Không thể lấy thông tin sự kiện.'
     }
@@ -992,8 +1129,6 @@ onUnmounted(async () => {
 })
 
 watch(selectedShowtimeId, async (newShowtimeId, oldShowtimeId) => {
-  if (!seatMapData.value) return // Wait until seatMapData is loaded
-  
   if (newShowtimeId) {
     // Clear selected seats first and unlock them
     if (selectedSeats.value.length > 0 && oldShowtimeId) {
@@ -1012,8 +1147,11 @@ watch(selectedShowtimeId, async (newShowtimeId, oldShowtimeId) => {
     clearAllSeatTimers()
     
     await stopHubConnection()
-    await loadSeatStates()
-    await startHubConnection(newShowtimeId)
+    if (seatMapData.value) {
+      await loadSeatStates()
+      await startHubConnection(newShowtimeId)
+    }
+    await loadTicketInventoryStates(newShowtimeId)
   } else {
     selectedSeats.value = []
     clearAllSeatTimers()
@@ -1270,23 +1408,128 @@ const formatCurrency = (amount) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)
 }
 
+// Summary text for the modal
+const checkoutSummaryText = computed(() => {
+  if (event.value?.seatMapId && activeTier.value && isReservedTier(activeTier.value)) {
+    return `${selectedSeats.value.length} ghế ngồi`
+  }
+  return `${qty.value} vé ${activeTier.value?.ticketTypeName || ''}`
+})
+
+// Opens the checkout modal, pre-fills name from store.user
 const handleBuyTicket = () => {
   if (!event.value || !activeTier.value) return
-  
-  if (event.value.seatMapId && isReservedTier(activeTier.value)) {
-    // Checkout reserved seating tickets
-    store.toast = {
-      message: `Đặt thành công ${selectedSeats.value.length} vé ghế ngồi (${selectedSeats.value.map(s => s.rowName + '-' + s.seatName).join(', ')}). Vui lòng check email nhận vé!`,
-      icon: '🎉'
+
+  // Auth check
+  const token = getToken()
+  if (!token) {
+    store.toast = { message: 'Vui lòng đăng nhập để mua vé.', icon: '🔑' }
+    store.showAuth = true
+    return
+  }
+
+  if (!selectedShowtimeId.value) {
+    store.toast = { message: 'Vui lòng chọn suất chiếu.', icon: '⚠️' }
+    return
+  }
+
+  if (event.value.seatMapId && isReservedTier(activeTier.value) && selectedSeats.value.length === 0) {
+    store.toast = { message: 'Vui lòng chọn ít nhất 1 ghế trên sơ đồ.', icon: '⚠️' }
+    return
+  }
+
+  // Pre-fill from JWT user info
+  checkoutForm.customerName = store.user?.name || store.user?.fullName || ''
+  checkoutForm.customerPhone = store.user?.phone || store.user?.phoneNumber || ''
+  formErrors.customerName = ''
+  formErrors.customerPhone = ''
+
+  showCheckoutModal.value = true
+}
+
+// Called when user confirms in modal
+const submitCheckout = async () => {
+  // Validate form
+  formErrors.customerName = ''
+  formErrors.customerPhone = ''
+  let hasError = false
+
+  if (!checkoutForm.customerName.trim()) {
+    formErrors.customerName = 'Vui lòng nhập tên người nhận vé.'
+    hasError = true
+  }
+  if (!checkoutForm.customerPhone.trim()) {
+    formErrors.customerPhone = 'Vui lòng nhập số điện thoại.'
+    hasError = true
+  } else if (!/^(0|\+84)[0-9]{8,10}$/.test(checkoutForm.customerPhone.trim())) {
+    formErrors.customerPhone = 'Số điện thoại không đúng định dạng (VD: 0901234567).'
+    hasError = true
+  }
+
+  if (hasError) return
+
+  const showtimeId = selectedShowtimeId.value
+  const selectedShowtime = event.value?.showtimes?.[selectedShowTimeIndex.value]
+
+  if (!showtimeId || !selectedShowtime) {
+    store.toast = { message: 'Không tìm thấy thông tin suất chiếu.', icon: '⚠️' }
+    return
+  }
+
+  isCheckingOut.value = true
+  try {
+    let items = []
+
+    if (event.value.seatMapId && isReservedTier(activeTier.value)) {
+      items = selectedSeats.value.map(seat => ({
+        seatId: seat.id,
+        seatName: seat.seatName,
+        rowName: seat.rowName,
+        ticketTypeId: activeTier.value.id,
+        ticketTypeName: activeTier.value.ticketTypeName,
+        price: seat.price,
+        quantity: 1
+      }))
+    } else {
+      items = [{
+        seatId: null,
+        seatName: null,
+        rowName: null,
+        ticketTypeId: activeTier.value.id,
+        ticketTypeName: activeTier.value.ticketTypeName,
+        price: activeTier.value.price,
+        quantity: qty.value
+      }]
     }
-    selectedSeats.value = []
-  } else {
-    // Checkout GA / standing / manual tickets
-    store.toast = {
-      message: `Đặt thành công ${qty.value} vé ${activeTier.value.ticketTypeName} cho sự kiện "${event.value.title}". Vui lòng check email nhận vé!`,
-      icon: '🎉'
+
+    // customerEmail is NOT sent — backend extracts from JWT
+    const payload = {
+      showtimeId: showtimeId,
+      eventId: event.value.id,
+      eventTitle: event.value.title,
+      showtimeStartAt: selectedShowtime.startAt,
+      customerName: checkoutForm.customerName.trim(),
+      customerPhone: checkoutForm.customerPhone.trim(),
+      paymentMethod: 'VNPay',
+      items: items
     }
-    qty.value = 1
+
+    const res = await checkout(payload)
+    if (res && res.success && res.data) {
+      const orderId = res.data
+      showCheckoutModal.value = false
+      selectedSeats.value = []
+      clearAllSeatTimers()
+      qty.value = 1
+      router.push({ name: 'payment', query: { orderId } })
+    } else {
+      store.toast = { message: res?.message || 'Không thể tạo đơn hàng. Vui lòng thử lại.', icon: '❌' }
+    }
+  } catch (err) {
+    console.error('[Checkout] Lỗi:', err)
+    store.toast = { message: 'Lỗi khi kết nối đến hệ thống thanh toán. Vui lòng thử lại.', icon: '❌' }
+  } finally {
+    isCheckingOut.value = false
   }
 }
 
@@ -1301,5 +1544,21 @@ const scrollToSelect = () => {
 <style scoped>
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+.modal-fade-enter-active .relative,
+.modal-fade-leave-active .relative {
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+.modal-fade-enter-from .relative {
+  transform: scale(0.95) translateY(12px);
 }
 </style>

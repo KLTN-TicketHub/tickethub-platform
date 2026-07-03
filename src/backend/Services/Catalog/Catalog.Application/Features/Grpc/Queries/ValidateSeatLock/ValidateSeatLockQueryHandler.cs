@@ -22,7 +22,6 @@ namespace Catalog.Application.Features.Grpc.Queries.ValidateSeatLock
             {
                 var now = DateTime.UtcNow;
 
-                // 1. Kiểm tra Showtime + Event thông qua EventRepository
                 var @event = await _unitOfWork.EventRepository.GetOneUntrackedAsync<Event>(
                     filter: e => e.ShowTimes.Any(st => st.Id == request.ShowtimeId) && !e.IsDeleted,
                     include: q => q.Include(e => e.ShowTimes),
@@ -39,16 +38,12 @@ namespace Catalog.Application.Features.Grpc.Queries.ValidateSeatLock
                 if (showtime.Status != CatalogStatus.Active)
                     return Fail($"Suất diễn '{request.ShowtimeId}' không còn hoạt động.");
 
-                if (showtime.StartAt <= now)
-                    return Fail($"Suất diễn '{request.ShowtimeId}' đã bắt đầu hoặc đã qua.");
-
                 if (@event.Status != EventStatus.Published)
                     return Fail($"Sự kiện '{@event.Title}' chưa được duyệt hoặc đã đóng.");
 
                 if (@event.SeatMapId == null)
                     return Fail($"Sự kiện '{@event.Title}' không có sơ đồ ghế.");
 
-                // 2. Kiểm tra từng Seat
                 var seats = await _unitOfWork.SeatRepository.GetAllAsync<Seat>(
                     filter: s => request.SeatIds.Contains(s.Id) && !s.IsDeleted,
                     include: q => q.Include(s => s.Row)

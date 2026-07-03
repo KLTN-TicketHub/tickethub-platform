@@ -62,5 +62,9 @@ export const LOCATION_PROVINCES = '/catalog/locations/provinces'
 export const LOCATION_DISTRICTS = (provinceCode) => `/catalog/locations/provinces/${provinceCode}/districts`
 export const LOCATION_WARDS = (districtCode) => `/catalog/locations/districts/${districtCode}/wards`
 
+// Ordering / Checkout
+export const ORDER_CHECKOUT = '/ordering/orders/checkout'
+export const ORDER_PAYMENT_LINK = (orderId) => `/ordering/orders/${orderId}/payment-link`
+
 
 

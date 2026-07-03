@@ -20,9 +20,9 @@ namespace Catalog.Application.Features.Grpc.Queries.ValidateCheckout
         {
             try
             {
-                var now = DateTime.UtcNow;
+                DateTime now = DateTime.UtcNow;
 
-                var @event = await _unitOfWork.EventRepository.GetOneUntrackedAsync<Event>(
+                Event? @event = await _unitOfWork.EventRepository.GetOneUntrackedAsync<Event>(
                     filter: e => e.Id == request.EventId && !e.IsDeleted,
                     include: q => q.Include(e => e.ShowTimes)
                                    .ThenInclude(st => st.TicketTypes),
@@ -47,9 +47,6 @@ namespace Catalog.Application.Features.Grpc.Queries.ValidateCheckout
 
                 if (showtime.Status != CatalogStatus.Active)
                     return Fail($"Suất diễn '{request.ShowtimeId}' không còn hoạt động (trạng thái: {showtime.Status}).");
-
-                if (showtime.StartAt <= now)
-                    return Fail($"Suất diễn '{request.ShowtimeId}' đã bắt đầu hoặc đã qua, không thể đặt vé.");
 
                 foreach (var (ticketTypeId, quantity) in request.TicketItems)
                 {

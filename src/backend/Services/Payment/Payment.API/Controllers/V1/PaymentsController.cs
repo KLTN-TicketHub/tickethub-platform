@@ -18,135 +18,73 @@ namespace Payment.API.Controllers.V1
         private readonly IVnpayService _vnpayService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPublishEndpoint _publishEndpoint;
+        private readonly ILogger<PaymentsController> _logger;
 
         public PaymentsController(
             IVnpayService vnpayService,
             IUnitOfWork unitOfWork,
-            IPublishEndpoint publishEndpoint)
+            IPublishEndpoint publishEndpoint,
+            ILogger<PaymentsController> logger)
         {
             _vnpayService = vnpayService;
             _unitOfWork = unitOfWork;
             _publishEndpoint = publishEndpoint;
+            _logger = logger;
         }
 
         [HttpGet("vnpay-ipn")]
         public async Task<IActionResult> VnpayIpn()
         {
-            Dictionary<string, string> vnpayParams = new Dictionary<string, string>();
-
-            string secureHash = string.Empty;
-            foreach (var key in Request.Query.Keys)
+            try
             {
-                string value = Request.Query[key]!;
+                Dictionary<string, string> vnpayParams = new Dictionary<string, string>();
 
-                if (key == "vnp_SecureHash")
+                string secureHash = string.Empty;
+                foreach (var key in Request.Query.Keys)
                 {
-                    secureHash = value;
+                    string value = Request.Query[key]!;
+
+                    if (key == "vnp_SecureHash")
+                    {
+                        secureHash = value;
+                    }
+                    else if (key.StartsWith("vnp_"))
+                    {
+                        vnpayParams.Add(key, value);
+                    }
                 }
-                else if (key.StartsWith("vnp_"))
+
+                bool isValid = _vnpayService.ValidateSignature(vnpayParams, secureHash);
+
+                if (!isValid)
                 {
-                    vnpayParams.Add(key, value);
+                    _logger.LogWarning("VNPay IPN: Invalid signature");
+                    return BadRequest(new { RspCode = "97", Message = "Invalid signature" });
                 }
-            }
 
-            bool isValid = _vnpayService.ValidateSignature(vnpayParams, secureHash);
-
-            if (!isValid)
-            {
-                return BadRequest(new { RspCode = "97", Message = "Invalid signature" });
-            }
-
-            string txnRef = Request.Query["vnp_TxnRef"]!;
-            var orderId = Guid.Parse(txnRef);
-            var transaction = await _unitOfWork.PaymentTransactionRepository.GetOneAsync<PaymentTransaction>(
-                filter: t => t.OrderId == orderId
-            );
-
-            if (transaction == null)
-            {
-                return NotFound(new { RspCode = "01", Message = "Order not found" });
-            }
-            if (transaction.Status != PaymentStatus.Pending)
-            {
-                return Ok(new { RspCode = "02", Message = "Order already confirmed" });
-            }
-
-            string responseCode = Request.Query["vnp_ResponseCode"]!;
-            string transactionStatus = Request.Query["vnp_TransactionStatus"]!;
-            string vnpayTranId = Request.Query["vnp_TransactionNo"]!;
-            string rawResponse = string.Join("&", Request.Query.Select(q => $"{q.Key}={q.Value}"));
-
-            if (responseCode == "00" && transactionStatus == "00")
-            {
-                transaction.MarkAsSuccess(vnpayTranId, rawResponse);
-                await _unitOfWork.PaymentTransactionRepository.UpdateAsync(transaction);
-                await _unitOfWork.SaveChangesAsync();
-
-                await _publishEndpoint.Publish(new PaymentCompletedEvent
-                {
-                    OrderId = transaction.OrderId,
-                    TransactionId = vnpayTranId,
-                    Amount = transaction.Amount,
-                    Gateway = transaction.Gateway,
-                    CompletedAt = DateTime.UtcNow
-                });
-            }
-
-            else
-            {
-                transaction.MarkAsFailed(vnpayTranId, rawResponse);
-                await _unitOfWork.PaymentTransactionRepository.UpdateAsync(transaction);
-                await _unitOfWork.SaveChangesAsync();
-                await _publishEndpoint.Publish(new PaymentFailedEvent
-                {
-                    OrderId = transaction.OrderId,
-                    Reason = $"Thanh toán thất bại tại VNPay. Mã lỗi: {responseCode}",
-                    CompletedAt = DateTime.UtcNow
-                });
-            }
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return Ok(new { RspCode = "00", Message = "Confirm success" });
-        }
-
-        [HttpGet("vnpay-return")]
-        [AllowAnonymous]
-        public async Task<IActionResult> VnpayReturn()
-        {
-            Dictionary<string, string> vnpayParams = new Dictionary<string, string>();
-            string secureHash = string.Empty;
-
-            foreach (var key in Request.Query.Keys)
-            {
-                string value = Request.Query[key]!;
-
-                if (key == "vnp_SecureHash")
-                {
-                    secureHash = value;
-                }
-                else if (key.StartsWith("vnp_"))
-                {
-                    vnpayParams.Add(key, value);
-                }
-            }
-
-            bool isValid = _vnpayService.ValidateSignature(vnpayParams, secureHash);
-            string responseCode = Request.Query["vnp_ResponseCode"]!;
-            string txnRef = Request.Query["vnp_TxnRef"]!;
-            bool success = isValid && responseCode == "00";
-
-            if (success && Guid.TryParse(txnRef, out var orderId))
-            {
+                string txnRef = Request.Query["vnp_TxnRef"]!;
+                var orderId = Guid.Parse(txnRef);
                 var transaction = await _unitOfWork.PaymentTransactionRepository.GetOneAsync<PaymentTransaction>(
                     filter: t => t.OrderId == orderId
                 );
 
-                if (transaction != null && transaction.Status == PaymentStatus.Pending)
+                if (transaction == null)
                 {
-                    string vnpayTranId = Request.Query["vnp_TransactionNo"]!;
-                    string rawResponse = string.Join("&", Request.Query.Select(q => $"{q.Key}={q.Value}"));
+                    _logger.LogWarning("VNPay IPN: Order not found for TxnRef {TxnRef}", txnRef);
+                    return NotFound(new { RspCode = "01", Message = "Order not found" });
+                }
+                if (transaction.Status != PaymentStatus.Pending)
+                {
+                    return Ok(new { RspCode = "02", Message = "Order already confirmed" });
+                }
 
+                string responseCode = Request.Query["vnp_ResponseCode"]!;
+                string transactionStatus = Request.Query["vnp_TransactionStatus"]!;
+                string vnpayTranId = Request.Query["vnp_TransactionNo"]!;
+                string rawResponse = string.Join("&", Request.Query.Select(q => $"{q.Key}={q.Value}"));
+
+                if (responseCode == "00" && transactionStatus == "00")
+                {
                     transaction.MarkAsSuccess(vnpayTranId, rawResponse);
                     await _unitOfWork.PaymentTransactionRepository.UpdateAsync(transaction);
                     await _unitOfWork.SaveChangesAsync();
@@ -159,13 +97,96 @@ namespace Payment.API.Controllers.V1
                         Gateway = transaction.Gateway,
                         CompletedAt = DateTime.UtcNow
                     });
-
-                    await _unitOfWork.SaveChangesAsync();
                 }
-            }
+                else
+                {
+                    transaction.MarkAsFailed(vnpayTranId, rawResponse);
+                    await _unitOfWork.PaymentTransactionRepository.UpdateAsync(transaction);
+                    await _unitOfWork.SaveChangesAsync();
+                    await _publishEndpoint.Publish(new PaymentFailedEvent
+                    {
+                        OrderId = transaction.OrderId,
+                        Reason = $"Thanh toán thất bại tại VNPay. Mã lỗi: {responseCode}",
+                        CompletedAt = DateTime.UtcNow
+                    });
+                }
 
-            string redirectUrl = $"http://localhost:5173/my-tickets?success={success.ToString().ToLower()}&orderId={txnRef}";
-            return Redirect(redirectUrl);
+                await _unitOfWork.SaveChangesAsync();
+
+                return Ok(new { RspCode = "00", Message = "Confirm success" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi xảy ra trong quá trình xử lý VNPay IPN");
+                return StatusCode(500, new { RspCode = "99", Message = "Unknown error" });
+            }
+        }
+
+        [HttpGet("vnpay-return")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VnpayReturn()
+        {
+            try
+            {
+                Dictionary<string, string> vnpayParams = new Dictionary<string, string>();
+                string secureHash = string.Empty;
+
+                foreach (var key in Request.Query.Keys)
+                {
+                    string value = Request.Query[key]!;
+
+                    if (key == "vnp_SecureHash")
+                    {
+                        secureHash = value;
+                    }
+                    else if (key.StartsWith("vnp_"))
+                    {
+                        vnpayParams.Add(key, value);
+                    }
+                }
+
+                bool isValid = _vnpayService.ValidateSignature(vnpayParams, secureHash);
+                string responseCode = Request.Query["vnp_ResponseCode"]!;
+                string txnRef = Request.Query["vnp_TxnRef"]!;
+                bool success = isValid && responseCode == "00";
+
+                if (success && Guid.TryParse(txnRef, out var orderId))
+                {
+                    var transaction = await _unitOfWork.PaymentTransactionRepository.GetOneAsync<PaymentTransaction>(
+                        filter: t => t.OrderId == orderId
+                    );
+
+                    if (transaction != null && transaction.Status == PaymentStatus.Pending)
+                    {
+                        string vnpayTranId = Request.Query["vnp_TransactionNo"]!;
+                        string rawResponse = string.Join("&", Request.Query.Select(q => $"{q.Key}={q.Value}"));
+
+                        transaction.MarkAsSuccess(vnpayTranId, rawResponse);
+                        await _unitOfWork.PaymentTransactionRepository.UpdateAsync(transaction);
+                        await _unitOfWork.SaveChangesAsync();
+
+                        await _publishEndpoint.Publish(new PaymentCompletedEvent
+                        {
+                            OrderId = transaction.OrderId,
+                            TransactionId = vnpayTranId,
+                            Amount = transaction.Amount,
+                            Gateway = transaction.Gateway,
+                            CompletedAt = DateTime.UtcNow
+                        });
+
+                        await _unitOfWork.SaveChangesAsync();
+                    }
+                }
+
+                string redirectUrl = $"http://localhost:5173/my-tickets?success={success.ToString().ToLower()}&orderId={txnRef}";
+                return Redirect(redirectUrl);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi xảy ra trong quá trình xử lý VNPay Return");
+                // Chuyển hướng về trang thất bại nếu có lỗi
+                return Redirect($"http://localhost:5173/my-tickets?success=false&error=server_error");
+            }
         }
     }
 }

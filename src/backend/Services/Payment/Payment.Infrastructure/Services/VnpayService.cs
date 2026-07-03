@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Payment.Common.Options;
 using Payment.Infrastructure.Interfaces.IServices;
 using System.Security.Cryptography;
@@ -47,17 +47,17 @@ namespace Payment.Infrastructure.Services
             {
                 if (!string.IsNullOrEmpty(kvp.Value))
                 {
-                    string keyEncoded = Uri.EscapeDataString(kvp.Key);
-                    string valEncoded = Uri.EscapeDataString(kvp.Value);
+                    string keyEncoded = System.Net.WebUtility.UrlEncode(kvp.Key);
+                    string valEncoded = System.Net.WebUtility.UrlEncode(kvp.Value);
                     queryBuilder.Append($"{keyEncoded}={valEncoded}&");
-                    signDataBuilder.Append($"{kvp.Key}={kvp.Value}&");
+                    signDataBuilder.Append($"{keyEncoded}={valEncoded}&");
                 }
             }
             if (queryBuilder.Length > 0) queryBuilder.Length--;
             if (signDataBuilder.Length > 0) signDataBuilder.Length--;
             string rawData = signDataBuilder.ToString();
             string secureHash = HmacSha512(hashSecret, rawData);
-            return $"{paymentUrl}?{queryBuilder}&vnp_SecureHash={secureHash}";
+            return $"{paymentUrl}?{queryBuilder.ToString()}&vnp_SecureHash={secureHash}";
         }
 
         public bool ValidateSignature(Dictionary<string, string> vnpayParams, string secureHash)
@@ -72,7 +72,9 @@ namespace Payment.Infrastructure.Services
             {
                 if (kvp.Key != "vnp_SecureHash" && kvp.Key != "vnp_SecureHashType" && !string.IsNullOrEmpty(kvp.Value))
                 {
-                    signDataBuilder.Append($"{kvp.Key}={kvp.Value}&");
+                    string keyEncoded = System.Net.WebUtility.UrlEncode(kvp.Key);
+                    string valEncoded = System.Net.WebUtility.UrlEncode(kvp.Value);
+                    signDataBuilder.Append($"{keyEncoded}={valEncoded}&");
                 }
             }
             if (signDataBuilder.Length > 0) signDataBuilder.Length--;
@@ -87,7 +89,7 @@ namespace Payment.Infrastructure.Services
             using (var hmac = new HMACSHA512(keyByte))
             {
                 byte[] hashMessage = hmac.ComputeHash(messageBytes);
-                return Convert.ToHexString(hashMessage);
+                return Convert.ToHexString(hashMessage).ToLowerInvariant();
             }
         }
     }

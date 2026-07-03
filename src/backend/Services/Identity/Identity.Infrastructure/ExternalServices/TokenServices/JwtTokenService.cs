@@ -40,8 +40,8 @@ namespace Identity.Infrastructure.ExternalServices.TokenServices
                 new Claim(JwtRegisteredClaimNames.Iss, issuer),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                 new Claim(ClaimTypes.Name, user.FullName),
-                new Claim(ClaimTypes.Email, user.Email!),
             };
 
             foreach (var role in roles)

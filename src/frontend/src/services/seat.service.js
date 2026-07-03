@@ -26,3 +26,12 @@ export async function unlockSeat(showtimeId, seatId) {
   const response = await api.post('/inventory/Seats/seats/unlock', { showtimeId, seatId })
   return response.data
 }
+
+/**
+ * Lấy trạng thái tồn kho của một loại vé (ví dụ: vé đứng) trong một suất chiếu
+ * GET /inventory/Tickets/showtimes/{showtimeId}/types/{ticketTypeId}
+ */
+export async function getTicketInventoryState(showtimeId, ticketTypeId) {
+  const response = await api.get(`/inventory/Tickets/showtimes/${showtimeId}/types/${ticketTypeId}`)
+  return response.data
+}

@@ -26,18 +26,26 @@ namespace Inventory.Infrastructure.Consumers
             var message = context.Message;
             _logger.LogInformation("Processing ReleaseSeatsCommand for OrderId={OrderId}", message.OrderId);
 
-            if (message.SeatIds != null && message.SeatIds.Any())
+            try
             {
-                foreach (var seatId in message.SeatIds)
+                if (message.SeatIds != null && message.SeatIds.Any())
                 {
-                    // 1. Release khóa Redis ngay lập tức
-                    await _redisLockService.UnlockSeatAsync(message.ShowtimeId, seatId, message.UserId);
+                    foreach (var seatId in message.SeatIds)
+                    {
+                        // 1. Release khóa Redis ngay lập tức
+                        await _redisLockService.UnlockSeatAsync(message.ShowtimeId, seatId, message.UserId);
 
-                    // 2. Notify SignalR về trạng thái Available
-                    await _hubNotificationService.NotifySeatStateChangedAsync(message.ShowtimeId, seatId, "Available");
+                        // 2. Notify SignalR về trạng thái Available
+                        await _hubNotificationService.NotifySeatStateChangedAsync(message.ShowtimeId, seatId, "Available");
+                    }
                 }
+                _logger.LogInformation("Successfully completed ReleaseSeats for Order {OrderId}", message.OrderId);
             }
-            _logger.LogInformation("Successfully completed ReleaseSeats for Order {OrderId}", message.OrderId);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi xử lý ReleaseSeatsCommand cho OrderId={OrderId}", message.OrderId);
+                throw;
+            }
         }
     }
 }
