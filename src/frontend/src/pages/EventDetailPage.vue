@@ -668,23 +668,42 @@ const loadSeatStates = async () => {
       // Support both camelCase (seatId) and PascalCase (SeatId)
       const id = s.seatId ?? s.SeatId
       const status = s.status ?? s.Status
-      if (id) stateMap[id] = status
+      const lockedByUserId = s.lockedByUserId ?? s.LockedByUserId
+      if (id) stateMap[id] = { status, lockedByUserId }
     })
 
     // Reset all seats to 'Trống' first, then apply fetched states
     seatMapData.value.zones?.forEach(zone => {
       zone.rows?.forEach(row => {
         row.seats?.forEach(seat => {
-          const status = stateMap[seat.id]
-          if (status === 'Sold') {
+          const state = stateMap[seat.id]
+          if (state && state.status === 'Sold') {
             seat.layoutStatus = 'Đã bán'
-          } else if (status === 'Selecting') {
+          } else if (state && (state.status === 'Selecting' || state.status === 'Checkout')) {
             // Only mark as 'Đang giữ' if this seat is NOT selected by current user
-            const isMine = selectedSeats.value.some(s => s.id === seat.id)
-            if (!isMine) {
-              seat.layoutStatus = 'Đang giữ'
+            const isMineLocal = selectedSeats.value.some(s => s.id === seat.id) || pendingLocks.has(seat.id)
+            const isMineRemote = store.user && store.user.id && state.lockedByUserId === store.user.id
+            
+            if (isMineRemote && !isMineLocal) {
+               const price = getZonePrice(zone.id)
+               const ticketTypeName = getZoneTicketTypeName(zone.id)
+               selectedSeats.value.push({
+                 id: seat.id,
+                 seatName: seat.seatName,
+                 seatCode: seat.seatCode,
+                 zoneId: zone.id,
+                 zoneName: zone.zoneName,
+                 rowName: row.rowName,
+                 price: price,
+                 ticketTypeName: ticketTypeName
+               })
             }
-            // If it's mine, leave it — getSeatFillColor handles it via selectedSeats
+
+            if (!isMineLocal && !isMineRemote) {
+              seat.layoutStatus = 'Đang giữ'
+            } else {
+              seat.layoutStatus = 'Trống' // Will be drawn as green because it's in selectedSeats
+            }
           } else {
             seat.layoutStatus = 'Trống'
           }
@@ -999,7 +1018,9 @@ const removeSelectedSeat = async (id) => {
     }
   } catch (err) {
     console.error(err)
-    store.toast = { message: 'Lỗi khi hủy khóa ghế.', icon: '⚠️' }
+    const msg = err.response?.data?.message || 'Lỗi khi hủy khóa ghế.'
+    alert('Error caught: ' + msg) // Debug alert
+    store.toast = { message: msg, icon: '⚠️' }
   } finally {
     setTimeout(() => localUnlocks.delete(id), 2000)
   }
@@ -1286,7 +1307,9 @@ async function onSeatClick(seat, zone, row) {
       }
     } catch (err) {
       console.error(err)
-      store.toast = { message: 'Lỗi khi hủy khóa ghế.', icon: '⚠️' }
+      const msg = err.response?.data?.message || 'Lỗi khi hủy khóa ghế.'
+      alert('Error caught: ' + msg) // Debug alert
+      store.toast = { message: msg, icon: '⚠️' }
     } finally {
       setTimeout(() => localUnlocks.delete(seat.id), 2000)
     }

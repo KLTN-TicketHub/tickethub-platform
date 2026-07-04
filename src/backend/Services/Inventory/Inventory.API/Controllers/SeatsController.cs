@@ -58,13 +58,20 @@ namespace Inventory.API.Controllers
                 return Unauthorized(new ApiResponse(false, "Bạn cần đăng nhập để thực hiện chức năng này."));
             }
 
-            var success = await _seatStateService.UnlockSeatAsync(request.ShowtimeId, request.SeatId, _currentUserService.UserId.Value);
-            if (!success)
+            try
             {
-                return BadRequest(new ApiResponse(false, "Bạn không thể hủy khóa ghế của người khác."));
-            }
+                var success = await _seatStateService.UnlockSeatAsync(request.ShowtimeId, request.SeatId, _currentUserService.UserId.Value);
+                if (!success)
+                {
+                    return BadRequest(new ApiResponse(false, "Bạn không thể hủy khóa ghế của người khác."));
+                }
 
-            return Ok(new ApiResponse(true, "Hủy khóa ghế thành công."));
+                return Ok(new ApiResponse(true, "Hủy khóa ghế thành công."));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new ApiResponse(false, ex.Message));
+            }
         }
     }
 

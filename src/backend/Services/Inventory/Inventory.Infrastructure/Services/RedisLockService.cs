@@ -15,10 +15,10 @@ namespace Inventory.Infrastructure.Services
             _redisDb = connection.GetDatabase();
         }
 
-        public async Task<bool> LockSeatAsync(Guid showtimeId, Guid seatId, Guid userId, TimeSpan ttl)
+        public async Task<bool> LockSeatAsync(Guid showtimeId, Guid seatId, Guid userId, TimeSpan ttl, string status = "Selecting")
         {
             string key = $"seat_lock:{showtimeId}:{seatId}";
-            string value = $"{userId}:Selecting";
+            string value = $"{userId}:{status}";
 
             string luaScript = @"
                 local val = redis.call('GET', KEYS[1])
@@ -45,6 +45,9 @@ namespace Inventory.Infrastructure.Services
                 if not val then
                     return 1
                 elseif string.sub(val, 1, string.len(ARGV[1])) == ARGV[1] then
+                    if string.find(val, ':Checkout', 1, true) then
+                        return -1
+                    end
                     return redis.call('DEL', KEYS[1])
                 else
                     return 0
@@ -54,12 +57,17 @@ namespace Inventory.Infrastructure.Services
                 new RedisKey[] { key },
                 new RedisValue[] { userId.ToString() });
 
+            if ((int)result == -1)
+            {
+                throw new InvalidOperationException("Ghế đang trong quá trình thanh toán, không thể hủy.");
+            }
+
             return (int)result == 1;
         }
 
-        public async Task<Dictionary<string, string>> GetLockedSeatsAsync(Guid showtimeId)
+        public async Task<Dictionary<string, (string Status, string UserId)>> GetLockedSeatsAsync(Guid showtimeId)
         {
-            Dictionary<string, string> result = new Dictionary<string, string>();
+            Dictionary<string, (string Status, string UserId)> result = new Dictionary<string, (string Status, string UserId)>();
             EndPoint[] endpoints = _connection.GetEndPoints();
             IServer server = _connection.GetServer(endpoints.First());
             string pattern = $"seat_lock:{showtimeId}:*";
@@ -72,8 +80,9 @@ namespace Inventory.Infrastructure.Services
                 {
                     string seatIdStr = key.ToString().Split(':').Last();
                     string[] parts = value.ToString().Split(':');
+                    string userId = parts[0];
                     string status = parts.Length > 1 ? parts[1] : "Selecting";
-                    result.Add(seatIdStr, status);
+                    result.Add(seatIdStr, (status, userId));
                 }
             }
 

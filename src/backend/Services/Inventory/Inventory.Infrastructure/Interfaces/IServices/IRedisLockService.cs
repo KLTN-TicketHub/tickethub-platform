@@ -2,11 +2,11 @@ namespace Inventory.Infrastructure.Interfaces.IServices
 {
     public interface IRedisLockService
     {
-        Task<bool> LockSeatAsync(Guid showtimeId, Guid seatId, Guid userId, TimeSpan ttl);
+        Task<bool> LockSeatAsync(Guid showtimeId, Guid seatId, Guid userId, TimeSpan ttl, string status = "Selecting");
 
         Task<bool> UnlockSeatAsync(Guid showtimeId, Guid seatId, Guid userId);
 
-        Task<Dictionary<string, string>> GetLockedSeatsAsync(Guid showtimeId);
+        Task<Dictionary<string, (string Status, string UserId)>> GetLockedSeatsAsync(Guid showtimeId);
 
         Task<bool> LockTicketsAsync(Guid showtimeId, Guid ticketTypeId, Guid userId, int quantity, TimeSpan ttl);
 

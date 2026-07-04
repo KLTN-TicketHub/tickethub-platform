@@ -31,6 +31,7 @@ namespace Payment.Infrastructure.Services
                 { "vnp_TmnCode", tmnCode },
                 { "vnp_Amount", vnpAmount.ToString() },
                 { "vnp_CreateDate", DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss") },
+                { "vnp_ExpireDate", DateTime.UtcNow.AddHours(7).AddMinutes(10).ToString("yyyyMMddHHmmss") },
                 { "vnp_CurrCode", _payment.VNPay!.Currency },
                 { "vnp_IpAddr", ipAddress },
                 { "vnp_Locale", _payment.VNPay!.Locale },

@@ -75,7 +75,8 @@ namespace Inventory.API.Services
                         showtimeId,
                         seatId,
                         userId,
-                        TimeSpan.FromMinutes(10));
+                        TimeSpan.FromMinutes(10),
+                        "Checkout");
 
                     if (!locked)
                     {

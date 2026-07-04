@@ -4,5 +4,6 @@ namespace Inventory.Infrastructure.Dtos
     {
         public string SeatId { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
+        public string? LockedByUserId { get; set; }
     }
 }

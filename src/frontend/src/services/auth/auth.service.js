@@ -33,6 +33,7 @@ function applyUserFromToken(token) {
 
   if (name) {
     store.user = {
+      id: payload.sub || payload.nameid || payload.id || null,
       name: String(name).split('@')[0] || String(name),
       email: payload.email || null,
       roles: roles,

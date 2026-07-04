@@ -31,7 +31,7 @@ namespace Inventory.Infrastructure.Services
 
             IEnumerable<string> soldSeatStrings = soldSeatIds.Select(id => id.ToString()).ToHashSet();
 
-            Dictionary<string, string> lockedSeats = await _redisLockService.GetLockedSeatsAsync(showtimeId);
+            Dictionary<string, (string Status, string UserId)> lockedSeats = await _redisLockService.GetLockedSeatsAsync(showtimeId);
 
             List<SeatStateDto> result = new List<SeatStateDto>();
 
@@ -44,7 +44,7 @@ namespace Inventory.Infrastructure.Services
             {
                 if (!soldSeatStrings.Contains(kvp.Key))
                 {
-                    result.Add(new SeatStateDto { SeatId = kvp.Key, Status = kvp.Value });
+                    result.Add(new SeatStateDto { SeatId = kvp.Key, Status = kvp.Value.Status, LockedByUserId = kvp.Value.UserId });
                 }
             }
 
