@@ -37,7 +37,6 @@ namespace Inventory.Infrastructure.Consumers
                 {
                     foreach (var seat in message.Seats)
                     {
-                        // 1. Tạo bản ghi đặt ghế trong DB với trạng thái Sold
                         var showtimeSeat = new ShowtimeSeat
                         {
                             ShowTimeId = message.ShowtimeId,
@@ -51,10 +50,8 @@ namespace Inventory.Infrastructure.Consumers
                         };
                         await _unitOfWork.ShowtimeSeatRepository.CreateAsync(showtimeSeat);
 
-                        // 2. Unlock trong Redis (vì đã thanh toán/được lưu DB, khóa tạm không cần nữa)
                         await _redisLockService.UnlockSeatAsync(message.ShowtimeId, seat.SeatId, message.UserId);
 
-                        // 3. Notify real-time qua SignalR
                         await _hubNotificationService.NotifySeatStateChangedAsync(message.ShowtimeId, seat.SeatId, "Sold");
                     }
                 }

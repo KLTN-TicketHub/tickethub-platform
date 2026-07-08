@@ -32,10 +32,8 @@ namespace Inventory.Infrastructure.Consumers
                 {
                     foreach (var seatId in message.SeatIds)
                     {
-                        // 1. Release khóa Redis ngay lập tức
                         await _redisLockService.UnlockSeatAsync(message.ShowtimeId, seatId, message.UserId);
 
-                        // 2. Notify SignalR về trạng thái Available
                         await _hubNotificationService.NotifySeatStateChangedAsync(message.ShowtimeId, seatId, "Available");
                     }
                 }
