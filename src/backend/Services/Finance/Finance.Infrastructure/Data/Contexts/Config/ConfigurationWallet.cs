@@ -17,6 +17,11 @@ namespace Finance.Infrastructure.Data.Contexts.Config
                 .IsRequired()
                 .HasPrecision(18, 2);
 
+            builder.HasMany(w => w.Transactions)
+                .WithOne(t => t.Wallet)
+                .HasForeignKey(t => t.WalletId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.Property(w => w.RowVersion)
                 .IsRowVersion();
         }

@@ -10,6 +10,9 @@ namespace Finance.Infrastructure.Entities
 
         public byte[] RowVersion { get; private set; } = default!;
 
+        private readonly List<WalletTransaction> _transactions = new List<WalletTransaction>();
+        public IReadOnlyCollection<WalletTransaction> Transactions => _transactions.AsReadOnly();
+
         public Wallet() { }
         public Wallet(Guid organizerId)
         {

@@ -33,7 +33,7 @@ namespace Ordering.Infrastructure.Consumers
                     order.MarkAsPaid();
                     await _unitOfWork.OrderRepository.UpdateAsync(order);
 
-                    var seats = order.OrderItems
+                    List<ReserveSeatItemDto> seats = order.OrderItems
                         .Where(x => x.SeatId.HasValue)
                         .Select(x => new ReserveSeatItemDto
                         {
@@ -44,7 +44,7 @@ namespace Ordering.Infrastructure.Consumers
                         })
                         .ToList();
 
-                    var standingItem = order.OrderItems.FirstOrDefault(x => !x.SeatId.HasValue);
+                    OrderItem? standingItem = order.OrderItems.FirstOrDefault(x => !x.SeatId.HasValue);
 
                     await context.Publish(new ReserveSeatsCommand
                     {

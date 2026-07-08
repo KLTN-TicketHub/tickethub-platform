@@ -4,6 +4,7 @@ namespace Finance.Infrastructure.Entities
 {
     public class WalletTransaction : BaseEntity, IAggregateRoot
     {
+        public Wallet Wallet { get; set; }
         public Guid WalletId { get; set; }
 
         public Guid? OrderId { get; set; }
