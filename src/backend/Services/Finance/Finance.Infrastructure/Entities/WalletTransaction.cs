@@ -18,7 +18,6 @@ namespace Finance.Infrastructure.Entities
         public WalletTransaction() { }
         public WalletTransaction(Guid walletId, Guid? orderId, decimal amount, WalletTransactionType type, string description)
         {
-            Id = Guid.NewGuid();
             WalletId = walletId;
             OrderId = orderId;
             Amount = amount;

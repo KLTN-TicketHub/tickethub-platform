@@ -13,10 +13,8 @@ namespace Finance.Infrastructure.Entities
         private readonly List<WalletTransaction> _transactions = new List<WalletTransaction>();
         public IReadOnlyCollection<WalletTransaction> Transactions => _transactions.AsReadOnly();
 
-        public Wallet() { }
         public Wallet(Guid organizerId)
         {
-            Id = Guid.NewGuid();
             OrganizerId = organizerId;
             Balance = 0;
             CreatedAt = DateTime.UtcNow;
