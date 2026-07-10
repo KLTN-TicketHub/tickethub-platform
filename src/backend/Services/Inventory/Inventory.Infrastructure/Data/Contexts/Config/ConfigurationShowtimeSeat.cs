@@ -36,9 +36,6 @@ namespace Inventory.Infrastructure.Data.Contexts.Config
             builder.Property(s => s.SeatStatus)
                 .IsRequired()
                 .HasConversion<string>();
-
-            builder.Property(s => s.IsCheckedIn)
-                .IsRequired();
         }
     }
 }

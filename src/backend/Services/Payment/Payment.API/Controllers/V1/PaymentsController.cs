@@ -184,7 +184,6 @@ namespace Payment.API.Controllers.V1
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Lỗi xảy ra trong quá trình xử lý VNPay Return");
-                // Chuyển hướng về trang thất bại nếu có lỗi
                 return Redirect($"http://localhost:5173/my-tickets?success=false&error=server_error");
             }
         }

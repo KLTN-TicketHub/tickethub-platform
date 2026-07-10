@@ -20,10 +20,6 @@ namespace Inventory.Infrastructure.Entities
         public string SeatName { get; set; }
 
         public SeatStatus SeatStatus { get; set; }
-
-        public bool IsCheckedIn { get; set; }
-
-        public DateTime? CheckedInAt { get; set; }
     }
 
     public enum SeatStatus
