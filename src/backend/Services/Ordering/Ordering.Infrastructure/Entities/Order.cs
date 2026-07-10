@@ -43,7 +43,6 @@ namespace Ordering.Infrastructure.Entities
             decimal totalPrice,
             string paymentMethod)
         {
-            Id = Guid.NewGuid();
             UserId = userId;
             CustomerName = customerName;
             CustomerEmail = customerEmail;

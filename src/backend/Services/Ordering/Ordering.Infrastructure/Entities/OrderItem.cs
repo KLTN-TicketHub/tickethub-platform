@@ -24,7 +24,6 @@ namespace Ordering.Infrastructure.Entities
 
         public OrderItem(Guid? seatId, string? seatName, string? rowName, Guid ticketTypeId, string ticketTypeName, decimal price, int quantity)
         {
-            Id = Guid.NewGuid();
             SeatId = seatId;
             SeatName = seatName;
             RowName = rowName;

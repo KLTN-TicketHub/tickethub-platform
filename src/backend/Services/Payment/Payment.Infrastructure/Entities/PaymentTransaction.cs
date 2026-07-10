@@ -22,7 +22,6 @@ namespace Payment.Infrastructure.Entities
 
         public PaymentTransaction(Guid orderId, string merchantOrderNo, decimal amount, string gateway)
         {
-            Id = Guid.NewGuid();
             OrderId = orderId;
             MerchantOrderNo = merchantOrderNo;
             Amount = amount;
