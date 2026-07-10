@@ -2,8 +2,10 @@ using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
 using Finance.API.Extensions;
+using Finance.Infrastructure.Interfaces.IServices;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,12 +38,15 @@ builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.AddCustomFluentValidation();
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddCustomHangfire(builder.Configuration.GetConnectionString("HangfireDbConnection")!);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseCustomSwaggerUI();
+    app.UseHangfireDashboard("/hangfire");
 }
 
 app.UseExceptionHandling();
@@ -57,5 +62,15 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+    recurringJobManager.AddOrUpdate<IReleaseFundsJobService>(
+        "ReleaseFundsJob",
+        job => job.ProcessReleaseFundsAsync(CancellationToken.None),
+        "0 0 * * *",
+        new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
+}
 
 app.Run();

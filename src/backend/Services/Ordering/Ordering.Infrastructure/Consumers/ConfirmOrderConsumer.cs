@@ -79,6 +79,8 @@ namespace Ordering.Infrastructure.Consumers
                         EventId = order.EventId,
                         EventTitle = order.EventTitle,
                         ShowtimeStartAt = order.ShowtimeStartAt,
+                        OrganizerId = order.OrganizerId,
+                        ShowtimeEndAt = order.ShowtimeEndAt,
                         Items = eventItems
                     });
 

@@ -1,4 +1,4 @@
-﻿namespace BuildingBlocks.Contracts.Events.Order
+namespace BuildingBlocks.Contracts.Events.Order
 {
     public class OrderPaidEvent
     {
@@ -22,6 +22,9 @@
 
         public DateTime ShowtimeStartAt { get; init; }
 
+        public Guid OrganizerId { get; init; }
+
+        public DateTime ShowtimeEndAt { get; init; }
         public List<OrderPaidItemDto> Items { get; init; } = new();
 
         public string CorrelationId { get; init; } = Guid.NewGuid().ToString();

@@ -1,5 +1,5 @@
 using Catalog.API.Protos;
-using Catalog.Application.Features.Grpc.Queries.ValidateCheckout;
+using Catalog.Application.Features.Grpc.Queries.GetCheckoutData;
 using Catalog.Application.Features.Grpc.Queries.ValidateSeatLock;
 using Catalog.Application.Features.Grpc.Queries.ValidateTicketTypes;
 using Grpc.Core;
@@ -16,46 +16,77 @@ namespace Catalog.API.Services
             _mediator = mediator;
         }
 
-        public override async Task<ValidateCheckoutResponse> ValidateCheckout(
-            ValidateCheckoutRequest request,
+        public override async Task<GetCheckoutDataResponse> GetCheckoutData(
+            GetCheckoutDataRequest request,
             ServerCallContext context)
         {
             try
             {
                 if (!Guid.TryParse(request.EventId, out var eventId))
-                    return new ValidateCheckoutResponse { IsSuccess = false, Message = "EventId không đúng định dạng Guid." };
+                    return new GetCheckoutDataResponse { IsSuccess = false, Message = "EventId không đúng định dạng Guid." };
 
                 if (!Guid.TryParse(request.ShowtimeId, out var showtimeId))
-                    return new ValidateCheckoutResponse { IsSuccess = false, Message = "ShowtimeId không đúng định dạng Guid." };
+                    return new GetCheckoutDataResponse { IsSuccess = false, Message = "ShowtimeId không đúng định dạng Guid." };
 
-                List<Guid> seatIds = new List<Guid>();
-                foreach (var seatIdStr in request.SeatIds)
-                {
-                    if (!Guid.TryParse(seatIdStr, out var seatId))
-                        return new ValidateCheckoutResponse { IsSuccess = false, Message = $"SeatId '{seatIdStr}' không đúng định dạng Guid." };
-                    seatIds.Add(seatId);
-                }
-
-                List<(Guid TicketTypeId, int Quantity)> ticketItems = new List<(Guid TicketTypeId, int Quantity)>();
-                foreach (var item in request.TicketItems)
+                List<GetCheckoutDataItem> items = new List<GetCheckoutDataItem>();
+                foreach (var item in request.Items)
                 {
                     if (!Guid.TryParse(item.TicketTypeId, out var ticketTypeId))
-                        return new ValidateCheckoutResponse { IsSuccess = false, Message = $"TicketTypeId '{item.TicketTypeId}' không đúng định dạng Guid." };
-                    ticketItems.Add((ticketTypeId, item.Quantity));
+                        return new GetCheckoutDataResponse { IsSuccess = false, Message = $"TicketTypeId '{item.TicketTypeId}' không đúng định dạng Guid." };
+
+                    Guid? seatId = null;
+                    if (!string.IsNullOrEmpty(item.SeatId))
+                    {
+                        if (!Guid.TryParse(item.SeatId, out var parsedSeatId))
+                            return new GetCheckoutDataResponse { IsSuccess = false, Message = $"SeatId '{item.SeatId}' không đúng định dạng Guid." };
+                        seatId = parsedSeatId;
+                    }
+
+                    items.Add(new GetCheckoutDataItem
+                    {
+                        SeatId = seatId,
+                        TicketTypeId = ticketTypeId,
+                        Quantity = item.Quantity
+                    });
                 }
 
-                var query = new ValidateCheckoutQuery(eventId, showtimeId, seatIds, ticketItems);
+                var query = new GetCheckoutDataQuery(eventId, showtimeId, items);
                 var result = await _mediator.Send(query, context.CancellationToken);
 
-                return new ValidateCheckoutResponse
+                if (!result.IsSuccess)
                 {
-                    IsSuccess = result.IsSuccess,
-                    Message = result.Message
+                    return new GetCheckoutDataResponse { IsSuccess = false, Message = result.Message };
+                }
+
+                GetCheckoutDataResponse response = new GetCheckoutDataResponse
+                {
+                    IsSuccess = true,
+                    Message = result.Message,
+                    EventTitle = result.EventTitle,
+                    OrganizerId = result.OrganizerId.ToString(),
+                    ShowtimeStartAt = result.ShowtimeStartAt.ToString("O"),
+                    ShowtimeEndAt = result.ShowtimeEndAt.ToString("O")
                 };
+
+                foreach (var t in result.TicketItems)
+                {
+                    response.TicketItems.Add(new ValidatedCheckoutTicketItem
+                    {
+                        SeatId = t.SeatId?.ToString() ?? "",
+                        TicketTypeId = t.TicketTypeId.ToString(),
+                        TicketTypeName = t.TicketTypeName,
+                        Price = (double)t.Price,
+                        SeatName = t.SeatName ?? "",
+                        RowName = t.RowName ?? "",
+                        Quantity = t.Quantity
+                    });
+                }
+
+                return response;
             }
             catch (Exception ex)
             {
-                return new ValidateCheckoutResponse
+                return new GetCheckoutDataResponse
                 {
                     IsSuccess = false,
                     Message = $"Lỗi xử lý hệ thống: {ex.Message}"

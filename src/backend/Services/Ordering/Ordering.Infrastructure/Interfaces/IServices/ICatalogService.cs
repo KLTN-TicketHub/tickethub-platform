@@ -2,16 +2,31 @@ namespace Ordering.Infrastructure.Interfaces.IServices
 {
     public interface ICatalogService
     {
-        Task<(bool IsSuccess, string Message)> ValidateCheckoutAsync(
+        Task<CheckoutDataResult> GetCheckoutDataAsync(
             Guid eventId,
             Guid showtimeId,
-            List<Guid> seatIds,
-            List<CheckoutTicketValidationItem> ticketItems);
+            List<Ordering.Common.Dtos.CheckoutItemDto> items);
     }
 
-    public class CheckoutTicketValidationItem
+    public class CheckoutDataResult
     {
+        public bool IsSuccess { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public string EventTitle { get; set; } = string.Empty;
+        public Guid OrganizerId { get; set; }
+        public DateTime ShowtimeStartAt { get; set; }
+        public DateTime ShowtimeEndAt { get; set; }
+        public List<ValidatedCheckoutTicketItemDto> TicketItems { get; set; } = new();
+    }
+
+    public class ValidatedCheckoutTicketItemDto
+    {
+        public Guid? SeatId { get; set; }
         public Guid TicketTypeId { get; set; }
+        public string TicketTypeName { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public string SeatName { get; set; } = string.Empty;
+        public string RowName { get; set; } = string.Empty;
         public int Quantity { get; set; }
     }
 }

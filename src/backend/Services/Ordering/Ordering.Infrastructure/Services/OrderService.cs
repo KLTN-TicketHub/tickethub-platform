@@ -33,23 +33,13 @@ namespace Ordering.Infrastructure.Services
                 .Select(x => x.SeatId!.Value)
                 .ToList();
 
-            List<CheckoutTicketValidationItem> ticketValidationItems = request.Items
-                .GroupBy(x => x.TicketTypeId)
-                .Select(g => new CheckoutTicketValidationItem
-                {
-                    TicketTypeId = g.Key,
-                    Quantity = g.Sum(x => x.Quantity)
-                })
-                .ToList();
-
-            var (isValidCatalog, catalogMessage) = await _catalogService.ValidateCheckoutAsync(
+            var checkoutData = await _catalogService.GetCheckoutDataAsync(
                 eventId: request.EventId,
                 showtimeId: request.ShowtimeId,
-                seatIds: seatIds,
-                ticketItems: ticketValidationItems);
+                items: request.Items);
 
-            if (!isValidCatalog)
-                return (false, Guid.Empty, $"Dữ liệu không hợp lệ từ Catalog: {catalogMessage}");
+            if (!checkoutData.IsSuccess)
+                return (false, Guid.Empty, $"Dữ liệu không hợp lệ từ Catalog: {checkoutData.Message}");
 
             if (seatIds.Any())
             {
@@ -58,7 +48,7 @@ namespace Ordering.Infrastructure.Services
                     return (false, Guid.Empty, $"Khóa ghế thất bại: {lockMessage}");
             }
 
-            decimal totalPrice = request.Items.Sum(x => x.Price * x.Quantity);
+            decimal totalPrice = checkoutData.TicketItems.Sum(x => x.Price * x.Quantity);
 
             Order order = new Order(
                 userId: userId,
@@ -67,13 +57,15 @@ namespace Ordering.Infrastructure.Services
                 customerPhone: request.CustomerPhone,
                 showTimeId: request.ShowtimeId,
                 eventId: request.EventId,
-                eventTitle: request.EventTitle,
-                showtimeStartAt: request.ShowtimeStartAt,
+                eventTitle: checkoutData.EventTitle,
+                organizerId: checkoutData.OrganizerId,
+                showtimeStartAt: checkoutData.ShowtimeStartAt,
+                showtimeEndAt: checkoutData.ShowtimeEndAt,
                 totalPrice: totalPrice,
                 paymentMethod: request.PaymentMethod
             );
 
-            foreach (var item in request.Items)
+            foreach (var item in checkoutData.TicketItems)
             {
                 var orderItem = new OrderItem(
                     seatId: item.SeatId,

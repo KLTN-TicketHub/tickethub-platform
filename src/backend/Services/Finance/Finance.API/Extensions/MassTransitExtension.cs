@@ -11,6 +11,8 @@ namespace Finance.API.Extensions
         {
             services.AddMassTransit(x =>
             {
+                x.AddConsumer<Finance.Infrastructure.Consumers.OrderPaidConsumer>();
+
                 x.AddEntityFrameworkOutbox<FinanceDbContext>(o =>
                 {
                     o.UseSqlServer();
@@ -32,6 +34,11 @@ namespace Finance.API.Extensions
                             h.Username(rabbitMqOptions.Username);
                             h.Password(rabbitMqOptions.Password);
                         });
+
+                    cfg.ReceiveEndpoint("finance-order-paid", e =>
+                    {
+                        e.ConfigureConsumer<Finance.Infrastructure.Consumers.OrderPaidConsumer>(context);
+                    });
 
                     cfg.ConfigureEndpoints(context);
                 });

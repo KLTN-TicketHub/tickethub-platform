@@ -1506,21 +1506,13 @@ const submitCheckout = async () => {
     if (event.value.seatMapId && isReservedTier(activeTier.value)) {
       items = selectedSeats.value.map(seat => ({
         seatId: seat.id,
-        seatName: seat.seatName,
-        rowName: seat.rowName,
         ticketTypeId: activeTier.value.id,
-        ticketTypeName: activeTier.value.ticketTypeName,
-        price: seat.price,
         quantity: 1
       }))
     } else {
       items = [{
         seatId: null,
-        seatName: null,
-        rowName: null,
         ticketTypeId: activeTier.value.id,
-        ticketTypeName: activeTier.value.ticketTypeName,
-        price: activeTier.value.price,
         quantity: qty.value
       }]
     }
@@ -1529,8 +1521,6 @@ const submitCheckout = async () => {
     const payload = {
       showtimeId: showtimeId,
       eventId: event.value.id,
-      eventTitle: event.value.title,
-      showtimeStartAt: selectedShowtime.startAt,
       customerName: checkoutForm.customerName.trim(),
       customerPhone: checkoutForm.customerPhone.trim(),
       paymentMethod: 'VNPay',

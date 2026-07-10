@@ -18,7 +18,11 @@ namespace Ordering.Infrastructure.Entities
 
         public string EventTitle { get; set; } = default!;
 
+        public Guid OrganizerId { get; set; }
+
         public DateTime ShowtimeStartAt { get; set; }
+
+        public DateTime ShowtimeEndAt { get; set; }
 
         public decimal TotalPrice { get; set; }
 
@@ -39,7 +43,9 @@ namespace Ordering.Infrastructure.Entities
             Guid showTimeId,
             Guid eventId,
             string eventTitle,
+            Guid organizerId,
             DateTime showtimeStartAt,
+            DateTime showtimeEndAt,
             decimal totalPrice,
             string paymentMethod)
         {
@@ -50,7 +56,9 @@ namespace Ordering.Infrastructure.Entities
             ShowTimeId = showTimeId;
             EventId = eventId;
             EventTitle = eventTitle;
+            OrganizerId = organizerId;
             ShowtimeStartAt = showtimeStartAt;
+            ShowtimeEndAt = showtimeEndAt;
             TotalPrice = totalPrice;
             PaymentMethod = paymentMethod;
             Status = OrderStatus.Pending;

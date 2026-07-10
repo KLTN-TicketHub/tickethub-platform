@@ -284,6 +284,9 @@ namespace Ordering.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("OrganizerId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -297,6 +300,9 @@ namespace Ordering.Infrastructure.Migrations
 
                     b.Property<Guid>("ShowTimeId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ShowtimeEndAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("ShowtimeStartAt")
                         .HasColumnType("datetime2");

@@ -13,33 +13,62 @@ namespace Ordering.Infrastructure.Services
             _client = client;
         }
 
-        public async Task<(bool IsSuccess, string Message)> ValidateCheckoutAsync(
+        public async Task<CheckoutDataResult> GetCheckoutDataAsync(
             Guid eventId,
             Guid showtimeId,
-            List<Guid> seatIds,
-            List<CheckoutTicketValidationItem> ticketItems)
+            List<Ordering.Common.Dtos.CheckoutItemDto> items)
         {
             try
             {
-                var request = new ValidateCheckoutRequest
+                var request = new GetCheckoutDataRequest
                 {
                     EventId = eventId.ToString(),
                     ShowtimeId = showtimeId.ToString(),
                 };
 
-                request.SeatIds.AddRange(seatIds.Select(id => id.ToString()));
-                request.TicketItems.AddRange(ticketItems.Select(t => new CheckoutTicketItem
+                request.Items.AddRange(items.Select(t => new CheckoutRequestItem
                 {
+                    SeatId = t.SeatId?.ToString() ?? "",
                     TicketTypeId = t.TicketTypeId.ToString(),
                     Quantity = t.Quantity
                 }));
 
-                ValidateCheckoutResponse response = await _client.ValidateCheckoutAsync(request);
-                return (response.IsSuccess, response.Message);
+                GetCheckoutDataResponse response = await _client.GetCheckoutDataAsync(request);
+
+                if (!response.IsSuccess)
+                {
+                    return new CheckoutDataResult { IsSuccess = false, Message = response.Message };
+                }
+
+                var result = new CheckoutDataResult
+                {
+                    IsSuccess = true,
+                    Message = response.Message,
+                    EventTitle = response.EventTitle,
+                    OrganizerId = Guid.Parse(response.OrganizerId),
+                    ShowtimeStartAt = DateTime.Parse(response.ShowtimeStartAt),
+                    ShowtimeEndAt = DateTime.Parse(response.ShowtimeEndAt)
+                };
+
+                foreach (var item in response.TicketItems)
+                {
+                    result.TicketItems.Add(new ValidatedCheckoutTicketItemDto
+                    {
+                        SeatId = string.IsNullOrEmpty(item.SeatId) ? null : Guid.Parse(item.SeatId),
+                        TicketTypeId = Guid.Parse(item.TicketTypeId),
+                        TicketTypeName = item.TicketTypeName,
+                        Price = (decimal)item.Price,
+                        SeatName = item.SeatName,
+                        RowName = item.RowName,
+                        Quantity = item.Quantity
+                    });
+                }
+
+                return result;
             }
             catch (RpcException ex)
             {
-                return (false, $"Lỗi kết nối gRPC tới Catalog: {ex.Status.Detail}");
+                return new CheckoutDataResult { IsSuccess = false, Message = $"Lỗi kết nối gRPC tới Catalog: {ex.Status.Detail}" };
             }
         }
     }

@@ -5,26 +5,41 @@ option csharp_namespace = "Catalog.API.Protos";
 package catalog;
 
 service CatalogGrpc {
-  rpc ValidateCheckout (ValidateCheckoutRequest) returns (ValidateCheckoutResponse);
+  rpc GetCheckoutData (GetCheckoutDataRequest) returns (GetCheckoutDataResponse);
   rpc ValidateSeatLock (ValidateSeatLockRequest) returns (ValidateSeatLockResponse);
   rpc ValidateTicketTypes (ValidateTicketTypesRequest) returns (ValidateTicketTypesResponse);
 }
 
-message ValidateCheckoutRequest {
+message GetCheckoutDataRequest {
   string eventId = 1;
   string showtimeId = 2;
-  repeated string seatIds = 3;
-  repeated CheckoutTicketItem ticketItems = 4;
+  repeated CheckoutRequestItem items = 3;
 }
 
-message CheckoutTicketItem {
-  string ticketTypeId = 1;
-  int32 quantity = 2;
+message CheckoutRequestItem {
+  string seatId = 1;
+  string ticketTypeId = 2;
+  int32 quantity = 3;
 }
 
-message ValidateCheckoutResponse {
+message GetCheckoutDataResponse {
   bool isSuccess = 1;
   string message = 2;
+  string eventTitle = 3;
+  string organizerId = 4;
+  string showtimeStartAt = 5;
+  string showtimeEndAt = 6;
+  repeated ValidatedCheckoutTicketItem ticketItems = 7;
+}
+
+message ValidatedCheckoutTicketItem {
+  string seatId = 1;
+  string ticketTypeId = 2;
+  string ticketTypeName = 3;
+  double price = 4;
+  string seatName = 5;
+  string rowName = 6;
+  int32 quantity = 7;
 }
 
 message ValidateSeatLockRequest {
