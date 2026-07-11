@@ -1,3 +1,4 @@
+using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Responses;
 using Inventory.Infrastructure.Dtos;
 using Inventory.Infrastructure.Interfaces.IServices;
@@ -32,7 +33,7 @@ namespace Inventory.API.Controllers
             return Ok(new ApiResponse<TicketInventoryStateDto>(true, "Lấy thông tin tồn kho thành công.", result));
         }
         [HttpPost("checkin/{qrToken}")]
-        [AllowAnonymous]
+        [Authorize(Roles = Roles.Staff)]
         public async Task<IActionResult> CheckInTicket([FromRoute] string qrToken)
         {
             if (string.IsNullOrWhiteSpace(qrToken))
