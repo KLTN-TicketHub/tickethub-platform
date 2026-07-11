@@ -59,6 +59,8 @@ namespace Ordering.Infrastructure.Services
                 eventId: request.EventId,
                 eventTitle: checkoutData.EventTitle,
                 organizerId: checkoutData.OrganizerId,
+                organizerName: checkoutData.OrganizerName,
+                eventImage: checkoutData.EventImage,
                 showtimeStartAt: checkoutData.ShowtimeStartAt,
                 showtimeEndAt: checkoutData.ShowtimeEndAt,
                 totalPrice: totalPrice,

@@ -276,6 +276,10 @@ namespace Ordering.Infrastructure.Migrations
                     b.Property<Guid>("EventId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("EventImage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("EventTitle")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -286,6 +290,10 @@ namespace Ordering.Infrastructure.Migrations
 
                     b.Property<Guid>("OrganizerId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OrganizerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()

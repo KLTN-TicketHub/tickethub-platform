@@ -22,6 +22,8 @@ namespace Catalog.Application.Features.Grpc.Queries.GetCheckoutData
         public DateTime ShowtimeStartAt { get; set; }
         public DateTime ShowtimeEndAt { get; set; }
         public List<ValidatedTicketItemResult> TicketItems { get; set; } = new();
+        public string OrganizerName { get; set; } = string.Empty;
+        public string EventImage { get; set; } = string.Empty;
 
         public static GetCheckoutDataResult Fail(string message) => new GetCheckoutDataResult { IsSuccess = false, Message = message };
     }

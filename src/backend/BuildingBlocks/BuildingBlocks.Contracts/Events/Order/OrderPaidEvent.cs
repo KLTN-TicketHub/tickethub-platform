@@ -23,6 +23,8 @@ namespace BuildingBlocks.Contracts.Events.Order
         public DateTime ShowtimeStartAt { get; init; }
 
         public Guid OrganizerId { get; init; }
+        public string OrganizerName { get; init; } = string.Empty;
+        public string EventImage { get; init; } = string.Empty;
 
         public DateTime ShowtimeEndAt { get; init; }
         public List<OrderPaidItemDto> Items { get; init; } = new();

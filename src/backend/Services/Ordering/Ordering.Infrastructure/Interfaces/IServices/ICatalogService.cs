@@ -16,6 +16,8 @@ namespace Ordering.Infrastructure.Interfaces.IServices
         public Guid OrganizerId { get; set; }
         public DateTime ShowtimeStartAt { get; set; }
         public DateTime ShowtimeEndAt { get; set; }
+        public string OrganizerName { get; set; } = string.Empty;
+        public string EventImage { get; set; } = string.Empty;
         public List<ValidatedCheckoutTicketItemDto> TicketItems { get; set; } = new();
     }
 

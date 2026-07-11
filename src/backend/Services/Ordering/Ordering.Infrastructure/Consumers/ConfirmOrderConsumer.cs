@@ -80,6 +80,8 @@ namespace Ordering.Infrastructure.Consumers
                         EventTitle = order.EventTitle,
                         ShowtimeStartAt = order.ShowtimeStartAt,
                         OrganizerId = order.OrganizerId,
+                        OrganizerName = order.OrganizerName,
+                        EventImage = order.EventImage,
                         ShowtimeEndAt = order.ShowtimeEndAt,
                         Items = eventItems
                     });

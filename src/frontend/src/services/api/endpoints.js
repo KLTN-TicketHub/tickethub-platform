@@ -66,5 +66,8 @@ export const LOCATION_WARDS = (districtCode) => `/catalog/locations/districts/${
 export const ORDER_CHECKOUT = '/ordering/orders/checkout'
 export const ORDER_PAYMENT_LINK = (orderId) => `/ordering/orders/${orderId}/payment-link`
 
+// Tickets
+export const MY_TICKETS = '/inventory/tickets/me'
+
 
 

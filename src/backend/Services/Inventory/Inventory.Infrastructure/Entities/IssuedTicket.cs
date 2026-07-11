@@ -12,6 +12,10 @@ namespace Inventory.Infrastructure.Entities
 
         public string EventTitle { get; set; } = string.Empty;
 
+        public string OrganizerName { get; set; } = string.Empty;
+
+        public string EventImage { get; set; } = string.Empty;
+
         public Guid UserId { get; set; }
 
         public string CustomerName { get; set; } = string.Empty;

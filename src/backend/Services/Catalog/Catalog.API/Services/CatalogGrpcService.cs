@@ -64,6 +64,8 @@ namespace Catalog.API.Services
                     Message = result.Message,
                     EventTitle = result.EventTitle,
                     OrganizerId = result.OrganizerId.ToString(),
+                    OrganizerName = result.OrganizerName,
+                    EventImage = result.EventImage,
                     ShowtimeStartAt = result.ShowtimeStartAt.ToString("O"),
                     ShowtimeEndAt = result.ShowtimeEndAt.ToString("O")
                 };

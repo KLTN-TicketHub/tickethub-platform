@@ -1,7 +1,9 @@
+using BuildingBlocks.Contracts.Models.Pagination;
 using Inventory.Infrastructure.Dtos;
 using Inventory.Infrastructure.Entities;
 using Inventory.Infrastructure.Interfaces;
 using Inventory.Infrastructure.Interfaces.IServices;
+using System.Linq.Expressions;
 
 namespace Inventory.Infrastructure.Services
 {
@@ -112,6 +114,39 @@ namespace Inventory.Infrastructure.Services
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return (true, "Check-in thành công.", ticket);
+        }
+
+        public async Task<PaginatedResult<UserTicketDto>> GetMyTicketsAsync(Guid userId, IssuedTicketStatus? status, int pageIndex, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var filter = (Expression<Func<IssuedTicket, bool>>)(t => t.UserId == userId && (!status.HasValue || t.Status == status.Value));
+
+            var (tickets, totalCount) = await _unitOfWork.IssuedTicketRepository.GetPagedAsync(
+                selector: t => new UserTicketDto
+                {
+                    IssuedTicketId = t.Id,
+                    OrderId = t.OrderId,
+                    EventId = t.EventId,
+                    EventTitle = t.EventTitle,
+                    OrganizerName = t.OrganizerName,
+                    EventImage = t.EventImage,
+                    QrCodeToken = t.QrCodeToken,
+                    QrCodeBase64 = t.QrCodeBase64,
+                    ShowtimeStartAt = t.ShowtimeStartAt,
+                    SeatName = t.SeatName,
+                    RowName = t.RowName,
+                    TicketTypeName = t.TicketTypeName,
+                    Price = t.Price,
+                    Status = t.Status
+                },
+                filter: filter,
+                orderBy: q => q.OrderByDescending(t => t.CreatedAt),
+                include: null,
+                pageNumber: pageIndex,
+                pageSize: pageSize,
+                cancellationToken: cancellationToken
+            );
+
+            return new PaginatedResult<UserTicketDto>(tickets.ToList(), totalCount, pageIndex, pageSize);
         }
     }
 }

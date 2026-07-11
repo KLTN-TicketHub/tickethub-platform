@@ -24,7 +24,8 @@ namespace Catalog.Application.Features.Grpc.Queries.GetCheckoutData
                 Event? @event = await _unitOfWork.EventRepository.GetOneUntrackedAsync<Event>(
                     filter: e => e.Id == request.EventId && !e.IsDeleted,
                     include: q => q.Include(e => e.ShowTimes)
-                                   .ThenInclude(st => st.TicketTypes),
+                                   .ThenInclude(st => st.TicketTypes)
+                                   .Include(e => e.Organizer),
                     cancellation: cancellationToken);
 
                 if (@event == null)
@@ -53,6 +54,8 @@ namespace Catalog.Application.Features.Grpc.Queries.GetCheckoutData
                     Message = "Thành công",
                     EventTitle = @event.Title,
                     OrganizerId = @event.OrganizerId,
+                    OrganizerName = @event.Organizer?.OrganizerName ?? string.Empty,
+                    EventImage = @event.CoverImageUrl ?? string.Empty,
                     ShowtimeStartAt = showtime.StartAt,
                     ShowtimeEndAt = showtime.EndAt
                 };

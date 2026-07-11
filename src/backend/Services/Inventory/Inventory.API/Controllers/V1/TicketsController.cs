@@ -1,10 +1,12 @@
 using BuildingBlocks.Contracts.Constants;
+using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
 using Inventory.Infrastructure.Dtos;
 using Inventory.Infrastructure.Interfaces.IServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Inventory.API.Controllers.V1
 {
@@ -32,6 +34,7 @@ namespace Inventory.API.Controllers.V1
             }
             return Ok(new ApiResponse<TicketInventoryStateDto>(true, "Lấy thông tin tồn kho thành công.", result));
         }
+
         [HttpPost("checkin/{qrToken}")]
         [Authorize(Roles = Roles.Staff)]
         public async Task<IActionResult> CheckInTicket([FromRoute] string qrToken)
@@ -49,6 +52,20 @@ namespace Inventory.API.Controllers.V1
             }
 
             return Ok(new ApiResponse<object>(true, message, ticket));
+        }
+
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMyTickets([FromQuery] GetMyTicketsRequest request)
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdStr, out Guid userId))
+            {
+                return Unauthorized(new ApiResponse(false, "Không thể xác định người dùng."));
+            }
+
+            var result = await _ticketInventoryService.GetMyTicketsAsync(userId, request.Status, request.PageNumber, request.PageSize);
+
+            return Ok(new ApiResponse<PaginatedResult<UserTicketDto>>(true, "Lấy danh sách vé thành công.", result));
         }
     }
 }

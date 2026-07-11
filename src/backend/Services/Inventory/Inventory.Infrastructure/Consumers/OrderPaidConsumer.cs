@@ -53,6 +53,8 @@ namespace Inventory.Infrastructure.Consumers
                             ShowTimeId = message.ShowTimeId,
                             EventId = message.EventId,
                             EventTitle = message.EventTitle,
+                            OrganizerName = message.OrganizerName,
+                            EventImage = message.EventImage,
                             UserId = message.UserId,
                             CustomerName = message.CustomerName,
                             CustomerEmail = message.CustomerEmail,

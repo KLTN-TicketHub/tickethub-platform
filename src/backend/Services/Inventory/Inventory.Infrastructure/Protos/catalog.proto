@@ -30,6 +30,8 @@ message GetCheckoutDataResponse {
   string showtimeStartAt = 5;
   string showtimeEndAt = 6;
   repeated ValidatedCheckoutTicketItem ticketItems = 7;
+  string organizerName = 8;
+  string eventImage = 9;
 }
 
 message ValidatedCheckoutTicketItem {

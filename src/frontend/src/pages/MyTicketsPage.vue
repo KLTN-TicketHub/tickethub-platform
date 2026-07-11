@@ -19,7 +19,10 @@
         <div class="bg-[#111916] border border-white/5 rounded-2xl p-4 px-6 flex items-center gap-4 shadow-inner">
           <div class="flex flex-col">
             <span class="text-[11px] font-bold text-white/50 uppercase tracking-widest">Tổng số vé</span>
-            <span class="text-2xl font-black text-primary font-heading">{{ store.tickets.length }}</span>
+            <span class="text-2xl font-black text-primary font-heading">
+              <PhSpinner v-if="isLoading" class="animate-spin text-xl inline" />
+              <span v-else>{{ totalPages > 1 ? totalCount : filteredTickets.length }}</span>
+            </span>
           </div>
         </div>
       </div>
@@ -50,12 +53,12 @@
       >
         <!-- Left: Poster Area -->
         <div class="lg:w-[320px] h-64 lg:h-auto overflow-hidden relative border-r border-dashed border-white/10 shrink-0">
-          <img :src="ticket.event?.image" :alt="ticket.event?.title" class="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" />
+          <img :src="ticket.eventImage" :alt="ticket.eventTitle" class="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" />
           <div class="absolute inset-0 bg-gradient-to-t from-[#0A0F0D] via-transparent to-transparent opacity-80"></div>
           
           <div class="absolute top-6 left-6 flex flex-col gap-2">
             <BaseBadge variant="primary" class="!bg-primary !text-black font-black uppercase tracking-[0.2em] shadow-lg shadow-primary/20">
-              {{ ticket.tier }}
+              {{ ticket.ticketTypeName }}
             </BaseBadge>
             <div class="px-3 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 text-[10px] text-white font-bold tracking-widest uppercase flex items-center gap-1.5">
               <PhCheckCircle weight="fill" class="text-primary" /> CONFIRMED
@@ -73,30 +76,30 @@
             <div class="space-y-3">
               <div class="flex items-center gap-3 text-primary">
                 <PhCalendarBlank weight="bold" class="text-xl" />
-                <span class="text-[13px] font-bold uppercase tracking-[0.2em]">{{ formatDate(ticket.event?.dateStart) }}</span>
+                <span class="text-[13px] font-bold uppercase tracking-[0.2em]">{{ formatDate(ticket.showtimeStartAt) }}</span>
               </div>
               <h2 class="text-3xl font-black font-heading text-white leading-tight group-hover:text-primary transition-colors duration-500 tracking-tight">
-                {{ ticket.event?.title }}
+                {{ ticket.eventTitle }}
               </h2>
             </div>
             
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div class="flex flex-col">
                 <span class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Mã xác nhận</span>
-                <span class="font-mono text-[16px] font-black text-white tracking-widest">{{ ticket.code }}</span>
+                <span class="font-mono text-[16px] font-black text-white tracking-widest">{{ ticket.issuedTicketId?.substring(0,8).toUpperCase() }}</span>
               </div>
               <div class="flex flex-col">
                 <span class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Cổng vào</span>
-                <span class="text-[16px] font-black text-white">Gate {{ ticket.gate || 'A1' }}</span>
+                <span class="text-[16px] font-black text-white">Gate A1</span>
               </div>
               <div class="flex flex-col">
                 <span class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Số lượng</span>
-                <span class="text-[16px] font-black text-white">x{{ ticket.qty }}</span>
+                <span class="text-[16px] font-black text-white">x1</span>
               </div>
               <div class="flex flex-col">
                 <span class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Chỗ ngồi</span>
                 <span class="text-[16px] font-black text-primary truncate">
-                  {{ ticket.seats?.length ? ticket.seats.map(s => s.id).join(', ') : 'Tự do' }}
+                  {{ ticket.seatName ? (ticket.rowName + ticket.seatName) : 'Tự do' }}
                 </span>
               </div>
             </div>
@@ -107,8 +110,8 @@
               <PhMapPin weight="fill" />
             </div>
             <div class="flex flex-col">
-              <span class="text-[11px] font-bold uppercase tracking-widest text-white/40">Địa điểm</span>
-              <span class="font-medium text-white">{{ ticket.event?.location?.name || 'VNDiamond Arena' }}</span>
+              <span class="text-[11px] font-bold uppercase tracking-widest text-white/40">Ban tổ chức</span>
+              <span class="font-medium text-white">{{ ticket.organizerName || 'Ban tổ chức' }}</span>
             </div>
           </div>
         </div>
@@ -116,9 +119,10 @@
         <!-- Right: Stub / Scannable -->
         <div class="w-full lg:w-[280px] p-8 flex flex-col items-center justify-center gap-8 bg-[#111916]/50 group/stub shrink-0">
           <div class="relative w-32 h-32 lg:w-40 lg:h-40 bg-white rounded-3xl p-4 shadow-2xl group-hover/stub:scale-105 transition-transform duration-700">
-            <!-- Mock QR -->
-            <div class="w-full h-full bg-[repeating-linear-gradient(45deg,#000_0,#000_4px,transparent_4px,transparent_8px),repeating-linear-gradient(-45deg,#000_0,#000_4px,transparent_4px,transparent_8px)] opacity-90 rounded-xl"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
+            <!-- Real QR or Mock -->
+            <img v-if="ticket.qrCodeBase64" :src="'data:image/png;base64,' + ticket.qrCodeBase64" class="w-full h-full object-contain" />
+            <div v-else class="w-full h-full bg-[repeating-linear-gradient(45deg,#000_0,#000_4px,transparent_4px,transparent_8px),repeating-linear-gradient(-45deg,#000_0,#000_4px,transparent_4px,transparent_8px)] opacity-90 rounded-xl"></div>
+            <div v-if="!ticket.qrCodeBase64" class="absolute inset-0 flex items-center justify-center">
               <div class="bg-white px-3 py-1.5 rounded-lg text-[11px] font-black shadow-xl border border-black/10 tracking-widest text-black">ES-WALLET</div>
             </div>
           </div>
@@ -135,8 +139,31 @@
       </div>
     </div>
 
+    <!-- PAGINATION -->
+    <div v-if="totalPages > 1" class="flex justify-center gap-4 mt-12 animate-fade-up">
+      <BaseButton 
+        variant="outline" 
+        :disabled="pageIndex <= 1"
+        @click="pageIndex--; fetchTickets()"
+        class="!px-6"
+      >
+        Trang trước
+      </BaseButton>
+      <div class="flex items-center text-white/50 font-medium">
+        Trang {{ pageIndex }} / {{ totalPages }}
+      </div>
+      <BaseButton 
+        variant="outline" 
+        :disabled="pageIndex >= totalPages"
+        @click="pageIndex++; fetchTickets()"
+        class="!px-6"
+      >
+        Trang sau
+      </BaseButton>
+    </div>
+
     <!-- EMPTY STATE -->
-    <div v-else class="flex flex-col items-center justify-center py-32 text-center animate-fade-up">
+    <div v-if="filteredTickets.length === 0 && !isLoading" class="flex flex-col items-center justify-center py-32 text-center animate-fade-up">
       <div class="w-40 h-40 bg-[#111916] border border-white/5 rounded-[3rem] flex items-center justify-center text-7xl mb-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden group text-white/20">
         <PhTicket weight="duotone" />
         <div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -157,17 +184,17 @@
     <BaseModal 
       :show="!!selectedTicket" 
       @close="selectedTicket = null"
-      :title="selectedTicket?.event?.title"
+      :title="selectedTicket?.eventTitle"
       subtitle="Thông tin vé điện tử chi tiết"
       size="lg"
     >
       <div v-if="selectedTicket" class="flex flex-col gap-8 py-4">
         <!-- Hero in modal -->
         <div class="relative rounded-[2rem] overflow-hidden h-56 border border-white/10 shadow-2xl">
-          <img :src="selectedTicket.event?.image" class="w-full h-full object-cover opacity-60 mix-blend-screen" />
+          <img :src="selectedTicket.eventImage" class="w-full h-full object-cover opacity-60 mix-blend-screen" />
           <div class="absolute inset-0 bg-gradient-to-t from-[#0A0F0D] via-transparent to-transparent opacity-90"></div>
           <div class="absolute bottom-6 left-6 right-6">
-            <h3 class="text-3xl font-black font-heading text-white tracking-tight">{{ selectedTicket.event?.title }}</h3>
+            <h3 class="text-3xl font-black font-heading text-white tracking-tight">{{ selectedTicket.eventTitle }}</h3>
           </div>
         </div>
 
@@ -179,24 +206,25 @@
             </div>
             <div class="space-y-1">
               <span class="text-[11px] font-bold text-white/50 uppercase tracking-widest flex items-center gap-1.5"><PhTicket weight="bold" /> Loại vé</span>
-              <p class="text-lg font-black text-primary uppercase tracking-widest">{{ selectedTicket.tier }}</p>
+              <p class="text-lg font-black text-primary uppercase tracking-widest">{{ selectedTicket.ticketTypeName }}</p>
             </div>
             <div class="space-y-1">
               <span class="text-[11px] font-bold text-white/50 uppercase tracking-widest flex items-center gap-1.5"><PhClock weight="bold" /> Ngày giờ</span>
-              <p class="text-lg font-black text-white">{{ formatDate(selectedTicket.event?.dateStart) }} · {{ selectedTicket.event?.time || '19:00' }}</p>
+              <p class="text-lg font-black text-white">{{ formatDate(selectedTicket.showtimeStartAt) }}</p>
             </div>
             <div class="space-y-1">
               <span class="text-[11px] font-bold text-white/50 uppercase tracking-widest flex items-center gap-1.5"><PhArmchair weight="bold" /> Vị trí chỗ ngồi</span>
-              <p class="text-lg font-black text-white">{{ selectedTicket.seats?.length ? selectedTicket.seats.map(s => s.id).join(', ') : 'Khu vực đứng (Free)' }}</p>
+              <p class="text-lg font-black text-white">{{ selectedTicket.seatName ? (selectedTicket.rowName + selectedTicket.seatName) : 'Khu vực đứng (Free)' }}</p>
             </div>
           </div>
 
           <div class="flex flex-col items-center justify-center p-8 bg-[#111916] rounded-[2rem] border border-white/5 shadow-inner">
             <div class="w-56 h-56 bg-white p-4 rounded-[2rem] shadow-[0_0_50px_rgba(255,255,255,0.1)] mb-6 relative">
               <div class="absolute inset-0 border-4 border-dashed border-black/10 rounded-[2rem] m-2 pointer-events-none"></div>
-              <div class="w-full h-full bg-[repeating-linear-gradient(45deg,#000_0,#000_4px,transparent_4px,transparent_8px),repeating-linear-gradient(-45deg,#000_0,#000_4px,transparent_4px,transparent_8px)] opacity-90 rounded-xl"></div>
+              <img v-if="selectedTicket.qrCodeBase64" :src="'data:image/png;base64,' + selectedTicket.qrCodeBase64" class="w-full h-full object-contain" />
+              <div v-else class="w-full h-full bg-[repeating-linear-gradient(45deg,#000_0,#000_4px,transparent_4px,transparent_8px),repeating-linear-gradient(-45deg,#000_0,#000_4px,transparent_4px,transparent_8px)] opacity-90 rounded-xl"></div>
             </div>
-            <p class="text-[14px] font-mono font-black text-white tracking-[0.4em] uppercase">{{ selectedTicket.code }}</p>
+            <p class="text-[14px] font-mono font-black text-white tracking-[0.4em] uppercase">{{ selectedTicket.issuedTicketId?.substring(0,8).toUpperCase() }}</p>
             <p class="text-[11px] font-bold text-white/50 uppercase mt-2 tracking-widest">Mã QR chính chủ</p>
           </div>
         </div>
@@ -220,7 +248,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { store } from '../stores/eventStore'
 import BaseBadge from '../components/ui/BaseBadge.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
@@ -228,22 +256,54 @@ import BaseModal from '../components/ui/BaseModal.vue'
 import { 
   PhWallet, PhShieldCheck, PhCheckCircle, PhCalendarBlank, 
   PhMapPin, PhQrCode, PhTicket, PhQuestion, PhUser, 
-  PhClock, PhArmchair, PhLightbulb
+  PhClock, PhArmchair, PhLightbulb, PhSpinner
 } from '@phosphor-icons/vue'
+import { ticketService } from '../services/ticket.service'
 
 const activeTab = ref('upcoming')
 const selectedTicket = ref(null)
+const tickets = ref([])
+const isLoading = ref(false)
+const pageIndex = ref(1)
+const pageSize = ref(10)
+const totalPages = ref(1)
+const totalCount = ref(0)
 
 const tabs = [
   { id: 'upcoming', label: 'Sắp diễn ra' },
   { id: 'past', label: 'Lịch sử đã đi' },
 ]
 
-const filteredTickets = computed(() => {
-  if (activeTab.value === 'upcoming') {
-    return store.tickets
+const fetchTickets = async () => {
+  isLoading.value = true;
+  try {
+    // status=1 (Valid/Upcoming), status=2 (Used/Past) - tuỳ thuộc vào backend, mặc định map theo logic
+    const status = activeTab.value === 'upcoming' ? 1 : 2;
+    const res = await ticketService.getMyTickets({ status, pageIndex: pageIndex.value, pageSize: pageSize.value });
+    if (res.success && res.data) {
+      tickets.value = res.data.data || [];
+      totalPages.value = res.data.totalPages || 1;
+      totalCount.value = res.data.totalCount || 0;
+    }
+  } catch (error) {
+    console.error('Failed to fetch tickets:', error);
+    store.toast = { message: 'Không thể tải danh sách vé. Vui lòng thử lại.', icon: '❌' };
+  } finally {
+    isLoading.value = false;
   }
-  return []
+}
+
+watch(activeTab, () => {
+  pageIndex.value = 1;
+  fetchTickets();
+});
+
+onMounted(() => {
+  fetchTickets();
+});
+
+const filteredTickets = computed(() => {
+  return tickets.value;
 })
 
 const formatDate = (dateStr) => {

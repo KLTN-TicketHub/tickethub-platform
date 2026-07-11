@@ -20,6 +20,10 @@ namespace Ordering.Infrastructure.Entities
 
         public Guid OrganizerId { get; set; }
 
+        public string OrganizerName { get; set; } = default!;
+
+        public string EventImage { get; set; } = default!;
+
         public DateTime ShowtimeStartAt { get; set; }
 
         public DateTime ShowtimeEndAt { get; set; }
@@ -44,6 +48,8 @@ namespace Ordering.Infrastructure.Entities
             Guid eventId,
             string eventTitle,
             Guid organizerId,
+            string organizerName,
+            string eventImage,
             DateTime showtimeStartAt,
             DateTime showtimeEndAt,
             decimal totalPrice,
@@ -57,6 +63,8 @@ namespace Ordering.Infrastructure.Entities
             EventId = eventId;
             EventTitle = eventTitle;
             OrganizerId = organizerId;
+            OrganizerName = organizerName;
+            EventImage = eventImage;
             ShowtimeStartAt = showtimeStartAt;
             ShowtimeEndAt = showtimeEndAt;
             TotalPrice = totalPrice;
