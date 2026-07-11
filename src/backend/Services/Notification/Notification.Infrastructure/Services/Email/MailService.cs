@@ -45,6 +45,21 @@ namespace Notification.Infrastructure.Services.Email
                 TextBody = email.TextBody
             };
 
+            if (email.Attachments != null && email.Attachments.Count > 0)
+            {
+                foreach (var attachment in email.Attachments)
+                {
+                    string filename = attachment.ContentId.Trim('<', '>');
+                    if (!filename.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+                    {
+                        filename += ".png";
+                    }
+
+                    var resource = builder.LinkedResources.Add(filename, attachment.ContentBytes, ContentType.Parse(attachment.ContentType));
+                    resource.ContentId = attachment.ContentId.Trim('<', '>');
+                }
+            }
+
             message.Body = builder.ToMessageBody();
 
             using var smtp = new SmtpClient();

@@ -50,7 +50,7 @@ namespace Inventory.Infrastructure.Consumers
                         };
                         await _unitOfWork.ShowtimeSeatRepository.CreateAsync(showtimeSeat);
 
-                        await _redisLockService.UnlockSeatAsync(message.ShowtimeId, seat.SeatId, message.UserId);
+                        await _redisLockService.UnlockSeatAsync(message.ShowtimeId, seat.SeatId, message.UserId, force: true);
 
                         await _hubNotificationService.NotifySeatStateChangedAsync(message.ShowtimeId, seat.SeatId, "Sold");
                     }

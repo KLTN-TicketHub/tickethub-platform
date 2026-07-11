@@ -2,7 +2,6 @@ using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
 using Finance.API.Extensions;
-using Finance.Infrastructure.Interfaces.IServices;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
@@ -66,7 +65,7 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
-    recurringJobManager.AddOrUpdate<IReleaseFundsJobService>(
+    recurringJobManager.AddOrUpdate<Finance.Infrastructure.Interfaces.IServices.IReleaseFundsJobService>(
         "ReleaseFundsJob",
         job => job.ProcessReleaseFundsAsync(CancellationToken.None),
         "0 0 * * *",

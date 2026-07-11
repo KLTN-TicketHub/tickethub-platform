@@ -41,6 +41,7 @@ namespace Inventory.API.Extensions
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
             services.AddScoped<IShowtimeTicketInventoryRepository, ShowtimeTicketInventoryRepository>();
             services.AddScoped<IShowtimeSeatRepository, ShowtimeSeatRepository>();
+            services.AddScoped<IIssuedTicketRepository, IssuedTicketRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }

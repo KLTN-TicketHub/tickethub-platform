@@ -23,7 +23,7 @@ namespace Finance.API.Extensions
             services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFileService, FileService>();
-            services.AddScoped<Finance.Infrastructure.Services.IReleaseFundsJobService, Finance.Infrastructure.Services.ReleaseFundsJobService>();
+            services.AddScoped<Finance.Infrastructure.Interfaces.IServices.IReleaseFundsJobService, Finance.Infrastructure.Services.ReleaseFundsJobService>();
 
             return services;
         }

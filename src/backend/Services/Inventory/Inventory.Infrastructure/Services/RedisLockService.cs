@@ -36,7 +36,7 @@ namespace Inventory.Infrastructure.Services
             return (int)result == 1;
         }
 
-        public async Task<bool> UnlockSeatAsync(Guid showtimeId, Guid seatId, Guid userId)
+        public async Task<bool> UnlockSeatAsync(Guid showtimeId, Guid seatId, Guid userId, bool force = false)
         {
             string key = $"seat_lock:{showtimeId}:{seatId}";
 
@@ -45,8 +45,10 @@ namespace Inventory.Infrastructure.Services
                 if not val then
                     return 1
                 elseif string.sub(val, 1, string.len(ARGV[1])) == ARGV[1] then
-                    if string.find(val, ':Checkout', 1, true) then
-                        return -1
+                    if ARGV[2] == '0' then
+                        if string.find(val, ':Checkout', 1, true) then
+                            return -1
+                        end
                     end
                     return redis.call('DEL', KEYS[1])
                 else
@@ -55,7 +57,7 @@ namespace Inventory.Infrastructure.Services
 
             var result = await _redisDb.ScriptEvaluateAsync(luaScript,
                 new RedisKey[] { key },
-                new RedisValue[] { userId.ToString() });
+                new RedisValue[] { userId.ToString(), force ? "1" : "0" });
 
             if ((int)result == -1)
             {

@@ -4,7 +4,7 @@ namespace Inventory.Infrastructure.Interfaces.IServices
     {
         Task<bool> LockSeatAsync(Guid showtimeId, Guid seatId, Guid userId, TimeSpan ttl, string status = "Selecting");
 
-        Task<bool> UnlockSeatAsync(Guid showtimeId, Guid seatId, Guid userId);
+        Task<bool> UnlockSeatAsync(Guid showtimeId, Guid seatId, Guid userId, bool force = false);
 
         Task<Dictionary<string, (string Status, string UserId)>> GetLockedSeatsAsync(Guid showtimeId);
 

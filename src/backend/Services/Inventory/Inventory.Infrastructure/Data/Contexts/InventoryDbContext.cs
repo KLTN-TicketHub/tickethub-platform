@@ -15,6 +15,7 @@ namespace Inventory.Infrastructure.Data.Contexts
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<ShowtimeSeat> ShowtimeSeats { get; set; }
         public DbSet<ShowtimeTicketInventory> ShowtimeTicketInventories { get; set; }
+        public DbSet<IssuedTicket> IssuedTickets { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

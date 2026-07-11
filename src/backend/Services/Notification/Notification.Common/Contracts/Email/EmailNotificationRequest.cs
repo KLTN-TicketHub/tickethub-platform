@@ -9,5 +9,7 @@ namespace Notification.Common.Contracts.Email
         public string HtmlBody { get; init; } = string.Empty;
 
         public string? TextBody { get; init; }
+
+        public List<EmailAttachmentDto> Attachments { get; init; } = new();
     }
 }
