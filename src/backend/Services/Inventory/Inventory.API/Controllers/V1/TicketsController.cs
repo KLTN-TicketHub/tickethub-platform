@@ -21,9 +21,9 @@ namespace Inventory.API.Controllers
             _ticketInventoryService = ticketInventoryService;
         }
 
-        [HttpGet("showtimes/{showtimeId}/types/{ticketTypeId}")]
+        [HttpGet("showtimes/{showtimeId:guid}/types/{ticketTypeId:guid}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetTicketInventoryState(Guid showtimeId, Guid ticketTypeId)
+        public async Task<IActionResult> GetTicketInventoryState([FromRoute] Guid showtimeId, [FromRoute] Guid ticketTypeId)
         {
             var result = await _ticketInventoryService.GetTicketInventoryStateAsync(showtimeId, ticketTypeId);
             if (result == null)
@@ -32,7 +32,7 @@ namespace Inventory.API.Controllers
             }
             return Ok(new ApiResponse<TicketInventoryStateDto>(true, "Lấy thông tin tồn kho thành công.", result));
         }
-        [HttpPost("checkin/{qrToken}")]
+        [HttpPost("checkin/{qrToken:string}")]
         [Authorize(Roles = Roles.Staff)]
         public async Task<IActionResult> CheckInTicket([FromRoute] string qrToken)
         {

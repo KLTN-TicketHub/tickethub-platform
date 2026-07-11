@@ -86,7 +86,6 @@ namespace Inventory.Infrastructure.Consumers
 
                 await _unitOfWork.SaveChangesAsync(context.CancellationToken);
 
-                // Publish event to notify Notification Worker to send email
                 await context.Publish(new TicketsIssuedEvent
                 {
                     OrderId = message.OrderId,
