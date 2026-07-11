@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Inventory.API.Controllers
+namespace Inventory.API.Controllers.V1
 {
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
@@ -32,7 +32,7 @@ namespace Inventory.API.Controllers
             }
             return Ok(new ApiResponse<TicketInventoryStateDto>(true, "Lấy thông tin tồn kho thành công.", result));
         }
-        [HttpPost("checkin/{qrToken:string}")]
+        [HttpPost("checkin/{qrToken}")]
         [Authorize(Roles = Roles.Staff)]
         public async Task<IActionResult> CheckInTicket([FromRoute] string qrToken)
         {
