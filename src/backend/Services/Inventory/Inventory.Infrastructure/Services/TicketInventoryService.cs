@@ -86,5 +86,32 @@ namespace Inventory.Infrastructure.Services
         {
             return await _redisLockService.UnlockTicketsAsync(showtimeId, ticketTypeId, userId);
         }
+
+        public async Task<(bool Success, string Message, IssuedTicket? Ticket)> CheckInTicketAsync(string qrToken, CancellationToken cancellationToken = default)
+        {
+            var ticket = await _unitOfWork.IssuedTicketRepository.GetOneAsync<IssuedTicket>(
+                filter: t => t.QrCodeToken == qrToken,
+                cancellation: cancellationToken);
+
+            if (ticket == null)
+            {
+                return (false, "Vé không hợp lệ hoặc không tồn tại.", null);
+            }
+
+            if (ticket.Status == IssuedTicketStatus.Used)
+            {
+                return (false, "Vé này đã được check-in trước đó.", ticket);
+            }
+
+            if (ticket.Status == IssuedTicketStatus.Cancelled)
+            {
+                return (false, "Vé này đã bị hủy.", ticket);
+            }
+
+            ticket.Status = IssuedTicketStatus.Used;
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return (true, "Check-in thành công.", ticket);
+        }
     }
 }

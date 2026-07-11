@@ -31,5 +31,23 @@ namespace Inventory.API.Controllers
             }
             return Ok(new ApiResponse<TicketInventoryStateDto>(true, "Lấy thông tin tồn kho thành công.", result));
         }
+        [HttpPost("checkin/{qrToken}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckInTicket([FromRoute] string qrToken)
+        {
+            if (string.IsNullOrWhiteSpace(qrToken))
+            {
+                return BadRequest(new ApiResponse(false, "Mã QR không được để trống."));
+            }
+
+            var (success, message, ticket) = await _ticketInventoryService.CheckInTicketAsync(qrToken);
+
+            if (!success)
+            {
+                return BadRequest(new ApiResponse(false, message));
+            }
+
+            return Ok(new ApiResponse<object>(true, message, ticket));
+        }
     }
 }
