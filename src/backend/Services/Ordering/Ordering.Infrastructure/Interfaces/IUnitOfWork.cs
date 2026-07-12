@@ -7,5 +7,6 @@ namespace Ordering.Infrastructure.Interfaces
     {
         IAuditLogRepository AuditLogRepository { get; }
         IOrderRepository OrderRepository { get; }
+        IEventSnapshotRepository EventSnapshotRepository { get; }
     }
 }

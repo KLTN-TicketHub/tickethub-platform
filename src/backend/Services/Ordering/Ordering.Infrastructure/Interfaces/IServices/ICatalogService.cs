@@ -12,12 +12,6 @@ namespace Ordering.Infrastructure.Interfaces.IServices
     {
         public bool IsSuccess { get; set; }
         public string Message { get; set; } = string.Empty;
-        public string EventTitle { get; set; } = string.Empty;
-        public Guid OrganizerId { get; set; }
-        public DateTime ShowtimeStartAt { get; set; }
-        public DateTime ShowtimeEndAt { get; set; }
-        public string OrganizerName { get; set; } = string.Empty;
-        public string EventImage { get; set; } = string.Empty;
         public List<ValidatedCheckoutTicketItemDto> TicketItems { get; set; } = new();
     }
 

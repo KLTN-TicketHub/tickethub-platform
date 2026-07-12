@@ -61,13 +61,7 @@ namespace Catalog.API.Services
                 GetCheckoutDataResponse response = new GetCheckoutDataResponse
                 {
                     IsSuccess = true,
-                    Message = result.Message,
-                    EventTitle = result.EventTitle,
-                    OrganizerId = result.OrganizerId.ToString(),
-                    OrganizerName = result.OrganizerName,
-                    EventImage = result.EventImage,
-                    ShowtimeStartAt = result.ShowtimeStartAt.ToString("O"),
-                    ShowtimeEndAt = result.ShowtimeEndAt.ToString("O")
+                    Message = result.Message
                 };
 
                 foreach (var t in result.TicketItems)

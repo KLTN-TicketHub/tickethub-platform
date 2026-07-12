@@ -37,6 +37,7 @@ namespace Ordering.API.Extensions
             services.AddScoped<AuditInterceptor>();
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IEventSnapshotRepository, EventSnapshotRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }

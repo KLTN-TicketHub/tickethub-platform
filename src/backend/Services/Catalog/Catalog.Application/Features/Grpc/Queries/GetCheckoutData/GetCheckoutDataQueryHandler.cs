@@ -51,13 +51,7 @@ namespace Catalog.Application.Features.Grpc.Queries.GetCheckoutData
                 var result = new GetCheckoutDataResult
                 {
                     IsSuccess = true,
-                    Message = "Thành công",
-                    EventTitle = @event.Title,
-                    OrganizerId = @event.OrganizerId,
-                    OrganizerName = @event.Organizer?.OrganizerName ?? string.Empty,
-                    EventImage = @event.CoverImageUrl ?? string.Empty,
-                    ShowtimeStartAt = showtime.StartAt,
-                    ShowtimeEndAt = showtime.EndAt
+                    Message = "Thành công"
                 };
 
                 var seatIds = request.Items.Where(x => x.SeatId.HasValue).Select(x => x.SeatId!.Value).ToList();

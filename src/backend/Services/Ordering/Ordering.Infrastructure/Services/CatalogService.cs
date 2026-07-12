@@ -43,13 +43,7 @@ namespace Ordering.Infrastructure.Services
                 var result = new CheckoutDataResult
                 {
                     IsSuccess = true,
-                    Message = response.Message,
-                    EventTitle = response.EventTitle,
-                    OrganizerId = Guid.Parse(response.OrganizerId),
-                    OrganizerName = response.OrganizerName,
-                    EventImage = response.EventImage,
-                    ShowtimeStartAt = DateTime.Parse(response.ShowtimeStartAt),
-                    ShowtimeEndAt = DateTime.Parse(response.ShowtimeEndAt)
+                    Message = response.Message
                 };
 
                 foreach (var item in response.TicketItems)

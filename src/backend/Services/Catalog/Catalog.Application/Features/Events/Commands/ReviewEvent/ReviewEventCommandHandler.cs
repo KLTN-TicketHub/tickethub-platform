@@ -15,11 +15,13 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IEventPublisher _eventPublisher;
+        private readonly IFileService _fileService;
 
-        public ReviewEventCommandHandler(IUnitOfWork unitOfWork, IEventPublisher eventPublisher)
+        public ReviewEventCommandHandler(IUnitOfWork unitOfWork, IEventPublisher eventPublisher, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
             _eventPublisher = eventPublisher;
+            _fileService = fileService;
         }
 
         public async Task<bool> Handle(ReviewEventCommand command, CancellationToken cancellationToken)
@@ -71,12 +73,21 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
                 var eventPublished = new EventPublishedEvent
                 {
                     EventId = eventEntity.Id,
+                    EventTitle = eventEntity.Title,
+                    EventImage = _fileService.GetAbsoluteUrl(eventEntity.CoverImageUrl),
+                    OrganizerId = eventEntity.OrganizerId,
+                    OrganizerName = eventEntity.Organizer?.OrganizerName ?? string.Empty,
+                    SaleOpenAt = eventEntity.SaleOpenAt,
+                    SaleCloseAt = eventEntity.SaleCloseAt,
                     Showtimes = eventEntity.ShowTimes.Select(s => new ShowtimePublishedDto
                     {
                         ShowTimeId = s.Id,
+                        StartAt = s.StartAt,
+                        EndAt = s.EndAt,
                         TicketTypes = s.TicketTypes.Select(t => new TicketTypePublishedDto
                         {
                             TicketTypeId = t.Id,
+                            TicketTypeName = t.TicketTypeName,
                             Capacity = t.PublishedQuota,
                             Price = t.Price,
                             IsReservingSeat = t.Zone?.IsReservingSeat ?? false

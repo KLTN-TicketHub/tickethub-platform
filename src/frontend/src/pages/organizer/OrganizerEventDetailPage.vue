@@ -44,10 +44,11 @@
                   <span v-if="event.endAt" class="text-white/40 font-medium"> — Kết thúc: {{ formatEventDate(event.endAt) }}</span>
                 </span>
               </div>
-              <div v-if="event.saleCloseAt" class="flex items-center gap-3 text-white/70 text-[14px]">
+              <div v-if="event.saleOpenAt || event.saleCloseAt" class="flex items-center gap-3 text-white/70 text-[14px]">
                 <PhClock weight="bold" class="text-warning text-xl flex-shrink-0" />
                 <span class="font-bold">
-                  Hạn bán vé: <span class="text-warning">{{ formatEventDate(event.saleCloseAt) }}</span>
+                  Mở bán vé: <span class="text-primary">{{ formatEventDate(event.saleOpenAt) }}</span>
+                  <span v-if="event.saleCloseAt" class="text-white/40 font-medium"> — Hạn bán: <span class="text-warning font-bold">{{ formatEventDate(event.saleCloseAt) }}</span></span>
                 </span>
               </div>
               <div class="flex items-start gap-3 text-white/70 text-[14px]">

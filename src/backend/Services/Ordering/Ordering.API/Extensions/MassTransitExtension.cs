@@ -22,6 +22,7 @@ namespace Ordering.API.Extensions
 
                 x.AddConsumer<ConfirmOrderConsumer>();
                 x.AddConsumer<CancelOrderConsumer>();
+                x.AddConsumer<EventPublishedConsumer>();
 
                 x.AddSagaStateMachine<OrderBookingStateMachine, OrderBookingState>()
                     .EntityFrameworkRepository(r =>
@@ -54,6 +55,11 @@ namespace Ordering.API.Extensions
                     cfg.ReceiveEndpoint("ordering-cancel-order", e =>
                     {
                         e.ConfigureConsumer<CancelOrderConsumer>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("ordering-event-published", e =>
+                    {
+                        e.ConfigureConsumer<EventPublishedConsumer>(context);
                     });
 
                     cfg.ConfigureEndpoints(context);

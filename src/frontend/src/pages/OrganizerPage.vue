@@ -136,12 +136,24 @@
             <!-- Event Details -->
             <div class="flex-1 flex flex-col justify-between py-1">
               <div>
-                <h3 
-                  @click="router.push(`/organizer/events/${event.id}`)"
-                  class="font-heading text-2xl font-black text-white group-hover:text-primary transition-colors line-clamp-1 mb-4 cursor-pointer hover:underline"
-                >
-                  {{ event.title }}
-                </h3>
+                <div class="flex items-start justify-between gap-4 mb-4">
+                  <h3 
+                    @click="router.push(`/organizer/events/${event.id}`)"
+                    class="font-heading text-2xl font-black text-white group-hover:text-primary transition-colors line-clamp-1 cursor-pointer hover:underline flex-1"
+                  >
+                    {{ event.title }}
+                  </h3>
+                  <div class="flex flex-wrap gap-2 mt-1">
+                    <div v-if="isEventOngoing(event)" class="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-primary text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm whitespace-nowrap">
+                      <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                      Đang diễn ra
+                    </div>
+                    <div v-if="isEventSelling(event)" class="px-3 py-1 bg-info/10 border border-info/20 rounded-full text-info text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm whitespace-nowrap">
+                      <span class="w-2 h-2 rounded-full bg-info animate-pulse"></span>
+                      Đang bán vé
+                    </div>
+                  </div>
+                </div>
                 
                 <div class="flex flex-col gap-3">
                   <!-- Date -->
@@ -369,6 +381,29 @@ const computedVisiblePages = computed(() => {
   }
   return [1, '...', current - 1, current, current + 1, '...', total]
 })
+
+// Check if event is currently happening
+const isEventOngoing = (event) => {
+  if (!event.startAt) return false;
+  const now = new Date();
+  const start = new Date(event.startAt);
+  if (event.endAt) {
+    const end = new Date(event.endAt);
+    return now >= start && now <= end;
+  }
+  // If no endAt is provided, estimate a 4-hour window
+  const estimatedEnd = new Date(start.getTime() + 4 * 60 * 60 * 1000);
+  return now >= start && now <= estimatedEnd;
+}
+
+// Check if event is currently selling tickets
+const isEventSelling = (event) => {
+  if (!event.saleOpenAt || !event.saleCloseAt) return false;
+  const now = new Date();
+  const open = new Date(event.saleOpenAt);
+  const close = new Date(event.saleCloseAt);
+  return now >= open && now <= close;
+}
 
 // Format Date: e.g. "00:00, Thứ 6, 15 tháng 05 2026"
 const formatEventDate = (dateStr) => {
