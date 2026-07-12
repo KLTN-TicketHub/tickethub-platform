@@ -42,8 +42,11 @@
               <span class="text-3xl font-heading font-black text-primary leading-none">{{ formatCurrency(getMinPrice()) }}</span>
             </div>
             
-            <button @click="scrollToSelect" class="w-full sm:w-auto px-10 py-4 bg-primary hover:bg-primary-dark text-black font-black rounded-xl transition-all hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(0,200,83,0.2)] text-[14px] flex items-center justify-center gap-2 cursor-pointer">
-              <PhTicket weight="fill" /> Mua vé ngay
+            <button @click="scrollToSelect" 
+                    class="w-full sm:w-auto px-10 py-4 font-black rounded-xl transition-all shadow-[0_0_30px_rgba(0,200,83,0.2)] text-[14px] flex items-center justify-center gap-2"
+                    :class="saleStatus === 'open' ? 'bg-primary hover:bg-primary-dark text-black hover:scale-[1.02] active:scale-95 cursor-pointer' : 'bg-white/10 text-white/50 cursor-not-allowed shadow-none'"
+                    :disabled="saleStatus !== 'open'">
+              <PhTicket weight="fill" /> {{ saleStatus === 'upcoming' ? 'Sắp mở bán' : (saleStatus === 'closed' ? 'Ngừng bán' : 'Mua vé ngay') }}
             </button>
           </div>
         </div>
@@ -300,8 +303,14 @@
               
               <div class="flex items-center justify-between mb-8 relative z-10">
                 <h3 class="font-heading text-2xl font-black text-white uppercase tracking-tight">Hạng vé</h3>
-                <div class="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-primary text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+                <div v-if="saleStatus === 'open'" class="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-primary text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
                   <PhFire weight="fill" class="animate-pulse" /> Đang bán
+                </div>
+                <div v-else-if="saleStatus === 'upcoming'" class="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+                  <PhClock weight="bold" /> Sắp mở bán
+                </div>
+                <div v-else-if="saleStatus === 'closed'" class="px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full text-red-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+                  <PhProhibit weight="bold" /> Ngừng bán
                 </div>
               </div>
 
@@ -400,13 +409,14 @@
                 <BaseButton 
                   variant="primary" 
                   size="lg" 
-                  class="w-full !rounded-2xl !py-4.5 shadow-[0_0_40px_rgba(0,200,83,0.2)] hover:shadow-[0_0_60px_rgba(0,200,83,0.4)] text-[16px] font-black flex justify-center items-center gap-2 cursor-pointer disabled:opacity-40 disabled:hover:shadow-none"
-                  :disabled="isCheckoutDisabled || isCheckingOut"
+                  class="w-full !rounded-2xl !py-4.5 text-[16px] font-black flex justify-center items-center gap-2"
+                  :class="saleStatus === 'open' ? 'shadow-[0_0_40px_rgba(0,200,83,0.2)] hover:shadow-[0_0_60px_rgba(0,200,83,0.4)] cursor-pointer disabled:opacity-40 disabled:hover:shadow-none' : '!bg-white/10 !text-white/50 cursor-not-allowed shadow-none'"
+                  :disabled="isCheckoutDisabled || isCheckingOut || saleStatus !== 'open'"
                   @click="handleBuyTicket"
                 >
                   <PhSpinner v-if="isCheckingOut" class="animate-spin" weight="bold"/>
                   <PhTicket v-else weight="fill"/>
-                  {{ isCheckingOut ? 'Đang xử lý...' : 'Đặt vé ngay' }}
+                  {{ isCheckingOut ? 'Đang xử lý...' : (saleStatus === 'upcoming' ? 'Sắp mở bán' : (saleStatus === 'closed' ? 'Đã đóng bán vé' : 'Đặt vé ngay')) }}
                 </BaseButton>
               </div>
 
@@ -608,6 +618,18 @@ const seatLockTimers = new Map()
 // Prevents race condition where SignalR 'Selecting' arrives before selectedSeats is updated
 const pendingLocks = new Set()
 const tierRemainingQuotas = reactive({})
+
+const saleStatus = computed(() => {
+  if (!event.value) return 'unknown'
+  const now = new Date()
+  if (event.value.saleOpenAt && new Date(event.value.saleOpenAt) > now) {
+    return 'upcoming'
+  }
+  if (event.value.saleCloseAt && new Date(event.value.saleCloseAt) < now) {
+    return 'closed'
+  }
+  return 'open'
+})
 
 const loadTicketInventoryStates = async (showtimeId) => {
   if (!event.value || !event.value.showtimes) return;
@@ -905,7 +927,7 @@ onMounted(async () => {
         await loadSeatMapLayout()
       }
       
-      if (selectedShowtimeId.value) {
+      if (selectedShowtimeId.value && saleStatus.value === 'open') {
         await loadTicketInventoryStates(selectedShowtimeId.value)
       }
     } else {
@@ -936,7 +958,7 @@ const loadSeatMapLayout = async () => {
       seatMapData.value = seatMapRes.data
       initKonvaResize()
       await loadSeatStates()
-      if (selectedShowtimeId.value) {
+      if (selectedShowtimeId.value && saleStatus.value === 'open') {
         await startHubConnection(selectedShowtimeId.value)
       }
     } else {
@@ -1169,10 +1191,14 @@ watch(selectedShowtimeId, async (newShowtimeId, oldShowtimeId) => {
     
     await stopHubConnection()
     if (seatMapData.value) {
-      await loadSeatStates()
-      await startHubConnection(newShowtimeId)
+      if (saleStatus.value === 'open') {
+        await loadSeatStates()
+        await startHubConnection(newShowtimeId)
+      }
     }
-    await loadTicketInventoryStates(newShowtimeId)
+    if (saleStatus.value === 'open') {
+      await loadTicketInventoryStates(newShowtimeId)
+    }
   } else {
     selectedSeats.value = []
     clearAllSeatTimers()
@@ -1270,6 +1296,11 @@ function onSeatLeave() {
 }
 
 async function onSeatClick(seat, zone, row) {
+  if (saleStatus.value !== 'open') {
+    store.toast = { message: 'Hiện tại không trong thời gian bán vé.', icon: '⚠️' }
+    return
+  }
+
   const isMySelection = selectedSeats.value.some(s => s.id === seat.id)
 
   // Block only if seat is locked/sold by someone else (not by current user)
