@@ -967,9 +967,11 @@ const loadSeatMapLayout = async () => {
     if (seatMapRes && seatMapRes.success && seatMapRes.data) {
       seatMapData.value = seatMapRes.data
       initKonvaResize()
-      await loadSeatStates()
-      if (selectedShowtimeId.value && saleStatus.value === 'open') {
-        await startHubConnection(selectedShowtimeId.value)
+      if (saleStatus.value === 'open') {
+        await loadSeatStates()
+        if (selectedShowtimeId.value) {
+          await startHubConnection(selectedShowtimeId.value)
+        }
       }
     } else {
       throw new Error(seatMapRes?.message || 'Tải dữ liệu sơ đồ ghế ngồi thất bại.')
