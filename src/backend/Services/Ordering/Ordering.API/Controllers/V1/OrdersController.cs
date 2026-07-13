@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Ordering.Common.Dtos;
+using Ordering.Common.Dtos.Reports;
 using Ordering.Infrastructure.Data.Contexts;
 using Ordering.Infrastructure.Interfaces.IServices;
 using System.Security.Claims;
@@ -18,11 +19,13 @@ namespace Ordering.API.Controllers.V1
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly IReportService _reportService;
         private readonly OrderingDbContext _dbContext;
 
-        public OrdersController(IOrderService orderService, OrderingDbContext dbContext)
+        public OrdersController(IOrderService orderService, IReportService reportService, OrderingDbContext dbContext)
         {
             _orderService = orderService;
+            _reportService = reportService;
             _dbContext = dbContext;
         }
 
@@ -79,6 +82,102 @@ namespace Ordering.API.Controllers.V1
                 status = sagaState.CurrentState,
                 paymentLink = sagaState.PaymentLink
             }));
+        }
+
+        [HttpGet("reports/events/{eventId}")]
+        public async Task<IActionResult> GetEventReport(Guid eventId, CancellationToken cancellationToken)
+        {
+            string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new ApiResponse(false, "Không xác định được danh tính người dùng."));
+            }
+
+            bool isAdminOrMod = User.IsInRole(BuildingBlocks.Contracts.Constants.Roles.Admin) ||
+                                 User.IsInRole(BuildingBlocks.Contracts.Constants.Roles.Moderator);
+
+            var (isSuccess, message, reportData) = await _reportService.GetEventReportAsync(eventId, userId, isAdminOrMod, cancellationToken);
+
+            if (!isSuccess)
+            {
+                if (message.Contains("Không tìm thấy"))
+                {
+                    return NotFound(new ApiResponse(false, message));
+                }
+                if (message.Contains("không có quyền"))
+                {
+                    return Forbid();
+                }
+                return BadRequest(new ApiResponse(false, message));
+            }
+
+            return Ok(new ApiResponse<object>(true, message, reportData!));
+        }
+
+        [HttpGet("reports/events/{eventId}/orders")]
+        public async Task<IActionResult> GetEventOrders(
+            Guid eventId,
+            [FromQuery] GetEventOrdersRequest request,
+            CancellationToken cancellationToken)
+        {
+            string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new ApiResponse(false, "Không xác định được danh tính người dùng."));
+            }
+
+            bool isAdminOrMod = User.IsInRole(BuildingBlocks.Contracts.Constants.Roles.Admin) ||
+                                 User.IsInRole(BuildingBlocks.Contracts.Constants.Roles.Moderator);
+
+            var (isSuccess, message, result) = await _reportService.GetEventOrdersAsync(eventId, userId, isAdminOrMod, request, cancellationToken);
+
+            if (!isSuccess)
+            {
+                if (message.Contains("Không tìm thấy"))
+                {
+                    return NotFound(new ApiResponse(false, message));
+                }
+                if (message.Contains("không có quyền"))
+                {
+                    return Forbid();
+                }
+                return BadRequest(new ApiResponse(false, message));
+            }
+
+            return Ok(new ApiResponse<object>(true, message, result!));
+        }
+
+        [HttpGet("reports/events/{eventId}/charts")]
+        public async Task<IActionResult> GetEventChartData(
+            Guid eventId,
+            [FromQuery] string range,
+            CancellationToken cancellationToken)
+        {
+            string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new ApiResponse(false, "Không xác định được danh tính người dùng."));
+            }
+
+            bool isAdminOrMod = User.IsInRole(BuildingBlocks.Contracts.Constants.Roles.Admin) ||
+                                 User.IsInRole(BuildingBlocks.Contracts.Constants.Roles.Moderator);
+
+            var (isSuccess, message, result) = await _reportService.GetEventChartDataAsync(eventId, userId, isAdminOrMod, range, cancellationToken);
+
+            if (!isSuccess)
+            {
+                if (message.Contains("Không tìm thấy"))
+                {
+                    return NotFound(new ApiResponse(false, message));
+                }
+                if (message.Contains("không có quyền"))
+                {
+                    return Forbid();
+                }
+                return BadRequest(new ApiResponse(false, message));
+            }
+
+            return Ok(new ApiResponse<object>(true, message, result!));
         }
     }
 }

@@ -457,6 +457,10 @@ const eventActions = [
 ]
 
 const handleAction = (action, event) => {
+  if (action.label === 'Tổng quan') {
+    router.push(`/organizer/events/${event.id}/report`)
+    return
+  }
   store.toast = { 
     message: `Chức năng "${action.label}" cho sự kiện "${event.title}" đang được phát triển!`, 
     icon: '✨' 

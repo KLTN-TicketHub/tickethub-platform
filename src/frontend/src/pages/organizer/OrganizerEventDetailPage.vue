@@ -64,6 +64,10 @@
               <PhPencilSimple weight="bold" />
               Chỉnh sửa sự kiện
             </BaseButton>
+            <BaseButton variant="outline" class="w-full sm:w-auto !rounded-xl !py-3.5 !px-8 flex items-center justify-center gap-2" @click="handleReport">
+              <PhChartPie weight="bold" />
+              Xem báo cáo
+            </BaseButton>
             <BaseButton variant="primary" class="w-full sm:w-auto !rounded-xl !py-3.5 !px-8 flex items-center justify-center gap-2" @click="handleOrders">
               <PhReceipt weight="bold" />
               Xem đơn hàng
@@ -320,6 +324,10 @@
                   <PhPencilSimple weight="bold" />
                   Chỉnh sửa sự kiện
                 </BaseButton>
+                <BaseButton variant="outline" class="w-full !rounded-xl !py-3 flex items-center justify-center gap-2" @click="handleReport">
+                  <PhChartPie weight="bold" />
+                  Xem báo cáo
+                </BaseButton>
                 <BaseButton variant="primary" class="w-full !rounded-xl !py-3 flex items-center justify-center gap-2" @click="handleOrders">
                   <PhReceipt weight="bold" />
                   Xem đơn hàng
@@ -353,7 +361,7 @@ import { store } from '../../stores/eventStore'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import { 
   PhCalendarBlank, PhMapPin, PhTicket, PhMapPinLine, PhSpinner, 
-  PhWarningCircle, PhPencilSimple, PhReceipt, PhClock
+  PhWarningCircle, PhPencilSimple, PhReceipt, PhClock, PhChartPie
 } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -453,6 +461,10 @@ const handleEdit = () => {
 
 const handleOrders = () => {
   store.toast = { message: 'Chức năng xem đơn hàng đang được phát triển.', icon: '✨' }
+}
+
+const handleReport = () => {
+  router.push(`/organizer/events/${event.value.id}/report`)
 }
 
 // Konva

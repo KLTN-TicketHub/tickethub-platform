@@ -113,7 +113,8 @@ const routes = [
     children: [
       { path: '', name: 'organizer', component: OrganizerPage },
       { path: 'create-event', name: 'organizer-create-event', component: OrganizerCreateEventPage },
-      { path: 'events/:id', name: 'organizer-event-detail', component: () => import('../pages/organizer/OrganizerEventDetailPage.vue') }
+      { path: 'events/:id', name: 'organizer-event-detail', component: () => import('../pages/organizer/OrganizerEventDetailPage.vue') },
+      { path: 'events/:id/report', name: 'organizer-event-report', component: () => import('../pages/organizer/OrganizerEventReportPage.vue') }
     ]
   }
 ]
