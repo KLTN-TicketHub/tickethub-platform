@@ -29,7 +29,7 @@ namespace Identity.API.Extensions
         public static IServiceCollection RegisterServices(IServiceCollection services)
         {
             services.AddScoped<ICurrentUserService, CurrentUserService>();
-            services.AddScoped<IJwtTokenService, JwtTokenService>();
+            services.AddSingleton<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IGoogleAuthService, GoogleAuthService>();
             services.AddScoped<ICacheService, RedisCacheService>();
             services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
