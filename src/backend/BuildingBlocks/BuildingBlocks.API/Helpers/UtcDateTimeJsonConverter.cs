@@ -20,7 +20,7 @@ namespace BuildingBlocks.API.Helpers
 
         public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         {
-            writer.WriteStringValue(DateTime.SpecifyKind(value.ToUniversalTime(), DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+            writer.WriteStringValue(DateTime.SpecifyKind(value, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
         }
     }
 
@@ -52,7 +52,7 @@ namespace BuildingBlocks.API.Helpers
             }
             else
             {
-                writer.WriteStringValue(DateTime.SpecifyKind(value.Value.ToUniversalTime(), DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+                writer.WriteStringValue(DateTime.SpecifyKind(value.Value, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
             }
         }
     }

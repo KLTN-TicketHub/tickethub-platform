@@ -49,7 +49,7 @@ namespace Finance.Infrastructure.Consumers
                     return;
                 }
 
-                var releaseAt = message.ShowtimeEndAt.Date.AddDays(1);
+                var releaseAt = message.ShowtimeEndAt;
 
                 var transaction = new WalletTransaction(
                     walletId: wallet.Id,
