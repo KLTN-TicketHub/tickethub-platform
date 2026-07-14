@@ -28,6 +28,11 @@ namespace Finance.Infrastructure.Services
             Guid organizerId,
             CancellationToken cancellationToken = default)
         {
+            bool hasUnreleasedRevenue = await _unitOfWork.WalletTransactionRepository.HasUnreleasedRevenueAsync(eventId, cancellationToken);
+
+            if (hasUnreleasedRevenue)
+                return (false, "Sự kiện chưa kết thúc hoặc vẫn còn trong thời gian chờ đối soát. Chỉ có thể yêu cầu giải ngân sau khi toàn bộ sự kiện đã kết thúc.");
+
             PendingPayoutSummary? summary = await _unitOfWork.WalletTransactionRepository.GetEventPendingSummaryAsync(eventId, cancellationToken);
 
             if (summary == null)

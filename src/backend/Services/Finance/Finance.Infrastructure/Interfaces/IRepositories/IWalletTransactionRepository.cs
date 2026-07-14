@@ -7,6 +7,8 @@ namespace Finance.Infrastructure.Interfaces.IRepositories
     public interface IWalletTransactionRepository : IBaseRepository<WalletTransaction, FinanceDbContext>
     {
         Task<PendingPayoutSummary?> GetEventPendingSummaryAsync(Guid eventId, CancellationToken cancellation = default);
+
+        Task<bool> HasUnreleasedRevenueAsync(Guid eventId, CancellationToken cancellation = default);
     }
 
     public class PendingPayoutSummary

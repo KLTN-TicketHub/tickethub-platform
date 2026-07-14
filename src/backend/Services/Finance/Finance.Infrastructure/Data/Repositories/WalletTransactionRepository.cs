@@ -33,5 +33,15 @@ namespace Finance.Infrastructure.Data.Repositories
                 })
                 .FirstOrDefaultAsync(cancellation);
         }
+
+        public async Task<bool> HasUnreleasedRevenueAsync(Guid eventId, CancellationToken cancellation = default)
+        {
+            return await _dbContext.Set<WalletTransaction>()
+                .AnyAsync(t => t.EventId == eventId
+                            && t.Status == WalletTransactionStatus.Pending
+                            && t.Type == WalletTransactionType.Revenue
+                            && t.ReleaseAt > DateTime.UtcNow,
+                    cancellation);
+        }
     }
 }
