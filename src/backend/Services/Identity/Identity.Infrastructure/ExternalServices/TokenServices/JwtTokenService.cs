@@ -9,35 +9,47 @@ using System.Security.Cryptography;
 
 namespace Identity.Infrastructure.ExternalServices.TokenServices
 {
-    public class JwtTokenService : IJwtTokenService
+    public class JwtTokenService : IJwtTokenService, IDisposable
     {
-        private readonly AppSettings _appSettings;
+        private readonly RSA _rsa;
+        private readonly RsaSecurityKey _signingKey;
+        private readonly string _issuer;
+        private readonly string _audience;
+        private readonly double _tokenExpirationMinutes;
+
         public JwtTokenService(IOptions<AppSettings> appSettings)
         {
-            _appSettings = appSettings.Value;
-        }
-        public string GenerateJwtToken(User user, IList<string> roles)
-        {
-            JwtSecurityTokenHandler jwtTokenHandler = new JwtSecurityTokenHandler();
-            JwtConfig jwtConfig = _appSettings.JwtConfig
+            AppSettings settings = appSettings.Value;
+            JwtConfig jwtConfig = settings.JwtConfig
                 ?? throw new InvalidOperationException("JWT config is not configured.");
 
             string privateKeyRelativePath = jwtConfig.PrivateKeyPath
                 ?? throw new InvalidOperationException("JWT private key path is not configured.");
-            string issuer = jwtConfig.ValidIssuer
+            _issuer = jwtConfig.ValidIssuer
                 ?? throw new InvalidOperationException("JWT issuer is not configured.");
-            string audience = jwtConfig.ValidAudience
+            _audience = jwtConfig.ValidAudience
                 ?? throw new InvalidOperationException("JWT audience is not configured.");
+            _tokenExpirationMinutes = Convert.ToDouble(jwtConfig.TokenExpirationMinutes);
 
             string privateKeyPath = Path.Combine(AppContext.BaseDirectory, privateKeyRelativePath);
 
-            RSA rsa = RSA.Create();
-            rsa.ImportFromPem(File.ReadAllText(privateKeyPath));
+            _rsa = RSA.Create();
+            _rsa.ImportFromPem(File.ReadAllText(privateKeyPath));
+
+            _signingKey = new RsaSecurityKey(_rsa)
+            {
+                KeyId = jwtConfig.KeyId ?? Guid.NewGuid().ToString()
+            };
+        }
+
+        public string GenerateJwtToken(User user, IList<string> roles)
+        {
+            JwtSecurityTokenHandler jwtTokenHandler = new JwtSecurityTokenHandler();
 
             List<Claim> claims = new List<Claim>()
             {
-                new Claim(JwtRegisteredClaimNames.Aud, audience),
-                new Claim(JwtRegisteredClaimNames.Iss, issuer),
+                new Claim(JwtRegisteredClaimNames.Aud, _audience),
+                new Claim(JwtRegisteredClaimNames.Iss, _issuer),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email!),
@@ -47,24 +59,22 @@ namespace Identity.Infrastructure.ExternalServices.TokenServices
             foreach (var role in roles)
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
-            var rsaKey = new RsaSecurityKey(rsa)
-            {
-                KeyId = jwtConfig.KeyId ?? Guid.NewGuid().ToString()
-            };
-
             SecurityTokenDescriptor securityTokenDescriptor = new SecurityTokenDescriptor()
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_appSettings.JwtConfig.TokenExpirationMinutes)),
-                SigningCredentials = new SigningCredentials(
-                    rsaKey,
-                    SecurityAlgorithms.RsaSha256)
+                Expires = DateTime.UtcNow.AddMinutes(_tokenExpirationMinutes),
+                SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.RsaSha256)
             };
 
             SecurityToken token = jwtTokenHandler.CreateToken(securityTokenDescriptor);
             string jwtToken = jwtTokenHandler.WriteToken(token);
 
             return jwtToken;
+        }
+
+        public void Dispose()
+        {
+            _rsa?.Dispose();
         }
     }
 }
