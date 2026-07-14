@@ -33,12 +33,12 @@ namespace Ordering.Infrastructure.Consumers
                     order.CancelOrder();
                     await _unitOfWork.OrderRepository.UpdateAsync(order);
 
-                    var seatIds = order.OrderItems
+                    List<Guid> seatIds = order.OrderItems
                         .Where(x => x.SeatId.HasValue)
                         .Select(x => x.SeatId!.Value)
                         .ToList();
 
-                    var standingItem = order.OrderItems.FirstOrDefault(x => !x.SeatId.HasValue);
+                    OrderItem? standingItem = order.OrderItems.FirstOrDefault(x => !x.SeatId.HasValue);
 
                     await context.Publish(new ReleaseSeatsCommand
                     {

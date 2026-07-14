@@ -21,7 +21,7 @@ namespace Inventory.API.Extensions
             RSA rsa = RSA.Create();
             rsa.ImportFromPem(publicPem);
 
-            var rsaSecurityKey = new RsaSecurityKey(rsa);
+            RsaSecurityKey rsaSecurityKey = new RsaSecurityKey(rsa);
 
             services.AddAuthentication(options =>
             {
