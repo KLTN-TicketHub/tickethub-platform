@@ -32,7 +32,7 @@ namespace Catalog.Application.Features.EventCategories.Commands.CreateEventCateg
         {
             EventCategory? eventCategory = await _unitOfWork.EventCategoryRepository.GetOneUntrackedAsync<EventCategory>(x => x.CategoryName == request.CategoryName, cancellation: cancellation);
 
-            if(eventCategory != null)   
+            if (eventCategory != null)
                 throw new BusinessRuleException($"Tên danh mục '{request.CategoryName}' đã tồn tại.");
 
             string categoryCode = await _unitOfWork
