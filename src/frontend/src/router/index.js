@@ -42,6 +42,7 @@ import ModeratorCreateSeatMapPage from '../pages/moderator/ModeratorCreateSeatMa
 import ModeratorSeatMapDetailPage from '../pages/moderator/ModeratorSeatMapDetailPage.vue'
 import ModeratorEventsPage from '../pages/moderator/ModeratorEventsPage.vue'
 import ModeratorEventDetailPage from '../pages/moderator/ModeratorEventDetailPage.vue'
+import ModeratorPayoutsPage from '../pages/moderator/ModeratorPayoutsPage.vue'
 
 // Organizer
 import OrganizerLayout from '../layouts/OrganizerLayout.vue'
@@ -102,7 +103,8 @@ const routes = [
       { path: 'venues/:id/seat-maps/create', name: 'moderator-venues-seatmaps-create', component: ModeratorCreateSeatMapPage },
       { path: 'venues/:id/seat-maps/:seatMapId', name: 'moderator-venues-seatmaps-detail', component: ModeratorSeatMapDetailPage },
       { path: 'events', name: 'moderator-events', component: ModeratorEventsPage },
-      { path: 'events/:id', name: 'moderator-event-detail', component: ModeratorEventDetailPage }
+      { path: 'events/:id', name: 'moderator-event-detail', component: ModeratorEventDetailPage },
+      { path: 'payouts', name: 'moderator-payouts', component: ModeratorPayoutsPage }
     ]
   },
 
@@ -115,7 +117,8 @@ const routes = [
       { path: '', name: 'organizer', component: OrganizerPage },
       { path: 'create-event', name: 'organizer-create-event', component: OrganizerCreateEventPage },
       { path: 'events/:id', name: 'organizer-event-detail', component: () => import('../pages/organizer/OrganizerEventDetailPage.vue') },
-      { path: 'events/:id/report', name: 'organizer-event-report', component: () => import('../pages/organizer/OrganizerEventReportPage.vue') }
+      { path: 'events/:id/report', name: 'organizer-event-report', component: () => import('../pages/organizer/OrganizerEventReportPage.vue') },
+      { path: 'wallet', name: 'organizer-wallet', component: () => import('../pages/organizer/OrganizerWalletPage.vue') }
     ]
   }
 ]

@@ -41,6 +41,7 @@ namespace Finance.Infrastructure.Services
                     Id = t.Id,
                     OrderId = t.OrderId,
                     EventId = t.EventId,
+                    EventTitle = t.EventTitle,
                     Amount = t.Amount,
                     Type = t.Type.ToString(),
                     Status = t.Status.ToString(),

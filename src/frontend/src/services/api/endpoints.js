@@ -76,5 +76,16 @@ export const ORDER_EVENT_CHARTS = (eventId) => `/ordering/orders/reports/events/
 // Tickets
 export const MY_TICKETS = '/inventory/tickets/me'
 
+// Finance - Moderator Payouts
+export const MODERATOR_PAYOUT_REQUESTS = '/finance/moderator/payouts/requests'
+export const MODERATOR_PAYOUT_PROPOSE = (payoutRequestId) => `/finance/moderator/payouts/requests/${payoutRequestId}/propose`
+
+// Finance - Organizer Wallet & Payouts
+export const ORGANIZER_WALLET = '/finance/organizer/wallet'
+export const ORGANIZER_WALLET_TRANSACTIONS = '/finance/organizer/wallet/transactions'
+export const ORGANIZER_PAYOUT_REQUEST = (eventId) => `/finance/organizer/payouts/events/${eventId}/request`
+export const ORGANIZER_PAYOUT_PROPOSED = '/finance/organizer/payouts/proposed'
+export const ORGANIZER_PAYOUT_ACCEPT = (payoutId) => `/finance/organizer/payouts/${payoutId}/accept`
+
 
 

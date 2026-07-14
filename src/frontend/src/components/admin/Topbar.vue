@@ -86,7 +86,7 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { adminSearch } from '../../stores/adminStore'
 import { logout as authLogout } from '../../services/auth/auth.service'
-import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin, PhList, PhX, PhSuitcase, PhPlus, PhFolderOpen } from '@phosphor-icons/vue'
+import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin, PhList, PhX, PhSuitcase, PhPlus, PhFolderOpen, PhHandCoins, PhWallet } from '@phosphor-icons/vue'
 
 const props = defineProps({
   role: { type: String, default: 'admin' }
@@ -111,11 +111,13 @@ const modMenuItems = [
   { label: 'Tổng quan', path: '/moderator/dashboard', icon: PhSquaresFour },
   { label: 'Duyệt sự kiện', path: '/moderator/events', icon: PhCheckSquareOffset },
   { label: 'Địa điểm', path: '/moderator/venues', icon: PhMapPin },
+  { label: 'Giải ngân', path: '/moderator/payouts', icon: PhHandCoins },
 ]
 
 const orgMenuItems = [
   { label: 'Tổng quan', path: '/organizer', icon: PhSquaresFour },
   { label: 'Tạo sự kiện', path: '/organizer/create-event', icon: PhPlus },
+  { label: 'Ví của tôi', path: '/organizer/wallet', icon: PhWallet },
 ]
 
 const activeMenuItems = computed(() => {

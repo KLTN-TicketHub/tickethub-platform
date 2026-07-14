@@ -30,8 +30,8 @@
       <div class="bg-[#111916] border border-white/5 rounded-[2.5rem] p-6 md:p-8 flex flex-col md:flex-row gap-6 items-center justify-between shadow-2xl mb-12">
         <div class="flex items-center gap-6">
           <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border border-white/5 bg-[#0A0F0D] flex-shrink-0">
-            <img 
-              :src="reportData.eventImage || 'https://picsum.photos/seed/event-placeholder/200/200'" 
+            <img
+              :src="reportData.eventImage || 'https://picsum.photos/seed/event-placeholder/200/200'"
               class="w-full h-full object-cover"
               @error="handleImageError"
             />
@@ -43,6 +43,14 @@
             </h1>
           </div>
         </div>
+
+        <BaseButton variant="primary" class="!rounded-2xl !py-3.5 !px-6 shrink-0 flex items-center gap-2" :disabled="isRequestingPayout" @click="handleRequestPayout">
+          <PhSpinner v-if="isRequestingPayout" class="animate-spin text-lg" />
+          <template v-else>
+            <PhHandCoins weight="bold" />
+            Yêu cầu giải ngân
+          </template>
+        </BaseButton>
       </div>
 
       <!-- Bento Grid KPIs -->
@@ -425,11 +433,13 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getEventReport, getEventOrders, getEventChartData } from '../../services/order.service'
+import { requestPayout } from '../../services/organizer-wallet.service'
+import { addToast } from '../../stores/adminStore'
 import BaseButton from '../../components/ui/BaseButton.vue'
-import { 
-  PhSpinner, PhWarningCircle, PhArrowLeft, PhCoins, 
+import {
+  PhSpinner, PhWarningCircle, PhArrowLeft, PhCoins,
   PhTicket, PhUsers, PhChartPie, PhMagnifyingGlass,
-  PhCaretLeft, PhCaretRight
+  PhCaretLeft, PhCaretRight, PhHandCoins
 } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -438,6 +448,7 @@ const router = useRouter()
 const reportData = ref(null)
 const isLoading = ref(true)
 const error = ref('')
+const isRequestingPayout = ref(false)
 
 // Orders list properties
 const searchKeyword = ref('')
@@ -573,6 +584,24 @@ const fetchOrders = async () => {
     ordersList.value = []
   } finally {
     isLoadingOrders.value = false
+  }
+}
+
+const handleRequestPayout = async () => {
+  isRequestingPayout.value = true
+  try {
+    const res = await requestPayout(route.params.id)
+    if (res && res.success) {
+      addToast(res.message || 'Đã gửi yêu cầu giải ngân thành công.', 'success')
+    } else {
+      addToast(res?.message || 'Không thể gửi yêu cầu giải ngân.', 'error')
+    }
+  } catch (err) {
+    console.error('Error requesting payout:', err)
+    const errorMsg = err.response?.data?.message || 'Có lỗi xảy ra khi gửi yêu cầu giải ngân.'
+    addToast(errorMsg, 'error')
+  } finally {
+    isRequestingPayout.value = false
   }
 }
 
