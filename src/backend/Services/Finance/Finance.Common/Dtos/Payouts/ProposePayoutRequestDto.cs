@@ -1,6 +1,6 @@
 namespace Finance.Common.Dtos.Payouts
 {
-    public class ReleaseEventFundsRequestDto
+    public class ProposePayoutRequestDto
     {
         public decimal AppliedRate { get; set; }
     }

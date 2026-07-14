@@ -16,6 +16,7 @@ namespace Notification.Worker.Extensions
                 x.AddConsumer<SendOrganizerWelcomeEmailConsumer>();
                 x.AddConsumer<SendEventReviewedEmailConsumer>();
                 x.AddConsumer<SendTicketEmailConsumer>();
+                x.AddConsumer<SendPayoutProposedEmailConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {

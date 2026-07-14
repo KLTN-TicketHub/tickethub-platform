@@ -12,23 +12,26 @@ namespace Finance.Infrastructure.Data.Repositories
         {
         }
 
-        public async Task<IEnumerable<PendingPayoutSummary>> GetPendingPayoutSummaryAsync(CancellationToken cancellation = default)
+        public async Task<PendingPayoutSummary?> GetEventPendingSummaryAsync(Guid eventId, CancellationToken cancellation = default)
         {
             return await _dbContext.Set<WalletTransaction>()
-                .Where(t => t.Status == WalletTransactionStatus.Pending
+                .Where(t => t.EventId == eventId
+                         && t.Status == WalletTransactionStatus.Pending
                          && t.Type == WalletTransactionType.Revenue
+                         && t.EventPayoutId == null
                          && t.ReleaseAt <= DateTime.UtcNow)
-                .GroupBy(t => new { t.EventId, t.CategoryId, t.WalletId, t.Wallet.OrganizerId })
+                .GroupBy(t => new { t.EventId, t.EventTitle, t.CategoryId, t.WalletId, t.Wallet.OrganizerId })
                 .Select(g => new PendingPayoutSummary
                 {
                     EventId = g.Key.EventId,
+                    EventTitle = g.Key.EventTitle,
                     CategoryId = g.Key.CategoryId,
                     WalletId = g.Key.WalletId,
                     OrganizerId = g.Key.OrganizerId,
                     GrossAmount = g.Sum(t => t.Amount),
                     OrderCount = g.Count()
                 })
-                .ToListAsync(cancellation);
+                .FirstOrDefaultAsync(cancellation);
         }
     }
 }

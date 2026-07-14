@@ -10,5 +10,7 @@ namespace Finance.Infrastructure.Interfaces
         IWalletTransactionRepository WalletTransactionRepository { get; }
         ICommissionSettingRepository CommissionSettingRepository { get; }
         IEventPayoutRepository EventPayoutRepository { get; }
+        IOrganizerSnapshotRepository OrganizerSnapshotRepository { get; }
+        IPayoutRequestRepository PayoutRequestRepository { get; }
     }
 }

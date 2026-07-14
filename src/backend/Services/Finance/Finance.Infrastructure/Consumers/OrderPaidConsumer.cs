@@ -55,6 +55,7 @@ namespace Finance.Infrastructure.Consumers
                     walletId: wallet.Id,
                     orderId: message.OrderId,
                     eventId: message.EventId,
+                    eventTitle: message.EventTitle,
                     categoryId: message.CategoryId,
                     amount: message.TotalPrice,
                     type: WalletTransactionType.Revenue,

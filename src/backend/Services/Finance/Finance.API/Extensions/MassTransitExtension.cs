@@ -13,6 +13,7 @@ namespace Finance.API.Extensions
             {
                 x.AddConsumer<Finance.Infrastructure.Consumers.OrderPaidConsumer>();
                 x.AddConsumer<Finance.Infrastructure.Consumers.EventCategoryCommissionRateChangedConsumer>();
+                x.AddConsumer<Finance.Infrastructure.Consumers.OrganizerActivatedConsumer>();
 
                 x.AddEntityFrameworkOutbox<FinanceDbContext>(o =>
                 {

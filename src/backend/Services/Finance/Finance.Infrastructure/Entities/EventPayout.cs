@@ -1,10 +1,13 @@
 using BuildingBlocks.Domain.DDD;
+using BuildingBlocks.Domain.Exceptions;
 
 namespace Finance.Infrastructure.Entities
 {
     public class EventPayout : BaseEntity, IAggregateRoot
     {
         public Guid EventId { get; private set; }
+
+        public string EventTitle { get; private set; } = default!;
 
         public Guid CategoryId { get; private set; }
 
@@ -30,8 +33,11 @@ namespace Finance.Infrastructure.Entities
 
         public DateTime ReviewedAt { get; private set; }
 
+        public DateTime? AcceptedAt { get; private set; }
+
         public EventPayout(
             Guid eventId,
+            string eventTitle,
             Guid categoryId,
             Guid organizerId,
             Guid walletId,
@@ -42,6 +48,7 @@ namespace Finance.Infrastructure.Entities
             string? reviewedByName)
         {
             EventId = eventId;
+            EventTitle = eventTitle;
             CategoryId = categoryId;
             OrganizerId = organizerId;
             WalletId = walletId;
@@ -50,15 +57,26 @@ namespace Finance.Infrastructure.Entities
             AppliedRate = appliedRate;
             FeeAmount = Math.Round(grossAmount * appliedRate / 100m, 2);
             NetAmount = grossAmount - FeeAmount;
-            Status = EventPayoutStatus.Released;
+            Status = EventPayoutStatus.Proposed;
             ReviewedByUserId = reviewedByUserId;
             ReviewedByName = reviewedByName;
             ReviewedAt = DateTime.UtcNow;
+        }
+
+        public void Accept()
+        {
+            if (Status != EventPayoutStatus.Proposed)
+                throw new BusinessRuleException("Chỉ có thể chấp nhận đề xuất giải ngân đang ở trạng thái chờ xác nhận.");
+
+            Status = EventPayoutStatus.Accepted;
+            AcceptedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
         }
     }
 
     public enum EventPayoutStatus
     {
-        Released = 1
+        Proposed = 1,
+        Accepted = 2
     }
 }

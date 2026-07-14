@@ -11,6 +11,8 @@ namespace Finance.Infrastructure.Entities
 
         public Guid EventId { get; set; }
 
+        public string EventTitle { get; set; } = default!;
+
         public Guid CategoryId { get; set; }
 
         public Guid? EventPayoutId { get; private set; }
@@ -29,6 +31,7 @@ namespace Finance.Infrastructure.Entities
             Guid walletId,
             Guid? orderId,
             Guid eventId,
+            string eventTitle,
             Guid categoryId,
             decimal amount,
             WalletTransactionType type,
@@ -38,6 +41,7 @@ namespace Finance.Infrastructure.Entities
             WalletId = walletId;
             OrderId = orderId;
             EventId = eventId;
+            EventTitle = eventTitle;
             CategoryId = categoryId;
             Amount = amount;
             Type = type;
@@ -49,6 +53,12 @@ namespace Finance.Infrastructure.Entities
         public void MarkAsSuccess()
         {
             Status = WalletTransactionStatus.Success;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        public void AttachToPayout(Guid eventPayoutId)
+        {
+            EventPayoutId = eventPayoutId;
             UpdatedAt = DateTime.UtcNow;
         }
 

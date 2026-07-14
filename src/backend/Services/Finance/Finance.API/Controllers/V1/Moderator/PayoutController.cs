@@ -1,5 +1,6 @@
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Constants;
+using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
 using Finance.Common.Dtos.Payouts;
 using Finance.Infrastructure.Interfaces.IServices;
@@ -25,25 +26,31 @@ namespace Finance.API.Controllers.V1.Moderator
             _currentUserService = currentUserService;
         }
 
-        [HttpGet("pending")]
-        public async Task<IActionResult> GetEventsPendingPayoutAsync(CancellationToken cancellationToken)
+        [HttpGet("requests")]
+        public async Task<IActionResult> GetPayoutRequestsAsync(
+            [FromQuery] int pageNumber,
+            [FromQuery] int pageSize,
+            CancellationToken cancellationToken)
         {
-            List<EventPendingPayoutDto> result = await _payoutService.GetEventsPendingPayoutAsync(cancellationToken);
+            PaginatedResult<PayoutRequestDto> result = await _payoutService.GetPayoutRequestsAsync(
+                pageNumber == 0 ? 1 : pageNumber,
+                pageSize == 0 ? 12 : pageSize,
+                cancellationToken);
 
-            return Ok(new ApiResponse<List<EventPendingPayoutDto>>(true, "Lấy danh sách sự kiện chờ giải ngân thành công.", result));
+            return Ok(new ApiResponse<PaginatedResult<PayoutRequestDto>>(true, "Lấy danh sách yêu cầu giải ngân thành công.", result));
         }
 
-        [HttpPost("events/{eventId:guid}/release")]
-        public async Task<IActionResult> ReleaseEventFundsAsync(
-            [FromRoute] Guid eventId,
-            [FromBody] ReleaseEventFundsRequestDto request,
+        [HttpPost("requests/{payoutRequestId:guid}/propose")]
+        public async Task<IActionResult> ProposePayoutAsync(
+            [FromRoute] Guid payoutRequestId,
+            [FromBody] ProposePayoutRequestDto request,
             CancellationToken cancellationToken)
         {
             Guid reviewerId = _currentUserService.UserId
                 ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người duyệt.");
 
-            (bool isSuccess, string message, EventPayoutResultDto? data) = await _payoutService.ReleaseEventFundsAsync(
-                eventId, request.AppliedRate, reviewerId, _currentUserService.UserName, cancellationToken);
+            (bool isSuccess, string message, EventPayoutResultDto? data) = await _payoutService.ProposePayoutAsync(
+                payoutRequestId, request.AppliedRate, reviewerId, _currentUserService.UserName, cancellationToken);
 
             if (!isSuccess)
                 return BadRequest(new ApiResponse(false, message));

@@ -37,6 +37,8 @@ namespace Finance.API.Extensions
             services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
             services.AddScoped<ICommissionSettingRepository, CommissionSettingRepository>();
             services.AddScoped<IEventPayoutRepository, EventPayoutRepository>();
+            services.AddScoped<IOrganizerSnapshotRepository, OrganizerSnapshotRepository>();
+            services.AddScoped<IPayoutRequestRepository, PayoutRequestRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }

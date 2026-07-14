@@ -15,6 +15,10 @@ namespace Finance.Infrastructure.Data.Contexts.Config
             builder.Property(ep => ep.EventId)
                 .IsRequired();
 
+            builder.Property(ep => ep.EventTitle)
+                .IsRequired()
+                .HasMaxLength(500);
+
             builder.Property(ep => ep.CategoryId)
                 .IsRequired();
 

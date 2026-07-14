@@ -6,12 +6,13 @@ namespace Finance.Infrastructure.Interfaces.IRepositories
 {
     public interface IWalletTransactionRepository : IBaseRepository<WalletTransaction, FinanceDbContext>
     {
-        Task<IEnumerable<PendingPayoutSummary>> GetPendingPayoutSummaryAsync(CancellationToken cancellation = default);
+        Task<PendingPayoutSummary?> GetEventPendingSummaryAsync(Guid eventId, CancellationToken cancellation = default);
     }
 
     public class PendingPayoutSummary
     {
         public Guid EventId { get; set; }
+        public string EventTitle { get; set; } = default!;
         public Guid CategoryId { get; set; }
         public Guid WalletId { get; set; }
         public Guid OrganizerId { get; set; }
