@@ -34,6 +34,13 @@ namespace Finance.Infrastructure.Entities
             EventPayoutId = eventPayoutId;
             UpdatedAt = DateTime.UtcNow;
         }
+
+        public void ResetToPending()
+        {
+            Status = PayoutRequestStatus.Pending;
+            EventPayoutId = null;
+            UpdatedAt = DateTime.UtcNow;
+        }
     }
 
     public enum PayoutRequestStatus

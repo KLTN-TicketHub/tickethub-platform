@@ -21,6 +21,12 @@ namespace Finance.Infrastructure.Interfaces.IServices
             Guid organizerId,
             CancellationToken cancellationToken = default);
 
+        Task<(bool IsSuccess, string Message)> RejectPayoutAsync(
+            Guid payoutId,
+            Guid organizerId,
+            string? reason,
+            CancellationToken cancellationToken = default);
+
         Task<PaginatedResult<PayoutRequestDto>> GetPayoutRequestsAsync(
             int pageNumber,
             int pageSize,

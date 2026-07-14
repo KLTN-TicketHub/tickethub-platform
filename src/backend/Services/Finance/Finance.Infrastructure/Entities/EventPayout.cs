@@ -35,6 +35,10 @@ namespace Finance.Infrastructure.Entities
 
         public DateTime? AcceptedAt { get; private set; }
 
+        public string? RejectionReason { get; private set; }
+
+        public DateTime? RejectedAt { get; private set; }
+
         public EventPayout(
             Guid eventId,
             string eventTitle,
@@ -72,11 +76,23 @@ namespace Finance.Infrastructure.Entities
             AcceptedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;
         }
+
+        public void Reject(string? reason)
+        {
+            if (Status != EventPayoutStatus.Proposed)
+                throw new BusinessRuleException("Chỉ có thể từ chối đề xuất giải ngân đang ở trạng thái chờ xác nhận.");
+
+            Status = EventPayoutStatus.Rejected;
+            RejectionReason = reason;
+            RejectedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
+        }
     }
 
     public enum EventPayoutStatus
     {
         Proposed = 1,
-        Accepted = 2
+        Accepted = 2,
+        Rejected = 3
     }
 }

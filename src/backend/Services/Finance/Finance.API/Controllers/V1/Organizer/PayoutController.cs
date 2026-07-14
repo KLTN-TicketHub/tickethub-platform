@@ -76,5 +76,23 @@ namespace Finance.API.Controllers.V1.Organizer
 
             return Ok(new ApiResponse<EventPayoutResultDto>(true, message, data!));
         }
+
+        [HttpPost("{payoutId:guid}/reject")]
+        public async Task<IActionResult> RejectPayoutAsync(
+            [FromRoute] Guid payoutId,
+            [FromBody] RejectPayoutRequestDto request,
+            CancellationToken cancellationToken)
+        {
+            Guid organizerId = _currentUserService.UserId
+                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
+
+            (bool isSuccess, string message) = await _payoutService.RejectPayoutAsync(
+                payoutId, organizerId, request.Reason, cancellationToken);
+
+            if (!isSuccess)
+                return BadRequest(new ApiResponse(false, message));
+
+            return Ok(new ApiResponse(true, message));
+        }
     }
 }

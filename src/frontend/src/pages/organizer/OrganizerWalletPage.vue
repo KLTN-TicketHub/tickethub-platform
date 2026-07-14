@@ -130,10 +130,15 @@
               </div>
             </div>
 
-            <BaseButton variant="primary" class="!rounded-2xl mt-2" :disabled="acceptingId === item.id" @click="confirmAccept(item)">
-              <PhSpinner v-if="acceptingId === item.id" class="animate-spin text-lg" />
-              <span v-else>Chấp nhận giải ngân</span>
-            </BaseButton>
+            <div class="flex gap-3 mt-2">
+              <BaseButton variant="outline" class="flex-1 !rounded-2xl !border-danger/30 !text-danger hover:!bg-danger/10" :disabled="acceptingId === item.id" @click="openRejectModal(item)">
+                Từ chối
+              </BaseButton>
+              <BaseButton variant="primary" class="flex-1 !rounded-2xl" :disabled="acceptingId === item.id" @click="confirmAccept(item)">
+                <PhSpinner v-if="acceptingId === item.id" class="animate-spin text-lg" />
+                <span v-else>Chấp nhận</span>
+              </BaseButton>
+            </div>
           </div>
         </div>
 
@@ -148,13 +153,46 @@
         </div>
       </template>
     </div>
+
+    <!-- Reject Modal -->
+    <div v-if="isRejectModalOpen" class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="closeRejectModal"></div>
+
+      <div class="relative bg-card/90 backdrop-blur-2xl border border-border-main rounded-[32px] w-full max-w-lg overflow-hidden shadow-2xl shadow-black/60 p-8 animate-in zoom-in-95 fade-in duration-300">
+        <h3 class="text-2xl font-bold text-main mb-1 font-heading">Từ chối đề xuất giải ngân</h3>
+        <p class="text-white/50 text-sm mb-6 line-clamp-1">{{ rejectingItem?.eventTitle }}</p>
+
+        <form @submit.prevent="handleSubmitReject" class="space-y-6">
+          <div class="flex flex-col gap-2">
+            <label class="text-[12px] font-bold text-white/50 uppercase tracking-widest">Lý do từ chối (không bắt buộc)</label>
+            <textarea
+              v-model="rejectReason"
+              placeholder="VD: % hoa hồng áp dụng chưa hợp lý, cần Moderator xem xét lại..."
+              rows="3"
+              class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-[14px] text-white outline-none focus:border-danger/50 transition-all placeholder:text-white/20 resize-none"
+            ></textarea>
+            <p class="text-white/40 text-xs">Yêu cầu sẽ được chuyển lại cho Moderator xem xét lại từ đầu.</p>
+          </div>
+
+          <div class="flex gap-3 pt-2">
+            <BaseButton type="button" variant="outline" class="flex-1 !rounded-2xl" @click="closeRejectModal">
+              Hủy bỏ
+            </BaseButton>
+            <BaseButton type="submit" variant="primary" class="flex-1 !rounded-2xl !bg-danger hover:!bg-danger/80" :disabled="isRejecting">
+              <PhSpinner v-if="isRejecting" class="animate-spin text-lg" />
+              <span v-else>Xác nhận từ chối</span>
+            </BaseButton>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { addToast, openConfirm } from '../../stores/adminStore'
-import { getWallet, getWalletTransactions, getProposedPayouts, acceptPayout } from '../../services/organizer-wallet.service'
+import { getWallet, getWalletTransactions, getProposedPayouts, acceptPayout, rejectPayout } from '../../services/organizer-wallet.service'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseTable from '../../components/ui/BaseTable.vue'
 import { PhSpinner, PhWallet, PhReceipt, PhHandCoins } from '@phosphor-icons/vue'
@@ -187,6 +225,12 @@ const proposedPage = ref(1)
 const proposedTotalPages = ref(1)
 const proposedPageSize = 6
 const acceptingId = ref(null)
+
+// Reject modal
+const isRejectModalOpen = ref(false)
+const isRejecting = ref(false)
+const rejectingItem = ref(null)
+const rejectReason = ref('')
 
 const fetchWallet = async () => {
   isLoadingWallet.value = true
@@ -292,6 +336,37 @@ const confirmAccept = (item) => {
       }
     }
   )
+}
+
+const openRejectModal = (item) => {
+  rejectingItem.value = item
+  rejectReason.value = ''
+  isRejectModalOpen.value = true
+}
+
+const closeRejectModal = () => {
+  isRejectModalOpen.value = false
+  rejectingItem.value = null
+}
+
+const handleSubmitReject = async () => {
+  isRejecting.value = true
+  try {
+    const res = await rejectPayout(rejectingItem.value.id, rejectReason.value.trim() || undefined)
+    if (res && res.success) {
+      addToast('Đã từ chối đề xuất giải ngân.', 'success')
+      closeRejectModal()
+      await fetchProposedPayouts()
+    } else {
+      addToast(res?.message || 'Từ chối đề xuất giải ngân thất bại.', 'error')
+    }
+  } catch (err) {
+    console.error('Error rejecting payout:', err)
+    const errorMsg = err.response?.data?.message || 'Có lỗi xảy ra khi từ chối đề xuất giải ngân.'
+    addToast(errorMsg, 'error')
+  } finally {
+    isRejecting.value = false
+  }
 }
 
 const getTypeBadgeClass = (type) => {

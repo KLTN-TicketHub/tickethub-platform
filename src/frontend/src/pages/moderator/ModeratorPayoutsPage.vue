@@ -16,7 +16,17 @@
       <template v-else>
         <BaseTable :columns="columns" :data="requestsList">
           <template #eventTitle="{ row }">
-            <span class="font-bold text-white line-clamp-1">{{ row.eventTitle }}</span>
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white line-clamp-1">{{ row.eventTitle }}</span>
+                <span v-if="row.isResubmitted" class="shrink-0 px-2 py-0.5 rounded-full bg-warning/20 border border-warning/30 text-warning text-[10px] font-black uppercase tracking-wider">
+                  Gửi lại
+                </span>
+              </div>
+              <span v-if="row.isResubmitted && row.lastRejectionReason" class="text-[12px] text-danger/80 font-medium line-clamp-1" :title="row.lastRejectionReason">
+                Lý do từ chối trước: {{ row.lastRejectionReason }}
+              </span>
+            </div>
           </template>
           <template #categoryName="{ row }">
             <span class="px-2.5 py-1 rounded-full bg-white/5 text-xs font-bold text-white/60">{{ row.categoryName || 'Không rõ' }}</span>
@@ -104,6 +114,15 @@
         <h3 class="text-2xl font-bold text-main mb-1 font-heading">Đề xuất giải ngân</h3>
         <p class="text-white/50 text-sm mb-6 line-clamp-1">{{ selectedRequest?.eventTitle }}</p>
 
+        <div v-if="selectedRequest?.isResubmitted" class="mb-6 p-4 rounded-2xl bg-warning/10 border border-warning/20 flex gap-3">
+          <PhWarningCircle class="text-warning text-xl shrink-0" weight="fill" />
+          <div class="flex flex-col gap-1">
+            <span class="font-bold text-warning text-sm">Organizer đã từ chối đề xuất trước đó</span>
+            <p v-if="selectedRequest.lastRejectionReason" class="text-white/70 text-sm leading-relaxed">{{ selectedRequest.lastRejectionReason }}</p>
+            <p v-else class="text-white/50 text-sm italic">Không có lý do cụ thể.</p>
+          </div>
+        </div>
+
         <div class="space-y-4 mb-6">
           <div class="flex items-center justify-between py-3 border-b border-white/5">
             <span class="text-white/50 text-sm font-medium">Doanh thu gộp</span>
@@ -161,7 +180,7 @@ import { addToast } from '../../stores/adminStore'
 import { getPayoutRequests, proposePayout } from '../../services/moderator-payout.service'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseTable from '../../components/ui/BaseTable.vue'
-import { PhSpinner, PhCaretLeft, PhCaretRight, PhHandCoins } from '@phosphor-icons/vue'
+import { PhSpinner, PhCaretLeft, PhCaretRight, PhHandCoins, PhWarningCircle } from '@phosphor-icons/vue'
 
 const isLoading = ref(true)
 const requestsList = ref([])

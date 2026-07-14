@@ -86,6 +86,7 @@ export const ORGANIZER_WALLET_TRANSACTIONS = '/finance/organizer/wallet/transact
 export const ORGANIZER_PAYOUT_REQUEST = (eventId) => `/finance/organizer/payouts/events/${eventId}/request`
 export const ORGANIZER_PAYOUT_PROPOSED = '/finance/organizer/payouts/proposed'
 export const ORGANIZER_PAYOUT_ACCEPT = (payoutId) => `/finance/organizer/payouts/${payoutId}/accept`
+export const ORGANIZER_PAYOUT_REJECT = (payoutId) => `/finance/organizer/payouts/${payoutId}/reject`
 
 
 

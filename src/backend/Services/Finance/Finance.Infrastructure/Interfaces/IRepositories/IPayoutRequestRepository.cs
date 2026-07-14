@@ -25,5 +25,8 @@ namespace Finance.Infrastructure.Interfaces.IRepositories
         public decimal RecommendedRate { get; set; }
         public int OrderCount { get; set; }
         public DateTime RequestedAt { get; set; }
+        public bool IsResubmitted { get; set; }
+        public string? LastRejectionReason { get; set; }
+        public DateTime? LastRejectedAt { get; set; }
     }
 }

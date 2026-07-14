@@ -74,7 +74,10 @@ namespace Finance.Infrastructure.Services
                 GrossAmount = s.GrossAmount,
                 RecommendedRate = s.RecommendedRate,
                 OrderCount = s.OrderCount,
-                RequestedAt = s.RequestedAt
+                RequestedAt = s.RequestedAt,
+                IsResubmitted = s.IsResubmitted,
+                LastRejectionReason = s.LastRejectionReason,
+                LastRejectedAt = s.LastRejectedAt
             }).ToList();
 
             return new PaginatedResult<PayoutRequestDto>(data, totalCount, pageNumber, pageSize);
@@ -277,6 +280,62 @@ namespace Finance.Infrastructure.Services
             }
 
             return (true, "Đã chấp nhận giải ngân, số dư ví đã được cập nhật.", MapToResultDto(payout));
+        }
+
+        public async Task<(bool IsSuccess, string Message)> RejectPayoutAsync(
+            Guid payoutId,
+            Guid organizerId,
+            string? reason,
+            CancellationToken cancellationToken = default)
+        {
+            EventPayout? payout = await _unitOfWork.EventPayoutRepository.GetOneAsync<EventPayout>(
+                filter: p => p.Id == payoutId, cancellation: cancellationToken);
+
+            if (payout == null)
+                return (false, $"Không tìm thấy đề xuất giải ngân với ID {payoutId}.");
+
+            if (payout.OrganizerId != organizerId)
+                return (false, "Bạn không có quyền từ chối đề xuất giải ngân này.");
+
+            if (payout.Status != EventPayoutStatus.Proposed)
+                return (false, "Đề xuất giải ngân này đã được xử lý.");
+
+            List<WalletTransaction> attachedTransactions = (await _unitOfWork.WalletTransactionRepository.GetAllAsync<WalletTransaction>(
+                filter: t => t.EventPayoutId == payout.Id && t.Status == WalletTransactionStatus.Pending,
+                cancellation: cancellationToken)).ToList();
+
+            PayoutRequest? payoutRequest = await _unitOfWork.PayoutRequestRepository.GetOneAsync<PayoutRequest>(
+                filter: pr => pr.EventPayoutId == payout.Id, cancellation: cancellationToken);
+
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                foreach (WalletTransaction tx in attachedTransactions)
+                {
+                    tx.DetachFromPayout();
+                    _unitOfWork.WalletTransactionRepository.UpdateEntity(tx);
+                }
+
+                payout.Reject(reason);
+                _unitOfWork.EventPayoutRepository.UpdateEntity(payout);
+
+                if (payoutRequest != null)
+                {
+                    payoutRequest.ResetToPending();
+                    _unitOfWork.PayoutRequestRepository.UpdateEntity(payoutRequest);
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Lỗi xảy ra khi từ chối giải ngân {PayoutId}", payoutId);
+                throw;
+            }
+
+            return (true, "Đã từ chối đề xuất giải ngân. Yêu cầu đã được chuyển lại cho Moderator xem xét.");
         }
 
         private static EventPayoutResultDto MapToResultDto(EventPayout payout)

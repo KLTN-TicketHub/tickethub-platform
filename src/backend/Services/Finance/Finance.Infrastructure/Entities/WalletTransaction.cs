@@ -62,6 +62,12 @@ namespace Finance.Infrastructure.Entities
             UpdatedAt = DateTime.UtcNow;
         }
 
+        public void DetachFromPayout()
+        {
+            EventPayoutId = null;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
         public void AssignPayout(Guid eventPayoutId)
         {
             EventPayoutId = eventPayoutId;

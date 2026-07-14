@@ -32,6 +32,10 @@ namespace Finance.Infrastructure.Data.Repositories
                 from cs in csJoin.DefaultIfEmpty()
                 join os in _dbContext.Set<OrganizerSnapshot>() on pr.OrganizerId equals os.Id into osJoin
                 from os in osJoin.DefaultIfEmpty()
+                let lastRejection = _dbContext.Set<EventPayout>()
+                    .Where(p => p.EventId == pr.EventId && p.Status == EventPayoutStatus.Rejected)
+                    .OrderByDescending(p => p.RejectedAt)
+                    .FirstOrDefault()
                 select new PayoutRequestSummary
                 {
                     PayoutRequestId = pr.Id,
@@ -44,7 +48,10 @@ namespace Finance.Infrastructure.Data.Repositories
                     GrossAmount = tx.GrossAmount,
                     RecommendedRate = cs != null ? cs.Rate : 0,
                     OrderCount = tx.OrderCount,
-                    RequestedAt = pr.CreatedAt
+                    RequestedAt = pr.CreatedAt,
+                    IsResubmitted = lastRejection != null,
+                    LastRejectionReason = lastRejection != null ? lastRejection.RejectionReason : null,
+                    LastRejectedAt = lastRejection != null ? lastRejection.RejectedAt : null
                 };
 
             int totalCount = await query.CountAsync(cancellation);

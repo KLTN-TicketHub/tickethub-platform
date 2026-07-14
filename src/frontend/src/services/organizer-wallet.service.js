@@ -1,7 +1,7 @@
 import api from './api/axios'
 import {
   ORGANIZER_WALLET, ORGANIZER_WALLET_TRANSACTIONS, ORGANIZER_PAYOUT_REQUEST,
-  ORGANIZER_PAYOUT_PROPOSED, ORGANIZER_PAYOUT_ACCEPT
+  ORGANIZER_PAYOUT_PROPOSED, ORGANIZER_PAYOUT_ACCEPT, ORGANIZER_PAYOUT_REJECT
 } from './api/endpoints'
 
 /**
@@ -55,5 +55,17 @@ export async function getProposedPayouts(params) {
  */
 export async function acceptPayout(payoutId) {
   const response = await api.post(ORGANIZER_PAYOUT_ACCEPT(payoutId))
+  return response.data
+}
+
+/**
+ * Từ chối đề xuất giải ngân (chuyển lại cho Moderator xem xét)
+ * POST /finance/organizer/payouts/{payoutId}/reject
+ * @param {string} payoutId
+ * @param {string} [reason]
+ * @returns {{ success, message }}
+ */
+export async function rejectPayout(payoutId, reason) {
+  const response = await api.post(ORGANIZER_PAYOUT_REJECT(payoutId), { reason })
   return response.data
 }

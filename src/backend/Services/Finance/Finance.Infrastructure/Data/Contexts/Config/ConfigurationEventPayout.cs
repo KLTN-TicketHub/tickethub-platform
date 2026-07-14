@@ -60,6 +60,9 @@ namespace Finance.Infrastructure.Data.Contexts.Config
 
             builder.Property(ep => ep.ReviewedAt)
                 .IsRequired();
+
+            builder.Property(ep => ep.RejectionReason)
+                .HasMaxLength(500);
         }
     }
 }
