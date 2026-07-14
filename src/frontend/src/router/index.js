@@ -81,6 +81,7 @@ const routes = [
       { path: 'dashboard', name: 'admin-dashboard', component: AdminDashboard },
       { path: 'events', name: 'admin-events', component: EventsAdmin },
       { path: 'users', name: 'admin-users', component: UsersAdmin },
+      { path: 'event-categories', name: 'admin-event-categories', component: () => import('../pages/admin/EventCategoriesAdmin.vue') },
       { path: 'moderators', name: 'admin-moderators', component: ModeratorsAdmin },
       { path: 'orders', name: 'admin-orders', component: OrdersAdmin },
     ]

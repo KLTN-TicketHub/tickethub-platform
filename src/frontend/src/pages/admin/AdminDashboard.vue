@@ -8,8 +8,9 @@
 
     <!-- Stats Bento Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div v-for="(stat, idx) in mainStats" :key="stat.label" 
-        class="relative overflow-hidden rounded-[2rem] p-8 flex flex-col gap-6 group transition-transform duration-500 hover:-translate-y-1"
+      <router-link v-for="(stat, idx) in mainStats" :key="stat.label" 
+        :to="stat.link || '/admin/dashboard'"
+        class="relative overflow-hidden rounded-[2rem] p-8 flex flex-col gap-6 group transition-transform duration-500 hover:-translate-y-1 hover:border-primary/20 border border-white/5"
         :class="stat.bgClass"
       >
         <div class="flex justify-between items-start relative z-10">
@@ -24,7 +25,7 @@
         </div>
         <!-- Decorative Glow -->
         <div class="absolute -bottom-10 -right-10 w-40 h-40 rounded-full blur-[50px] opacity-20 pointer-events-none transition-opacity duration-500 group-hover:opacity-40" :class="stat.glowClass"></div>
-      </div>
+      </router-link>
     </div>
 
     <!-- Main Content Area -->
@@ -138,6 +139,7 @@ const mainStats = computed(() => [
     value: allEvents.value.length, 
     sub: 'Đang mở',
     icon: PhTicket,
+    link: '/admin/events',
     bgClass: 'bg-[#111916] border border-white/5',
     iconBgClass: 'bg-primary/10',
     iconColorClass: 'text-primary',
@@ -148,6 +150,7 @@ const mainStats = computed(() => [
     value: usersData.length, 
     sub: 'Hoạt động',
     icon: PhUsers,
+    link: '/admin/users',
     bgClass: 'bg-[#111916] border border-white/5',
     iconBgClass: 'bg-[#818cf8]/10',
     iconColorClass: 'text-[#818cf8]',
@@ -158,6 +161,7 @@ const mainStats = computed(() => [
     value: ordersData.length, 
     sub: 'Thành công',
     icon: PhReceipt,
+    link: '/admin/orders',
     bgClass: 'bg-[#111916] border border-white/5',
     iconBgClass: 'bg-yellow-500/10',
     iconColorClass: 'text-yellow-500',
@@ -168,6 +172,7 @@ const mainStats = computed(() => [
     value: formatPrice(ordersData.filter(o => o.status === 'confirmed').reduce((sum, o) => sum + o.totalPrice, 0)), 
     sub: 'Tuần này',
     icon: PhCoins,
+    link: '/admin/orders',
     bgClass: 'bg-[#111916] border border-white/5',
     iconBgClass: 'bg-[#f472b6]/10',
     iconColorClass: 'text-[#f472b6]',

@@ -35,6 +35,7 @@ namespace Catalog.Application.Features.EventCategories.Queries.GetEventCategorie
                     Description = e.Description,
                     Status = e.Status.GetDisplayName(),
                     CreatedAt = e.CreatedAt,
+                    RecommendedCommissionRate = e.RecommendedCommissionRate,
                     RowVersion = e.RowVersion
                 },
                 pageNumber: request.PageNumber,

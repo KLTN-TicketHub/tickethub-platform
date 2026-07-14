@@ -40,6 +40,10 @@ export const MODERATOR_EVENTS_LIST = '/catalog/moderator/events'
 export const MODERATOR_EVENT_DETAIL = (id) => `/catalog/moderator/events/${id}`
 export const MODERATOR_EVENT_REVIEW = (id) => `/catalog/moderator/events/${id}/review`
 
+// Admin Events & Categories
+export const ADMIN_EVENT_CATEGORIES = '/catalog/admin/event-categories'
+export const ADMIN_EVENT_CATEGORY_DETAIL = (id) => `/catalog/admin/event-categories/${id}`
+
 // Organizer Venues & SeatMaps
 export const ORGANIZER_VENUE_LIST = '/catalog/organizer/venues'
 export const ORGANIZER_VENUE_SEATMAPS = (venueId) => `/catalog/organizer/venue/${venueId}/seat-maps`

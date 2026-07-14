@@ -86,7 +86,7 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { adminSearch } from '../../stores/adminStore'
 import { logout as authLogout } from '../../services/auth/auth.service'
-import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin, PhList, PhX, PhSuitcase, PhPlus } from '@phosphor-icons/vue'
+import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin, PhList, PhX, PhSuitcase, PhPlus, PhFolderOpen } from '@phosphor-icons/vue'
 
 const props = defineProps({
   role: { type: String, default: 'admin' }
@@ -101,6 +101,7 @@ let debounceTimer = null
 const adminMenuItems = [
   { label: 'Tổng quan', path: '/admin/dashboard', icon: PhSquaresFour },
   { label: 'Sự kiện', path: '/admin/events', icon: PhTicket },
+  { label: 'Danh mục', path: '/admin/event-categories', icon: PhFolderOpen },
   { label: 'Người dùng', path: '/admin/users', icon: PhUsers },
   { label: 'Kiểm duyệt', path: '/admin/moderators', icon: PhShieldCheck },
   { label: 'Đơn hàng', path: '/admin/orders', icon: PhReceipt },
@@ -132,6 +133,7 @@ const isRouteActive = (path) => {
 
 const searchPlaceholder = computed(() => {
   if (route.path.includes('/events')) return 'Tìm sự kiện...'
+  if (route.path.includes('/event-categories')) return 'Tìm danh mục...'
   if (route.path.includes('/users')) return 'Tìm người dùng...'
   if (route.path.includes('/orders')) return 'Tìm đơn hàng...'
   return 'Tìm kiếm...'

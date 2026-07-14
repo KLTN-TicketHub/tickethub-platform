@@ -30,12 +30,10 @@ namespace Catalog.Application.Features.EventCategories.Commands.CreateEventCateg
 
         private async Task<EventCategoryDto> CreateEventCategoryAsync(CreateEventCategoryRequest request, CancellationToken cancellation = default)
         {
-            if (await _unitOfWork
-                .EventCategoryRepository
-                .IsExistsAsync(
-                    nameof(EventCategory.CategoryName),
-                    request.CategoryName, cancellation))
-                throw new ValidatorException($"Tên danh mục sự kiện '{request.CategoryName}' đã tồn tại.");
+            EventCategory? eventCategory = await _unitOfWork.EventCategoryRepository.GetOneUntrackedAsync<EventCategory>(x => x.CategoryName == request.CategoryName, cancellation: cancellation);
+
+            if(eventCategory != null)   
+                throw new BusinessRuleException($"Tên danh mục '{request.CategoryName}' đã tồn tại.");
 
             string categoryCode = await _unitOfWork
                 .EventCategoryRepository

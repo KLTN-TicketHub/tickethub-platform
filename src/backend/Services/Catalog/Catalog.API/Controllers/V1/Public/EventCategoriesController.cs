@@ -31,6 +31,7 @@ namespace Catalog.API.Controllers.V1.Public
             CancellationToken cancellationToken = default)
         {
             var result = await _sender.Send(new GetEventCategoriesQuery(request), cancellationToken);
+
             return Ok(new ApiResponse<PaginatedResult<EventCategoryDto>>
             {
                 Success = true,
