@@ -18,16 +18,24 @@ namespace Catalog.Domain.Entities
 
         public CatalogStatus Status { get; set; }
 
+        public decimal RecommendedCommissionRate { get; private set; }
+
         public byte[] RowVersion { get; set; } = default!;
 
         private readonly List<Event> _events = new List<Event>();
         public IReadOnlyCollection<Event> Events => _events.AsReadOnly();
 
-        public EventCategory(string categoryName, string? description)
+        public EventCategory(string categoryName, string? description, decimal recommendedCommissionRate)
         {
             CategoryName = categoryName;
             Description = description;
+            RecommendedCommissionRate = recommendedCommissionRate;
             Status = CatalogStatus.Active;
+        }
+
+        public void UpdateCommissionRate(decimal recommendedCommissionRate)
+        {
+            RecommendedCommissionRate = recommendedCommissionRate;
         }
 
         public static string NormalizeCategoryCode(string name, int maxLen = 40)

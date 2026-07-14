@@ -18,6 +18,10 @@ namespace Ordering.Infrastructure.Entities
 
         public string EventTitle { get; set; } = default!;
 
+        public Guid CategoryId { get; set; }
+
+        public string CategoryName { get; set; } = default!;
+
         public Guid OrganizerId { get; set; }
 
         public string OrganizerName { get; set; } = default!;
@@ -47,6 +51,8 @@ namespace Ordering.Infrastructure.Entities
             Guid showTimeId,
             Guid eventId,
             string eventTitle,
+            Guid categoryId,
+            string categoryName,
             Guid organizerId,
             string organizerName,
             string eventImage,
@@ -62,6 +68,8 @@ namespace Ordering.Infrastructure.Entities
             ShowTimeId = showTimeId;
             EventId = eventId;
             EventTitle = eventTitle;
+            CategoryId = categoryId;
+            CategoryName = categoryName;
             OrganizerId = organizerId;
             OrganizerName = organizerName;
             EventImage = eventImage;

@@ -20,6 +20,10 @@ namespace BuildingBlocks.Contracts.Events.Order
 
         public string EventTitle { get; init; } = string.Empty;
 
+        public Guid CategoryId { get; init; }
+
+        public string CategoryName { get; init; } = string.Empty;
+
         public DateTime ShowtimeStartAt { get; init; }
 
         public Guid OrganizerId { get; init; }

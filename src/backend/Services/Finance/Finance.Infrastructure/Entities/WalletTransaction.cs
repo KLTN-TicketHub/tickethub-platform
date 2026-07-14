@@ -9,6 +9,12 @@ namespace Finance.Infrastructure.Entities
 
         public Guid? OrderId { get; set; }
 
+        public Guid EventId { get; set; }
+
+        public Guid CategoryId { get; set; }
+
+        public Guid? EventPayoutId { get; private set; }
+
         public decimal Amount { get; set; }
 
         public WalletTransactionType Type { get; set; }
@@ -19,10 +25,20 @@ namespace Finance.Infrastructure.Entities
 
         public string Description { get; set; } = default!;
 
-        public WalletTransaction(Guid walletId, Guid? orderId, decimal amount, WalletTransactionType type, string description, DateTime releaseAt)
+        public WalletTransaction(
+            Guid walletId,
+            Guid? orderId,
+            Guid eventId,
+            Guid categoryId,
+            decimal amount,
+            WalletTransactionType type,
+            string description,
+            DateTime releaseAt)
         {
             WalletId = walletId;
             OrderId = orderId;
+            EventId = eventId;
+            CategoryId = categoryId;
             Amount = amount;
             Type = type;
             Description = description;
@@ -34,6 +50,12 @@ namespace Finance.Infrastructure.Entities
         {
             Status = WalletTransactionStatus.Success;
             UpdatedAt = DateTime.UtcNow;
+        }
+
+        public void AssignPayout(Guid eventPayoutId)
+        {
+            EventPayoutId = eventPayoutId;
+            MarkAsSuccess();
         }
     }
     public enum WalletTransactionType

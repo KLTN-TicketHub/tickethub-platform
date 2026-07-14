@@ -1,0 +1,64 @@
+using BuildingBlocks.Domain.DDD;
+
+namespace Finance.Infrastructure.Entities
+{
+    public class EventPayout : BaseEntity, IAggregateRoot
+    {
+        public Guid EventId { get; private set; }
+
+        public Guid CategoryId { get; private set; }
+
+        public Guid OrganizerId { get; private set; }
+
+        public Guid WalletId { get; private set; }
+
+        public decimal GrossAmount { get; private set; }
+
+        public decimal RecommendedRate { get; private set; }
+
+        public decimal AppliedRate { get; private set; }
+
+        public decimal FeeAmount { get; private set; }
+
+        public decimal NetAmount { get; private set; }
+
+        public EventPayoutStatus Status { get; private set; }
+
+        public Guid ReviewedByUserId { get; private set; }
+
+        public string? ReviewedByName { get; private set; }
+
+        public DateTime ReviewedAt { get; private set; }
+
+        public EventPayout(
+            Guid eventId,
+            Guid categoryId,
+            Guid organizerId,
+            Guid walletId,
+            decimal grossAmount,
+            decimal recommendedRate,
+            decimal appliedRate,
+            Guid reviewedByUserId,
+            string? reviewedByName)
+        {
+            EventId = eventId;
+            CategoryId = categoryId;
+            OrganizerId = organizerId;
+            WalletId = walletId;
+            GrossAmount = grossAmount;
+            RecommendedRate = recommendedRate;
+            AppliedRate = appliedRate;
+            FeeAmount = Math.Round(grossAmount * appliedRate / 100m, 2);
+            NetAmount = grossAmount - FeeAmount;
+            Status = EventPayoutStatus.Released;
+            ReviewedByUserId = reviewedByUserId;
+            ReviewedByName = reviewedByName;
+            ReviewedAt = DateTime.UtcNow;
+        }
+    }
+
+    public enum EventPayoutStatus
+    {
+        Released = 1
+    }
+}

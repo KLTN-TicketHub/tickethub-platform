@@ -10,15 +10,21 @@ namespace Finance.Infrastructure.Data.Contexts
             FinanceDbContext dbContext,
             IAuditLogRepository auditLogRepository,
             IWalletRepository walletRepository,
-            IWalletTransactionRepository walletTransactionRepository) : base(dbContext)
+            IWalletTransactionRepository walletTransactionRepository,
+            ICommissionSettingRepository commissionSettingRepository,
+            IEventPayoutRepository eventPayoutRepository) : base(dbContext)
         {
             AuditLogRepository = auditLogRepository;
             WalletRepository = walletRepository;
             WalletTransactionRepository = walletTransactionRepository;
+            CommissionSettingRepository = commissionSettingRepository;
+            EventPayoutRepository = eventPayoutRepository;
         }
 
         public IAuditLogRepository AuditLogRepository { get; }
         public IWalletRepository WalletRepository { get; }
         public IWalletTransactionRepository WalletTransactionRepository { get; }
+        public ICommissionSettingRepository CommissionSettingRepository { get; }
+        public IEventPayoutRepository EventPayoutRepository { get; }
     }
 }

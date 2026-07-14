@@ -23,6 +23,12 @@ namespace Ordering.Infrastructure.Data.Contexts.Config
             builder.Property(e => e.EventImage)
                 .HasMaxLength(2000);
 
+            builder.Property(e => e.CategoryId).IsRequired();
+
+            builder.Property(e => e.CategoryName)
+                .HasMaxLength(50)
+                .IsRequired();
+
             builder.Property(e => e.OrganizerId).IsRequired();
 
             builder.Property(e => e.OrganizerName)

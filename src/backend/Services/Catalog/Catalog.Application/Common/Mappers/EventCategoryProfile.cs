@@ -12,7 +12,8 @@ namespace Catalog.Application.Common.Mappers
             CreateMap<CreateEventCategoryRequest, EventCategory>()
                 .ConstructUsing(src => new EventCategory(
                     src.CategoryName,
-                    src.Description
+                    src.Description,
+                    src.RecommendedCommissionRate
                 ));
 
             CreateMap<EventCategory, EventCategoryDto>()
@@ -21,13 +22,15 @@ namespace Catalog.Application.Common.Mappers
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.CategoryName))
                 .ForMember(dest => dest.Slug, opt => opt.MapFrom(src => src.Slug))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.RecommendedCommissionRate, opt => opt.MapFrom(src => src.RecommendedCommissionRate))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
                 .ForMember(dest => dest.RowVersion, opt => opt.MapFrom(src => src.RowVersion));
 
             CreateMap<UpdateEventCategoryRequest, EventCategory>()
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.CategoryName))
-                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description));
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.RecommendedCommissionRate, opt => opt.Ignore());
         }
     }
 }

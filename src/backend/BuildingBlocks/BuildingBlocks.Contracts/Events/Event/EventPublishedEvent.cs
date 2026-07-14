@@ -5,6 +5,8 @@ namespace BuildingBlocks.Contracts.Events.Event
         public Guid EventId { get; init; }
         public string EventTitle { get; init; } = default!;
         public string EventImage { get; init; } = default!;
+        public Guid CategoryId { get; init; }
+        public string CategoryName { get; init; } = default!;
         public Guid OrganizerId { get; init; }
         public string OrganizerName { get; init; } = default!;
         public DateTime SaleOpenAt { get; init; }

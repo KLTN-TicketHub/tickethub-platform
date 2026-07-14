@@ -1,4 +1,6 @@
 using AutoMapper;
+using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Contracts.Events.EventCategory;
 using BuildingBlocks.Domain.Exceptions;
 using Catalog.Application.Common.DTOs.EventCategories;
 using Catalog.Application.Features.EventCategories.Requests;
@@ -12,11 +14,13 @@ namespace Catalog.Application.Features.EventCategories.Commands.UpdateEventCateg
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IEventPublisher _eventPublisher;
 
-        public UpdateEventCategoryCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public UpdateEventCategoryCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, IEventPublisher eventPublisher)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _eventPublisher = eventPublisher;
         }
 
         public async Task<EventCategoryDto> Handle(UpdateEventCategoryCommand command, CancellationToken cancellationToken)
@@ -31,8 +35,18 @@ namespace Catalog.Application.Features.EventCategories.Commands.UpdateEventCateg
                 cancellation: cancellationToken) ?? throw new NotFoundException("Không tìm thấy danh mục sự kiện");
 
             _mapper.Map(request, category);
+            category.UpdateCommissionRate(request.RecommendedCommissionRate);
 
             EventCategory updatedCategory = await _unitOfWork.EventCategoryRepository.UpdateAsync(category, cancellationToken);
+
+            await _eventPublisher.PublishAsync(new EventCategoryCommissionRateChangedEvent
+            {
+                CategoryId = updatedCategory.Id,
+                CategoryName = updatedCategory.CategoryName,
+                RecommendedCommissionRate = updatedCategory.RecommendedCommissionRate
+            }, cancellationToken: cancellationToken);
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return _mapper.Map<EventCategoryDto>(updatedCategory);
         }

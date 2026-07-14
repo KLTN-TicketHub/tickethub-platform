@@ -15,13 +15,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
-namespace Catalog.API.Controllers.V1.Moderator
+namespace Catalog.API.Controllers.V1.Admin
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/moderator/event-categories")]
+    [Route("api/v{version:apiVersion}/admin/event-categories")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [Authorize(Roles = Roles.Moderator)]
+    [Authorize(Roles = Roles.Admin)]
     public class EventCategoriesController : ControllerBase
     {
         private readonly ISender _sender;

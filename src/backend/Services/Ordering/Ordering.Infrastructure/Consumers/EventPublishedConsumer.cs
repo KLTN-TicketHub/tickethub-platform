@@ -45,6 +45,8 @@ namespace Ordering.Infrastructure.Consumers
                     eventId: message.EventId,
                     eventTitle: message.EventTitle,
                     eventImage: message.EventImage,
+                    categoryId: message.CategoryId,
+                    categoryName: message.CategoryName,
                     organizerId: message.OrganizerId,
                     organizerName: message.OrganizerName,
                     saleOpenAt: message.SaleOpenAt,

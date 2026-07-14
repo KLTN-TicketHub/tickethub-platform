@@ -44,6 +44,7 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
             Event eventEntity = await _unitOfWork.EventRepository.GetOneAsync<Event>(
                 filter: e => e.Id == eventId && !e.IsDeleted,
                 include: q => q.Include(e => e.Organizer!)
+                               .Include(e => e.Category)
                                .Include(e => e.ShowTimes)
                                .ThenInclude(s => s.TicketTypes)
                                .ThenInclude(t => t.Zone),
@@ -75,6 +76,8 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
                     EventId = eventEntity.Id,
                     EventTitle = eventEntity.Title,
                     EventImage = _fileService.GetAbsoluteUrl(eventEntity.CoverImageUrl),
+                    CategoryId = eventEntity.CategoryId,
+                    CategoryName = eventEntity.Category?.CategoryName ?? string.Empty,
                     OrganizerId = eventEntity.OrganizerId,
                     OrganizerName = eventEntity.Organizer?.OrganizerName ?? string.Empty,
                     SaleOpenAt = eventEntity.SaleOpenAt,

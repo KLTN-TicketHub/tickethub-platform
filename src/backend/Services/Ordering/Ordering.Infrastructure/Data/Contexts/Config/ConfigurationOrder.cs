@@ -37,6 +37,13 @@ namespace Ordering.Infrastructure.Data.Contexts.Config
                 .HasMaxLength(500)
                 .IsRequired();
 
+            builder.Property(o => o.CategoryId)
+                .IsRequired();
+
+            builder.Property(o => o.CategoryName)
+                .HasMaxLength(50)
+                .IsRequired();
+
             builder.Property(o => o.ShowtimeStartAt)
                 .IsRequired();
 

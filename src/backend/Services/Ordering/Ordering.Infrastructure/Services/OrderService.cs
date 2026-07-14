@@ -105,6 +105,8 @@ namespace Ordering.Infrastructure.Services
                 showTimeId: request.ShowtimeId,
                 eventId: eventSnap.EventId,
                 eventTitle: eventSnap.EventTitle,
+                categoryId: eventSnap.CategoryId,
+                categoryName: eventSnap.CategoryName,
                 organizerId: eventSnap.OrganizerId,
                 organizerName: eventSnap.OrganizerName,
                 eventImage: eventSnap.EventImage,

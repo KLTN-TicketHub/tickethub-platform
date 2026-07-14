@@ -12,6 +12,7 @@ namespace Finance.API.Extensions
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<Finance.Infrastructure.Consumers.OrderPaidConsumer>();
+                x.AddConsumer<Finance.Infrastructure.Consumers.EventCategoryCommissionRateChangedConsumer>();
 
                 x.AddEntityFrameworkOutbox<FinanceDbContext>(o =>
                 {
@@ -38,6 +39,11 @@ namespace Finance.API.Extensions
                     cfg.ReceiveEndpoint("finance-order-paid", e =>
                     {
                         e.ConfigureConsumer<Finance.Infrastructure.Consumers.OrderPaidConsumer>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("finance-event-category-commission-rate-changed", e =>
+                    {
+                        e.ConfigureConsumer<Finance.Infrastructure.Consumers.EventCategoryCommissionRateChangedConsumer>(context);
                     });
 
                     cfg.ConfigureEndpoints(context);

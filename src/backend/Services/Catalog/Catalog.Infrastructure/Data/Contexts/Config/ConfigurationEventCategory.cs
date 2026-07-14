@@ -27,6 +27,10 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
             builder.Property(ec => ec.Description)
                 .HasMaxLength(500);
 
+            builder.Property(ec => ec.RecommendedCommissionRate)
+                .IsRequired()
+                .HasPrecision(5, 2);
+
             builder.Property(ec => ec.Status)
                 .IsRequired()
                 .HasConversion<string>();

@@ -78,6 +78,8 @@ namespace Ordering.Infrastructure.Consumers
                         ShowTimeId = order.ShowTimeId,
                         EventId = order.EventId,
                         EventTitle = order.EventTitle,
+                        CategoryId = order.CategoryId,
+                        CategoryName = order.CategoryName,
                         ShowtimeStartAt = order.ShowtimeStartAt,
                         OrganizerId = order.OrganizerId,
                         OrganizerName = order.OrganizerName,

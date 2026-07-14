@@ -14,6 +14,9 @@ namespace Catalog.Application.Features.EventCategories.Validators
             RuleFor(x => x.Description)
                 .MaximumLength(500).WithMessage("Mô tả không được vượt quá 500 ký tự.")
                 .When(x => !string.IsNullOrWhiteSpace(x.Description));
+
+            RuleFor(x => x.RecommendedCommissionRate)
+                .InclusiveBetween(0, 100).WithMessage("Phần trăm hoa hồng tham khảo phải nằm trong khoảng từ 0 đến 100.");
         }
     }
 }

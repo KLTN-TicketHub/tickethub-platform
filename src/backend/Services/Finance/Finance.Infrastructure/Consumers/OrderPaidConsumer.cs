@@ -54,6 +54,8 @@ namespace Finance.Infrastructure.Consumers
                 var transaction = new WalletTransaction(
                     walletId: wallet.Id,
                     orderId: message.OrderId,
+                    eventId: message.EventId,
+                    categoryId: message.CategoryId,
                     amount: message.TotalPrice,
                     type: WalletTransactionType.Revenue,
                     description: $"Doanh thu từ đơn hàng {message.OrderId} của sự kiện {message.EventTitle}",

@@ -8,5 +8,7 @@ namespace Finance.Infrastructure.Interfaces
         IAuditLogRepository AuditLogRepository { get; }
         IWalletRepository WalletRepository { get; }
         IWalletTransactionRepository WalletTransactionRepository { get; }
+        ICommissionSettingRepository CommissionSettingRepository { get; }
+        IEventPayoutRepository EventPayoutRepository { get; }
     }
 }

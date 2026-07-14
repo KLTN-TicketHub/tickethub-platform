@@ -23,7 +23,8 @@ namespace Finance.API.Extensions
             services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFileService, FileService>();
-            services.AddScoped<Finance.Infrastructure.Interfaces.IServices.IReleaseFundsJobService, Finance.Infrastructure.Services.ReleaseFundsJobService>();
+            services.AddScoped<Finance.Infrastructure.Interfaces.IServices.IPayoutService, Finance.Infrastructure.Services.PayoutService>();
+            services.AddScoped<Finance.Infrastructure.Interfaces.IServices.IWalletService, Finance.Infrastructure.Services.WalletService>();
 
             return services;
         }
@@ -34,6 +35,8 @@ namespace Finance.API.Extensions
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
             services.AddScoped<IWalletRepository, WalletRepository>();
             services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
+            services.AddScoped<ICommissionSettingRepository, CommissionSettingRepository>();
+            services.AddScoped<IEventPayoutRepository, EventPayoutRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }

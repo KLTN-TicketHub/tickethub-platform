@@ -15,6 +15,12 @@ namespace Finance.Infrastructure.Data.Contexts.Config
                 .HasForeignKey(wt => wt.WalletId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Property(wt => wt.EventId)
+                .IsRequired();
+
+            builder.Property(wt => wt.CategoryId)
+                .IsRequired();
+
             builder.Property(wt => wt.Amount)
                 .IsRequired()
                 .HasPrecision(18, 2);

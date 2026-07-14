@@ -12,6 +12,8 @@ namespace Finance.Infrastructure.Data.Contexts
 
         #region DbSet Section
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<Entities.CommissionSetting> CommissionSettings { get; set; }
+        public DbSet<Entities.EventPayout> EventPayouts { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
