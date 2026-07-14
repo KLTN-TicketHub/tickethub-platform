@@ -1,6 +1,6 @@
 services:
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: heidiks/rabbitmq-delayed-message-exchange:3.13.3-management
     container_name: tickethub-rabbitmq
     hostname: rabbitmq
     restart: unless-stopped

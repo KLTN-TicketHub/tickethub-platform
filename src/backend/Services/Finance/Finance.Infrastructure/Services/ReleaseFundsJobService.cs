@@ -1,7 +1,6 @@
 using Finance.Infrastructure.Entities;
 using Finance.Infrastructure.Interfaces;
 using Finance.Infrastructure.Interfaces.IServices;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Finance.Infrastructure.Services
@@ -27,7 +26,6 @@ namespace Finance.Infrastructure.Services
                     filter: t => t.Status == WalletTransactionStatus.Pending &&
                                  t.Type == WalletTransactionType.Revenue &&
                                  t.ReleaseAt <= DateTime.UtcNow,
-                    include: q => q.Include(t => t.Wallet),
                     cancellation: cancellationToken
                 );
 
@@ -37,25 +35,8 @@ namespace Finance.Infrastructure.Services
                     return;
                 }
 
-                int successCount = 0;
-                foreach (var tx in pendingTransactions)
-                {
-                    if (tx.Wallet == null)
-                    {
-                        _logger.LogWarning("Không tìm thấy ví cho giao dịch {TxId}", tx.Id);
-                        continue;
-                    }
+                int successCount = await ReleaseFundsForWalletsAsync(pendingTransactions, cancellationToken);
 
-                    tx.Wallet.Credit(tx.Amount);
-                    tx.MarkAsSuccess();
-
-                    await _unitOfWork.WalletRepository.UpdateAsync(tx.Wallet);
-                    await _unitOfWork.WalletTransactionRepository.UpdateAsync(tx);
-
-                    successCount++;
-                }
-
-                await _unitOfWork.SaveChangesAsync();
                 _logger.LogInformation("Đã giải ngân thành công {Count} giao dịch.", successCount);
             }
             catch (Exception ex)
@@ -63,6 +44,51 @@ namespace Finance.Infrastructure.Services
                 _logger.LogError(ex, "Lỗi xảy ra trong quá trình chạy Job giải ngân.");
                 throw;
             }
+        }
+
+        private async Task<int> ReleaseFundsForWalletsAsync(
+            IEnumerable<WalletTransaction> pendingTransactions,
+            CancellationToken cancellationToken)
+        {
+            int successCount = 0;
+
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                IEnumerable<IGrouping<Guid, WalletTransaction>> transactionsByWallet =
+                    pendingTransactions.GroupBy(t => t.WalletId);
+
+                foreach (IGrouping<Guid, WalletTransaction> group in transactionsByWallet)
+                {
+                    Wallet? wallet = await _unitOfWork.WalletRepository.GetByIdAsync(group.Key, cancellationToken);
+                    if (wallet == null)
+                    {
+                        _logger.LogWarning("Không tìm thấy ví {WalletId} cho các giao dịch chờ giải ngân.", group.Key);
+                        continue;
+                    }
+
+                    foreach (WalletTransaction tx in group)
+                    {
+                        wallet.Credit(tx.Amount);
+                        tx.MarkAsSuccess();
+
+                        _unitOfWork.WalletTransactionRepository.UpdateEntity(tx);
+                        successCount++;
+                    }
+
+                    _unitOfWork.WalletRepository.UpdateEntity(wallet);
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                throw;
+            }
+
+            return successCount;
         }
     }
 }

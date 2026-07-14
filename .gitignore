@@ -7,4 +7,7 @@
 .codegraph
 .codegraph/
 **/.codegraph/
-**/.codegraph
+**/.codegraph
+
+# Local AI assistant notes (not shared with team)
+CLAUDE.md

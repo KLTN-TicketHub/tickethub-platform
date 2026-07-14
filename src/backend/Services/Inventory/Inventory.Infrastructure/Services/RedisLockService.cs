@@ -73,19 +73,23 @@ namespace Inventory.Infrastructure.Services
             EndPoint[] endpoints = _connection.GetEndPoints();
             IServer server = _connection.GetServer(endpoints.First());
             string pattern = $"seat_lock:{showtimeId}:*";
-            List<RedisKey> keys = server.Keys(database: _redisDb.Database, pattern: pattern).ToList();
+            RedisKey[] keys = server.Keys(database: _redisDb.Database, pattern: pattern).ToArray();
 
-            foreach (var key in keys)
+            if (keys.Length == 0)
+                return result;
+
+            RedisValue[] values = await _redisDb.StringGetAsync(keys);
+
+            for (int i = 0; i < keys.Length; i++)
             {
-                RedisValue value = await _redisDb.StringGetAsync(key);
-                if (!value.IsNullOrEmpty)
-                {
-                    string seatIdStr = key.ToString().Split(':').Last();
-                    string[] parts = value.ToString().Split(':');
-                    string userId = parts[0];
-                    string status = parts.Length > 1 ? parts[1] : "Selecting";
-                    result.Add(seatIdStr, (status, userId));
-                }
+                if (values[i].IsNullOrEmpty)
+                    continue;
+
+                string seatIdStr = keys[i].ToString().Split(':').Last();
+                string[] parts = values[i].ToString().Split(':');
+                string userId = parts[0];
+                string status = parts.Length > 1 ? parts[1] : "Selecting";
+                result[seatIdStr] = (status, userId);
             }
 
             return result;
@@ -110,11 +114,15 @@ namespace Inventory.Infrastructure.Services
             EndPoint[] endpoints = _connection.GetEndPoints();
             IServer server = _connection.GetServer(endpoints.First());
             string pattern = $"ticket_lock:{showtimeId}:{ticketTypeId}:*";
-            List<RedisKey> keys = server.Keys(database: _redisDb.Database, pattern: pattern).ToList();
+            RedisKey[] keys = server.Keys(database: _redisDb.Database, pattern: pattern).ToArray();
 
-            foreach (var key in keys)
+            if (keys.Length == 0)
+                return total;
+
+            RedisValue[] values = await _redisDb.StringGetAsync(keys);
+
+            foreach (RedisValue value in values)
             {
-                RedisValue value = await _redisDb.StringGetAsync(key);
                 if (!value.IsNullOrEmpty && int.TryParse(value.ToString(), out int qty))
                 {
                     total += qty;

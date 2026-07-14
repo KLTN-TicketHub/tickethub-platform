@@ -18,6 +18,12 @@ namespace Ordering.Infrastructure.Sagas
             Event(() => PaymentCompleted, x => x.CorrelateById(c => c.Message.OrderId));
             Event(() => PaymentFailed, x => x.CorrelateById(c => c.Message.OrderId));
 
+            Schedule(() => PaymentTimeout, x => x.TimeoutTokenId, s =>
+            {
+                s.Delay = TimeSpan.FromMinutes(10);
+                s.Received = r => r.CorrelateById(context => context.Message.OrderId);
+            });
+
             Initially(
                 When(CheckoutStarted)
                     .Then(context =>
@@ -35,6 +41,7 @@ namespace Ordering.Infrastructure.Sagas
                         CustomerName = context.Message.CustomerName,
                         CustomerEmail = context.Message.CustomerEmail,
                     })
+                    .Schedule(PaymentTimeout, context => new PaymentTimeoutEvent { OrderId = context.Saga.CorrelationId })
                     .TransitionTo(Reserved));
 
             During(Reserved,
@@ -42,16 +49,27 @@ namespace Ordering.Infrastructure.Sagas
                     .Then(context => context.Saga.PaymentLink = context.Message.PaymentLink),
 
                 When(PaymentCompleted)
+                    .Unschedule(PaymentTimeout)
                     .Send(new Uri("queue:ordering-confirm-order"),
                         context => new ConfirmOrderCommand { OrderId = context.Saga.CorrelationId })
                     .TransitionTo(Paid)
                     .Finalize(),
 
                  When(PaymentFailed)
+                    .Unschedule(PaymentTimeout)
                     .Send(new Uri("queue:ordering-cancel-order"), context => new CancelOrderCommand
                     {
                         OrderId = context.Saga.CorrelationId,
                         Reason = "Thanh toán không thành công"
+                    })
+                    .TransitionTo(Failed)
+                    .Finalize(),
+
+                When(PaymentTimeout.Received)
+                    .Send(new Uri("queue:ordering-cancel-order"), context => new CancelOrderCommand
+                    {
+                        OrderId = context.Saga.CorrelationId,
+                        Reason = "Hết thời gian thanh toán"
                     })
                     .TransitionTo(Failed)
                     .Finalize()
@@ -71,6 +89,8 @@ namespace Ordering.Infrastructure.Sagas
         public Event<PaymentCompletedEvent> PaymentCompleted { get; private set; }
 
         public Event<PaymentFailedEvent> PaymentFailed { get; private set; }
+
+        public Schedule<OrderBookingState, PaymentTimeoutEvent> PaymentTimeout { get; private set; }
     }
     public class PaymentTimeoutEvent
     {

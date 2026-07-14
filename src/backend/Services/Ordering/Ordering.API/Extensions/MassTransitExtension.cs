@@ -20,6 +20,8 @@ namespace Ordering.API.Extensions
                     o.UseBusOutbox();
                 });
 
+                x.AddDelayedMessageScheduler();
+
                 x.AddConsumer<ConfirmOrderConsumer>();
                 x.AddConsumer<CancelOrderConsumer>();
                 x.AddConsumer<EventPublishedConsumer>();
@@ -46,6 +48,8 @@ namespace Ordering.API.Extensions
                             h.Username(rabbitMqOptions.Username);
                             h.Password(rabbitMqOptions.Password);
                         });
+
+                    cfg.UseDelayedMessageScheduler();
 
                     cfg.ReceiveEndpoint("ordering-confirm-order", e =>
                     {
