@@ -68,6 +68,10 @@
               <PhChartPie weight="bold" />
               Xem báo cáo
             </BaseButton>
+            <BaseButton variant="outline" class="w-full sm:w-auto !rounded-xl !py-3.5 !px-8 flex items-center justify-center gap-2" @click="handleRatings">
+              <PhStar weight="bold" />
+              Xem đánh giá
+            </BaseButton>
             <BaseButton variant="primary" class="w-full sm:w-auto !rounded-xl !py-3.5 !px-8 flex items-center justify-center gap-2" @click="handleOrders">
               <PhReceipt weight="bold" />
               Xem đơn hàng
@@ -328,6 +332,10 @@
                   <PhChartPie weight="bold" />
                   Xem báo cáo
                 </BaseButton>
+                <BaseButton variant="outline" class="w-full !rounded-xl !py-3 flex items-center justify-center gap-2" @click="handleRatings">
+                  <PhStar weight="bold" />
+                  Xem đánh giá
+                </BaseButton>
                 <BaseButton variant="primary" class="w-full !rounded-xl !py-3 flex items-center justify-center gap-2" @click="handleOrders">
                   <PhReceipt weight="bold" />
                   Xem đơn hàng
@@ -359,9 +367,9 @@ import { getOrganizerEventDetail } from '../../services/eventService'
 import { getOrganizerSeatMapDetail } from '../../services/venue.service'
 import { store } from '../../stores/eventStore'
 import BaseButton from '../../components/ui/BaseButton.vue'
-import { 
-  PhCalendarBlank, PhMapPin, PhTicket, PhMapPinLine, PhSpinner, 
-  PhWarningCircle, PhPencilSimple, PhReceipt, PhClock, PhChartPie
+import {
+  PhCalendarBlank, PhMapPin, PhTicket, PhMapPinLine, PhSpinner,
+  PhWarningCircle, PhPencilSimple, PhReceipt, PhClock, PhChartPie, PhStar
 } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -465,6 +473,10 @@ const handleOrders = () => {
 
 const handleReport = () => {
   router.push(`/organizer/events/${event.value.id}/report`)
+}
+
+const handleRatings = () => {
+  router.push(`/organizer/events/${event.value.id}/ratings`)
 }
 
 // Konva

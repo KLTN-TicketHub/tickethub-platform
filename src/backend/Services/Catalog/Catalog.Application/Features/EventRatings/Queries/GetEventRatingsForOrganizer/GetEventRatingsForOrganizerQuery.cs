@@ -3,14 +3,14 @@ using Catalog.Application.Common.DTOs.EventRatings;
 using Catalog.Application.Features.EventRatings.Requests;
 using MediatR;
 
-namespace Catalog.Application.Features.EventRatings.Queries.GetEventRatings
+namespace Catalog.Application.Features.EventRatings.Queries.GetEventRatingsForOrganizer
 {
-    public class GetEventRatingsQuery : IRequest<PaginatedResult<EventRatingDto>>
+    public class GetEventRatingsForOrganizerQuery : IRequest<PaginatedResult<EventRatingDto>>
     {
         public Guid EventId { get; set; }
         public GetEventRatingsRequest Request { get; set; }
 
-        public GetEventRatingsQuery(Guid eventId, GetEventRatingsRequest request)
+        public GetEventRatingsForOrganizerQuery(Guid eventId, GetEventRatingsRequest request)
         {
             EventId = eventId;
             Request = request;

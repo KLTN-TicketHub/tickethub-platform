@@ -118,6 +118,7 @@ const routes = [
       { path: 'create-event', name: 'organizer-create-event', component: OrganizerCreateEventPage },
       { path: 'events/:id', name: 'organizer-event-detail', component: () => import('../pages/organizer/OrganizerEventDetailPage.vue') },
       { path: 'events/:id/report', name: 'organizer-event-report', component: () => import('../pages/organizer/OrganizerEventReportPage.vue') },
+      { path: 'events/:id/ratings', name: 'organizer-event-ratings', component: () => import('../pages/organizer/OrganizerEventRatingsPage.vue') },
       { path: 'wallet', name: 'organizer-wallet', component: () => import('../pages/organizer/OrganizerWalletPage.vue') }
     ]
   }

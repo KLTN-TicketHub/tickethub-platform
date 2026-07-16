@@ -36,7 +36,7 @@ namespace Inventory.API.Controllers.V1
         }
 
         [HttpPost("checkin/{qrToken}")]
-        [Authorize(Roles = Roles.Staff)]
+        [AllowAnonymous]
         public async Task<IActionResult> CheckInTicket([FromRoute] string qrToken)
         {
             if (string.IsNullOrWhiteSpace(qrToken))

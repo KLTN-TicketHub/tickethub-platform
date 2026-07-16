@@ -1,28 +1,37 @@
+using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Models.Pagination;
+using BuildingBlocks.Domain.Exceptions;
 using Catalog.Application.Common.DTOs.EventRatings;
 using Catalog.Application.Features.EventRatings.Requests;
 using Catalog.Domain.Entities;
 using Catalog.Domain.Interfaces;
 using MediatR;
 
-namespace Catalog.Application.Features.EventRatings.Queries.GetEventRatings
+namespace Catalog.Application.Features.EventRatings.Queries.GetEventRatingsForOrganizer
 {
-    public class GetEventRatingsQueryHandler : IRequestHandler<GetEventRatingsQuery, PaginatedResult<EventRatingDto>>
+    public class GetEventRatingsForOrganizerQueryHandler : IRequestHandler<GetEventRatingsForOrganizerQuery, PaginatedResult<EventRatingDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentUserService _currentUserService;
 
-        public GetEventRatingsQueryHandler(IUnitOfWork unitOfWork)
+        public GetEventRatingsForOrganizerQueryHandler(IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork;
+            _currentUserService = currentUserService;
         }
 
-        public async Task<PaginatedResult<EventRatingDto>> Handle(GetEventRatingsQuery query, CancellationToken cancellationToken)
+        public async Task<PaginatedResult<EventRatingDto>> Handle(GetEventRatingsForOrganizerQuery query, CancellationToken cancellationToken)
         {
-            return await GetEventRatingsAsync(query.EventId, query.Request, cancellationToken);
+            return await GetEventRatingsForOrganizerAsync(query.EventId, query.Request, cancellationToken);
         }
 
-        private async Task<PaginatedResult<EventRatingDto>> GetEventRatingsAsync(Guid eventId, GetEventRatingsRequest request, CancellationToken cancellationToken)
+        private async Task<PaginatedResult<EventRatingDto>> GetEventRatingsForOrganizerAsync(Guid eventId, GetEventRatingsRequest request, CancellationToken cancellationToken)
         {
+            _ = await _unitOfWork.EventRepository.GetOneUntrackedAsync<Event>(
+                filter: e => e.Id == eventId && e.OrganizerId == _currentUserService.UserId && !e.IsDeleted,
+                cancellation: cancellationToken)
+                ?? throw new NotFoundException($"Không tìm thấy sự kiện với ID {eventId}.");
+
             (IEnumerable<EventRatingDto> ratings, int totalCount) =
                 await _unitOfWork.EventRatingRepository.GetPagedAsync(
                     filter: r => r.EventId == eventId,

@@ -239,8 +239,47 @@
 
       <template #footer>
         <BaseButton variant="outline" @click="selectedTicket = null" class="!px-6">Đóng</BaseButton>
-        <BaseButton variant="primary" class="!rounded-full shadow-lg shadow-primary/20 flex items-center gap-2">
+        <BaseButton v-if="activeTab === 'past'" variant="primary" class="!rounded-full shadow-lg shadow-primary/20 flex items-center gap-2" @click="openRatingModal">
+          <PhStar weight="fill" /> Đánh giá sự kiện
+        </BaseButton>
+        <BaseButton v-else variant="primary" class="!rounded-full shadow-lg shadow-primary/20 flex items-center gap-2">
           <PhWallet weight="fill" /> Lưu vào Ví thiết bị
+        </BaseButton>
+      </template>
+    </BaseModal>
+
+    <!-- RATING SUBMISSION MODAL -->
+    <BaseModal
+      :show="showRatingModal"
+      @close="showRatingModal = false"
+      title="Đánh giá sự kiện"
+      :subtitle="selectedTicket?.eventTitle"
+      size="md"
+    >
+      <div class="flex flex-col gap-6 py-2">
+        <StarRatingInput v-model="ratingForm.soundRating" label="Âm thanh" />
+        <StarRatingInput v-model="ratingForm.visualRating" label="Ánh sáng / Hình ảnh" />
+        <StarRatingInput v-model="ratingForm.organizationRating" label="Tổ chức / Sắp xếp" />
+        <StarRatingInput v-model="ratingForm.facilityRating" label="Trang thiết bị / Cơ sở vật chất" />
+        <StarRatingInput v-model="ratingForm.serviceRating" label="Nhân viên / Dịch vụ" />
+        <StarRatingInput v-model="ratingForm.performanceRating" label="Nghệ sĩ / Chương trình biểu diễn" />
+
+        <div class="flex flex-col gap-2">
+          <label class="text-[12px] font-bold text-white/50 uppercase tracking-widest">Bình luận (không bắt buộc)</label>
+          <textarea
+            v-model="ratingForm.comment"
+            maxlength="1000"
+            rows="4"
+            placeholder="Chia sẻ trải nghiệm của bạn về sự kiện..."
+            class="w-full rounded-2xl px-5 py-3 text-[14px] font-medium bg-white/5 border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-primary/50 focus:bg-white/10 transition-all resize-none"
+          ></textarea>
+        </div>
+      </div>
+
+      <template #footer>
+        <BaseButton variant="outline" @click="showRatingModal = false" class="!px-6" :disabled="isSubmittingRating">Huỷ</BaseButton>
+        <BaseButton variant="primary" class="!rounded-full shadow-lg shadow-primary/20" :disabled="isSubmittingRating" @click="submitRating">
+          {{ isSubmittingRating ? 'Đang gửi...' : 'Gửi đánh giá' }}
         </BaseButton>
       </template>
     </BaseModal>
@@ -253,12 +292,14 @@ import { store } from '../stores/eventStore'
 import BaseBadge from '../components/ui/BaseBadge.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import BaseModal from '../components/ui/BaseModal.vue'
-import { 
-  PhWallet, PhShieldCheck, PhCheckCircle, PhCalendarBlank, 
-  PhMapPin, PhQrCode, PhTicket, PhQuestion, PhUser, 
-  PhClock, PhArmchair, PhLightbulb, PhSpinner
+import StarRatingInput from '../components/ui/StarRatingInput.vue'
+import {
+  PhWallet, PhShieldCheck, PhCheckCircle, PhCalendarBlank,
+  PhMapPin, PhQrCode, PhTicket, PhQuestion, PhUser,
+  PhClock, PhArmchair, PhLightbulb, PhSpinner, PhStar
 } from '@phosphor-icons/vue'
 import { ticketService } from '../services/ticket.service'
+import { submitEventRating } from '../services/rating.service'
 
 const activeTab = ref('upcoming')
 const selectedTicket = ref(null)
@@ -318,6 +359,56 @@ const formatDate = (dateStr) => {
 
 const openTicketDetail = (ticket) => {
   selectedTicket.value = ticket
+}
+
+const showRatingModal = ref(false)
+const isSubmittingRating = ref(false)
+const ratingForm = ref({
+  soundRating: 0,
+  visualRating: 0,
+  organizationRating: 0,
+  facilityRating: 0,
+  serviceRating: 0,
+  performanceRating: 0,
+  comment: ''
+})
+
+const openRatingModal = () => {
+  ratingForm.value = {
+    soundRating: 0,
+    visualRating: 0,
+    organizationRating: 0,
+    facilityRating: 0,
+    serviceRating: 0,
+    performanceRating: 0,
+    comment: ''
+  }
+  showRatingModal.value = true
+}
+
+const submitRating = async () => {
+  const { soundRating, visualRating, organizationRating, facilityRating, serviceRating, performanceRating } = ratingForm.value
+  if (![soundRating, visualRating, organizationRating, facilityRating, serviceRating, performanceRating].every(r => r >= 1 && r <= 5)) {
+    store.toast = { message: 'Vui lòng chấm đủ 5 sao cho tất cả các hạng mục.', icon: '❌' }
+    return
+  }
+
+  isSubmittingRating.value = true
+  try {
+    const res = await submitEventRating(selectedTicket.value.eventId, ratingForm.value)
+    if (res && res.success) {
+      store.toast = { message: 'Cảm ơn bạn đã đánh giá sự kiện!', icon: '⭐' }
+      showRatingModal.value = false
+      selectedTicket.value = null
+    } else {
+      store.toast = { message: res?.message || 'Gửi đánh giá thất bại.', icon: '❌' }
+    }
+  } catch (err) {
+    console.error('Failed to submit rating:', err)
+    store.toast = { message: err.response?.data?.message || 'Có lỗi xảy ra khi gửi đánh giá.', icon: '❌' }
+  } finally {
+    isSubmittingRating.value = false
+  }
 }
 </script>
 

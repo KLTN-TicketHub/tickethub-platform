@@ -1,10 +1,8 @@
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Constants;
-using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Application.Common.DTOs.EventRatings;
 using Catalog.Application.Features.EventRatings.Commands.CreateEventRating;
-using Catalog.Application.Features.EventRatings.Queries.GetEventRatings;
 using Catalog.Application.Features.EventRatings.Requests;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -25,20 +23,6 @@ namespace Catalog.API.Controllers.V1.Public
         {
             _sender = sender;
             _currentUserService = currentUserService;
-        }
-
-        [AllowAnonymous]
-        [HttpGet]
-        public async Task<IActionResult> GetEventRatingsAsync(Guid eventId, [FromQuery] GetEventRatingsRequest request, CancellationToken cancellationToken = default)
-        {
-            var result = await _sender.Send(new GetEventRatingsQuery(eventId, request), cancellationToken);
-
-            return Ok(new ApiResponse<PaginatedResult<EventRatingDto>>
-            {
-                Success = true,
-                Message = "Lấy danh sách đánh giá thành công.",
-                Data = result,
-            });
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

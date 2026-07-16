@@ -76,6 +76,10 @@ export const ORDER_EVENT_CHARTS = (eventId) => `/ordering/orders/reports/events/
 // Tickets
 export const MY_TICKETS = '/inventory/tickets/me'
 
+// Event Ratings
+export const EVENT_RATINGS = (eventId) => `/catalog/events/${eventId}/ratings`
+export const ORGANIZER_EVENT_RATINGS = (eventId) => `/catalog/organizer/events/${eventId}/ratings`
+
 // Finance - Moderator Payouts
 export const MODERATOR_PAYOUT_REQUESTS = '/finance/moderator/payouts/requests'
 export const MODERATOR_PAYOUT_PROPOSE = (payoutRequestId) => `/finance/moderator/payouts/requests/${payoutRequestId}/propose`
