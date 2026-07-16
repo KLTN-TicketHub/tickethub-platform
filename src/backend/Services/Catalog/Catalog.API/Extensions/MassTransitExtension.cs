@@ -19,6 +19,7 @@ namespace Catalog.API.Extensions
                 });
 
                 x.AddConsumer<OrganizerActivatedConsumer>();
+                x.AddConsumer<TicketCheckedInConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {

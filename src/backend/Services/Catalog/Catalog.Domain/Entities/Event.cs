@@ -44,6 +44,9 @@ namespace Catalog.Domain.Entities
         private readonly List<ShowTime> _showTimes = new List<ShowTime>();
         public IReadOnlyCollection<ShowTime> ShowTimes => _showTimes.AsReadOnly();
 
+        private readonly List<EventRating> _eventRatings = new List<EventRating>();
+        public IReadOnlyCollection<EventRating> EventRatings => _eventRatings.AsReadOnly();
+
         public EventApproval? Approval { get; private set; }
 
         public Event(

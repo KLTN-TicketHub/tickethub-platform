@@ -13,5 +13,7 @@ namespace Catalog.Domain.Interfaces
         ITicketTypeRepository TicketTypeRepository { get; }
         IZoneRepository ZoneRepository { get; }
         IOrganizerSnapshotRepository OrganizerSnapshotRepository { get; }
+        IEventRatingRepository EventRatingRepository { get; }
+        IEventCheckInRepository EventCheckInRepository { get; }
     }
 }

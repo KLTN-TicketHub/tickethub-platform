@@ -38,6 +38,8 @@ namespace Catalog.API.Extensions
             services.AddScoped<ITicketTypeRepository, TicketTypeRepository>();
             services.AddScoped<IZoneRepository, ZoneRepository>();
             services.AddScoped<IOrganizerSnapshotRepository, OrganizerSnapshotRepository>();
+            services.AddScoped<IEventRatingRepository, EventRatingRepository>();
+            services.AddScoped<IEventCheckInRepository, EventCheckInRepository>();
             services.AddScoped<AuditInterceptor>();
             return services;
         }

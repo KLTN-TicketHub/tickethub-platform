@@ -1,3 +1,5 @@
+using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Contracts.Events.Inventory;
 using BuildingBlocks.Contracts.Models.Pagination;
 using Inventory.Infrastructure.Dtos;
 using Inventory.Infrastructure.Entities;
@@ -11,13 +13,16 @@ namespace Inventory.Infrastructure.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRedisLockService _redisLockService;
+        private readonly IEventPublisher _eventPublisher;
 
         public TicketInventoryService(
             IUnitOfWork unitOfWork,
-            IRedisLockService redisLockService)
+            IRedisLockService redisLockService,
+            IEventPublisher eventPublisher)
         {
             _unitOfWork = unitOfWork;
             _redisLockService = redisLockService;
+            _eventPublisher = eventPublisher;
         }
 
         public async Task<TicketInventoryStateDto?> GetTicketInventoryStateAsync(Guid showtimeId, Guid ticketTypeId, CancellationToken cancellationToken = default)
@@ -111,6 +116,16 @@ namespace Inventory.Infrastructure.Services
             }
 
             ticket.Status = IssuedTicketStatus.Used;
+
+            await _eventPublisher.PublishAsync(new TicketCheckedInEvent
+            {
+                IssuedTicketId = ticket.Id,
+                EventId = ticket.EventId,
+                OrderId = ticket.OrderId,
+                UserId = ticket.UserId,
+                CheckedInAt = DateTime.UtcNow
+            }, cancellationToken);
+
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return (true, "Check-in thành công.", ticket);
