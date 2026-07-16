@@ -10,4 +10,5 @@
 **/.codegraph
 
 # Local AI assistant notes (not shared with team)
-CLAUDE.md
+CLAUDE.md
+.claude/docs/
