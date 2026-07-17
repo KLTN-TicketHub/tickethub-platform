@@ -83,6 +83,10 @@ export const ORGANIZER_EVENT_RATINGS = (eventId) => `/catalog/organizer/events/$
 // Event Click Tracking
 export const EVENT_CLICK_TRACK = (eventId, clickType) => `/catalog/events/${eventId}/click/${clickType}`
 
+// Organizer Insights
+export const ORGANIZER_EVENT_CLICK_TREND = (eventId) => `/catalog/organizer/events/${eventId}/click-trend`
+export const ORGANIZER_INSIGHTS = '/catalog/organizer/insights'
+
 // Finance - Moderator Payouts
 export const MODERATOR_PAYOUT_REQUESTS = '/finance/moderator/payouts/requests'
 export const MODERATOR_PAYOUT_PROPOSE = (payoutRequestId) => `/finance/moderator/payouts/requests/${payoutRequestId}/propose`

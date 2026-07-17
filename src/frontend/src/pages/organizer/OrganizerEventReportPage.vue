@@ -240,6 +240,54 @@
         </div>
       </section>
 
+      <!-- Engagement Trend Section -->
+      <section class="mb-12">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="font-heading text-2xl font-black text-white uppercase tracking-wider">Xu hướng tương tác</h2>
+            <p class="text-white/40 text-[13px] font-medium mt-1">Lượt xem và lượt có ý định mua vé theo thời gian</p>
+          </div>
+
+          <div class="flex bg-[#0A0F0D] p-1.5 rounded-xl border border-white/5 self-start">
+            <button
+              @click="setClickTrendRange('7d')"
+              class="px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer"
+              :class="clickTrendRange === '7d' ? 'bg-primary text-black shadow-lg font-black' : 'text-white/50 hover:text-white'"
+            >
+              7 Ngày Qua
+            </button>
+            <button
+              @click="setClickTrendRange('30d')"
+              class="px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer"
+              :class="clickTrendRange === '30d' ? 'bg-primary text-black shadow-lg font-black' : 'text-white/50 hover:text-white'"
+            >
+              30 Ngày Qua
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <TrendMiniChart
+            title="Lượt xem sự kiện"
+            color="#00C853"
+            :data="clickTrend"
+            value-key="viewCount"
+            value-label="lượt xem"
+            :label-fn="formatClickTrendLabel"
+            :is-loading="isLoadingClickTrend"
+          />
+          <TrendMiniChart
+            title="Lượt có ý định mua vé"
+            color="#818cf8"
+            :data="clickTrend"
+            value-key="purchaseIntentCount"
+            value-label="lượt"
+            :label-fn="formatClickTrendLabel"
+            :is-loading="isLoadingClickTrend"
+          />
+        </div>
+      </section>
+
       <!-- Showtimes Detailed Breakdown -->
       <section class="bg-[#111916] border border-white/5 rounded-[2.5rem] p-6 md:p-8 shadow-2xl mb-12">
         <h2 class="font-heading text-2xl font-black text-white uppercase tracking-wider mb-6">Chi tiết theo suất diễn</h2>
@@ -434,8 +482,10 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getEventReport, getEventOrders, getEventChartData } from '../../services/order.service'
 import { requestPayout } from '../../services/organizer-wallet.service'
+import { getEventClickTrend } from '../../services/insights.service'
 import { addToast } from '../../stores/adminStore'
 import BaseButton from '../../components/ui/BaseButton.vue'
+import TrendMiniChart from '../../components/organizer/TrendMiniChart.vue'
 import {
   PhSpinner, PhWarningCircle, PhArrowLeft, PhCoins,
   PhTicket, PhUsers, PhChartPie, PhMagnifyingGlass,
@@ -486,6 +536,40 @@ const setChartRange = async (range) => {
   if (chartRange.value === range) return
   chartRange.value = range
   await fetchChart()
+}
+
+// Engagement (click trend) properties
+const clickTrendRange = ref('30d')
+const isLoadingClickTrend = ref(false)
+const clickTrend = ref([])
+
+const fetchClickTrend = async () => {
+  isLoadingClickTrend.value = true
+  try {
+    const res = await getEventClickTrend(route.params.id, { range: clickTrendRange.value })
+    if (res && res.success) {
+      clickTrend.value = res.data || []
+    } else {
+      clickTrend.value = []
+    }
+  } catch (err) {
+    console.error('Error fetching event click trend:', err)
+    clickTrend.value = []
+  } finally {
+    isLoadingClickTrend.value = false
+  }
+}
+
+const setClickTrendRange = async (range) => {
+  if (clickTrendRange.value === range) return
+  clickTrendRange.value = range
+  await fetchClickTrend()
+}
+
+const formatClickTrendLabel = (point) => {
+  if (!point?.date) return ''
+  const d = new Date(point.date)
+  return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`
 }
 
 const maxChartValue = computed(() => {
@@ -620,10 +704,11 @@ onMounted(async () => {
     isLoading.value = false
   }
 
-  // Also fetch chart and orders list
+  // Also fetch chart, orders list, and engagement trend
   await Promise.all([
     fetchChart(),
-    fetchOrders()
+    fetchOrders(),
+    fetchClickTrend()
   ])
 })
 
