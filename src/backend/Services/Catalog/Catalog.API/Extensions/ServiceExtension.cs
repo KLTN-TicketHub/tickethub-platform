@@ -4,7 +4,9 @@ using BuildingBlocks.Infrastructure.Services;
 using Catalog.Domain.Interfaces;
 using Catalog.Domain.Interfaces.IRepositories;
 using Catalog.Infrastructure.Data.Contexts;
+using Catalog.Application.Common.Interfaces;
 using Catalog.Infrastructure.Data.Repositories;
+using Catalog.Infrastructure.Services;
 
 namespace Catalog.API.Extensions
 {
@@ -23,6 +25,7 @@ namespace Catalog.API.Extensions
             services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFileService, FileService>();
+            services.AddScoped<IEventClickTrackingService, EventClickTrackingService>();
 
             return services;
         }
@@ -40,6 +43,8 @@ namespace Catalog.API.Extensions
             services.AddScoped<IOrganizerSnapshotRepository, OrganizerSnapshotRepository>();
             services.AddScoped<IEventRatingRepository, EventRatingRepository>();
             services.AddScoped<IEventCheckInRepository, EventCheckInRepository>();
+            services.AddScoped<IEventClickStatRepository, EventClickStatRepository>();
+            services.AddScoped<IUserEventClickRepository, UserEventClickRepository>();
             services.AddScoped<AuditInterceptor>();
             return services;
         }

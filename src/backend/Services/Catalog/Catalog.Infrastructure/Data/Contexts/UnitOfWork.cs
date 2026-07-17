@@ -17,7 +17,9 @@ namespace Catalog.Infrastructure.Data.Contexts
             IZoneRepository zoneRepository,
             IOrganizerSnapshotRepository organizerSnapshotRepository,
             IEventRatingRepository eventRatingRepository,
-            IEventCheckInRepository eventCheckInRepository) : base(dbContext)
+            IEventCheckInRepository eventCheckInRepository,
+            IEventClickStatRepository eventClickStatRepository,
+            IUserEventClickRepository userEventClickRepository) : base(dbContext)
         {
             VenueRepository = venueRepository;
             EventRepository = eventRepository;
@@ -29,6 +31,8 @@ namespace Catalog.Infrastructure.Data.Contexts
             OrganizerSnapshotRepository = organizerSnapshotRepository;
             EventRatingRepository = eventRatingRepository;
             EventCheckInRepository = eventCheckInRepository;
+            EventClickStatRepository = eventClickStatRepository;
+            UserEventClickRepository = userEventClickRepository;
         }
 
         public IVenueRepository VenueRepository { get; set; }
@@ -41,5 +45,7 @@ namespace Catalog.Infrastructure.Data.Contexts
         public IOrganizerSnapshotRepository OrganizerSnapshotRepository { get; set; }
         public IEventRatingRepository EventRatingRepository { get; set; }
         public IEventCheckInRepository EventCheckInRepository { get; set; }
+        public IEventClickStatRepository EventClickStatRepository { get; set; }
+        public IUserEventClickRepository UserEventClickRepository { get; set; }
     }
 }

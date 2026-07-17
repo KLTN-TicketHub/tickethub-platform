@@ -584,7 +584,7 @@
 import { ref, reactive, computed, onMounted, onUnmounted, nextTick, markRaw, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Stage as VStage, Layer as VLayer, Rect as VRect, Path as VPath, Text as VText, Circle as VCircle } from 'vue-konva'
-import { getEventDetail } from '../services/eventService'
+import { getEventDetail, trackEventClick } from '../services/eventService'
 import { getVenues, getSeatMapDetail } from '../services/venue.service'
 import { getSeatStates, lockSeat, unlockSeat, getTicketInventoryState } from '../services/seat.service'
 import { checkout } from '../services/order.service'
@@ -927,6 +927,7 @@ const handleUnloadEvents = () => {
 onMounted(async () => {
   window.addEventListener('beforeunload', handleUnloadEvents)
   window.addEventListener('pagehide', handleUnloadEvents)
+  trackEventClick(route.params.id, 'ViewDetail').catch(() => {})
   try {
     const res = await getEventDetail(route.params.id)
     if (res && res.success && res.data) {
@@ -1503,6 +1504,8 @@ const handleBuyTicket = () => {
     store.toast = { message: 'Vui lòng chọn ít nhất 1 ghế trên sơ đồ.', icon: '⚠️' }
     return
   }
+
+  trackEventClick(event.value.id, 'PurchaseIntent').catch(() => {})
 
   // Pre-fill from JWT user info
   checkoutForm.customerName = store.user?.name || store.user?.fullName || ''

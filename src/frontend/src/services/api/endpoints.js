@@ -80,6 +80,9 @@ export const MY_TICKETS = '/inventory/tickets/me'
 export const EVENT_RATINGS = (eventId) => `/catalog/events/${eventId}/ratings`
 export const ORGANIZER_EVENT_RATINGS = (eventId) => `/catalog/organizer/events/${eventId}/ratings`
 
+// Event Click Tracking
+export const EVENT_CLICK_TRACK = (eventId, clickType) => `/catalog/events/${eventId}/click/${clickType}`
+
 // Finance - Moderator Payouts
 export const MODERATOR_PAYOUT_REQUESTS = '/finance/moderator/payouts/requests'
 export const MODERATOR_PAYOUT_PROPOSE = (payoutRequestId) => `/finance/moderator/payouts/requests/${payoutRequestId}/propose`

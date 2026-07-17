@@ -15,5 +15,7 @@ namespace Catalog.Domain.Interfaces
         IOrganizerSnapshotRepository OrganizerSnapshotRepository { get; }
         IEventRatingRepository EventRatingRepository { get; }
         IEventCheckInRepository EventCheckInRepository { get; }
+        IEventClickStatRepository EventClickStatRepository { get; }
+        IUserEventClickRepository UserEventClickRepository { get; }
     }
 }

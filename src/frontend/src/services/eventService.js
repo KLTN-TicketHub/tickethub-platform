@@ -4,10 +4,10 @@
 // with actual fetch/axios calls. The function signatures stay the same.
 
 import api from './api/axios'
-import { 
-  ORGANIZER_EVENT_DETAIL, MODERATOR_EVENT_DETAIL, ORGANIZER_EVENTS_LIST, 
+import {
+  ORGANIZER_EVENT_DETAIL, MODERATOR_EVENT_DETAIL, ORGANIZER_EVENTS_LIST,
   MODERATOR_EVENTS_LIST, EVENT_STATUSES_FOR_MODERATOR, MODERATOR_EVENT_REVIEW,
-  PUBLIC_EVENTS, CATALOG_EVENT_DETAIL, COMMON_EVENT_CATEGORIES
+  PUBLIC_EVENTS, CATALOG_EVENT_DETAIL, COMMON_EVENT_CATEGORIES, EVENT_CLICK_TRACK
 } from './api/endpoints'
 import { MOCK_EVENTS } from '../mocks/eventMock'
 
@@ -161,6 +161,17 @@ export async function getPublicEventCategories() {
  */
 export async function getEventDetail(id) {
   const response = await api.get(CATALOG_EVENT_DETAIL(id))
+  return response.data
+}
+
+/**
+ * Ghi nhận lượt tương tác của user với sự kiện (xem chi tiết / có ý định mua)
+ * POST /catalog/events/:id/click/:clickType
+ * @param {string} id
+ * @param {'ViewDetail'|'PurchaseIntent'} clickType
+ */
+export async function trackEventClick(id, clickType) {
+  const response = await api.post(EVENT_CLICK_TRACK(id, clickType))
   return response.data
 }
 

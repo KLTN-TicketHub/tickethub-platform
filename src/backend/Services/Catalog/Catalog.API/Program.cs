@@ -2,6 +2,7 @@ using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
 using Catalog.API.Extensions;
+using Catalog.API.Services;
 using Catalog.Application.Common.Mappers;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -35,6 +36,7 @@ builder.Services.AddCustomSwagger();
 builder.Services.AddCustomApiVersioning();
 
 builder.Services.AddCustomRedis(builder.Configuration);
+builder.Services.AddHostedService<EventClickFlushHostedService>();
 
 #region AutoMapper
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(CatalogProfile).Assembly));

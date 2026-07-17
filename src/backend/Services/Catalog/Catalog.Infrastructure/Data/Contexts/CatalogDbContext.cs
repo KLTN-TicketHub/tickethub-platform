@@ -26,6 +26,8 @@ namespace Catalog.Infrastructure.Data.Contexts
         public DbSet<ShowTime> ShowTimes { get; set; }
         public DbSet<EventRating> EventRatings { get; set; }
         public DbSet<EventCheckIn> EventCheckIns { get; set; }
+        public DbSet<EventClickStat> EventClickStats { get; set; }
+        public DbSet<UserEventClick> UserEventClicks { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
