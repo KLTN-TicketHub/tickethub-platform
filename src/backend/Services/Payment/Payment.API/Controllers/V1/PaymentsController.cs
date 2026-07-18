@@ -33,6 +33,7 @@ namespace Payment.API.Controllers.V1
         }
 
         [HttpGet("vnpay-ipn")]
+        [AllowAnonymous]
         public async Task<IActionResult> VnpayIpn()
         {
             try
