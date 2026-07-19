@@ -55,7 +55,7 @@ namespace Catalog.Application.Features.Grpc.Queries.GetCheckoutData
                 };
 
                 var seatIds = request.Items.Where(x => x.SeatId.HasValue).Select(x => x.SeatId!.Value).ToList();
-                var seats = new System.Collections.Generic.Dictionary<Guid, Seat>();
+                var seats = new Dictionary<Guid, Seat>();
                 if (seatIds.Any())
                 {
                     if (@event.SeatMapId == null)
@@ -111,7 +111,7 @@ namespace Catalog.Application.Features.Grpc.Queries.GetCheckoutData
                         if (!zone.IsSalable)
                             return GetCheckoutDataResult.Fail($"Khu vực '{zone.ZoneName}' của ghế '{seat.SeatName}' không được phép bán vé.");
 
-                        if (zone.SeatMapId != @event.SeatMapId.Value)
+                        if (zone.SeatMapId != @event.SeatMapId!.Value)
                             return GetCheckoutDataResult.Fail($"Ghế '{seat.SeatName}' (khu vực '{zone.ZoneName}') không thuộc sơ đồ ghế của sự kiện này.");
 
                         if (ticketType.ZoneId.HasValue && ticketType.ZoneId.Value != zone.Id)

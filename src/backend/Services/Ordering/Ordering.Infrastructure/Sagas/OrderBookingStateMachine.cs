@@ -65,7 +65,7 @@ namespace Ordering.Infrastructure.Sagas
                     .TransitionTo(Failed)
                     .Finalize(),
 
-                When(PaymentTimeout.Received)
+                When(PaymentTimeout!.Received)
                     .Send(new Uri("queue:ordering-cancel-order"), context => new CancelOrderCommand
                     {
                         OrderId = context.Saga.CorrelationId,

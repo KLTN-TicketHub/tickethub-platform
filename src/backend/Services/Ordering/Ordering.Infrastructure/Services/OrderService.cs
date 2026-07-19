@@ -37,7 +37,7 @@ namespace Ordering.Infrastructure.Services
                 .Select(x => x.SeatId!.Value)
                 .ToList();
 
-            var showtimeSnapshot = await _unitOfWork.EventSnapshotRepository.GetShowtimeByIdAsync(request.ShowtimeId);
+            ShowtimeSnapshot? showtimeSnapshot = await _unitOfWork.EventSnapshotRepository.GetShowtimeByIdAsync(request.ShowtimeId);
             if (showtimeSnapshot == null || showtimeSnapshot.EventSnapshot == null)
             {
                 _logger.LogError(
@@ -46,7 +46,7 @@ namespace Ordering.Infrastructure.Services
                 return (false, Guid.Empty, "Thông tin suất diễn chưa sẵn sàng. Vui lòng thử lại sau.");
             }
 
-            var eventSnap = showtimeSnapshot.EventSnapshot;
+            EventSnapshot eventSnap = showtimeSnapshot.EventSnapshot;
 
             List<ResolvedOrderItem> resolvedItems;
 
@@ -160,7 +160,7 @@ namespace Ordering.Infrastructure.Services
 
             foreach (var item in requestItems)
             {
-                var ttSnapshot = showtimeSnapshot.TicketTypes
+                TicketTypeSnapshot? ttSnapshot = showtimeSnapshot.TicketTypes
                     .FirstOrDefault(t => t.TicketTypeId == item.TicketTypeId);
 
                 if (ttSnapshot == null)
