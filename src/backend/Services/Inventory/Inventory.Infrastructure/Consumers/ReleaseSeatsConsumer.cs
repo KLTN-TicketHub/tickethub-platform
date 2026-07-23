@@ -37,6 +37,12 @@ namespace Inventory.Infrastructure.Consumers
                         await _hubNotificationService.NotifySeatStateChangedAsync(message.ShowtimeId, seatId, "Available");
                     }
                 }
+
+                if (message.TicketTypeId.HasValue && message.Quantity > 0)
+                {
+                    await _redisLockService.UnlockTicketsAsync(message.ShowtimeId, message.TicketTypeId.Value, message.UserId);
+                }
+
                 _logger.LogInformation("Successfully completed ReleaseSeats for Order {OrderId}", message.OrderId);
             }
             catch (Exception ex)

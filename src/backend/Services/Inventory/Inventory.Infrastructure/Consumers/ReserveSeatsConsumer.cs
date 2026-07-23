@@ -64,9 +64,18 @@ namespace Inventory.Infrastructure.Consumers
                     );
                     if (inventory != null)
                     {
+                        if (inventory.SoldQuantity + message.Quantity > inventory.Capacity)
+                        {
+                            _logger.LogError(
+                                "[ReserveSeatsConsumer] Vượt quá sức chứa khi xác nhận vé cho OrderId={OrderId}, TicketTypeId={TicketTypeId}: SoldQuantity={SoldQuantity}, Quantity={Quantity}, Capacity={Capacity}.",
+                                message.OrderId, message.TicketTypeId.Value, inventory.SoldQuantity, message.Quantity, inventory.Capacity);
+                        }
+
                         inventory.SoldQuantity += message.Quantity;
                         await _unitOfWork.ShowtimeTicketInventoryRepository.UpdateAsync(inventory);
                     }
+
+                    await _redisLockService.UnlockTicketsAsync(message.ShowtimeId, message.TicketTypeId.Value, message.UserId);
                 }
 
                 await _unitOfWork.SaveChangesAsync(context.CancellationToken);

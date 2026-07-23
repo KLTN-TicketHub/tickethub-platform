@@ -34,5 +34,31 @@ namespace Ordering.Infrastructure.Services
                 return (false, $"Lỗi kết nối gRPC tới Inventory: {ex.Status.Detail}");
             }
         }
+
+        public async Task<(bool IsSuccess, string Message)> LockTicketQuantitiesAsync(Guid showtimeId, List<(Guid TicketTypeId, int Quantity)> items, Guid userId)
+        {
+            try
+            {
+                LockTicketQuantitiesRequest request = new LockTicketQuantitiesRequest
+                {
+                    ShowtimeId = showtimeId.ToString(),
+                    UserId = userId.ToString()
+                };
+
+                request.TicketQuantities.AddRange(items.Select(x => new TicketQuantityDto
+                {
+                    TicketTypeId = x.TicketTypeId.ToString(),
+                    Quantity = x.Quantity
+                }));
+
+                LockTicketQuantitiesResponse response = await _client.LockTicketQuantitiesAsync(request);
+
+                return (response.IsSuccess, response.Message);
+            }
+            catch (RpcException ex)
+            {
+                return (false, $"Lỗi kết nối gRPC tới Inventory: {ex.Status.Detail}");
+            }
+        }
     }
 }

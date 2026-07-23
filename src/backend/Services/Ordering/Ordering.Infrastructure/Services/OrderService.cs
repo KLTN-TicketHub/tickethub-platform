@@ -94,6 +94,16 @@ namespace Ordering.Infrastructure.Services
                 if (!isLockSuccess)
                     return (false, Guid.Empty, $"Khóa ghế thất bại: {lockMessage}");
             }
+            else
+            {
+                var ticketQuantities = resolvedItems
+                    .Select(x => (x.TicketTypeId, x.Quantity))
+                    .ToList();
+
+                var (isLockSuccess, lockMessage) = await _inventoryService.LockTicketQuantitiesAsync(request.ShowtimeId, ticketQuantities, userId);
+                if (!isLockSuccess)
+                    return (false, Guid.Empty, $"Khóa số lượng vé thất bại: {lockMessage}");
+            }
 
             decimal totalPrice = resolvedItems.Sum(x => x.Price * x.Quantity);
 
