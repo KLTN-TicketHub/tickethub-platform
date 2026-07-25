@@ -82,11 +82,12 @@ namespace Payment.API.Controllers.V1
                 string responseCode = Request.Query["vnp_ResponseCode"]!;
                 string transactionStatus = Request.Query["vnp_TransactionStatus"]!;
                 string vnpayTranId = Request.Query["vnp_TransactionNo"]!;
+                string? payDate = Request.Query["vnp_PayDate"];
                 string rawResponse = string.Join("&", Request.Query.Select(q => $"{q.Key}={q.Value}"));
 
                 if (responseCode == "00" && transactionStatus == "00")
                 {
-                    transaction.MarkAsSuccess(vnpayTranId, rawResponse);
+                    transaction.MarkAsSuccess(vnpayTranId, rawResponse, payDate);
                     await _unitOfWork.PaymentTransactionRepository.UpdateAsync(transaction);
                     await _unitOfWork.SaveChangesAsync();
 
@@ -160,9 +161,10 @@ namespace Payment.API.Controllers.V1
                     if (transaction != null && transaction.Status == PaymentStatus.Pending)
                     {
                         string vnpayTranId = Request.Query["vnp_TransactionNo"]!;
+                        string? payDate = Request.Query["vnp_PayDate"];
                         string rawResponse = string.Join("&", Request.Query.Select(q => $"{q.Key}={q.Value}"));
 
-                        transaction.MarkAsSuccess(vnpayTranId, rawResponse);
+                        transaction.MarkAsSuccess(vnpayTranId, rawResponse, payDate);
                         await _unitOfWork.PaymentTransactionRepository.UpdateAsync(transaction);
                         await _unitOfWork.SaveChangesAsync();
 

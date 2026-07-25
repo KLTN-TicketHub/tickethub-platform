@@ -60,6 +60,13 @@
                 Phê duyệt
               </button>
             </div>
+
+            <div v-else-if="isPublished" class="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center gap-4 mt-6">
+              <button @click="handleCancelEvent" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-danger/10 text-danger border border-danger/20 font-bold hover:bg-danger hover:text-white transition-all shadow-[0_0_15px_rgba(255,0,0,0.1)] flex items-center justify-center gap-2 cursor-pointer">
+                <PhProhibit weight="bold" />
+                Hủy sự kiện
+              </button>
+            </div>
           </div>
 
           <!-- Ticket Divider (Dashed vertical line with circular cutouts at top/bottom) -->
@@ -262,8 +269,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getModeratorEventDetail, reviewModeratorEvent } from '../../services/eventService'
-import { PhArrowLeft, PhCheckCircle, PhWarningCircle, PhClockClockwise, PhCheck, PhCalendarStar, PhMapPin, PhEnvelope, PhPhone, PhTicket, PhMapTrifold, PhClock } from '@phosphor-icons/vue'
+import { getModeratorEventDetail, reviewModeratorEvent, cancelModeratorEvent } from '../../services/eventService'
+import { addToast, openConfirm } from '../../stores/adminStore'
+import { PhArrowLeft, PhCheckCircle, PhWarningCircle, PhClockClockwise, PhCheck, PhCalendarStar, PhMapPin, PhEnvelope, PhPhone, PhTicket, PhMapTrifold, PhClock, PhProhibit } from '@phosphor-icons/vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -299,6 +307,10 @@ const loadEventDetail = async () => {
 
 const isPending = computed(() => {
   return event.value?.status === 'PendingApproval' || event.value?.status === 'Chờ duyệt'
+})
+
+const isPublished = computed(() => {
+  return event.value?.status === 'Published' || event.value?.status === 'Đã xuất bản'
 })
 
 // UI Helpers
@@ -343,6 +355,27 @@ const approveEvent = async () => {
       alert("Đã có lỗi xảy ra. Vui lòng thử lại sau.")
     }
   }
+}
+
+const handleCancelEvent = () => {
+  openConfirm(
+    'Hủy sự kiện',
+    `Bạn có chắc chắn muốn hủy sự kiện "${event.value.title}"? Toàn bộ đơn hàng chưa check-in sẽ được tự động hoàn tiền cho khách hàng.`,
+    async () => {
+      try {
+        const res = await cancelModeratorEvent(event.value.id)
+        if (res.success) {
+          addToast('Đã hủy sự kiện thành công.', 'success')
+          await loadEventDetail()
+        } else {
+          addToast(res.message || 'Lỗi khi hủy sự kiện.', 'error')
+        }
+      } catch (e) {
+        console.error(e)
+        addToast(e.response?.data?.message || 'Đã có lỗi xảy ra. Vui lòng thử lại sau.', 'error')
+      }
+    }
+  )
 }
 
 const openRejectModal = () => {

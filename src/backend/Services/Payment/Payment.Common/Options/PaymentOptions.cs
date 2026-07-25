@@ -18,6 +18,8 @@
 
         public string PaymentUrl { get; init; } = default!;
 
+        public string RefundUrl { get; init; } = default!;
+
         public string ReturnUrl { get; init; } = default!;
 
         public string IpnUrl { get; init; } = default!;

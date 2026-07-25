@@ -49,6 +49,8 @@ namespace Catalog.Domain.Entities
 
         public EventApproval? Approval { get; private set; }
 
+        public EventCancellation? Cancellation { get; private set; }
+
         public Event(
             Guid organizerId,
             Guid categoryId,
@@ -113,6 +115,19 @@ namespace Catalog.Domain.Entities
                 Approval.ReviewedAt = DateTime.UtcNow;
                 Approval.Reason = reason;
             }
+        }
+
+        public void Cancel(Guid cancelledByUserId, string? cancelledByName, string? reason)
+        {
+            Status = EventStatus.Cancelled;
+            Cancellation = new EventCancellation
+            {
+                EventId = Id,
+                CancelledByUserId = cancelledByUserId,
+                CancelledByName = cancelledByName,
+                Reason = reason,
+                CancelledAt = DateTime.UtcNow
+            };
         }
 
         public static string GenerateSlug(string title, int maxLen = 200)

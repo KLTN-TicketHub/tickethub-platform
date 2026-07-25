@@ -39,6 +39,9 @@ export const MODERATOR_EVENT_CATEGORY_DETAIL = (id) => `/catalog/moderator/event
 export const MODERATOR_EVENTS_LIST = '/catalog/moderator/events'
 export const MODERATOR_EVENT_DETAIL = (id) => `/catalog/moderator/events/${id}`
 export const MODERATOR_EVENT_REVIEW = (id) => `/catalog/moderator/events/${id}/review`
+export const MODERATOR_EVENT_CANCEL = (id) => `/catalog/moderator/events/${id}/cancel`
+export const MODERATOR_EVENT_CANCELLATION_REQUESTS = '/catalog/moderator/event-cancellation-requests'
+export const MODERATOR_EVENT_CANCELLATION_REVIEW = (requestId) => `/catalog/moderator/event-cancellation-requests/${requestId}/review`
 
 // Admin Events & Categories
 export const ADMIN_EVENT_CATEGORIES = '/catalog/admin/event-categories'
@@ -53,6 +56,7 @@ export const ORGANIZER_VENUE_SEATMAP_DETAIL = (venueId, seatMapId) => `/catalog/
 export const ORGANIZER_EVENT_CREATE = '/catalog/organizer/events'
 export const ORGANIZER_EVENTS_LIST = '/catalog/organizer/events'
 export const ORGANIZER_EVENT_DETAIL = (id) => `/catalog/organizer/events/${id}`
+export const ORGANIZER_EVENT_CANCELLATION_REQUEST = (eventId) => `/catalog/organizer/event-cancellation-requests/events/${eventId}`
 
 // Common Files & Lookups
 export const UPLOAD_SVG = '/catalog/common/files/upload-svg'
@@ -86,6 +90,11 @@ export const EVENT_CLICK_TRACK = (eventId, clickType) => `/catalog/events/${even
 // Organizer Insights
 export const ORGANIZER_EVENT_CLICK_TREND = (eventId) => `/catalog/organizer/events/${eventId}/click-trend`
 export const ORGANIZER_INSIGHTS = '/catalog/organizer/insights'
+
+// AI Suggestions (Organizer)
+export const AI_SUGGESTIONS_MARKET_DIRECTION = '/ai/organizer/suggestions/market-direction'
+export const AI_SUGGESTIONS_PORTFOLIO = '/ai/organizer/suggestions/portfolio'
+export const AI_SUGGESTIONS_EVENT = (eventId) => `/ai/organizer/suggestions/events/${eventId}`
 
 // Finance - Moderator Payouts
 export const MODERATOR_PAYOUT_REQUESTS = '/finance/moderator/payouts/requests'

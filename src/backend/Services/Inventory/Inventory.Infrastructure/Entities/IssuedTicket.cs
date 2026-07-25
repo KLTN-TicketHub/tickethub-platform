@@ -41,6 +41,12 @@ namespace Inventory.Infrastructure.Entities
         public DateTime ShowtimeStartAt { get; set; }
 
         public IssuedTicketStatus Status { get; set; }
+
+        public void Cancel()
+        {
+            if (Status == IssuedTicketStatus.Valid)
+                Status = IssuedTicketStatus.Cancelled;
+        }
     }
 
     public enum IssuedTicketStatus

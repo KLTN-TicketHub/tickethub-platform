@@ -1,10 +1,10 @@
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Infrastructure.Auditing;
 using BuildingBlocks.Infrastructure.Services;
+using Catalog.Application.Common.Interfaces;
 using Catalog.Domain.Interfaces;
 using Catalog.Domain.Interfaces.IRepositories;
 using Catalog.Infrastructure.Data.Contexts;
-using Catalog.Application.Common.Interfaces;
 using Catalog.Infrastructure.Data.Repositories;
 using Catalog.Infrastructure.Services;
 
@@ -45,6 +45,7 @@ namespace Catalog.API.Extensions
             services.AddScoped<IEventCheckInRepository, EventCheckInRepository>();
             services.AddScoped<IEventClickStatRepository, EventClickStatRepository>();
             services.AddScoped<IUserEventClickRepository, UserEventClickRepository>();
+            services.AddScoped<IEventCancellationRequestRepository, EventCancellationRequestRepository>();
             services.AddScoped<AuditInterceptor>();
             return services;
         }

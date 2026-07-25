@@ -51,6 +51,10 @@ namespace Ordering.Infrastructure.Data.Contexts.Config
                 .IsRequired()
                 .HasPrecision(18, 2);
 
+            builder.Property(o => o.RefundedAmount)
+                .IsRequired()
+                .HasPrecision(18, 2);
+
             builder.Property(o => o.Status)
                 .IsRequired()
                 .HasConversion<string>();

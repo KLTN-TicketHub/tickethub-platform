@@ -3,6 +3,7 @@ using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Application.Common.DTOs.Events;
+using Catalog.Application.Features.Events.Commands.CancelEvent;
 using Catalog.Application.Features.Events.Commands.ReviewEvent;
 using Catalog.Application.Features.Events.Queries.GetEventByIdForModerator;
 using Catalog.Application.Features.Events.Queries.GetEventsForModerator;
@@ -47,6 +48,24 @@ namespace Catalog.API.Controllers.V1.Moderator
             {
                 Success = true,
                 Message = request.IsApproved ? "Đã duyệt sự kiện thành công." : "Đã từ chối sự kiện thành công.",
+                Data = result
+            });
+        }
+
+        [HttpPost("{id:guid}/cancel")]
+        public async Task<IActionResult> CancelEventAsync(
+            [FromRoute] Guid id,
+            CancellationToken cancellationToken = default)
+        {
+            Guid moderatorId = _currentUserService.UserId
+                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người duyệt.");
+
+            var result = await _sender.Send(new CancelEventCommand(id, moderatorId, _currentUserService.UserName), cancellationToken);
+
+            return Ok(new ApiResponse<bool>
+            {
+                Success = true,
+                Message = "Đã hủy sự kiện thành công.",
                 Data = result
             });
         }

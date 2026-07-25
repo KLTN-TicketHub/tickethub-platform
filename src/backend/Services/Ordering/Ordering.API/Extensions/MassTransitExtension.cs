@@ -25,8 +25,17 @@ namespace Ordering.API.Extensions
                 x.AddConsumer<ConfirmOrderConsumer>();
                 x.AddConsumer<CancelOrderConsumer>();
                 x.AddConsumer<EventPublishedConsumer>();
+                x.AddConsumer<EventCancelledConsumer>();
+                x.AddConsumer<FinalizeOrderRefundConsumer>();
 
                 x.AddSagaStateMachine<OrderBookingStateMachine, OrderBookingState>()
+                    .EntityFrameworkRepository(r =>
+                    {
+                        r.ConcurrencyMode = ConcurrencyMode.Optimistic;
+                        r.ExistingDbContext<OrderingDbContext>();
+                    });
+
+                x.AddSagaStateMachine<OrderRefundStateMachine, OrderRefundState>()
                     .EntityFrameworkRepository(r =>
                     {
                         r.ConcurrencyMode = ConcurrencyMode.Optimistic;
@@ -64,6 +73,16 @@ namespace Ordering.API.Extensions
                     cfg.ReceiveEndpoint("ordering-event-published", e =>
                     {
                         e.ConfigureConsumer<EventPublishedConsumer>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("ordering-event-cancelled", e =>
+                    {
+                        e.ConfigureConsumer<EventCancelledConsumer>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("ordering-finalize-refund", e =>
+                    {
+                        e.ConfigureConsumer<FinalizeOrderRefundConsumer>(context);
                     });
 
                     cfg.ConfigureEndpoints(context);

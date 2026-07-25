@@ -76,6 +76,18 @@
               <PhReceipt weight="bold" />
               Xem đơn hàng
             </BaseButton>
+            <BaseButton
+              v-if="canRequestCancellation"
+              variant="outline"
+              class="w-full sm:w-auto !rounded-xl !py-3.5 !px-8 !border-danger/30 !text-danger hover:!bg-danger/10 flex items-center justify-center gap-2"
+              @click="openCancelModal"
+            >
+              <PhProhibit weight="bold" />
+              Hủy sự kiện
+            </BaseButton>
+            <span v-else-if="hasPendingCancelRequest" class="w-full sm:w-auto text-center px-8 py-3.5 rounded-xl bg-warning/10 border border-warning/20 text-warning text-sm font-bold">
+              Đang chờ Moderator duyệt yêu cầu hủy
+            </span>
           </div>
         </div>
 
@@ -340,10 +352,53 @@
                   <PhReceipt weight="bold" />
                   Xem đơn hàng
                 </BaseButton>
+                <BaseButton
+                  v-if="canRequestCancellation"
+                  variant="outline"
+                  class="w-full !rounded-xl !py-3 !border-danger/30 !text-danger hover:!bg-danger/10 flex items-center justify-center gap-2"
+                  @click="openCancelModal"
+                >
+                  <PhProhibit weight="bold" />
+                  Hủy sự kiện
+                </BaseButton>
               </div>
             </div>
           </div>
         </aside>
+      </div>
+    </div>
+
+    <!-- Cancel Event Request Modal -->
+    <div v-if="isCancelModalOpen" class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="closeCancelModal"></div>
+
+      <div class="relative bg-card/90 backdrop-blur-2xl border border-border-main rounded-[32px] w-full max-w-lg overflow-hidden shadow-2xl shadow-black/60 p-8 animate-in zoom-in-95 fade-in duration-300">
+        <h3 class="text-2xl font-bold text-main mb-1 font-heading">Yêu cầu hủy sự kiện</h3>
+        <p class="text-white/50 text-sm mb-6 line-clamp-1">{{ event?.title }}</p>
+
+        <form @submit.prevent="submitCancelRequest" class="space-y-6">
+          <div class="flex flex-col gap-2">
+            <label class="text-[12px] font-bold text-white/50 uppercase tracking-widest">Lý do hủy <span class="text-danger">*</span></label>
+            <textarea
+              v-model="cancelReason"
+              placeholder="VD: Sự kiện không thể tổ chức do lý do bất khả kháng..."
+              rows="4"
+              class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-[14px] text-white outline-none focus:border-danger/50 transition-all placeholder:text-white/20 resize-none"
+            ></textarea>
+            <span v-if="cancelError" class="text-danger text-xs font-bold">{{ cancelError }}</span>
+            <p class="text-white/40 text-xs">Yêu cầu sẽ được gửi tới Moderator xem xét. Toàn bộ đơn hàng chưa check-in sẽ được hoàn tiền tự động nếu được duyệt.</p>
+          </div>
+
+          <div class="flex gap-3 pt-2">
+            <BaseButton type="button" variant="outline" class="flex-1 !rounded-2xl" @click="closeCancelModal">
+              Hủy bỏ
+            </BaseButton>
+            <BaseButton type="submit" variant="primary" class="flex-1 !rounded-2xl !bg-danger hover:!bg-danger/80" :disabled="isSubmittingCancel">
+              <PhSpinner v-if="isSubmittingCancel" class="animate-spin text-lg" />
+              <span v-else>Gửi yêu cầu hủy</span>
+            </BaseButton>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -363,13 +418,14 @@
 import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Stage as VStage, Layer as VLayer, Rect as VRect, Path as VPath, Text as VText, Circle as VCircle } from 'vue-konva'
-import { getOrganizerEventDetail } from '../../services/eventService'
+import { getOrganizerEventDetail, requestEventCancellation } from '../../services/eventService'
 import { getOrganizerSeatMapDetail } from '../../services/venue.service'
 import { store } from '../../stores/eventStore'
+import { addToast } from '../../stores/adminStore'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import {
   PhCalendarBlank, PhMapPin, PhTicket, PhMapPinLine, PhSpinner,
-  PhWarningCircle, PhPencilSimple, PhReceipt, PhClock, PhChartPie, PhStar
+  PhWarningCircle, PhPencilSimple, PhReceipt, PhClock, PhChartPie, PhStar, PhProhibit
 } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -385,6 +441,18 @@ const isLoadingSeatMap = ref(false)
 const seatMapError = ref('')
 const hoveredSeat = ref(null)
 const konvaContainer = ref(null)
+
+const isCancelModalOpen = ref(false)
+const cancelReason = ref('')
+const cancelError = ref('')
+const isSubmittingCancel = ref(false)
+const hasPendingCancelRequest = ref(false)
+
+const canRequestCancellation = computed(() => {
+  if (!event.value) return false
+  if (hasPendingCancelRequest.value) return false
+  return event.value.status === 'Published' || event.value.status === 'Đã xuất bản'
+})
 
 onMounted(async () => {
   try {
@@ -477,6 +545,40 @@ const handleReport = () => {
 
 const handleRatings = () => {
   router.push(`/organizer/events/${event.value.id}/ratings`)
+}
+
+const openCancelModal = () => {
+  cancelReason.value = ''
+  cancelError.value = ''
+  isCancelModalOpen.value = true
+}
+
+const closeCancelModal = () => {
+  isCancelModalOpen.value = false
+}
+
+const submitCancelRequest = async () => {
+  if (!cancelReason.value.trim()) {
+    cancelError.value = 'Vui lòng nhập lý do hủy sự kiện.'
+    return
+  }
+
+  isSubmittingCancel.value = true
+  try {
+    const res = await requestEventCancellation(event.value.id, cancelReason.value.trim())
+    if (res && res.success) {
+      addToast(res.message || 'Đã gửi yêu cầu hủy sự kiện thành công.', 'success')
+      hasPendingCancelRequest.value = true
+      closeCancelModal()
+    } else {
+      addToast(res?.message || 'Không thể gửi yêu cầu hủy sự kiện.', 'error')
+    }
+  } catch (err) {
+    console.error('Error requesting event cancellation:', err)
+    addToast(err.response?.data?.message || 'Có lỗi xảy ra khi gửi yêu cầu hủy sự kiện.', 'error')
+  } finally {
+    isSubmittingCancel.value = false
+  }
 }
 
 // Konva

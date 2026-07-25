@@ -77,6 +77,14 @@ namespace Catalog.Application.Features.Events.Queries.GetEventsForOrganizer
                     (string.IsNullOrEmpty(search) || e.Title.Contains(search)) &&
                     e.Status == EventStatus.Rejected;
             }
+            else if (request.Status == EventStatus.Cancelled)
+            {
+                filter = e =>
+                    !e.IsDeleted &&
+                    e.OrganizerId == organizerId &&
+                    (string.IsNullOrEmpty(search) || e.Title.Contains(search)) &&
+                    e.Status == EventStatus.Cancelled;
+            }
             else
             {
                 filter = e =>

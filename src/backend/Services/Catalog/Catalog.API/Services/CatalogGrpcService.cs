@@ -1,5 +1,8 @@
 using Catalog.API.Protos;
+using Catalog.Application.Features.Grpc.Queries.GetCategoryTrend;
 using Catalog.Application.Features.Grpc.Queries.GetCheckoutData;
+using Catalog.Application.Features.Grpc.Queries.GetEventInsight;
+using Catalog.Application.Features.Grpc.Queries.GetOrganizerPortfolio;
 using Catalog.Application.Features.Grpc.Queries.ValidateSeatLock;
 using Catalog.Application.Features.Grpc.Queries.ValidateTicketTypes;
 using Grpc.Core;
@@ -155,6 +158,169 @@ namespace Catalog.API.Services
             catch (Exception ex)
             {
                 return new ValidateTicketTypesResponse
+                {
+                    IsSuccess = false,
+                    Message = $"Lỗi xử lý hệ thống: {ex.Message}"
+                };
+            }
+        }
+
+        public override async Task<GetCategoryTrendResponse> GetCategoryTrend(
+            GetCategoryTrendRequest request,
+            ServerCallContext context)
+        {
+            try
+            {
+                if (!DateOnly.TryParse(request.From, out var from))
+                    return new GetCategoryTrendResponse { IsSuccess = false, Message = "From không đúng định dạng ngày." };
+
+                if (!DateOnly.TryParse(request.To, out var to))
+                    return new GetCategoryTrendResponse { IsSuccess = false, Message = "To không đúng định dạng ngày." };
+
+                var query = new GetCategoryTrendQuery(from, to);
+                var result = await _mediator.Send(query, context.CancellationToken);
+
+                if (!result.IsSuccess)
+                    return new GetCategoryTrendResponse { IsSuccess = false, Message = result.Message };
+
+                var response = new GetCategoryTrendResponse { IsSuccess = true, Message = result.Message };
+
+                foreach (var c in result.Categories)
+                {
+                    response.Categories.Add(new CategoryTrendItem
+                    {
+                        CategoryId = c.CategoryId.ToString(),
+                        CategoryName = c.CategoryName,
+                        ViewCount = c.ViewCount,
+                        PurchaseIntentCount = c.PurchaseIntentCount,
+                        ActiveEventCount = c.ActiveEventCount,
+                        ViewGrowthPercent = c.ViewGrowthPercent,
+                        AvgOverallRating = c.AvgOverallRating,
+                        RatingSampleSize = c.RatingSampleSize
+                    });
+                }
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new GetCategoryTrendResponse
+                {
+                    IsSuccess = false,
+                    Message = $"Lỗi xử lý hệ thống: {ex.Message}"
+                };
+            }
+        }
+
+        public override async Task<GetOrganizerPortfolioResponse> GetOrganizerPortfolio(
+            GetOrganizerPortfolioRequest request,
+            ServerCallContext context)
+        {
+            try
+            {
+                if (!Guid.TryParse(request.OrganizerId, out var organizerId))
+                    return new GetOrganizerPortfolioResponse { IsSuccess = false, Message = "OrganizerId không đúng định dạng Guid." };
+
+                if (!DateOnly.TryParse(request.From, out var from))
+                    return new GetOrganizerPortfolioResponse { IsSuccess = false, Message = "From không đúng định dạng ngày." };
+
+                if (!DateOnly.TryParse(request.To, out var to))
+                    return new GetOrganizerPortfolioResponse { IsSuccess = false, Message = "To không đúng định dạng ngày." };
+
+                var query = new GetOrganizerPortfolioQuery(organizerId, from, to);
+                var result = await _mediator.Send(query, context.CancellationToken);
+
+                if (!result.IsSuccess)
+                    return new GetOrganizerPortfolioResponse { IsSuccess = false, Message = result.Message };
+
+                var response = new GetOrganizerPortfolioResponse { IsSuccess = true, Message = result.Message };
+
+                foreach (var c in result.CategoryDistribution)
+                {
+                    response.CategoryDistribution.Add(new OrganizerPortfolioCategoryItem
+                    {
+                        CategoryId = c.CategoryId.ToString(),
+                        CategoryName = c.CategoryName,
+                        EventCount = c.EventCount
+                    });
+                }
+
+                foreach (var e in result.Events)
+                {
+                    response.Events.Add(new OrganizerPortfolioEventItem
+                    {
+                        EventId = e.EventId.ToString(),
+                        EventTitle = e.EventTitle,
+                        ViewCount = e.ViewCount,
+                        PurchaseIntentCount = e.PurchaseIntentCount,
+                        ConversionRate = e.ConversionRate,
+                        OverallRatingAvg = e.OverallRatingAvg,
+                        RatingSampleSize = e.RatingSampleSize,
+                        LowestRatingDimension = e.LowestRatingDimension
+                    });
+                }
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new GetOrganizerPortfolioResponse
+                {
+                    IsSuccess = false,
+                    Message = $"Lỗi xử lý hệ thống: {ex.Message}"
+                };
+            }
+        }
+
+        public override async Task<GetEventInsightResponse> GetEventInsight(
+            GetEventInsightRequest request,
+            ServerCallContext context)
+        {
+            try
+            {
+                if (!Guid.TryParse(request.EventId, out var eventId))
+                    return new GetEventInsightResponse { IsSuccess = false, Message = "EventId không đúng định dạng Guid." };
+
+                if (!Guid.TryParse(request.OrganizerId, out var organizerId))
+                    return new GetEventInsightResponse { IsSuccess = false, Message = "OrganizerId không đúng định dạng Guid." };
+
+                if (!DateOnly.TryParse(request.From, out var from))
+                    return new GetEventInsightResponse { IsSuccess = false, Message = "From không đúng định dạng ngày." };
+
+                if (!DateOnly.TryParse(request.To, out var to))
+                    return new GetEventInsightResponse { IsSuccess = false, Message = "To không đúng định dạng ngày." };
+
+                var query = new GetEventInsightQuery(eventId, organizerId, from, to);
+                var result = await _mediator.Send(query, context.CancellationToken);
+
+                if (!result.IsSuccess)
+                    return new GetEventInsightResponse { IsSuccess = false, Message = result.Message };
+
+                var response = new GetEventInsightResponse
+                {
+                    IsSuccess = true,
+                    Message = result.Message,
+                    EventTitle = result.EventTitle,
+                    ViewCount = result.ViewCount,
+                    PurchaseIntentCount = result.PurchaseIntentCount,
+                    ConversionRate = result.ConversionRate,
+                    SoundAvg = result.SoundAvg,
+                    VisualAvg = result.VisualAvg,
+                    OrganizationAvg = result.OrganizationAvg,
+                    FacilityAvg = result.FacilityAvg,
+                    ServiceAvg = result.ServiceAvg,
+                    PerformanceAvg = result.PerformanceAvg,
+                    OverallAvg = result.OverallAvg,
+                    RatingSampleSize = result.RatingSampleSize
+                };
+
+                response.RecentComments.AddRange(result.RecentComments);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new GetEventInsightResponse
                 {
                     IsSuccess = false,
                     Message = $"Lỗi xử lý hệ thống: {ex.Message}"

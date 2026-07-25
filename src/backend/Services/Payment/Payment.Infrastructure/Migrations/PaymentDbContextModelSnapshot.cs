@@ -270,6 +270,10 @@ namespace Payment.Infrastructure.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("PayDate")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<string>("RawGatewayResponse")
                         .HasColumnType("nvarchar(max)");
 

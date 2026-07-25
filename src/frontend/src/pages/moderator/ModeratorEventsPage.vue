@@ -258,7 +258,8 @@ const getStatusLabel = (status) => {
     'Rejected': 'Từ chối',
     'Draft': 'Bản nháp',
     'Bị từ chối': 'Bị từ chối',
-    'Chờ duyệt': 'Chờ duyệt'
+    'Chờ duyệt': 'Chờ duyệt',
+    'Cancelled': 'Đã hủy'
   }
   return map[status] || status
 }

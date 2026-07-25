@@ -14,6 +14,7 @@ namespace Finance.API.Extensions
                 x.AddConsumer<Finance.Infrastructure.Consumers.OrderPaidConsumer>();
                 x.AddConsumer<Finance.Infrastructure.Consumers.EventCategoryCommissionRateChangedConsumer>();
                 x.AddConsumer<Finance.Infrastructure.Consumers.OrganizerActivatedConsumer>();
+                x.AddConsumer<Finance.Infrastructure.Consumers.OrderRefundedConsumer>();
 
                 x.AddEntityFrameworkOutbox<FinanceDbContext>(o =>
                 {
@@ -45,6 +46,11 @@ namespace Finance.API.Extensions
                     cfg.ReceiveEndpoint("finance-event-category-commission-rate-changed", e =>
                     {
                         e.ConfigureConsumer<Finance.Infrastructure.Consumers.EventCategoryCommissionRateChangedConsumer>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("finance-order-refunded", e =>
+                    {
+                        e.ConfigureConsumer<Finance.Infrastructure.Consumers.OrderRefundedConsumer>(context);
                     });
 
                     cfg.ConfigureEndpoints(context);

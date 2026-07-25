@@ -16,6 +16,7 @@ namespace Ordering.Infrastructure.Data.Contexts
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<OrderBookingState> OrderBookingStates { get; set; }
+        public DbSet<OrderRefundState> OrderRefundStates { get; set; }
         public DbSet<EventSnapshot> EventSnapshots { get; set; }
         public DbSet<ShowtimeSnapshot> ShowtimeSnapshots { get; set; }
         public DbSet<TicketTypeSnapshot> TicketTypeSnapshots { get; set; }

@@ -1,4 +1,3 @@
-using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
 using Inventory.Infrastructure.Dtos;

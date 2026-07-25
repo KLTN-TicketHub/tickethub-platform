@@ -73,6 +73,18 @@ namespace Finance.Infrastructure.Entities
             EventPayoutId = eventPayoutId;
             MarkAsSuccess();
         }
+
+        public void ReduceAmount(decimal refundedAmount)
+        {
+            Amount -= refundedAmount;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        public void Void()
+        {
+            Status = WalletTransactionStatus.Voided;
+            UpdatedAt = DateTime.UtcNow;
+        }
     }
     public enum WalletTransactionType
     {
@@ -84,6 +96,7 @@ namespace Finance.Infrastructure.Entities
     {
         Pending = 1,
         Success = 2,
-        Failed = 3
+        Failed = 3,
+        Voided = 4
     }
 }

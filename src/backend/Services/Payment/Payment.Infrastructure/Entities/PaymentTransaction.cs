@@ -18,6 +18,8 @@ namespace Payment.Infrastructure.Entities
 
         public string? RawGatewayResponse { get; set; }
 
+        public string? PayDate { get; set; }
+
         public DateTime? CompletedAt { get; set; }
 
         public PaymentTransaction(Guid orderId, string merchantOrderNo, decimal amount, string gateway)
@@ -29,11 +31,12 @@ namespace Payment.Infrastructure.Entities
             Status = PaymentStatus.Pending;
             CreatedAt = DateTime.UtcNow;
         }
-        public void MarkAsSuccess(string transactionId, string rawResponse)
+        public void MarkAsSuccess(string transactionId, string rawResponse, string? payDate)
         {
             Status = PaymentStatus.Success;
             TransactionId = transactionId;
             RawGatewayResponse = rawResponse;
+            PayDate = payDate;
             CompletedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;
         }
@@ -43,6 +46,12 @@ namespace Payment.Infrastructure.Entities
             TransactionId = transactionId;
             RawGatewayResponse = rawResponse;
             CompletedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
+        }
+        public void MarkAsRefunded(string rawRefundResponse)
+        {
+            Status = PaymentStatus.Refunded;
+            RawGatewayResponse = rawRefundResponse;
             UpdatedAt = DateTime.UtcNow;
         }
     }

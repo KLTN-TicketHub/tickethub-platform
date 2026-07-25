@@ -28,6 +28,9 @@ namespace Payment.Infrastructure.Data.Contexts.Config
             builder.Property(t => t.Status)
                 .IsRequired()
                 .HasConversion<string>();
+
+            builder.Property(t => t.PayDate)
+                .HasMaxLength(20);
         }
     }
 }

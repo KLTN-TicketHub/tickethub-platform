@@ -26,6 +26,7 @@ namespace Payment.API.Extensions
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IVnpayService, VnpayService>();
+            services.AddHttpClient();
 
             return services;
         }

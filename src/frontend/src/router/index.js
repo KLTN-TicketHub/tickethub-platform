@@ -43,6 +43,7 @@ import ModeratorSeatMapDetailPage from '../pages/moderator/ModeratorSeatMapDetai
 import ModeratorEventsPage from '../pages/moderator/ModeratorEventsPage.vue'
 import ModeratorEventDetailPage from '../pages/moderator/ModeratorEventDetailPage.vue'
 import ModeratorPayoutsPage from '../pages/moderator/ModeratorPayoutsPage.vue'
+import ModeratorEventCancellationRequestsPage from '../pages/moderator/ModeratorEventCancellationRequestsPage.vue'
 
 // Organizer
 import OrganizerLayout from '../layouts/OrganizerLayout.vue'
@@ -104,7 +105,8 @@ const routes = [
       { path: 'venues/:id/seat-maps/:seatMapId', name: 'moderator-venues-seatmaps-detail', component: ModeratorSeatMapDetailPage },
       { path: 'events', name: 'moderator-events', component: ModeratorEventsPage },
       { path: 'events/:id', name: 'moderator-event-detail', component: ModeratorEventDetailPage },
-      { path: 'payouts', name: 'moderator-payouts', component: ModeratorPayoutsPage }
+      { path: 'payouts', name: 'moderator-payouts', component: ModeratorPayoutsPage },
+      { path: 'event-cancellation-requests', name: 'moderator-event-cancellation-requests', component: ModeratorEventCancellationRequestsPage }
     ]
   },
 

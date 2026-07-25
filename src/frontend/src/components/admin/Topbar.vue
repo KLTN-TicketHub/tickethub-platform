@@ -86,7 +86,7 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { adminSearch } from '../../stores/adminStore'
 import { logout as authLogout } from '../../services/auth/auth.service'
-import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin, PhList, PhX, PhSuitcase, PhPlus, PhFolderOpen, PhHandCoins, PhWallet, PhChartLineUp } from '@phosphor-icons/vue'
+import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin, PhList, PhX, PhSuitcase, PhPlus, PhFolderOpen, PhHandCoins, PhWallet, PhChartLineUp, PhProhibit } from '@phosphor-icons/vue'
 
 const props = defineProps({
   role: { type: String, default: 'admin' }
@@ -112,6 +112,7 @@ const modMenuItems = [
   { label: 'Duyệt sự kiện', path: '/moderator/events', icon: PhCheckSquareOffset },
   { label: 'Địa điểm', path: '/moderator/venues', icon: PhMapPin },
   { label: 'Giải ngân', path: '/moderator/payouts', icon: PhHandCoins },
+  { label: 'Yêu cầu hủy sự kiện', path: '/moderator/event-cancellation-requests', icon: PhProhibit },
 ]
 
 const orgMenuItems = [

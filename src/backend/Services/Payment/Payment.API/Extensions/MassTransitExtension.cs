@@ -19,6 +19,7 @@ namespace Payment.API.Extensions
                 });
 
                 x.AddConsumer<GeneratePaymentLinkConsumer>();
+                x.AddConsumer<RefundPaymentConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -39,6 +40,11 @@ namespace Payment.API.Extensions
                     cfg.ReceiveEndpoint("payment-generate-link", e =>
                     {
                         e.ConfigureConsumer<GeneratePaymentLinkConsumer>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("payment-refund-order", e =>
+                    {
+                        e.ConfigureConsumer<RefundPaymentConsumer>(context);
                     });
 
                     cfg.ConfigureEndpoints(context);

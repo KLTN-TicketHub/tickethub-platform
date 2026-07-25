@@ -7,7 +7,9 @@ import api from './api/axios'
 import {
   ORGANIZER_EVENT_DETAIL, MODERATOR_EVENT_DETAIL, ORGANIZER_EVENTS_LIST,
   MODERATOR_EVENTS_LIST, EVENT_STATUSES_FOR_MODERATOR, MODERATOR_EVENT_REVIEW,
-  PUBLIC_EVENTS, CATALOG_EVENT_DETAIL, COMMON_EVENT_CATEGORIES, EVENT_CLICK_TRACK
+  PUBLIC_EVENTS, CATALOG_EVENT_DETAIL, COMMON_EVENT_CATEGORIES, EVENT_CLICK_TRACK,
+  MODERATOR_EVENT_CANCEL, MODERATOR_EVENT_CANCELLATION_REQUESTS, MODERATOR_EVENT_CANCELLATION_REVIEW,
+  ORGANIZER_EVENT_CANCELLATION_REQUEST
 } from './api/endpoints'
 import { MOCK_EVENTS } from '../mocks/eventMock'
 
@@ -211,5 +213,42 @@ export async function getEventStatusesForModerator() {
 export async function reviewModeratorEvent(id, payload) {
   // payload: { isApproved: boolean, reason: string }
   const response = await api.post(MODERATOR_EVENT_REVIEW(id), payload)
+  return response.data
+}
+
+/**
+ * Moderator hủy trực tiếp một sự kiện đang xuất bản (không cần lý do)
+ * POST /catalog/moderator/events/:id/cancel
+ */
+export async function cancelModeratorEvent(id) {
+  const response = await api.post(MODERATOR_EVENT_CANCEL(id))
+  return response.data
+}
+
+/**
+ * Lấy danh sách yêu cầu hủy sự kiện đang chờ duyệt (Moderator)
+ * GET /catalog/moderator/event-cancellation-requests
+ */
+export async function getEventCancellationRequests(params) {
+  const response = await api.get(MODERATOR_EVENT_CANCELLATION_REQUESTS, { params })
+  return response.data
+}
+
+/**
+ * Moderator duyệt/từ chối một yêu cầu hủy sự kiện
+ * POST /catalog/moderator/event-cancellation-requests/:requestId/review
+ */
+export async function reviewEventCancellationRequest(requestId, payload) {
+  // payload: { isApproved: boolean, reason?: string }
+  const response = await api.post(MODERATOR_EVENT_CANCELLATION_REVIEW(requestId), payload)
+  return response.data
+}
+
+/**
+ * Organizer gửi yêu cầu hủy sự kiện kèm lý do
+ * POST /catalog/organizer/event-cancellation-requests/events/:eventId
+ */
+export async function requestEventCancellation(eventId, reason) {
+  const response = await api.post(ORGANIZER_EVENT_CANCELLATION_REQUEST(eventId), { reason })
   return response.data
 }

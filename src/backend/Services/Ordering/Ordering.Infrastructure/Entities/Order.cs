@@ -34,6 +34,8 @@ namespace Ordering.Infrastructure.Entities
 
         public decimal TotalPrice { get; set; }
 
+        public decimal RefundedAmount { get; set; }
+
         public OrderStatus Status { get; set; }
 
         public string PaymentMethod { get; set; } = default!;
@@ -92,6 +94,12 @@ namespace Ordering.Infrastructure.Entities
         public void CancelOrder(Guid? updatedBy = null)
         {
             Status = OrderStatus.Cancelled;
+            SetUpdated(updatedBy);
+        }
+        public void RefundOrder(decimal refundedAmount, Guid? updatedBy = null)
+        {
+            Status = OrderStatus.Refunded;
+            RefundedAmount = refundedAmount;
             SetUpdated(updatedBy);
         }
     }

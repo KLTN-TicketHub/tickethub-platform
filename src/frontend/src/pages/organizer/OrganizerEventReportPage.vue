@@ -288,6 +288,15 @@
         </div>
       </section>
 
+      <!-- AI Suggestion Section -->
+      <div class="mb-12">
+        <AiSuggestionSection
+          title="Gợi ý cải thiện sự kiện"
+          :fetcher="(r) => getEventSuggestions(route.params.id, { range: r })"
+          :range="clickTrendRange"
+        />
+      </div>
+
       <!-- Showtimes Detailed Breakdown -->
       <section class="bg-[#111916] border border-white/5 rounded-[2.5rem] p-6 md:p-8 shadow-2xl mb-12">
         <h2 class="font-heading text-2xl font-black text-white uppercase tracking-wider mb-6">Chi tiết theo suất diễn</h2>
@@ -483,9 +492,11 @@ import { useRoute, useRouter } from 'vue-router'
 import { getEventReport, getEventOrders, getEventChartData } from '../../services/order.service'
 import { requestPayout } from '../../services/organizer-wallet.service'
 import { getEventClickTrend } from '../../services/insights.service'
+import { getEventSuggestions } from '../../services/ai-insights.service'
 import { addToast } from '../../stores/adminStore'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import TrendMiniChart from '../../components/organizer/TrendMiniChart.vue'
+import AiSuggestionSection from '../../components/organizer/AiSuggestionSection.vue'
 import {
   PhSpinner, PhWarningCircle, PhArrowLeft, PhCoins,
   PhTicket, PhUsers, PhChartPie, PhMagnifyingGlass,

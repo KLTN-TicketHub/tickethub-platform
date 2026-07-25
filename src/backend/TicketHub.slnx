@@ -10,6 +10,11 @@
     <Project Path="BuildingBlocks/BuildingBlocks.Infrastructure/BuildingBlocks.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Services/" />
+  <Folder Name="/Services/AI/">
+    <Project Path="Services/AI/AI.API/AI.API.csproj" />
+    <Project Path="Services/AI/AI.Common/AI.Common.csproj" />
+    <Project Path="Services/AI/AI.Infrastructure/AI.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Services/Catalog/">
     <Project Path="Services/Catalog/Catalog.API/Catalog.API.csproj" />
     <Project Path="Services/Catalog/Catalog.Application/Catalog.Application.csproj" />

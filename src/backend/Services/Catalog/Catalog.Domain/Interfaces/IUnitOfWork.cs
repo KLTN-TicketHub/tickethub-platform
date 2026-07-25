@@ -17,5 +17,6 @@ namespace Catalog.Domain.Interfaces
         IEventCheckInRepository EventCheckInRepository { get; }
         IEventClickStatRepository EventClickStatRepository { get; }
         IUserEventClickRepository UserEventClickRepository { get; }
+        IEventCancellationRequestRepository EventCancellationRequestRepository { get; }
     }
 }

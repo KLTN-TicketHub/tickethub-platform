@@ -80,6 +80,19 @@
             </table>
           </div>
         </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+          <AiSuggestionSection
+            title="Gợi ý định hướng thị trường"
+            :fetcher="(r) => getMarketDirectionSuggestions({ range: r })"
+            :range="range"
+          />
+          <AiSuggestionSection
+            title="Gợi ý cho sự kiện của bạn"
+            :fetcher="(r) => getPortfolioSuggestions({ range: r })"
+            :range="range"
+          />
+        </div>
       </template>
     </div>
   </div>
@@ -89,7 +102,9 @@
 import { ref, onMounted } from 'vue'
 import { PhSpinner } from '@phosphor-icons/vue'
 import { getOrganizerInsights } from '../../services/insights.service'
+import { getMarketDirectionSuggestions, getPortfolioSuggestions } from '../../services/ai-insights.service'
 import TrendMiniChart from '../../components/organizer/TrendMiniChart.vue'
+import AiSuggestionSection from '../../components/organizer/AiSuggestionSection.vue'
 
 const range = ref('30d')
 const isLoading = ref(true)

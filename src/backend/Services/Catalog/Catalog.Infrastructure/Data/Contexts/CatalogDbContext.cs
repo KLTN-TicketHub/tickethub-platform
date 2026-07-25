@@ -15,6 +15,8 @@ namespace Catalog.Infrastructure.Data.Contexts
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<Catalog.Domain.Entities.Event> Events { get; set; }
         public DbSet<EventApproval> EventApprovals { get; set; }
+        public DbSet<EventCancellation> EventCancellations { get; set; }
+        public DbSet<EventCancellationRequest> EventCancellationRequests { get; set; }
         public DbSet<EventCategory> EventCategories { get; set; }
         public DbSet<EventLocation> EventLocations { get; set; }
         public DbSet<Seat> Seats { get; set; }

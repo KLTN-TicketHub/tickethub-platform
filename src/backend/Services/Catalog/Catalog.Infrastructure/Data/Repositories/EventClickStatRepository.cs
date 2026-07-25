@@ -56,5 +56,24 @@ namespace Catalog.Infrastructure.Data.Repositories
 
             return rows.Select(r => (r.EventId, r.EventTitle, r.ViewCount, r.PurchaseIntentCount)).ToList();
         }
+
+        public async Task<List<(Guid CategoryId, string CategoryName, long ViewCount, long PurchaseIntentCount, int ActiveEventCount)>> GetCategoryTrendAsync(
+            DateOnly from, DateOnly to, CancellationToken cancellation = default)
+        {
+            var rows = await _dbContext.Set<EventClickStat>()
+                .Where(s => s.Event!.Status == EventStatus.Published && s.StatDate >= from && s.StatDate <= to)
+                .GroupBy(s => new { s.Event!.CategoryId, s.Event!.Category!.CategoryName })
+                .Select(g => new
+                {
+                    g.Key.CategoryId,
+                    g.Key.CategoryName,
+                    ViewCount = g.Sum(x => x.ClickType == EventClickType.ViewDetail ? x.ClickCount : 0),
+                    PurchaseIntentCount = g.Sum(x => x.ClickType == EventClickType.PurchaseIntent ? x.ClickCount : 0),
+                    ActiveEventCount = g.Select(x => x.EventId).Distinct().Count()
+                })
+                .ToListAsync(cancellation);
+
+            return rows.Select(r => (r.CategoryId, r.CategoryName, r.ViewCount, r.PurchaseIntentCount, r.ActiveEventCount)).ToList();
+        }
     }
 }

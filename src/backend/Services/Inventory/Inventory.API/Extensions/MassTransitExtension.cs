@@ -22,6 +22,7 @@ namespace Inventory.API.Extensions
                 x.AddConsumer<ReserveSeatsConsumer>();
                 x.AddConsumer<ReleaseSeatsConsumer>();
                 x.AddConsumer<OrderPaidConsumer>();
+                x.AddConsumer<InvalidateOrderTicketsConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -38,6 +39,11 @@ namespace Inventory.API.Extensions
                             h.Username(rabbitMqOptions.Username);
                             h.Password(rabbitMqOptions.Password);
                         });
+
+                    cfg.ReceiveEndpoint("inventory-invalidate-order-tickets", e =>
+                    {
+                        e.ConfigureConsumer<InvalidateOrderTicketsConsumer>(context);
+                    });
 
                     cfg.ConfigureEndpoints(context);
                 });
