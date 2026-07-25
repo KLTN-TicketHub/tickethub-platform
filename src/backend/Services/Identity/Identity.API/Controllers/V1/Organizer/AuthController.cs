@@ -23,11 +23,13 @@ namespace Identity.API.Controllers.V1.Organizer
     {
         private readonly AppSettings _appSettings;
         private readonly ISender _sender;
+        private readonly AppUrls _appUrls;
 
-        public AuthController(IOptions<AppSettings> appSettings, ISender sender)
+        public AuthController(IOptions<AppSettings> appSettings, ISender sender, IOptions<AppUrls> appUrls)
         {
             _appSettings = appSettings.Value;
             _sender = sender;
+            _appUrls = appUrls.Value;
         }
 
         [EnableRateLimiting(RateLimitPolicies.Login)]
@@ -80,7 +82,7 @@ namespace Identity.API.Controllers.V1.Organizer
         {
             await _sender.Send(new ActivateOrganizerCommand(request), cancellationToken);
 
-            return Redirect("http://localhost:5173/organizer/login");
+            return Redirect($"{_appUrls.FrontendBaseUrl}/organizer/login");
         }
     }
 }

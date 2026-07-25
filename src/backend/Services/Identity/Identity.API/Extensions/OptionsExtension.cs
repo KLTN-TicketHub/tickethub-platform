@@ -14,6 +14,8 @@ namespace Identity.API.Extensions
 
             services.Configure<RabbitMqOptions>(configuration.GetSection("RabbitMq"));
 
+            services.Configure<AppUrls>(configuration.GetSection("AppUrls"));
+
             return services;
         }
     }

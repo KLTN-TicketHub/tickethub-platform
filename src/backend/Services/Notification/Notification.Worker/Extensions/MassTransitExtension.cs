@@ -13,6 +13,7 @@ namespace Notification.Worker.Extensions
             {
                 x.AddConsumer<SendEmailCodeConsumer>();
                 x.AddConsumer<SendModeratorWelcomeEmailConsumer>();
+                x.AddConsumer<SendStaffWelcomeEmailConsumer>();
                 x.AddConsumer<SendOrganizerWelcomeEmailConsumer>();
                 x.AddConsumer<SendEventReviewedEmailConsumer>();
                 x.AddConsumer<SendTicketEmailConsumer>();

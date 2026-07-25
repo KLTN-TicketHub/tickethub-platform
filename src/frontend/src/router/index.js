@@ -50,6 +50,10 @@ import OrganizerLayout from '../layouts/OrganizerLayout.vue'
 import OrganizerLoginPage from '../pages/organizer/OrganizerLoginPage.vue'
 import OrganizerRegisterPage from '../pages/organizer/OrganizerRegisterPage.vue'
 
+// Staff
+import StaffLayout from '../layouts/StaffLayout.vue'
+import StaffLoginPage from '../pages/staff/StaffLoginPage.vue'
+
 const routes = [
   { path: '/', name: 'home', component: HomePage },
   { path: '/search', name: 'search', component: SearchPage },
@@ -66,6 +70,7 @@ const routes = [
   { path: '/moderator/login', name: 'moderator-login', component: ModeratorLoginPage },
   { path: '/organizer/login', name: 'organizer-login', component: OrganizerLoginPage },
   { path: '/organizer/register', name: 'organizer-register', component: OrganizerRegisterPage },
+  { path: '/staff/login', name: 'staff-login', component: StaffLoginPage },
   { path: '/activate-account', name: 'activate-account', component: ActivateAccountPage },
   { path: '/403', name: 'forbidden', component: ForbiddenPage },
   // Payment flow
@@ -122,7 +127,19 @@ const routes = [
       { path: 'events/:id/report', name: 'organizer-event-report', component: () => import('../pages/organizer/OrganizerEventReportPage.vue') },
       { path: 'events/:id/ratings', name: 'organizer-event-ratings', component: () => import('../pages/organizer/OrganizerEventRatingsPage.vue') },
       { path: 'insights', name: 'organizer-insights', component: () => import('../pages/organizer/OrganizerInsightsPage.vue') },
-      { path: 'wallet', name: 'organizer-wallet', component: () => import('../pages/organizer/OrganizerWalletPage.vue') }
+      { path: 'wallet', name: 'organizer-wallet', component: () => import('../pages/organizer/OrganizerWalletPage.vue') },
+      { path: 'staffs', name: 'organizer-staffs', component: () => import('../pages/organizer/OrganizerStaffsPage.vue') }
+    ]
+  },
+
+  // Staff Routes
+  {
+    path: '/staff',
+    component: StaffLayout,
+    meta: { requiresAuth: true, role: 'staff' },
+    children: [
+      { path: '', redirect: '/staff/dashboard' },
+      { path: 'dashboard', name: 'staff-dashboard', component: () => import('../pages/staff/StaffScanPage.vue') }
     ]
   }
 ]

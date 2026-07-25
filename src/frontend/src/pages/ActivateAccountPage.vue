@@ -15,7 +15,7 @@
           <PhKey weight="duotone" />
         </div>
         <h1 class="text-4xl font-black font-heading text-white tracking-tight uppercase mb-2">Kích hoạt tài khoản</h1>
-        <p class="text-[15px] text-white/50 font-medium">Thiết lập mật khẩu mới cho tài khoản kiểm duyệt viên của bạn</p>
+        <p class="text-[15px] text-white/50 font-medium">Thiết lập mật khẩu mới cho tài khoản {{ roleLabel }} của bạn</p>
       </div>
 
       <!-- General Error -->
@@ -131,7 +131,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { activateModeratorAccount } from '../services/auth/auth.service'
+import { activateModeratorAccount, activateStaffAccount } from '../services/auth/auth.service'
 import { store } from '../stores/eventStore'
 import BaseButton from '../components/ui/BaseButton.vue'
 import { 
@@ -145,6 +145,9 @@ const router = useRouter()
 
 const userId = route.query.userId || ''
 const token = route.query.token || ''
+const role = route.query.role === 'staff' ? 'staff' : 'moderator'
+
+const roleLabel = role === 'staff' ? 'nhân viên soát vé' : 'kiểm duyệt viên'
 
 const password = ref('')
 const confirmPassword = ref('')
@@ -167,11 +170,12 @@ const handleActivate = async () => {
   }
 
   try {
-    const res = await activateModeratorAccount(payload)
+    const res = role === 'staff'
+      ? await activateStaffAccount(payload)
+      : await activateModeratorAccount(payload)
     if (res.success) {
       store.toast = { message: 'Kích hoạt tài khoản thành công! Vui lòng đăng nhập.', icon: 'PhShieldCheck' }
-      // Redirect to moderator login
-      await router.push('/moderator/login')
+      await router.push(role === 'staff' ? '/staff/login' : '/moderator/login')
     } else {
       validationErrors.value.general = res.message || 'Kích hoạt tài khoản không thành công.'
     }

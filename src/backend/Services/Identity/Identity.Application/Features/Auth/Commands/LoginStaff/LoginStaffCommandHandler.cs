@@ -114,9 +114,9 @@ namespace Identity.Application.Features.Auth.Commands.LoginStaff
 
             RefreshToken newToken = new RefreshToken(
                 user.Id,
-                DateTime.UtcNow.AddDays(_appSettings.JwtConfig.RefreshTokenExpirationDays),
-                deviceInfo,
-                ipAddress);
+                DateTime.UtcNow.AddDays(_appSettings.JwtConfig!.RefreshTokenExpirationDays),
+                deviceInfo!,
+                ipAddress!);
 
             _unitOfWork.RefreshTokenRepository.AddEntity(newToken);
 

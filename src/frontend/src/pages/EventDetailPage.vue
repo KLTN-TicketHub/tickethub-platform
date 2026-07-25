@@ -590,6 +590,7 @@ import { getSeatStates, lockSeat, unlockSeat, getTicketInventoryState } from '..
 import { checkout } from '../services/order.service'
 import { HubConnectionBuilder, HttpTransportType } from '@microsoft/signalr'
 import { getToken } from '../services/auth/token.service'
+import { API_BASE_URL } from '../services/api/axios'
 import { store } from '../stores/eventStore'
 import BaseButton from '../components/ui/BaseButton.vue'
 import { 
@@ -665,8 +666,7 @@ const selectedShowtimeId = computed(() => {
 })
 
 const getHubUrl = () => {
-  const apiUrl = import.meta.env.VITE_API_URL || 'https://localhost:7044/api/v1'
-  return apiUrl.replace('/api/v1', '/hubs/seatmap')
+  return API_BASE_URL.replace('/api/v1', '/hubs/seatmap')
 }
 
 // ── Seat State Loading & Merging ──
@@ -900,8 +900,7 @@ const unlockAllSeatsProactively = () => {
   const token = getToken()
   if (!token) return
   
-  const apiUrl = import.meta.env.VITE_API_URL || 'https://localhost:7044/api/v1'
-  const url = `${apiUrl}/inventory/Seats/seats/unlock`
+  const url = `${API_BASE_URL}/inventory/Seats/seats/unlock`
   
   selectedSeats.value.forEach(seat => {
     fetch(url, {

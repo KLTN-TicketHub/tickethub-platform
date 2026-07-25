@@ -1,3 +1,4 @@
+using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Pagination;
 using BuildingBlocks.Contracts.Models.Responses;
 using Inventory.Infrastructure.Dtos;
@@ -35,7 +36,7 @@ namespace Inventory.API.Controllers.V1
         }
 
         [HttpPost("checkin/{qrToken}")]
-        [AllowAnonymous]
+        [Authorize(Roles = $"{Roles.Staff},{Roles.Organizer}")]
         public async Task<IActionResult> CheckInTicket([FromRoute] string qrToken)
         {
             if (string.IsNullOrWhiteSpace(qrToken))

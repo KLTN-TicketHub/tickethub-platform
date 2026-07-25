@@ -1,5 +1,5 @@
 import api from './api/axios'
-import { MY_TICKETS } from './api/endpoints'
+import { MY_TICKETS, TICKET_CHECKIN } from './api/endpoints'
 
 export const ticketService = {
   /**
@@ -19,5 +19,24 @@ export const ticketService = {
 
     const response = await api.get(`${MY_TICKETS}?${query.toString()}`);
     return response.data;
+  },
+
+  /**
+   * Check-in một vé bằng token giải mã từ QR code
+   * @param {string} qrToken
+   * @returns {Promise<{success: boolean, message: string, data: object|null}>}
+   */
+  async checkInTicket(qrToken) {
+    try {
+      const response = await api.post(TICKET_CHECKIN(qrToken))
+      return response.data
+    } catch (err) {
+      const errorData = err.response?.data
+      return {
+        success: false,
+        message: errorData?.message || err.message || 'Lỗi kết nối máy chủ.',
+        data: null
+      }
+    }
   }
 }

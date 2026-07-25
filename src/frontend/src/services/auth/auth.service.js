@@ -1,6 +1,6 @@
 import axios from 'axios'
 import api from '../api/axios'
-import { GOOGLE_REDIRECT, AUTH_REFRESH, AUTH_PROFILE, AUTH_LOGOUT, ADMIN_AUTH_LOGIN, ADMIN_AUTH_CONFIRM, MODERATOR_AUTH_LOGIN, ADMIN_MODERATOR_REGISTER, MODERATOR_ACTIVATE_ACCOUNT, ORGANIZER_AUTH_LOGIN, ORGANIZER_AUTH_REGISTER } from '../api/endpoints'
+import { GOOGLE_REDIRECT, AUTH_REFRESH, AUTH_PROFILE, AUTH_LOGOUT, ADMIN_AUTH_LOGIN, ADMIN_AUTH_CONFIRM, MODERATOR_AUTH_LOGIN, ADMIN_MODERATOR_REGISTER, MODERATOR_ACTIVATE_ACCOUNT, ORGANIZER_AUTH_LOGIN, ORGANIZER_AUTH_REGISTER, ORGANIZER_STAFF_REGISTER, STAFF_AUTH_LOGIN, STAFF_ACTIVATE_ACCOUNT } from '../api/endpoints'
 import * as tokenService from './token.service'
 import { store } from '../../stores/eventStore'
 
@@ -365,6 +365,27 @@ export async function registerOrganizer(payload) {
   return response.data
 }
 
+export async function registerStaff(payload) {
+  const response = await api.post(ORGANIZER_STAFF_REGISTER, payload)
+  return response.data
+}
+
+export async function loginStaff(username, password) {
+  const response = await axios.post(buildApiUrl(STAFF_AUTH_LOGIN), {
+    userName: username,
+    password: password
+  }, { withCredentials: true })
+
+  const newToken = response.data?.accessToken || null
+  await handleAuthSuccess(newToken, 'staff')
+  return response.data
+}
+
+export async function activateStaffAccount(data) {
+  const response = await api.post(STAFF_ACTIVATE_ACCOUNT, data)
+  return response.data
+}
+
 export async function logout() {
   const role = getCurrentRole()
   try {
@@ -397,5 +418,8 @@ export default {
   registerModerator,
   activateModeratorAccount,
   loginOrganizer,
-  registerOrganizer
+  registerOrganizer,
+  registerStaff,
+  loginStaff,
+  activateStaffAccount
 }

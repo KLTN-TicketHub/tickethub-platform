@@ -10,6 +10,7 @@ namespace Payment.API.Extensions
             services.Configure<RateLimitConfig>(configuration.GetSection("AppSettings:RateLimit"));
             services.Configure<RabbitMqOptions>(configuration.GetSection("RabbitMq"));
             services.Configure<PaymentOptions>(configuration.GetSection("Payment"));
+            services.Configure<AppUrls>(configuration.GetSection("AppUrls"));
 
             return services;
         }

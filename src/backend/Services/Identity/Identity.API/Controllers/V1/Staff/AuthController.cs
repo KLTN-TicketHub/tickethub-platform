@@ -2,6 +2,8 @@
 using BuildingBlocks.Contracts.Models.Responses;
 using Identity.Application.Features.Auth.Commands.LoginStaff;
 using Identity.Application.Features.Auth.Requests;
+using Identity.Application.Features.Organizer.Staffs.Commands.ActivateStaffAccount;
+using Identity.Application.Features.Organizer.Staffs.Requests;
 using Identity.Common.Options;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -50,6 +52,22 @@ namespace Identity.API.Controllers.V1.Staff
                 Success = true,
                 Message = "Đăng nhập thành công",
                 AccessToken = result.AccessToken
+            });
+        }
+
+        [EnableRateLimiting(RateLimitPolicies.PerUser)]
+        [AllowAnonymous]
+        [HttpPost("activate-account")]
+        public async Task<IActionResult> ActivateStaffAccountAsync(
+            [FromBody] ActivateStaffAccountRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            await _sender.Send(new ActivateStaffAccountCommand(request), cancellationToken);
+
+            return Ok(new ApiResponse
+            {
+                Success = true,
+                Message = "Kích hoạt tài khoản nhân viên soát vé thành công."
             });
         }
     }

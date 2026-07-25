@@ -86,7 +86,7 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { adminSearch } from '../../stores/adminStore'
 import { logout as authLogout } from '../../services/auth/auth.service'
-import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin, PhList, PhX, PhSuitcase, PhPlus, PhFolderOpen, PhHandCoins, PhWallet, PhChartLineUp, PhProhibit } from '@phosphor-icons/vue'
+import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin, PhList, PhX, PhSuitcase, PhPlus, PhFolderOpen, PhHandCoins, PhWallet, PhChartLineUp, PhProhibit, PhIdentificationBadge } from '@phosphor-icons/vue'
 
 const props = defineProps({
   role: { type: String, default: 'admin' }
@@ -120,6 +120,7 @@ const orgMenuItems = [
   { label: 'Tạo sự kiện', path: '/organizer/create-event', icon: PhPlus },
   { label: 'Thống kê', path: '/organizer/insights', icon: PhChartLineUp },
   { label: 'Ví của tôi', path: '/organizer/wallet', icon: PhWallet },
+  { label: 'Nhân viên soát vé', path: '/organizer/staffs', icon: PhIdentificationBadge },
 ]
 
 const activeMenuItems = computed(() => {

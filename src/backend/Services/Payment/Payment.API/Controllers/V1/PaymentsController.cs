@@ -3,6 +3,8 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Payment.Common.Options;
 using Payment.Infrastructure.Entities;
 using Payment.Infrastructure.Interfaces;
 using Payment.Infrastructure.Interfaces.IServices;
@@ -19,17 +21,20 @@ namespace Payment.API.Controllers.V1
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<PaymentsController> _logger;
+        private readonly AppUrls _appUrls;
 
         public PaymentsController(
             IVnpayService vnpayService,
             IUnitOfWork unitOfWork,
             IPublishEndpoint publishEndpoint,
-            ILogger<PaymentsController> logger)
+            ILogger<PaymentsController> logger,
+            IOptions<AppUrls> appUrls)
         {
             _vnpayService = vnpayService;
             _unitOfWork = unitOfWork;
             _publishEndpoint = publishEndpoint;
             _logger = logger;
+            _appUrls = appUrls.Value;
         }
 
         [HttpGet("vnpay-ipn")]
@@ -181,13 +186,13 @@ namespace Payment.API.Controllers.V1
                     }
                 }
 
-                string redirectUrl = $"http://localhost:5173/my-tickets?success={success.ToString().ToLower()}&orderId={txnRef}";
+                string redirectUrl = $"{_appUrls.FrontendBaseUrl}/my-tickets?success={success.ToString().ToLower()}&orderId={txnRef}";
                 return Redirect(redirectUrl);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Lỗi xảy ra trong quá trình xử lý VNPay Return");
-                return Redirect($"http://localhost:5173/my-tickets?success=false&error=server_error");
+                return Redirect($"{_appUrls.FrontendBaseUrl}/my-tickets?success=false&error=server_error");
             }
         }
     }

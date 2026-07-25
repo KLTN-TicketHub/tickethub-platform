@@ -40,7 +40,6 @@ namespace Inventory.Infrastructure.Consumers
                 }
 
                 await _unitOfWork.IssuedTicketRepository.UpdateRangeAsync(validTickets, context.CancellationToken);
-                await _unitOfWork.SaveChangesAsync(context.CancellationToken);
 
                 await context.Publish(new OrderTicketsInvalidatedEvent
                 {

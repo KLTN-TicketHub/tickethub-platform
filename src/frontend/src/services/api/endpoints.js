@@ -9,6 +9,9 @@ export const ADMIN_MODERATOR_REGISTER = '/auth/admin/moderators/register'
 export const MODERATOR_ACTIVATE_ACCOUNT = '/auth/moderator/activate-account'
 export const ORGANIZER_AUTH_LOGIN = '/auth/organizer/login'
 export const ORGANIZER_AUTH_REGISTER = '/auth/organizer'
+export const ORGANIZER_STAFF_REGISTER = '/auth/organizer/staffs/register'
+export const STAFF_AUTH_LOGIN = '/auth/staff/login'
+export const STAFF_ACTIVATE_ACCOUNT = '/auth/staff/activate-account'
 
 
 
@@ -79,6 +82,7 @@ export const ORDER_EVENT_CHARTS = (eventId) => `/ordering/orders/reports/events/
 
 // Tickets
 export const MY_TICKETS = '/inventory/tickets/me'
+export const TICKET_CHECKIN = (qrToken) => `/inventory/tickets/checkin/${qrToken}`
 
 // Event Ratings
 export const EVENT_RATINGS = (eventId) => `/catalog/events/${eventId}/ratings`
