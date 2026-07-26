@@ -124,7 +124,7 @@ namespace Payment.API.Controllers.V1
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi xảy ra trong quá trình xử lý VNPay IPN");
+                _logger.LogError(ex, "Error occurred while processing VNPay IPN");
                 return StatusCode(500, new { RspCode = "99", Message = "Unknown error" });
             }
         }
@@ -191,7 +191,7 @@ namespace Payment.API.Controllers.V1
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi xảy ra trong quá trình xử lý VNPay Return");
+                _logger.LogError(ex, "Error occurred while processing VNPay Return");
                 return Redirect($"{_appUrls.FrontendBaseUrl}/my-tickets?success=false&error=server_error");
             }
         }

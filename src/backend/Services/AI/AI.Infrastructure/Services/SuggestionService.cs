@@ -160,7 +160,7 @@ namespace AI.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "[SuggestionService] Không thể tạo gợi ý AI cho {SuggestionType}/{ScopeId}.", suggestionType, scopeId);
+                _logger.LogError(ex, "[SuggestionService] Failed to generate AI suggestion for {SuggestionType}/{ScopeId}.", suggestionType, scopeId);
                 return (false, "Không thể tạo gợi ý AI lúc này. Vui lòng thử lại sau.", null);
             }
         }

@@ -168,7 +168,7 @@ namespace Finance.Infrastructure.Services
                 }
                 else
                 {
-                    _logger.LogWarning("Không tìm thấy OrganizerSnapshot cho OrganizerId {OrganizerId}, bỏ qua gửi email thông báo giải ngân.", payoutRequest.OrganizerId);
+                    _logger.LogWarning("OrganizerSnapshot not found for OrganizerId {OrganizerId}, skipping payout notification email.", payoutRequest.OrganizerId);
                 }
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -177,7 +177,7 @@ namespace Finance.Infrastructure.Services
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, "Lỗi xảy ra khi đề xuất giải ngân cho sự kiện {EventId}", payoutRequest.EventId);
+                _logger.LogError(ex, "Error occurred while proposing payout for event {EventId}", payoutRequest.EventId);
                 throw;
             }
 
@@ -275,7 +275,7 @@ namespace Finance.Infrastructure.Services
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, "Lỗi xảy ra khi chấp nhận giải ngân {PayoutId}", payoutId);
+                _logger.LogError(ex, "Error occurred while approving payout {PayoutId}", payoutId);
                 throw;
             }
 
@@ -331,7 +331,7 @@ namespace Finance.Infrastructure.Services
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, "Lỗi xảy ra khi từ chối giải ngân {PayoutId}", payoutId);
+                _logger.LogError(ex, "Error occurred while rejecting payout {PayoutId}", payoutId);
                 throw;
             }
 

@@ -47,7 +47,7 @@ namespace Inventory.Infrastructure.Consumers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi xử lý ReleaseSeatsCommand cho OrderId={OrderId}", message.OrderId);
+                _logger.LogError(ex, "Error processing ReleaseSeatsCommand for OrderId={OrderId}", message.OrderId);
                 throw;
             }
         }

@@ -56,7 +56,7 @@ namespace Ordering.Infrastructure.Consumers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi xảy ra khi CancelOrder cho OrderId: {OrderId}", context.Message.OrderId);
+                _logger.LogError(ex, "Error occurred while cancelling order for OrderId: {OrderId}", context.Message.OrderId);
                 throw;
             }
         }

@@ -36,7 +36,7 @@ namespace Finance.Infrastructure.Consumers
 
                 await _unitOfWork.OrganizerSnapshotRepository.CreateAsync(snapshot, context.CancellationToken);
 
-                _logger.LogInformation("Đã tạo OrganizerSnapshot cho OrganizerId {OrganizerId}", message.Id);
+                _logger.LogInformation("Created OrganizerSnapshot for OrganizerId {OrganizerId}", message.Id);
             }
             else
             {
@@ -47,7 +47,7 @@ namespace Finance.Infrastructure.Consumers
 
                 await _unitOfWork.OrganizerSnapshotRepository.UpdateAsync(existing, context.CancellationToken);
 
-                _logger.LogInformation("Đã cập nhật OrganizerSnapshot cho OrganizerId {OrganizerId}", message.Id);
+                _logger.LogInformation("Updated OrganizerSnapshot for OrganizerId {OrganizerId}", message.Id);
             }
         }
     }

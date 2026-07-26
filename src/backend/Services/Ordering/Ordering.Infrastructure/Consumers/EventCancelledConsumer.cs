@@ -21,7 +21,7 @@ namespace Ordering.Infrastructure.Consumers
         public async Task Consume(ConsumeContext<EventCancelledEvent> context)
         {
             var message = context.Message;
-            _logger.LogInformation("Processing EventCancelledEvent for EventId={EventId}, tìm đơn hàng cần hoàn tiền", message.EventId);
+            _logger.LogInformation("Processing EventCancelledEvent for EventId={EventId}, finding orders that need refunds", message.EventId);
 
             try
             {
@@ -38,11 +38,11 @@ namespace Ordering.Infrastructure.Consumers
                     });
                 }
 
-                _logger.LogInformation("Đã khởi tạo hoàn tiền cho {Count} đơn hàng của EventId={EventId}", orders.Count(), message.EventId);
+                _logger.LogInformation("Initiated refunds for {Count} order(s) of EventId={EventId}", orders.Count(), message.EventId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi xử lý EventCancelledEvent cho EventId={EventId}", message.EventId);
+                _logger.LogError(ex, "Error processing EventCancelledEvent for EventId={EventId}", message.EventId);
                 throw;
             }
         }

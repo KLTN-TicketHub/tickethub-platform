@@ -41,7 +41,7 @@ namespace Ordering.Infrastructure.Services
             if (showtimeSnapshot == null || showtimeSnapshot.EventSnapshot == null)
             {
                 _logger.LogError(
-                    "[OrderService] Không tìm thấy EventSnapshot cho ShowtimeId={ShowtimeId}. Event chưa được approve hoặc snapshot chưa được replicate.",
+                    "[OrderService] EventSnapshot not found for ShowtimeId={ShowtimeId}. Event has not been approved or the snapshot has not been replicated yet.",
                     request.ShowtimeId);
                 return (false, Guid.Empty, "Thông tin suất diễn chưa sẵn sàng. Vui lòng thử lại sau.");
             }
@@ -53,7 +53,7 @@ namespace Ordering.Infrastructure.Services
             if (seatIds.Any())
             {
                 _logger.LogInformation(
-                    "[OrderService] Reserved seat checkout, gọi Catalog gRPC để validate ghế cho ShowtimeId={ShowtimeId}",
+                    "[OrderService] Reserved seat checkout, calling Catalog gRPC to validate seats for ShowtimeId={ShowtimeId}",
                     request.ShowtimeId);
 
                 var checkoutData = await _catalogService.GetCheckoutDataAsync(
@@ -78,7 +78,7 @@ namespace Ordering.Infrastructure.Services
             else
             {
                 _logger.LogInformation(
-                    "[OrderService] GA ticket checkout, sử dụng EventSnapshot local cho ShowtimeId={ShowtimeId}",
+                    "[OrderService] GA ticket checkout, using local EventSnapshot for ShowtimeId={ShowtimeId}",
                     request.ShowtimeId);
 
                 var validationResult = ValidateGAItemsFromSnapshot(request.Items, showtimeSnapshot);

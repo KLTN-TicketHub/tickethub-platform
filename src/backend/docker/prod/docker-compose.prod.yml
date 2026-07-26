@@ -1,0 +1,289 @@
+networks:
+  tickethub-net:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
+  redis_data:
+  rabbitmq_data:
+  caddy_data:
+  caddy_config:
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: tickethub-sqlserver
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD}
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - tickethub-net
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./init-hangfire-db.sql:/init-hangfire-db.sql:ro
+    networks:
+      - tickethub-net
+    entrypoint: ["/opt/mssql-tools18/bin/sqlcmd", "-S", "sqlserver", "-U", "sa", "-P", "${SA_PASSWORD}", "-C", "-i", "/init-hangfire-db.sql"]
+    restart: "no"
+
+  redis:
+    image: redis:7-alpine
+    container_name: tickethub-redis
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --notify-keyspace-events
+      - Ex
+    volumes:
+      - redis_data:/data
+    networks:
+      - tickethub-net
+
+  rabbitmq:
+    image: heidiks/rabbitmq-delayed-message-exchange:3.13.3-management
+    container_name: tickethub-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - tickethub-net
+
+  identity-api:
+    build:
+      context: ../../
+      dockerfile: Services/Identity/Identity.API/Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+    volumes:
+      - ${SECRETS_DIR}/identity/appsettings.Production.json:/app/appsettings.Production.json:ro
+      - ${SECRETS_DIR}/identity/Keys:/app/Keys:ro
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      sqlserver-init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    networks:
+      - tickethub-net
+
+  catalog-api:
+    build:
+      context: ../../
+      dockerfile: Services/Catalog/Catalog.API/Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      Kestrel__EndpointDefaults__Protocols: Http1AndHttp2
+    volumes:
+      - ${SECRETS_DIR}/catalog/appsettings.Production.json:/app/appsettings.Production.json:ro
+      - ${SECRETS_DIR}/catalog/Keys:/app/Keys:ro
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    networks:
+      - tickethub-net
+
+  inventory-api:
+    build:
+      context: ../../
+      dockerfile: Services/Inventory/Inventory.API/Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      Kestrel__EndpointDefaults__Protocols: Http1AndHttp2
+    volumes:
+      - ${SECRETS_DIR}/inventory/appsettings.Production.json:/app/appsettings.Production.json:ro
+      - ${SECRETS_DIR}/inventory/Keys:/app/Keys:ro
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      catalog-api:
+        condition: service_started
+    networks:
+      - tickethub-net
+
+  ordering-api:
+    build:
+      context: ../../
+      dockerfile: Services/Ordering/Ordering.API/Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+    volumes:
+      - ${SECRETS_DIR}/ordering/appsettings.Production.json:/app/appsettings.Production.json:ro
+      - ${SECRETS_DIR}/ordering/Keys:/app/Keys:ro
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      inventory-api:
+        condition: service_started
+      catalog-api:
+        condition: service_started
+    networks:
+      - tickethub-net
+
+  payment-api:
+    build:
+      context: ../../
+      dockerfile: Services/Payment/Payment.API/Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+    volumes:
+      - ${SECRETS_DIR}/payment/appsettings.Production.json:/app/appsettings.Production.json:ro
+      - ${SECRETS_DIR}/payment/Keys:/app/Keys:ro
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    networks:
+      - tickethub-net
+
+  finance-api:
+    build:
+      context: ../../
+      dockerfile: Services/Finance/Finance.API/Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+    volumes:
+      - ${SECRETS_DIR}/finance/appsettings.Production.json:/app/appsettings.Production.json:ro
+      - ${SECRETS_DIR}/finance/Keys:/app/Keys:ro
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    networks:
+      - tickethub-net
+
+  ai-api:
+    build:
+      context: ../../
+      dockerfile: Services/AI/AI.API/Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+    volumes:
+      - ${SECRETS_DIR}/ai/appsettings.Production.json:/app/appsettings.Production.json:ro
+      - ${SECRETS_DIR}/ai/Keys:/app/Keys:ro
+    depends_on:
+      redis:
+        condition: service_started
+      catalog-api:
+        condition: service_started
+    networks:
+      - tickethub-net
+
+  notification-worker:
+    build:
+      context: ../../
+      dockerfile: Services/Notification/Notification.Worker/Dockerfile
+    restart: unless-stopped
+    environment:
+      DOTNET_ENVIRONMENT: Production
+    volumes:
+      - ${SECRETS_DIR}/notification/appsettings.Production.json:/app/appsettings.Production.json:ro
+    depends_on:
+      rabbitmq:
+        condition: service_started
+    networks:
+      - tickethub-net
+
+  gateway:
+    build:
+      context: ../../
+      dockerfile: ApiGateways/YarpApiGateway/Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+    volumes:
+      - ./appsettings-templates/YarpApiGateway.appsettings.Production.json:/app/appsettings.Production.json:ro
+    depends_on:
+      - identity-api
+      - catalog-api
+      - inventory-api
+      - ordering-api
+      - payment-api
+      - finance-api
+      - ai-api
+    networks:
+      - tickethub-net
+
+  frontend:
+    build:
+      context: ../../../frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: https://${DOMAIN}/api/v1
+    restart: unless-stopped
+    depends_on:
+      - gateway
+    networks:
+      - tickethub-net
+
+  caddy:
+    image: caddy:2
+    container_name: tickethub-caddy
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - gateway
+      - frontend
+    networks:
+      - tickethub-net

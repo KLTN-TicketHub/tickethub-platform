@@ -32,7 +32,7 @@ namespace Payment.Infrastructure.Consumers
 
                 if (transaction == null || transaction.Status != PaymentStatus.Success || transaction.TransactionId == null || transaction.PayDate == null)
                 {
-                    _logger.LogWarning("Không thể hoàn tiền cho OrderId={OrderId}: không tìm thấy giao dịch thanh toán thành công hợp lệ.", message.OrderId);
+                    _logger.LogWarning("Cannot refund OrderId={OrderId}: no valid successful payment transaction found.", message.OrderId);
                     await context.Publish(new PaymentRefundFailedEvent
                     {
                         OrderId = message.OrderId,
@@ -67,11 +67,11 @@ namespace Payment.Infrastructure.Consumers
                         RefundedAt = DateTime.UtcNow
                     });
 
-                    _logger.LogInformation("Đã hoàn tiền thành công cho OrderId={OrderId}, số tiền={Amount}", message.OrderId, message.Amount);
+                    _logger.LogInformation("Successfully refunded OrderId={OrderId}, amount={Amount}", message.OrderId, message.Amount);
                 }
                 else
                 {
-                    _logger.LogError("VNPay từ chối hoàn tiền cho OrderId={OrderId}: {Message}. RawResponse={RawResponse}", message.OrderId, resultMessage, rawResponse);
+                    _logger.LogError("VNPay rejected the refund for OrderId={OrderId}: {Message}. RawResponse={RawResponse}", message.OrderId, resultMessage, rawResponse);
                     await context.Publish(new PaymentRefundFailedEvent
                     {
                         OrderId = message.OrderId,
@@ -81,7 +81,7 @@ namespace Payment.Infrastructure.Consumers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi xử lý RefundPaymentCommand cho OrderId={OrderId}", message.OrderId);
+                _logger.LogError(ex, "Error processing RefundPaymentCommand for OrderId={OrderId}", message.OrderId);
                 throw;
             }
         }

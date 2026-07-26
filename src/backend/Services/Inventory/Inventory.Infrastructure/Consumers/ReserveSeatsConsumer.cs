@@ -67,7 +67,7 @@ namespace Inventory.Infrastructure.Consumers
                         if (inventory.SoldQuantity + message.Quantity > inventory.Capacity)
                         {
                             _logger.LogError(
-                                "[ReserveSeatsConsumer] Vượt quá sức chứa khi xác nhận vé cho OrderId={OrderId}, TicketTypeId={TicketTypeId}: SoldQuantity={SoldQuantity}, Quantity={Quantity}, Capacity={Capacity}.",
+                                "[ReserveSeatsConsumer] Capacity exceeded while confirming tickets for OrderId={OrderId}, TicketTypeId={TicketTypeId}: SoldQuantity={SoldQuantity}, Quantity={Quantity}, Capacity={Capacity}.",
                                 message.OrderId, message.TicketTypeId.Value, inventory.SoldQuantity, message.Quantity, inventory.Capacity);
                         }
 
@@ -83,7 +83,7 @@ namespace Inventory.Infrastructure.Consumers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi xử lý ReserveSeatsCommand cho OrderId={OrderId}", message.OrderId);
+                _logger.LogError(ex, "Error processing ReserveSeatsCommand for OrderId={OrderId}", message.OrderId);
                 throw;
             }
         }

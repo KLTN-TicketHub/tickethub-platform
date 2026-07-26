@@ -36,7 +36,7 @@ namespace Catalog.Infrastructure.Consumers
 
             if (existing != null)
             {
-                _logger.LogInformation("EventCheckIn đã tồn tại cho IssuedTicketId: {IssuedTicketId}, bỏ qua.", message.IssuedTicketId);
+                _logger.LogInformation("EventCheckIn already exists for IssuedTicketId: {IssuedTicketId}, skipping.", message.IssuedTicketId);
                 return;
             }
 

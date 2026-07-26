@@ -50,12 +50,12 @@ namespace Inventory.Infrastructure.Consumers
                 });
 
                 _logger.LogInformation(
-                    "Đã hủy {CancelledCount} vé, giữ nguyên {KeptCount} vé đã check-in cho OrderId={OrderId}, số tiền hoàn={RefundableAmount}",
+                    "Cancelled {CancelledCount} ticket(s), kept {KeptCount} checked-in ticket(s) for OrderId={OrderId}, refundable amount={RefundableAmount}",
                     validTickets.Count, keptCount, message.OrderId, refundableAmount);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi xử lý InvalidateOrderTicketsCommand cho OrderId={OrderId}", message.OrderId);
+                _logger.LogError(ex, "Error processing InvalidateOrderTicketsCommand for OrderId={OrderId}", message.OrderId);
                 throw;
             }
         }

@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+**/.codegraph/
+*.user
+*.suo
+docker/
+
+# Không bao giờ bake config/secret thật hay khóa JWT vào image —
+# appsettings.Production.json và Keys/*.pem được bind-mount lúc chạy container.
+**/appsettings.json
+**/appsettings.Development.json
+**/appsettings.Production.json
+**/Keys/

@@ -26,7 +26,7 @@ namespace Finance.Infrastructure.Consumers
 
                 if (organizerId == Guid.Empty)
                 {
-                    _logger.LogWarning("Bỏ qua OrderPaidEvent cho OrderId {OrderId} do OrganizerId trống.", message.OrderId);
+                    _logger.LogWarning("Skipping OrderPaidEvent for OrderId {OrderId} because OrganizerId is empty.", message.OrderId);
                     return;
                 }
 
@@ -45,7 +45,7 @@ namespace Finance.Infrastructure.Consumers
 
                 if (existingTx != null)
                 {
-                    _logger.LogInformation("Giao dịch doanh thu cho OrderId {OrderId} đã tồn tại.", message.OrderId);
+                    _logger.LogInformation("Revenue transaction for OrderId {OrderId} already exists.", message.OrderId);
                     return;
                 }
 
@@ -66,11 +66,11 @@ namespace Finance.Infrastructure.Consumers
                 await _unitOfWork.WalletTransactionRepository.CreateAsync(transaction);
                 await _unitOfWork.SaveChangesAsync();
 
-                _logger.LogInformation("Đã tạo giao dịch chờ giải ngân cho OrderId {OrderId}, dự kiến giải ngân lúc {ReleaseAt}", message.OrderId, releaseAt);
+                _logger.LogInformation("Created pending payout transaction for OrderId {OrderId}, scheduled release at {ReleaseAt}", message.OrderId, releaseAt);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi xử lý OrderPaidEvent cho OrderId {OrderId}", context.Message.OrderId);
+                _logger.LogError(ex, "Error processing OrderPaidEvent for OrderId {OrderId}", context.Message.OrderId);
                 throw;
             }
         }

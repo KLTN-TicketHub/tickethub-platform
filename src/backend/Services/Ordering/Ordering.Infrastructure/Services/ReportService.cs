@@ -88,7 +88,7 @@ namespace Ordering.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "[ReportService] Lỗi khi lấy báo cáo cho EventId={EventId}", eventId);
+                _logger.LogError(ex, "[ReportService] Error retrieving report for EventId={EventId}", eventId);
                 return (false, $"Lỗi xử lý hệ thống: {ex.Message}", null);
             }
         }
@@ -166,7 +166,7 @@ namespace Ordering.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "[ReportService] Lỗi khi lấy danh sách đơn hàng cho EventId={EventId}", eventId);
+                _logger.LogError(ex, "[ReportService] Error retrieving order list for EventId={EventId}", eventId);
                 return (false, $"Lỗi xử lý hệ thống: {ex.Message}", null);
             }
         }
@@ -256,7 +256,7 @@ namespace Ordering.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "[ReportService] Lỗi khi lấy thống kê biểu đồ cho EventId={EventId}", eventId);
+                _logger.LogError(ex, "[ReportService] Error retrieving chart statistics for EventId={EventId}", eventId);
                 return (false, $"Lỗi xử lý hệ thống: {ex.Message}", null);
             }
         }

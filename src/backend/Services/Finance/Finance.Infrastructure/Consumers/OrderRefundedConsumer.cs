@@ -28,7 +28,7 @@ namespace Finance.Infrastructure.Consumers
 
                 if (transaction == null)
                 {
-                    _logger.LogWarning("Không tìm thấy giao dịch doanh thu đang chờ cho OrderId {OrderId} để hoàn tiền.", message.OrderId);
+                    _logger.LogWarning("No pending revenue transaction found for OrderId {OrderId} to refund.", message.OrderId);
                     return;
                 }
 
@@ -44,11 +44,11 @@ namespace Finance.Infrastructure.Consumers
                 await _unitOfWork.WalletTransactionRepository.UpdateAsync(transaction);
                 await _unitOfWork.SaveChangesAsync();
 
-                _logger.LogInformation("Đã cập nhật giao dịch doanh thu cho OrderId {OrderId} sau khi hoàn tiền {RefundedAmount}.", message.OrderId, message.RefundedAmount);
+                _logger.LogInformation("Updated revenue transaction for OrderId {OrderId} after refund of {RefundedAmount}.", message.OrderId, message.RefundedAmount);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi xử lý OrderRefundedEvent cho OrderId {OrderId}", message.OrderId);
+                _logger.LogError(ex, "Error processing OrderRefundedEvent for OrderId {OrderId}", message.OrderId);
                 throw;
             }
         }

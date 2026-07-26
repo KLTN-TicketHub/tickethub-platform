@@ -29,7 +29,7 @@ namespace Ordering.Infrastructure.Consumers
 
                 if (order == null || order.Status != OrderStatus.Paid)
                 {
-                    _logger.LogInformation("Bỏ qua FinalizeOrderRefundCommand cho OrderId={OrderId} vì đơn không ở trạng thái Paid.", message.OrderId);
+                    _logger.LogInformation("Skipping FinalizeOrderRefundCommand for OrderId={OrderId} because the order is not in Paid status.", message.OrderId);
                     return;
                 }
 
@@ -55,11 +55,11 @@ namespace Ordering.Infrastructure.Consumers
                 });
 
                 await _unitOfWork.SaveChangesAsync(context.CancellationToken);
-                _logger.LogInformation("Đã hoàn tất hoàn tiền cho OrderId={OrderId}, số tiền={RefundedAmount}", order.Id, message.RefundedAmount);
+                _logger.LogInformation("Completed refund for OrderId={OrderId}, amount={RefundedAmount}", order.Id, message.RefundedAmount);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi xử lý FinalizeOrderRefundCommand cho OrderId={OrderId}", message.OrderId);
+                _logger.LogError(ex, "Error processing FinalizeOrderRefundCommand for OrderId={OrderId}", message.OrderId);
                 throw;
             }
         }

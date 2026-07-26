@@ -1,0 +1,152 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedCors": {
+    "Origins": [
+      "https://tickethub.click"
+    ]
+  },
+  "AllowedHosts": "*",
+  "ReverseProxy": {
+    "Routes": {
+      "auth-route": {
+        "ClusterId": "identity-cluster",
+        "Match": {
+          "Path": "/api/v{version}/auth/{**catch-all}"
+        },
+        "Transforms": [
+          {
+            "PathPattern": "/api/v{version}/{**catch-all}"
+          }
+        ]
+      },
+      "catalog-route": {
+        "ClusterId": "catalog-cluster",
+        "Match": {
+          "Path": "/api/v{version}/catalog/{**catch-all}"
+        },
+        "Transforms": [
+          {
+            "PathPattern": "/api/v{version}/{**catch-all}"
+          }
+        ]
+      },
+      "inventory-route": {
+        "ClusterId": "inventory-cluster",
+        "Match": {
+          "Path": "/api/v{version}/inventory/{**catch-all}"
+        },
+        "Transforms": [
+          {
+            "PathPattern": "/api/v{version}/{**catch-all}"
+          }
+        ]
+      },
+      "inventory-hub-route": {
+        "ClusterId": "inventory-cluster",
+        "Match": {
+          "Path": "/hubs/seatmap/{**catch-all}"
+        }
+      },
+      "ordering-route": {
+        "ClusterId": "ordering-cluster",
+        "Match": {
+          "Path": "/api/v{version}/ordering/{**catch-all}"
+        },
+        "Transforms": [
+          {
+            "PathPattern": "/api/v{version}/{**catch-all}"
+          }
+        ]
+      },
+      "payment-route": {
+        "ClusterId": "payment-cluster",
+        "Match": {
+          "Path": "/api/v{version}/payment/{**catch-all}"
+        },
+        "Transforms": [
+          {
+            "PathPattern": "/api/v{version}/{**catch-all}"
+          }
+        ]
+      },
+      "finance-route": {
+        "ClusterId": "finance-cluster",
+        "Match": {
+          "Path": "/api/v{version}/finance/{**catch-all}"
+        },
+        "Transforms": [
+          {
+            "PathPattern": "/api/v{version}/{**catch-all}"
+          }
+        ]
+      },
+      "ai-route": {
+        "ClusterId": "ai-cluster",
+        "Match": {
+          "Path": "/api/v{version}/ai/{**catch-all}"
+        },
+        "Transforms": [
+          {
+            "PathPattern": "/api/v{version}/{**catch-all}"
+          }
+        ]
+      }
+    },
+    "Clusters": {
+      "identity-cluster": {
+        "Destinations": {
+          "identity-destination": {
+            "Address": "http://identity-api:8080"
+          }
+        }
+      },
+      "catalog-cluster": {
+        "Destinations": {
+          "catalog-destination": {
+            "Address": "http://catalog-api:8080"
+          }
+        }
+      },
+      "inventory-cluster": {
+        "Destinations": {
+          "inventory-destination": {
+            "Address": "http://inventory-api:8080"
+          }
+        }
+      },
+      "ordering-cluster": {
+        "Destinations": {
+          "ordering-destination": {
+            "Address": "http://ordering-api:8080"
+          }
+        }
+      },
+      "payment-cluster": {
+        "Destinations": {
+          "payment-destination": {
+            "Address": "http://payment-api:8080"
+          }
+        }
+      },
+      "finance-cluster": {
+        "Destinations": {
+          "finance-destination": {
+            "Address": "http://finance-api:8080"
+          }
+        }
+      },
+      "ai-cluster": {
+        "Destinations": {
+          "ai-destination": {
+            "Address": "http://ai-api:8080"
+          }
+        }
+      }
+    }
+  }
+}

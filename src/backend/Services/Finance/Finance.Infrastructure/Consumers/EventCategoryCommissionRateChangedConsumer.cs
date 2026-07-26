@@ -38,7 +38,7 @@ namespace Finance.Infrastructure.Consumers
             await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation(
-                "Đã đồng bộ % hoa hồng tham khảo cho danh mục {CategoryId}: {Rate}%",
+                "Synced recommended commission rate for category {CategoryId}: {Rate}%",
                 message.CategoryId, message.RecommendedCommissionRate);
         }
     }
