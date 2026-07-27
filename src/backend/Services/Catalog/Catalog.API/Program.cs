@@ -36,6 +36,7 @@ builder.Services.AddCustomSwagger();
 builder.Services.AddCustomApiVersioning();
 
 builder.Services.AddCustomRedis(builder.Configuration);
+builder.Services.AddCustomHealthChecks(builder.Configuration);
 builder.Services.AddHostedService<EventClickFlushHostedService>();
 
 #region AutoMapper
@@ -72,5 +73,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();

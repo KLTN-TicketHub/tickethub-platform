@@ -50,6 +50,16 @@
    <File Path="docker/infra/.env.example" />
    <File Path="docker/infra/README.md" />
   </Folder>
+  <Folder Name="/docker/prod/">
+   <File Path="docker/prod/docker-compose.prod.yml" />
+   <File Path="docker/prod/.env.example" />
+   <File Path="docker/prod/.gitignore" />
+   <File Path="docker/prod/Caddyfile" />
+   <File Path="docker/prod/init-hangfire-db.sql" />
+  </Folder>
+  <Folder Name="/docker/prod/appsettings-templates/">
+   <File Path="docker/prod/appsettings-templates/YarpApiGateway.appsettings.Production.json" />
+  </Folder>
   <Folder Name="/Services/Ordering/">
     <Project Path="Services/Ordering/Ordering.API/Ordering.API.csproj" />
     <Project Path="Services/Ordering/Ordering.Common/Ordering.Common.csproj" />

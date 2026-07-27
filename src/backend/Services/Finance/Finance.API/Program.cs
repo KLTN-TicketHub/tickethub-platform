@@ -30,6 +30,7 @@ builder.Services.AddCustomSwagger();
 builder.Services.AddCustomApiVersioning();
 
 builder.Services.AddCustomRedis(builder.Configuration);
+builder.Services.AddCustomHealthChecks(builder.Configuration);
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
@@ -57,5 +58,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();

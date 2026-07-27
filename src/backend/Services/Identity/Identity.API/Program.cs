@@ -39,6 +39,7 @@ builder.Services.Register();
 builder.Services.AddCustomHangfire(builder.Configuration.GetConnectionString("HangfireDbConnection")!);
 builder.Services.AddHttpClient();
 builder.Services.AddCustomRedis(builder.Configuration);
+builder.Services.AddCustomHealthChecks(builder.Configuration);
 builder.Services.AddAuthorization();
 
 builder.Services.AddFluentValidationAutoValidation();
@@ -76,6 +77,7 @@ app.UseRequestResponseLogging();
 #endregion
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 app.UseStaticFiles();
 
 app.Run();

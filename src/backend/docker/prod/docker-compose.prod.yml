@@ -12,7 +12,6 @@ volumes:
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: tickethub-sqlserver
     restart: unless-stopped
     environment:
       ACCEPT_EULA: "Y"
@@ -41,7 +40,6 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: tickethub-redis
     restart: unless-stopped
     command:
       - redis-server
@@ -56,7 +54,6 @@ services:
 
   rabbitmq:
     image: heidiks/rabbitmq-delayed-message-exchange:3.13.3-management
-    container_name: tickethub-rabbitmq
     restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
@@ -67,6 +64,7 @@ services:
       - tickethub-net
 
   identity-api:
+    image: ghcr.io/kltn-tickethub/tickethub-platform-identity-api:latest
     build:
       context: ../../
       dockerfile: Services/Identity/Identity.API/Dockerfile
@@ -76,7 +74,7 @@ services:
       ASPNETCORE_URLS: http://+:8080
     volumes:
       - ${SECRETS_DIR}/identity/appsettings.Production.json:/app/appsettings.Production.json:ro
-      - ${SECRETS_DIR}/identity/Keys:/app/Keys:ro
+      - ../../Services/Identity/Identity.API/Keys:/app/Keys:ro
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -88,8 +86,15 @@ services:
         condition: service_started
     networks:
       - tickethub-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   catalog-api:
+    image: ghcr.io/kltn-tickethub/tickethub-platform-catalog-api:latest
     build:
       context: ../../
       dockerfile: Services/Catalog/Catalog.API/Dockerfile
@@ -100,7 +105,7 @@ services:
       Kestrel__EndpointDefaults__Protocols: Http1AndHttp2
     volumes:
       - ${SECRETS_DIR}/catalog/appsettings.Production.json:/app/appsettings.Production.json:ro
-      - ${SECRETS_DIR}/catalog/Keys:/app/Keys:ro
+      - ../../Services/Catalog/Catalog.API/Keys:/app/Keys:ro
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -110,8 +115,15 @@ services:
         condition: service_started
     networks:
       - tickethub-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   inventory-api:
+    image: ghcr.io/kltn-tickethub/tickethub-platform-inventory-api:latest
     build:
       context: ../../
       dockerfile: Services/Inventory/Inventory.API/Dockerfile
@@ -122,7 +134,7 @@ services:
       Kestrel__EndpointDefaults__Protocols: Http1AndHttp2
     volumes:
       - ${SECRETS_DIR}/inventory/appsettings.Production.json:/app/appsettings.Production.json:ro
-      - ${SECRETS_DIR}/inventory/Keys:/app/Keys:ro
+      - ../../Services/Inventory/Inventory.API/Keys:/app/Keys:ro
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -131,11 +143,18 @@ services:
       rabbitmq:
         condition: service_started
       catalog-api:
-        condition: service_started
+        condition: service_healthy
     networks:
       - tickethub-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   ordering-api:
+    image: ghcr.io/kltn-tickethub/tickethub-platform-ordering-api:latest
     build:
       context: ../../
       dockerfile: Services/Ordering/Ordering.API/Dockerfile
@@ -145,7 +164,7 @@ services:
       ASPNETCORE_URLS: http://+:8080
     volumes:
       - ${SECRETS_DIR}/ordering/appsettings.Production.json:/app/appsettings.Production.json:ro
-      - ${SECRETS_DIR}/ordering/Keys:/app/Keys:ro
+      - ../../Services/Ordering/Ordering.API/Keys:/app/Keys:ro
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -154,13 +173,20 @@ services:
       rabbitmq:
         condition: service_started
       inventory-api:
-        condition: service_started
+        condition: service_healthy
       catalog-api:
-        condition: service_started
+        condition: service_healthy
     networks:
       - tickethub-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   payment-api:
+    image: ghcr.io/kltn-tickethub/tickethub-platform-payment-api:latest
     build:
       context: ../../
       dockerfile: Services/Payment/Payment.API/Dockerfile
@@ -170,7 +196,7 @@ services:
       ASPNETCORE_URLS: http://+:8080
     volumes:
       - ${SECRETS_DIR}/payment/appsettings.Production.json:/app/appsettings.Production.json:ro
-      - ${SECRETS_DIR}/payment/Keys:/app/Keys:ro
+      - ../../Services/Payment/Payment.API/Keys:/app/Keys:ro
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -180,8 +206,15 @@ services:
         condition: service_started
     networks:
       - tickethub-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   finance-api:
+    image: ghcr.io/kltn-tickethub/tickethub-platform-finance-api:latest
     build:
       context: ../../
       dockerfile: Services/Finance/Finance.API/Dockerfile
@@ -191,7 +224,7 @@ services:
       ASPNETCORE_URLS: http://+:8080
     volumes:
       - ${SECRETS_DIR}/finance/appsettings.Production.json:/app/appsettings.Production.json:ro
-      - ${SECRETS_DIR}/finance/Keys:/app/Keys:ro
+      - ../../Services/Finance/Finance.API/Keys:/app/Keys:ro
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -201,8 +234,15 @@ services:
         condition: service_started
     networks:
       - tickethub-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   ai-api:
+    image: ghcr.io/kltn-tickethub/tickethub-platform-ai-api:latest
     build:
       context: ../../
       dockerfile: Services/AI/AI.API/Dockerfile
@@ -212,16 +252,23 @@ services:
       ASPNETCORE_URLS: http://+:8080
     volumes:
       - ${SECRETS_DIR}/ai/appsettings.Production.json:/app/appsettings.Production.json:ro
-      - ${SECRETS_DIR}/ai/Keys:/app/Keys:ro
+      - ../../Services/AI/AI.API/Keys:/app/Keys:ro
     depends_on:
       redis:
         condition: service_started
       catalog-api:
-        condition: service_started
+        condition: service_healthy
     networks:
       - tickethub-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   notification-worker:
+    image: ghcr.io/kltn-tickethub/tickethub-platform-notification-worker:latest
     build:
       context: ../../
       dockerfile: Services/Notification/Notification.Worker/Dockerfile
@@ -237,6 +284,7 @@ services:
       - tickethub-net
 
   gateway:
+    image: ghcr.io/kltn-tickethub/tickethub-platform-gateway:latest
     build:
       context: ../../
       dockerfile: ApiGateways/YarpApiGateway/Dockerfile
@@ -247,17 +295,31 @@ services:
     volumes:
       - ./appsettings-templates/YarpApiGateway.appsettings.Production.json:/app/appsettings.Production.json:ro
     depends_on:
-      - identity-api
-      - catalog-api
-      - inventory-api
-      - ordering-api
-      - payment-api
-      - finance-api
-      - ai-api
+      identity-api:
+        condition: service_healthy
+      catalog-api:
+        condition: service_healthy
+      inventory-api:
+        condition: service_healthy
+      ordering-api:
+        condition: service_healthy
+      payment-api:
+        condition: service_healthy
+      finance-api:
+        condition: service_healthy
+      ai-api:
+        condition: service_healthy
     networks:
       - tickethub-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   frontend:
+    image: ghcr.io/kltn-tickethub/tickethub-platform-frontend:latest
     build:
       context: ../../../frontend
       dockerfile: Dockerfile
@@ -265,13 +327,13 @@ services:
         VITE_API_URL: https://${DOMAIN}/api/v1
     restart: unless-stopped
     depends_on:
-      - gateway
+      gateway:
+        condition: service_healthy
     networks:
       - tickethub-net
 
   caddy:
     image: caddy:2
-    container_name: tickethub-caddy
     restart: unless-stopped
     environment:
       DOMAIN: ${DOMAIN}

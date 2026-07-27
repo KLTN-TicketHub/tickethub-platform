@@ -10,6 +10,7 @@ builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 builder.Services.AddCustomCors(builder.Configuration);
+builder.Services.AddCustomHealthChecks();
 
 var app = builder.Build();
 
@@ -30,5 +31,6 @@ app.UseWebSockets();
 app.MapReverseProxy();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();

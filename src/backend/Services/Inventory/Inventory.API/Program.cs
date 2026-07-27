@@ -32,6 +32,7 @@ builder.Services.AddCustomSwagger();
 builder.Services.AddCustomApiVersioning();
 
 builder.Services.AddCustomRedis(builder.Configuration);
+builder.Services.AddCustomHealthChecks(builder.Configuration);
 builder.Services.AddHostedService<RedisKeyspaceNotificationHostedService>();
 
 builder.Services.AddFluentValidationAutoValidation();
@@ -65,5 +66,6 @@ app.UseAuthorization();
 
 app.MapHub<SeatMapHub>("/hubs/seatmap");
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();

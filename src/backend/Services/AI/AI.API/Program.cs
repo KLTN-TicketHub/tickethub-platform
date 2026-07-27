@@ -26,6 +26,7 @@ builder.Services.AddCustomSwagger();
 builder.Services.AddCustomApiVersioning();
 
 builder.Services.AddCustomRedis(builder.Configuration);
+builder.Services.AddCustomHealthChecks(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
 
@@ -49,5 +50,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();
