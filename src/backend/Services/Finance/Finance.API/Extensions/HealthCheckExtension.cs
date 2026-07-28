@@ -4,7 +4,9 @@ namespace Finance.API.Extensions
     {
         public static IServiceCollection AddCustomHealthChecks(this IServiceCollection services, IConfiguration configuration)
         {
-            string rabbitMqUri = $"amqp://{configuration["RabbitMq:Username"]}:{configuration["RabbitMq:Password"]}@{configuration["RabbitMq:Host"]}:{configuration["RabbitMq:Port"]}/";
+            string rabbitMqUsername = Uri.EscapeDataString(configuration["RabbitMq:Username"]!);
+            string rabbitMqPassword = Uri.EscapeDataString(configuration["RabbitMq:Password"]!);
+            string rabbitMqUri = $"amqp://{rabbitMqUsername}:{rabbitMqPassword}@{configuration["RabbitMq:Host"]}:{configuration["RabbitMq:Port"]}/";
 
             services.AddHealthChecks()
                 .AddSqlServer(configuration.GetConnectionString("PrimaryDbConnection")!, name: "sqlserver")
