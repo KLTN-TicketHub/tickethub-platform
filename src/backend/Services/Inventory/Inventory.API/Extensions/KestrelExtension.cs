@@ -8,7 +8,7 @@ namespace Inventory.API.Extensions
         {
             builder.WebHost.ConfigureKestrel(options =>
             {
-                options.ConfigureEndpointDefaults(listenOptions =>
+                options.ListenAnyIP(8080, listenOptions =>
                 {
                     listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
                 });

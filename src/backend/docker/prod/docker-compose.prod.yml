@@ -104,8 +104,6 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      ASPNETCORE_URLS: http://+:8080
-      Kestrel__EndpointDefaults__Protocols: Http1AndHttp2
     volumes:
       - ${SECRETS_DIR}/catalog/appsettings.Production.json:/app/appsettings.Production.json:ro
       - ../../Services/Catalog/Catalog.API/Keys:/app/Keys:ro
@@ -134,8 +132,6 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      ASPNETCORE_URLS: http://+:8080
-      Kestrel__EndpointDefaults__Protocols: Http1AndHttp2
     volumes:
       - ${SECRETS_DIR}/inventory/appsettings.Production.json:/app/appsettings.Production.json:ro
       - ../../Services/Inventory/Inventory.API/Keys:/app/Keys:ro
