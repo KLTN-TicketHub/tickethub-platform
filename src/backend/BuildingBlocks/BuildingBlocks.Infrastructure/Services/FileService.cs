@@ -1,6 +1,7 @@
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace BuildingBlocks.Infrastructure.Services
@@ -9,13 +10,15 @@ namespace BuildingBlocks.Infrastructure.Services
     {
         private readonly string _baseDirectory;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly string? _publicBaseUrl;
         private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg" };
         private readonly long _maxFileSize = 5 * 1024 * 1024;
         private readonly ILogger<FileService> _logger;
 
-        public FileService(IHttpContextAccessor httpContextAccessor, ILogger<FileService> logger)
+        public FileService(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ILogger<FileService> logger)
         {
             _httpContextAccessor = httpContextAccessor;
+            _publicBaseUrl = configuration["AppUrls:PublicBaseUrl"];
             _logger = logger;
             _baseDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
             Directory.CreateDirectory(_baseDirectory);
@@ -134,6 +137,9 @@ namespace BuildingBlocks.Infrastructure.Services
 
         public string GetAbsoluteUrl(string relativePath)
         {
+            if (!string.IsNullOrWhiteSpace(_publicBaseUrl))
+                return $"{_publicBaseUrl.TrimEnd('/')}/{relativePath.TrimStart('/')}";
+
             return $"{_httpContextAccessor?.HttpContext?.Request?.Scheme}://{_httpContextAccessor?.HttpContext?.Request?.Host}/{relativePath.TrimStart('/')}";
         }
 

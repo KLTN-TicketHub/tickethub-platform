@@ -7,6 +7,18 @@
         reverse_proxy gateway:8080
     }
 
+    handle /uploads/events/* {
+        reverse_proxy catalog-api:8080
+    }
+
+    handle /uploads/seatmaps/* {
+        reverse_proxy catalog-api:8080
+    }
+
+    handle /uploads/moderators/* {
+        reverse_proxy identity-api:8080
+    }
+
     handle {
         reverse_proxy frontend:80
     }
