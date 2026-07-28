@@ -8,6 +8,8 @@ volumes:
   rabbitmq_data:
   caddy_data:
   caddy_config:
+  catalog_uploads:
+  identity_uploads:
 
 services:
   sqlserver:
@@ -75,6 +77,7 @@ services:
     volumes:
       - ${SECRETS_DIR}/identity/appsettings.Production.json:/app/appsettings.Production.json:ro
       - ../../Services/Identity/Identity.API/Keys:/app/Keys:ro
+      - identity_uploads:/app/wwwroot/uploads
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -106,6 +109,7 @@ services:
     volumes:
       - ${SECRETS_DIR}/catalog/appsettings.Production.json:/app/appsettings.Production.json:ro
       - ../../Services/Catalog/Catalog.API/Keys:/app/Keys:ro
+      - catalog_uploads:/app/wwwroot/uploads
     depends_on:
       sqlserver:
         condition: service_healthy
