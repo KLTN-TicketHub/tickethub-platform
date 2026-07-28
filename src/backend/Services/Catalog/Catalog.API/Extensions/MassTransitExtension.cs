@@ -37,6 +37,11 @@ namespace Catalog.API.Extensions
                             h.Password(rabbitMqOptions.Password);
                         });
 
+                    cfg.ReceiveEndpoint("catalog-organizer-activated", e =>
+                    {
+                        e.ConfigureConsumer<OrganizerActivatedConsumer>(context);
+                    });
+
                     cfg.ConfigureEndpoints(context);
                 });
             });

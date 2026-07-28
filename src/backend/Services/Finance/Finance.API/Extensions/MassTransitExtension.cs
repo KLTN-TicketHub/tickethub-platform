@@ -53,6 +53,11 @@ namespace Finance.API.Extensions
                         e.ConfigureConsumer<Finance.Infrastructure.Consumers.OrderRefundedConsumer>(context);
                     });
 
+                    cfg.ReceiveEndpoint("finance-organizer-activated", e =>
+                    {
+                        e.ConfigureConsumer<Finance.Infrastructure.Consumers.OrganizerActivatedConsumer>(context);
+                    });
+
                     cfg.ConfigureEndpoints(context);
                 });
             });
