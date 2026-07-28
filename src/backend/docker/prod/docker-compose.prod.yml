@@ -10,6 +10,7 @@ volumes:
   caddy_config:
   catalog_uploads:
   identity_uploads:
+  identity_dataprotection_keys:
 
 services:
   sqlserver:
@@ -77,6 +78,7 @@ services:
     volumes:
       - ${SECRETS_DIR}/identity/appsettings.Production.json:/app/appsettings.Production.json:ro
       - ../../Services/Identity/Identity.API/Keys:/app/Keys:ro
+      - identity_dataprotection_keys:/root/.aspnet/DataProtection-Keys
       - identity_uploads:/app/wwwroot/uploads
     depends_on:
       sqlserver:
