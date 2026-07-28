@@ -25,10 +25,11 @@ import ToastNotification from './components/ToastNotification.vue'
 
 const route = useRoute()
 
-const isAdminRoute = computed(() => 
-  route.path.startsWith('/admin') || 
-  route.path.startsWith('/moderator') || 
-  route.path.startsWith('/organizer') || 
+const isAdminRoute = computed(() =>
+  route.path.startsWith('/admin') ||
+  route.path.startsWith('/moderator') ||
+  route.path.startsWith('/organizer') ||
+  route.path.startsWith('/staff') ||
   route.path === '/activate-account'
 )
 
