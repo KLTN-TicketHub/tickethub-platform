@@ -9,6 +9,8 @@ using Inventory.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddCustomKestrel();
+
 // Add services to the container.
 
 builder.Services.AddCustomControllers();
