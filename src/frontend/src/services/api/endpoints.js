@@ -50,6 +50,11 @@ export const MODERATOR_EVENT_CANCELLATION_REVIEW = (requestId) => `/catalog/mode
 export const ADMIN_EVENT_CATEGORIES = '/catalog/admin/event-categories'
 export const ADMIN_EVENT_CATEGORY_DETAIL = (id) => `/catalog/admin/event-categories/${id}`
 
+// Admin Users
+export const ADMIN_USERS = '/auth/admin/users'
+export const ADMIN_USER_DETAIL = (id) => `/auth/admin/users/${id}`
+export const ADMIN_USER_LOCK_STATUS = (id) => `/auth/admin/users/${id}/lock-status`
+
 // Organizer Venues & SeatMaps
 export const ORGANIZER_VENUE_LIST = '/catalog/organizer/venues'
 export const ORGANIZER_VENUE_SEATMAPS = (venueId) => `/catalog/organizer/venue/${venueId}/seat-maps`

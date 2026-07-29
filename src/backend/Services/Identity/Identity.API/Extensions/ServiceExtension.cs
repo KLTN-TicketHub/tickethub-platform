@@ -7,10 +7,12 @@ using Identity.Application.Common.Interfaces.IExternalServices.IGoogleServices;
 using Identity.Application.Common.Interfaces.IExternalServices.ITokenServices;
 using Identity.Domain.Interfaces;
 using Identity.Domain.Interfaces.IIdentity_AuthRepositories;
+using Identity.Domain.Interfaces.ISystem_LogRepositories;
 using Identity.Infrastructure.BackgroundJobs;
 using Identity.Infrastructure.Data.Contexts;
 using Identity.Infrastructure.Data.DataSeedingServices;
 using Identity.Infrastructure.Data.Repositories.Identity_AuthRepositories;
+using Identity.Infrastructure.Data.Repositories.System_LogRepositories;
 using Identity.Infrastructure.ExternalServices.GoogleServices;
 using Identity.Infrastructure.ExternalServices.TokenServices;
 
@@ -43,6 +45,8 @@ namespace Identity.API.Extensions
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
             services.AddScoped<AuditInterceptor>();
             return services;
