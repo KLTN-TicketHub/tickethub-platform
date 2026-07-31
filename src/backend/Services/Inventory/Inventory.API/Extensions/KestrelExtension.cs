@@ -6,6 +6,9 @@ namespace Inventory.API.Extensions
     {
         public static WebApplicationBuilder AddCustomKestrel(this WebApplicationBuilder builder)
         {
+            if (!builder.Environment.IsProduction())
+                return builder;
+
             builder.WebHost.ConfigureKestrel(options =>
             {
                 options.ListenAnyIP(8080, listenOptions =>
