@@ -1,6 +1,9 @@
+using BuildingBlocks.API.Extensions;
 using YarpApiGateway.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCustomLogging(builder.Configuration, "Gateway");
 
 // Add services to the container.
 

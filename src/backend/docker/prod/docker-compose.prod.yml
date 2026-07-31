@@ -6,6 +6,7 @@ volumes:
   sqlserver_data:
   redis_data:
   rabbitmq_data:
+  seq_data:
   caddy_data:
   caddy_config:
   catalog_uploads:
@@ -63,6 +64,16 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - tickethub-net
+
+  seq:
+    image: datalust/seq:latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+    volumes:
+      - seq_data:/data
     networks:
       - tickethub-net
 
@@ -343,6 +354,8 @@ services:
     restart: unless-stopped
     environment:
       DOMAIN: ${DOMAIN}
+      SEQ_BASICAUTH_USER: ${SEQ_BASICAUTH_USER}
+      SEQ_BASICAUTH_HASH: ${SEQ_BASICAUTH_HASH}
     ports:
       - "80:80"
       - "443:443"

@@ -12,6 +12,8 @@ using Identity.Common.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCustomLogging(builder.Configuration, "Identity");
+
 // Add services to the container.
 
 builder.Services.AddCustomDb(builder.Configuration);
