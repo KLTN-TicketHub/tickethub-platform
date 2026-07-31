@@ -1,7 +1,6 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
-using BuildingBlocks.Logging;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Inventory.API.Extensions;
@@ -9,8 +8,6 @@ using Inventory.API.Hubs;
 using Inventory.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddCustomLogging(builder.Configuration, "Inventory");
 
 builder.AddCustomKestrel();
 

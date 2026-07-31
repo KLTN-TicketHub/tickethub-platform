@@ -1,6 +1,5 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
-using BuildingBlocks.Logging;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
@@ -12,8 +11,6 @@ using Identity.Application.Features.Auth.Validators;
 using Identity.Common.Options;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddCustomLogging(builder.Configuration, "Identity");
 
 // Add services to the container.
 

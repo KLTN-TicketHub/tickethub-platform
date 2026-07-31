@@ -1,15 +1,12 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
-using BuildingBlocks.Logging;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Ordering.API.Extensions;
 using Ordering.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddCustomLogging(builder.Configuration, "Ordering");
 
 builder.AddCustomKestrel();
 
