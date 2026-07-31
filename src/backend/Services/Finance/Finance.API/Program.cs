@@ -1,14 +1,11 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
-using BuildingBlocks.Logging;
 using Finance.API.Extensions;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddCustomLogging(builder.Configuration, "Finance");
 
 // Add services to the container.
 
