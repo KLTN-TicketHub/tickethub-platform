@@ -1,3 +1,10 @@
+logs.{$DOMAIN} {
+    basic_auth {
+        {$SEQ_BASICAUTH_USER} {$SEQ_BASICAUTH_HASH}
+    }
+    reverse_proxy seq:80
+}
+
 {$DOMAIN} {
     handle /api/* {
         reverse_proxy gateway:8080
