@@ -106,7 +106,8 @@ jobs:
             git pull origin main
             sed -i '/^SEQ_BASICAUTH_USER=/d;/^SEQ_BASICAUTH_HASH=/d' src/backend/docker/prod/.env
             echo 'SEQ_BASICAUTH_USER=${{ secrets.SEQ_BASICAUTH_USER }}' >> src/backend/docker/prod/.env
-            echo 'SEQ_BASICAUTH_HASH=${{ secrets.SEQ_BASICAUTH_HASH }}' >> src/backend/docker/prod/.env
+            escaped_hash=$(printf '%s' '${{ secrets.SEQ_BASICAUTH_HASH }}' | sed 's/\$/$$/g')
+            echo "SEQ_BASICAUTH_HASH=$escaped_hash" >> src/backend/docker/prod/.env
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker compose -f src/backend/docker/prod/docker-compose.prod.yml --env-file src/backend/docker/prod/.env pull
             docker compose -f src/backend/docker/prod/docker-compose.prod.yml --env-file src/backend/docker/prod/.env up -d
