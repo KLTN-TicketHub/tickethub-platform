@@ -1,6 +1,7 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
+using BuildingBlocks.Logging;
 using Finance.API.Extensions;
 using FluentValidation;
 using FluentValidation.AspNetCore;
