@@ -7,6 +7,8 @@ using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCustomLogging(builder.Configuration, "Finance");
+
 // Add services to the container.
 
 builder.Services.AddCustomControllers();

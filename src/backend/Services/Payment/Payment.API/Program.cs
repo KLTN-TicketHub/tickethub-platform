@@ -7,6 +7,8 @@ using Payment.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCustomLogging(builder.Configuration, "Payment");
+
 // Add services to the container.
 
 builder.Services.AddCustomControllers();
