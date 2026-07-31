@@ -1,4 +1,4 @@
-using BuildingBlocks.API.Extensions;
+using BuildingBlocks.Logging;
 using Notification.Infrastructure.Factories.Email;
 using Notification.Worker;
 using Notification.Worker.Extensions;

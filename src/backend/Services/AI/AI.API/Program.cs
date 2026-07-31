@@ -2,6 +2,7 @@ using AI.API.Extensions;
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
+using BuildingBlocks.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 

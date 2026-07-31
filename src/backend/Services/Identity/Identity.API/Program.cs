@@ -1,5 +1,6 @@
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
+using BuildingBlocks.Logging;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
