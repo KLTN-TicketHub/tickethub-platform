@@ -9,8 +9,6 @@ using Inventory.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCustomLogging(builder.Configuration, "Inventory");
-
 builder.AddCustomKestrel();
 
 // Add services to the container.

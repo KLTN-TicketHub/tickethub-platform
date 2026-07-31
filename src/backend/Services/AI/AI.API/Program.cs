@@ -5,8 +5,6 @@ using BuildingBlocks.Contracts.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCustomLogging(builder.Configuration, "AI");
-
 // Add services to the container.
 
 builder.Services.AddCustomControllers();

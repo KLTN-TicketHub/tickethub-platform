@@ -9,8 +9,6 @@ using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCustomLogging(builder.Configuration, "Catalog");
-
 builder.AddCustomKestrel();
 
 // Add services to the container.
