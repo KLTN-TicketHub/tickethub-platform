@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+option csharp_namespace = "Ordering.API.Protos";
+
+package ordering;
+
+service OrderingGrpc {
+  rpc GetMyOrders (GetMyOrdersRequest) returns (GetMyOrdersResponse);
+}
+
+message GetMyOrdersRequest {
+  string userId = 1;
+  int32 maxResults = 2;
+}
+
+message OrderSummaryItem {
+  string orderId = 1;
+  string eventTitle = 2;
+  string status = 3;
+  string showtimeStartAt = 4;
+  double totalPrice = 5;
+  string createdAt = 6;
+}
+
+message GetMyOrdersResponse {
+  bool isSuccess = 1;
+  string message = 2;
+  repeated OrderSummaryItem orders = 3;
+}

@@ -16,6 +16,10 @@ service CatalogGrpc {
   rpc GetOrganizerPortfolio (GetOrganizerPortfolioRequest) returns (GetOrganizerPortfolioResponse);
 
   rpc GetEventInsight (GetEventInsightRequest) returns (GetEventInsightResponse);
+
+  rpc SearchEvents (SearchEventsRequest) returns (SearchEventsResponse);
+
+  rpc GetEventDetail (GetEventDetailRequest) returns (GetEventDetailResponse);
 }
 
 message GetCheckoutDataRequest {
@@ -152,4 +156,56 @@ message GetEventInsightResponse {
   double overallAvg = 13;
   int32 ratingSampleSize = 14;
   repeated string recentComments = 15;
+}
+
+message SearchEventsRequest {
+  string search = 1;
+  string categoryId = 2;
+  string provinceCity = 3;
+  int32 pageSize = 4;
+}
+
+message EventSummaryItem {
+  string eventId = 1;
+  string title = 2;
+  string startAt = 3;
+  string endAt = 4;
+  double minPrice = 5;
+  string categoryName = 6;
+  string provinceCity = 7;
+}
+
+message SearchEventsResponse {
+  bool isSuccess = 1;
+  string message = 2;
+  repeated EventSummaryItem events = 3;
+}
+
+message GetEventDetailRequest {
+  string eventId = 1;
+}
+
+message EventTicketTypeItem {
+  string ticketTypeName = 1;
+  double price = 2;
+  int32 publishedQuota = 3;
+}
+
+message EventShowtimeItem {
+  string showtimeId = 1;
+  string startAt = 2;
+  string endAt = 3;
+  repeated EventTicketTypeItem ticketTypes = 4;
+}
+
+message GetEventDetailResponse {
+  bool isSuccess = 1;
+  string message = 2;
+  string title = 3;
+  string description = 4;
+  string categoryName = 5;
+  string provinceCity = 6;
+  string venueName = 7;
+  string addressLine = 8;
+  repeated EventShowtimeItem showtimes = 9;
 }
