@@ -53,6 +53,44 @@ namespace AI.Infrastructure.Services
             throw lastException ?? new InvalidOperationException("Gọi OpenRouter API thất bại.");
         }
 
+        public async Task<string> ChatCompleteAsync(string systemPrompt, IReadOnlyList<ChatHistoryMessage> history, CancellationToken cancellationToken = default)
+        {
+            HttpClient client = _httpClientFactory.CreateClient();
+            client.Timeout = TimeSpan.FromSeconds(_options.TimeoutSeconds);
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _options.ApiKey);
+
+            List<OpenRouterMessage> messages = new List<OpenRouterMessage>
+            {
+                new OpenRouterMessage { Role = "system", Content = systemPrompt }
+            };
+
+            messages.AddRange(history.Select(m => new OpenRouterMessage { Role = m.Role, Content = m.Content }));
+
+            OpenRouterRequest requestBody = new OpenRouterRequest
+            {
+                Model = _options.Model,
+                Messages = messages,
+                Temperature = _options.Temperature,
+                MaxTokens = _options.MaxTokens
+            };
+
+            Exception? lastException = null;
+
+            for (int attempt = 1; attempt <= _options.MaxRetries; attempt++)
+            {
+                try
+                {
+                    return await SendRequestAsync(client, requestBody, cancellationToken);
+                }
+                catch (Exception ex) when (attempt < _options.MaxRetries)
+                {
+                    lastException = ex;
+                }
+            }
+
+            throw lastException ?? new InvalidOperationException("Gọi OpenRouter API thất bại.");
+        }
+
         private async Task<string> SendRequestAsync(HttpClient client, OpenRouterRequest requestBody, CancellationToken cancellationToken)
         {
             HttpResponseMessage response = await client.PostAsJsonAsync(_options.BaseUrl, requestBody, cancellationToken);
@@ -88,6 +126,7 @@ namespace AI.Infrastructure.Services
             public int MaxTokens { get; set; }
 
             [JsonPropertyName("response_format")]
+            [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
             public OpenRouterResponseFormat? ResponseFormat { get; set; }
         }
 

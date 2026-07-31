@@ -4,8 +4,11 @@ using BuildingBlocks.Contracts.Options;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Ordering.API.Extensions;
+using Ordering.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddCustomKestrel();
 
 // Add services to the container.
 
@@ -17,6 +20,7 @@ builder.Services.AddCustomDb(builder.Configuration);
 
 builder.Services.AddMassTransitWithRabbitMq();
 builder.Services.AddCustomGrpc(builder.Configuration);
+builder.Services.AddGrpc();
 
 builder.Services.AddCustomRateLimit(
     builder.Configuration.GetSection("AppSettings:RateLimit").Get<RateLimitConfig>());
@@ -52,6 +56,8 @@ await app.UseDatabaseInitialization();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.MapGrpcService<OrderingGrpcService>();
 
 app.UseRateLimiter();
 

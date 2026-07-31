@@ -65,6 +65,52 @@ namespace AI.Infrastructure.Interfaces.IServices
         public List<string> RecentComments { get; set; } = new();
     }
 
+    public class EventSummaryResult
+    {
+        public Guid EventId { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public DateTime StartAt { get; set; }
+        public DateTime EndAt { get; set; }
+        public decimal MinPrice { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
+        public string ProvinceCity { get; set; } = string.Empty;
+    }
+
+    public class SearchEventsResult
+    {
+        public bool IsSuccess { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public List<EventSummaryResult> Events { get; set; } = new();
+    }
+
+    public class EventTicketTypeResult
+    {
+        public string TicketTypeName { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public int PublishedQuota { get; set; }
+    }
+
+    public class EventShowtimeResult
+    {
+        public Guid ShowtimeId { get; set; }
+        public DateTime StartAt { get; set; }
+        public DateTime EndAt { get; set; }
+        public List<EventTicketTypeResult> TicketTypes { get; set; } = new();
+    }
+
+    public class EventDetailResult
+    {
+        public bool IsSuccess { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string CategoryName { get; set; } = string.Empty;
+        public string ProvinceCity { get; set; } = string.Empty;
+        public string VenueName { get; set; } = string.Empty;
+        public string AddressLine { get; set; } = string.Empty;
+        public List<EventShowtimeResult> Showtimes { get; set; } = new();
+    }
+
     public interface ICatalogAiClient
     {
         Task<CategoryTrendResult> GetCategoryTrendAsync(DateOnly from, DateOnly to);
@@ -72,5 +118,9 @@ namespace AI.Infrastructure.Interfaces.IServices
         Task<OrganizerPortfolioResult> GetOrganizerPortfolioAsync(Guid organizerId, DateOnly from, DateOnly to);
 
         Task<EventInsightResult> GetEventInsightAsync(Guid eventId, Guid organizerId, DateOnly from, DateOnly to);
+
+        Task<SearchEventsResult> SearchEventsAsync(string search, Guid? categoryId, string? provinceCity, int pageSize);
+
+        Task<EventDetailResult> GetEventDetailAsync(Guid eventId);
     }
 }

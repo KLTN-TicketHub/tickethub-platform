@@ -1,4 +1,5 @@
 using Catalog.API.Protos;
+using Ordering.API.Protos;
 
 namespace AI.API.Extensions
 {
@@ -11,6 +12,11 @@ namespace AI.API.Extensions
             services.AddGrpcClient<CatalogGrpc.CatalogGrpcClient>(o =>
             {
                 o.Address = new Uri(configuration["GrpcSettings:CatalogUrl"]!);
+            });
+
+            services.AddGrpcClient<OrderingGrpc.OrderingGrpcClient>(o =>
+            {
+                o.Address = new Uri(configuration["GrpcSettings:OrderingUrl"]!);
             });
 
             return services;

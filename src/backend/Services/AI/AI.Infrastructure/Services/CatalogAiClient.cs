@@ -145,5 +145,99 @@ namespace AI.Infrastructure.Services
                 return new EventInsightResult { IsSuccess = false, Message = $"Lỗi kết nối gRPC tới Catalog: {ex.Status.Detail}" };
             }
         }
+
+        public async Task<SearchEventsResult> SearchEventsAsync(string search, Guid? categoryId, string? provinceCity, int pageSize)
+        {
+            try
+            {
+                SearchEventsRequest request = new SearchEventsRequest
+                {
+                    Search = search ?? string.Empty,
+                    CategoryId = categoryId?.ToString() ?? string.Empty,
+                    ProvinceCity = provinceCity ?? string.Empty,
+                    PageSize = pageSize
+                };
+
+                SearchEventsResponse response = await _client.SearchEventsAsync(request);
+
+                if (!response.IsSuccess)
+                    return new SearchEventsResult { IsSuccess = false, Message = response.Message };
+
+                SearchEventsResult result = new SearchEventsResult { IsSuccess = true, Message = response.Message };
+
+                foreach (var e in response.Events)
+                {
+                    result.Events.Add(new EventSummaryResult
+                    {
+                        EventId = Guid.Parse(e.EventId),
+                        Title = e.Title,
+                        StartAt = DateTime.Parse(e.StartAt),
+                        EndAt = DateTime.Parse(e.EndAt),
+                        MinPrice = (decimal)e.MinPrice,
+                        CategoryName = e.CategoryName,
+                        ProvinceCity = e.ProvinceCity
+                    });
+                }
+
+                return result;
+            }
+            catch (RpcException ex)
+            {
+                return new SearchEventsResult { IsSuccess = false, Message = $"Lỗi kết nối gRPC tới Catalog: {ex.Status.Detail}" };
+            }
+        }
+
+        public async Task<EventDetailResult> GetEventDetailAsync(Guid eventId)
+        {
+            try
+            {
+                GetEventDetailRequest request = new GetEventDetailRequest { EventId = eventId.ToString() };
+
+                GetEventDetailResponse response = await _client.GetEventDetailAsync(request);
+
+                if (!response.IsSuccess)
+                    return new EventDetailResult { IsSuccess = false, Message = response.Message };
+
+                EventDetailResult result = new EventDetailResult
+                {
+                    IsSuccess = true,
+                    Message = response.Message,
+                    Title = response.Title,
+                    Description = response.Description,
+                    CategoryName = response.CategoryName,
+                    ProvinceCity = response.ProvinceCity,
+                    VenueName = response.VenueName,
+                    AddressLine = response.AddressLine
+                };
+
+                foreach (var st in response.Showtimes)
+                {
+                    EventShowtimeResult showtime = new EventShowtimeResult
+                    {
+                        ShowtimeId = Guid.Parse(st.ShowtimeId),
+                        StartAt = DateTime.Parse(st.StartAt),
+                        EndAt = DateTime.Parse(st.EndAt)
+                    };
+
+                    foreach (var tt in st.TicketTypes)
+                    {
+                        showtime.TicketTypes.Add(new EventTicketTypeResult
+                        {
+                            TicketTypeName = tt.TicketTypeName,
+                            Price = (decimal)tt.Price,
+                            PublishedQuota = tt.PublishedQuota
+                        });
+                    }
+
+                    result.Showtimes.Add(showtime);
+                }
+
+                return result;
+            }
+            catch (RpcException ex)
+            {
+                return new EventDetailResult { IsSuccess = false, Message = $"Lỗi kết nối gRPC tới Catalog: {ex.Status.Detail}" };
+            }
+        }
     }
 }

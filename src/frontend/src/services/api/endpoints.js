@@ -105,6 +105,9 @@ export const AI_SUGGESTIONS_MARKET_DIRECTION = '/ai/organizer/suggestions/market
 export const AI_SUGGESTIONS_PORTFOLIO = '/ai/organizer/suggestions/portfolio'
 export const AI_SUGGESTIONS_EVENT = (eventId) => `/ai/organizer/suggestions/events/${eventId}`
 
+// AI Chat (Customer)
+export const AI_CHAT_SEND = '/ai/chat'
+
 // Finance - Moderator Payouts
 export const MODERATOR_PAYOUT_REQUESTS = '/finance/moderator/payouts/requests'
 export const MODERATOR_PAYOUT_PROPOSE = (payoutRequestId) => `/finance/moderator/payouts/requests/${payoutRequestId}/propose`

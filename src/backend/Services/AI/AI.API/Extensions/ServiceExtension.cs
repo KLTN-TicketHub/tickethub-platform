@@ -12,8 +12,10 @@ namespace AI.API.Extensions
             services.AddScoped<ICacheService, RedisCacheService>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<ICatalogAiClient, CatalogAiClient>();
+            services.AddScoped<IOrderingAiClient, OrderingAiClient>();
             services.AddScoped<ILlmClient, OpenRouterLlmClient>();
             services.AddScoped<ISuggestionService, SuggestionService>();
+            services.AddScoped<IChatService, ChatService>();
             services.AddHttpClient();
 
             return services;

@@ -1,4 +1,7 @@
 using Catalog.API.Protos;
+using Catalog.Application.Features.Events.Queries.GetEventById;
+using Catalog.Application.Features.Events.Queries.GetEvents;
+using Catalog.Application.Features.Events.Requests;
 using Catalog.Application.Features.Grpc.Queries.GetCategoryTrend;
 using Catalog.Application.Features.Grpc.Queries.GetCheckoutData;
 using Catalog.Application.Features.Grpc.Queries.GetEventInsight;
@@ -321,6 +324,110 @@ namespace Catalog.API.Services
             catch (Exception ex)
             {
                 return new GetEventInsightResponse
+                {
+                    IsSuccess = false,
+                    Message = $"Lỗi xử lý hệ thống: {ex.Message}"
+                };
+            }
+        }
+
+        public override async Task<SearchEventsResponse> SearchEvents(
+            SearchEventsRequest request,
+            ServerCallContext context)
+        {
+            try
+            {
+                var eventsRequest = new GetEventsRequest
+                {
+                    Search = request.Search,
+                    CategoryId = Guid.TryParse(request.CategoryId, out var categoryId) ? categoryId : Guid.Empty,
+                    ProvinceCity = string.IsNullOrEmpty(request.ProvinceCity) ? null : request.ProvinceCity,
+                    PageNumber = 1,
+                    PageSize = request.PageSize > 0 ? request.PageSize : 5
+                };
+
+                var query = new GetEventsQuery(eventsRequest);
+                var result = await _mediator.Send(query, context.CancellationToken);
+
+                var response = new SearchEventsResponse { IsSuccess = true, Message = "Tìm kiếm sự kiện thành công." };
+
+                foreach (var e in result.Data)
+                {
+                    response.Events.Add(new EventSummaryItem
+                    {
+                        EventId = e.Id.ToString(),
+                        Title = e.Title,
+                        StartAt = e.StartAt.ToString("O"),
+                        EndAt = e.EndAt.ToString("O"),
+                        MinPrice = (double)e.MinPrice,
+                        CategoryName = e.CategoryName,
+                        ProvinceCity = e.ProvinceCity
+                    });
+                }
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new SearchEventsResponse
+                {
+                    IsSuccess = false,
+                    Message = $"Lỗi xử lý hệ thống: {ex.Message}"
+                };
+            }
+        }
+
+        public override async Task<GetEventDetailResponse> GetEventDetail(
+            GetEventDetailRequest request,
+            ServerCallContext context)
+        {
+            try
+            {
+                if (!Guid.TryParse(request.EventId, out var eventId))
+                    return new GetEventDetailResponse { IsSuccess = false, Message = "EventId không đúng định dạng Guid." };
+
+                var query = new GetEventByIdQuery(eventId);
+                var result = await _mediator.Send(query, context.CancellationToken);
+
+                var response = new GetEventDetailResponse
+                {
+                    IsSuccess = true,
+                    Message = "Lấy chi tiết sự kiện thành công.",
+                    Title = result.Title,
+                    Description = result.Description,
+                    CategoryName = result.CategoryName,
+                    ProvinceCity = result.Location?.ProvinceCity ?? "",
+                    VenueName = result.Location?.VenueName ?? "",
+                    AddressLine = result.Location?.AddressLine ?? ""
+                };
+
+                foreach (var st in result.Showtimes)
+                {
+                    var showtimeItem = new EventShowtimeItem
+                    {
+                        ShowtimeId = st.Id.ToString(),
+                        StartAt = st.StartAt.ToString("O"),
+                        EndAt = st.EndAt.ToString("O")
+                    };
+
+                    foreach (var tt in st.TicketTypes)
+                    {
+                        showtimeItem.TicketTypes.Add(new EventTicketTypeItem
+                        {
+                            TicketTypeName = tt.TicketTypeName,
+                            Price = (double)tt.Price,
+                            PublishedQuota = tt.PublishedQuota
+                        });
+                    }
+
+                    response.Showtimes.Add(showtimeItem);
+                }
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new GetEventDetailResponse
                 {
                     IsSuccess = false,
                     Message = $"Lỗi xử lý hệ thống: {ex.Message}"
