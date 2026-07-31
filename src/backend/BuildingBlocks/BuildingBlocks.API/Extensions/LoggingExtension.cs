@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
 
-namespace BuildingBlocks.Logging
+namespace BuildingBlocks.API.Extensions
 {
     public static class LoggingExtension
     {

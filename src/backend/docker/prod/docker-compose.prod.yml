@@ -72,7 +72,6 @@ services:
     restart: unless-stopped
     environment:
       ACCEPT_EULA: "Y"
-      SEQ_FIRSTRUN_NOAUTHENTICATION: "true"
     volumes:
       - seq_data:/data
     networks:

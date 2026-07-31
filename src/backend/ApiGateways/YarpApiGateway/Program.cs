@@ -1,4 +1,4 @@
-using BuildingBlocks.Logging;
+using BuildingBlocks.API.Extensions;
 using YarpApiGateway.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
