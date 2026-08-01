@@ -353,5 +353,6 @@ services:
     depends_on:
       - gateway
       - frontend
+      - rabbitmq
     networks:
       - tickethub-net
