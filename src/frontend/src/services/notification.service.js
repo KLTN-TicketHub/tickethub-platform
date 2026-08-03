@@ -8,6 +8,7 @@ import {
   ADMIN_NOTIFICATION_SEND,
   ADMIN_NOTIFICATION_SENT_LIST,
   ADMIN_NOTIFICATION_STATS,
+  ADMIN_NOTIFICATION_DETAIL_STATS,
   ADMIN_NOTIFICATION_SCHEDULED,
   ADMIN_NOTIFICATION_SCHEDULED_CANCEL
 } from './api/endpoints'
@@ -83,6 +84,11 @@ export const notificationService = {
 
     const suffix = query.toString() ? `?${query.toString()}` : ''
     const response = await api.get(`${ADMIN_NOTIFICATION_STATS}${suffix}`)
+    return response.data?.data ?? null
+  },
+
+  async getDetailStats(id) {
+    const response = await api.get(ADMIN_NOTIFICATION_DETAIL_STATS(id))
     return response.data?.data ?? null
   },
 

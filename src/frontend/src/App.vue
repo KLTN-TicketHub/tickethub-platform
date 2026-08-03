@@ -11,6 +11,7 @@
   <AuthModal v-if="!isAdminRoute && store.showAuth" @close="closeAuth" />
   <ToastNotification v-if="!isAdminRoute && store.toast" :message="store.toast.message" :icon="store.toast.icon" @close="clearToast" />
   <ChatWidget v-if="!isAdminRoute" />
+  <NotificationToast />
 </template>
 
 <script setup>
@@ -24,6 +25,7 @@ import BookingModal from './components/BookingModal.vue'
 import AuthModal from './components/AuthModal.vue'
 import ToastNotification from './components/ToastNotification.vue'
 import ChatWidget from './components/chat/ChatWidget.vue'
+import NotificationToast from './components/layout/NotificationToast.vue'
 
 const route = useRoute()
 

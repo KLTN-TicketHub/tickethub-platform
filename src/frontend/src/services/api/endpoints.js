@@ -117,6 +117,7 @@ export const NOTIFICATION_DELETE = (id) => `/notification/notifications/${id}`
 export const ADMIN_NOTIFICATION_SEND = '/notification/admin/notifications'
 export const ADMIN_NOTIFICATION_SENT_LIST = '/notification/admin/notifications'
 export const ADMIN_NOTIFICATION_STATS = '/notification/admin/notifications/stats'
+export const ADMIN_NOTIFICATION_DETAIL_STATS = (id) => `/notification/admin/notifications/${id}/stats`
 export const ADMIN_NOTIFICATION_SCHEDULED = '/notification/admin/notifications/scheduled'
 export const ADMIN_NOTIFICATION_SCHEDULED_CANCEL = (id) => `/notification/admin/notifications/scheduled/${id}`
 

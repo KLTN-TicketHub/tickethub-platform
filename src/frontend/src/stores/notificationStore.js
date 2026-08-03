@@ -5,6 +5,7 @@ import { getToken, isLoggedIn } from '../services/auth/token.service'
 import { notificationService } from '../services/notification.service'
 
 const PAGE_SIZE = 12
+const TOAST_AUTO_DISMISS_MS = 6000
 
 export const notificationStore = reactive({
   items: [],
@@ -13,8 +14,13 @@ export const notificationStore = reactive({
   pageNumber: 0,
   hasMore: true,
   isLoading: false,
-  isConnected: false
+  isConnected: false,
+  toastQueue: []
 })
+
+export function dismissToast(toastId) {
+  notificationStore.toastQueue = notificationStore.toastQueue.filter(t => t.toastId !== toastId)
+}
 
 let hubConnection = null
 let initialized = false
@@ -41,6 +47,10 @@ export async function connectHub() {
     if (!notification.isRead) {
       notificationStore.unreadCount += 1
     }
+
+    const toastId = `${notification.id}-${Date.now()}`
+    notificationStore.toastQueue.push({ ...notification, toastId })
+    setTimeout(() => dismissToast(toastId), TOAST_AUTO_DISMISS_MS)
   })
 
   hubConnection.onreconnected(() => {
@@ -190,4 +200,5 @@ export async function resetNotifications() {
   notificationStore.pageNumber = 0
   notificationStore.hasMore = true
   notificationStore.isLoading = false
+  notificationStore.toastQueue = []
 }

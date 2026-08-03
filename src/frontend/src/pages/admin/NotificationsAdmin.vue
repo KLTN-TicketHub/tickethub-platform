@@ -254,7 +254,12 @@
             @scroll.passive="handleSentScroll"
             class="max-h-[520px] overflow-y-auto overscroll-contain divide-y divide-white/5"
           >
-            <article v-for="item in sentItems" :key="item.id" class="p-5 hover:bg-white/[0.03] transition-colors">
+            <article
+              v-for="item in sentItems"
+              :key="item.id"
+              @click="openDetailModal(item)"
+              class="p-5 hover:bg-white/[0.03] transition-colors cursor-pointer"
+            >
               <div class="flex items-center gap-2 mb-2">
                 <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest" :class="targetBadgeClass(item)">
                   {{ describeTarget(item) }}
@@ -317,6 +322,55 @@
         </div>
       </div>
     </div>
+
+    <!-- Detail stats modal -->
+    <BaseModal :show="isDetailModalOpen" title="Chi tiết thông báo" @close="closeDetailModal">
+      <div v-if="isLoadingDetail" class="py-12 text-center text-[13px] text-muted font-medium">Đang tải...</div>
+
+      <div v-else-if="detailStats" class="flex flex-col gap-6">
+        <div class="flex items-start gap-4">
+          <div class="w-11 h-11 flex-shrink-0 rounded-xl border flex items-center justify-center" :class="getNotificationPreset(detailStats.type).tone">
+            <component :is="getNotificationPreset(detailStats.type).icon" weight="fill" class="text-xl" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="text-[16px] font-bold text-white leading-snug">{{ detailStats.title }}</h4>
+            <span class="px-2.5 py-1 mt-1.5 inline-block rounded-full text-[10px] font-black uppercase tracking-widest" :class="targetBadgeClass(detailStats)">
+              {{ describeTarget(detailStats) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+            <span class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Lượt đọc</span>
+            <div class="text-2xl font-black text-white mt-1 tabular-nums">{{ detailStats.readCount }}</div>
+          </div>
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+            <span class="text-[11px] font-bold text-white/40 uppercase tracking-widest">Đã gửi lúc</span>
+            <div class="text-[13px] font-bold text-white mt-2">{{ formatSchedule(detailStats.createdAt) }}</div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-between gap-4 py-2 border-b border-white/5">
+            <span class="text-[13px] font-medium text-white/50">Lượt đọc đầu tiên</span>
+            <span class="text-[13px] font-bold text-white">
+              {{ detailStats.firstReadAt ? formatSchedule(detailStats.firstReadAt) : 'Chưa có ai đọc' }}
+            </span>
+          </div>
+          <div class="flex items-center justify-between gap-4 py-2">
+            <span class="text-[13px] font-medium text-white/50">Lượt đọc gần nhất</span>
+            <span class="text-[13px] font-bold text-white">
+              {{ detailStats.lastReadAt ? formatSchedule(detailStats.lastReadAt) : '—' }}
+            </span>
+          </div>
+        </div>
+
+        <p v-if="detailStats.isBroadcast" class="text-[12px] text-white/30 leading-relaxed">
+          Đây là bản tin chung nên chỉ ghi nhận được số lượt đọc, không tính được tỉ lệ vì hệ thống không lưu tổng số người thuộc nhóm nhận.
+        </p>
+      </div>
+    </BaseModal>
   </div>
 </template>
 
@@ -326,6 +380,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { PhClock, PhGlobeHemisphereEast, PhMegaphone, PhPaperPlaneTilt, PhUser, PhUsersThree } from '@phosphor-icons/vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseSelect from '../../components/ui/BaseSelect.vue'
+import BaseModal from '../../components/ui/BaseModal.vue'
 import NotificationStatsPanel from '../../components/admin/NotificationStatsPanel.vue'
 import { addToast, openConfirm } from '../../stores/adminStore'
 import { notificationService } from '../../services/notification.service'
@@ -407,6 +462,10 @@ const scheduledPage = ref(0)
 const hasMoreScheduled = ref(true)
 const isLoadingScheduled = ref(false)
 const scheduledRef = ref(null)
+
+const isDetailModalOpen = ref(false)
+const isLoadingDetail = ref(false)
+const detailStats = ref(null)
 
 const preset = computed(() => getNotificationPreset('Announcement'))
 
@@ -565,6 +624,26 @@ const handleCancel = (item) => {
       addToast(err.response?.data?.message || 'Không thể huỷ thông báo hẹn giờ.', 'error')
     }
   })
+}
+
+const openDetailModal = async (item) => {
+  isDetailModalOpen.value = true
+  isLoadingDetail.value = true
+  detailStats.value = null
+
+  try {
+    detailStats.value = await notificationService.getDetailStats(item.id)
+  } catch (err) {
+    addToast(err.response?.data?.message || 'Không thể tải chi tiết thông báo.', 'error')
+    closeDetailModal()
+  } finally {
+    isLoadingDetail.value = false
+  }
+}
+
+const closeDetailModal = () => {
+  isDetailModalOpen.value = false
+  detailStats.value = null
 }
 
 const loadMoreSent = async () => {
