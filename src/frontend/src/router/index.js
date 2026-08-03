@@ -94,6 +94,7 @@ const routes = [
       { path: 'moderators', name: 'admin-moderators', component: ModeratorsAdmin },
       { path: 'orders', name: 'admin-orders', component: OrdersAdmin },
       { path: 'notifications', name: 'admin-notifications', component: NotificationsPage },
+      { path: 'notifications/send', name: 'admin-notifications-send', component: () => import('../pages/admin/NotificationsAdmin.vue') },
     ]
   },
 
@@ -144,7 +145,8 @@ const routes = [
     meta: { requiresAuth: true, role: 'staff' },
     children: [
       { path: '', redirect: '/staff/dashboard' },
-      { path: 'dashboard', name: 'staff-dashboard', component: () => import('../pages/staff/StaffScanPage.vue') }
+      { path: 'dashboard', name: 'staff-dashboard', component: () => import('../pages/staff/StaffScanPage.vue') },
+      { path: 'notifications', name: 'staff-notifications', component: NotificationsPage }
     ]
   }
 ]

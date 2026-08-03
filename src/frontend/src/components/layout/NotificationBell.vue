@@ -132,6 +132,7 @@ const inboxPath = computed(() => {
   if (route.path.startsWith('/admin')) return '/admin/notifications'
   if (route.path.startsWith('/moderator')) return '/moderator/notifications'
   if (route.path.startsWith('/organizer')) return '/organizer/notifications'
+  if (route.path.startsWith('/staff')) return '/staff/notifications'
   return '/notifications'
 })
 

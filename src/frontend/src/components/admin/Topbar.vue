@@ -90,7 +90,7 @@ import { adminSearch } from '../../stores/adminStore'
 import { logout as authLogout } from '../../services/auth/auth.service'
 import { resetNotifications } from '../../stores/notificationStore'
 import NotificationBell from '../layout/NotificationBell.vue'
-import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin, PhList, PhX, PhSuitcase, PhPlus, PhFolderOpen, PhHandCoins, PhWallet, PhChartLineUp, PhProhibit, PhIdentificationBadge } from '@phosphor-icons/vue'
+import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin, PhList, PhX, PhSuitcase, PhPlus, PhFolderOpen, PhHandCoins, PhWallet, PhChartLineUp, PhProhibit, PhIdentificationBadge, PhMegaphone } from '@phosphor-icons/vue'
 
 const props = defineProps({
   role: { type: String, default: 'admin' }
@@ -109,6 +109,7 @@ const adminMenuItems = [
   { label: 'Người dùng', path: '/admin/users', icon: PhUsers },
   { label: 'Kiểm duyệt', path: '/admin/moderators', icon: PhShieldCheck },
   { label: 'Đơn hàng', path: '/admin/orders', icon: PhReceipt },
+  { label: 'Thông báo', path: '/admin/notifications/send', icon: PhMegaphone },
 ]
 
 const modMenuItems = [

@@ -5,7 +5,8 @@ import {
   NOTIFICATION_MARK_READ,
   NOTIFICATION_MARK_ALL_READ,
   NOTIFICATION_DELETE,
-  ADMIN_NOTIFICATION_SEND
+  ADMIN_NOTIFICATION_SEND,
+  ADMIN_NOTIFICATION_SENT_LIST
 } from './api/endpoints'
 
 export const notificationService = {
@@ -49,5 +50,20 @@ export const notificationService = {
   async sendAsAdmin(payload) {
     const response = await api.post(ADMIN_NOTIFICATION_SEND, payload)
     return response.data
+  },
+
+  /**
+   * Lịch sử thông báo Admin đã gửi
+   * @param {Object} params
+   * @param {number} [params.pageNumber=1]
+   * @param {number} [params.pageSize=10]
+   */
+  async getSentByAdmin({ pageNumber = 1, pageSize = 10 } = {}) {
+    const query = new URLSearchParams()
+    query.append('pageNumber', pageNumber)
+    query.append('pageSize', pageSize)
+
+    const response = await api.get(`${ADMIN_NOTIFICATION_SENT_LIST}?${query.toString()}`)
+    return response.data?.data ?? null
   }
 }

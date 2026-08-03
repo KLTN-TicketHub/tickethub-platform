@@ -11,9 +11,13 @@
         </div>
       </div>
 
-      <button @click="handleLogout" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-danger hover:border-danger/30 hover:bg-danger/10 transition-all">
-        <PhSignOut class="text-lg" weight="bold" />
-      </button>
+      <div class="flex items-center gap-2.5">
+        <NotificationBell />
+
+        <button @click="handleLogout" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-danger hover:border-danger/30 hover:bg-danger/10 transition-all">
+          <PhSignOut class="text-lg" weight="bold" />
+        </button>
+      </div>
     </header>
 
     <main class="flex-1 min-h-0 overflow-y-auto">
@@ -27,6 +31,8 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { logout as authLogout } from '../services/auth/auth.service'
+import { resetNotifications } from '../stores/notificationStore'
+import NotificationBell from '../components/layout/NotificationBell.vue'
 import ToastNotification from '../components/admin/ToastNotification.vue'
 import { PhQrCode, PhSignOut } from '@phosphor-icons/vue'
 
@@ -34,6 +40,7 @@ const router = useRouter()
 
 const handleLogout = async () => {
   await authLogout()
+  await resetNotifications()
   router.replace('/staff/login')
 }
 </script>

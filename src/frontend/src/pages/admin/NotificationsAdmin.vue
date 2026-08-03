@@ -1,0 +1,379 @@
+<template>
+  <div class="flex flex-col gap-8 animate-fade-up pb-12">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      <div class="flex flex-col gap-2">
+        <h1 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight">Gửi thông báo</h1>
+        <p class="text-white/50 font-medium text-lg">Gửi thông báo in-app tới toàn hệ thống, một nhóm vai trò hoặc một người dùng cụ thể.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-[1.15fr_1fr] gap-8 items-start">
+      <!-- Compose form -->
+      <form
+        @submit.prevent="handleSubmit"
+        class="bg-[#111916]/50 border border-white/5 rounded-[2rem] overflow-hidden flex flex-col"
+      >
+        <div class="p-6 border-b border-white/5 bg-white/[0.02]">
+          <h3 class="text-xl font-bold font-heading text-white">Soạn thông báo</h3>
+        </div>
+
+        <div class="p-6 flex flex-col gap-6">
+          <!-- Target -->
+          <div class="flex flex-col gap-3">
+            <span class="text-[12px] font-bold text-white/50 uppercase tracking-widest">Đối tượng nhận</span>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button
+                v-for="option in targetOptions"
+                :key="option.value"
+                type="button"
+                @click="selectTarget(option.value)"
+                class="flex flex-col items-start gap-1.5 px-4 py-3.5 rounded-2xl border text-left transition-all"
+                :class="target === option.value
+                  ? 'bg-primary/10 border-primary/40 text-white'
+                  : 'bg-white/5 border-white/10 text-white/60 hover:border-white/20 hover:bg-white/10'"
+              >
+                <component
+                  :is="option.icon"
+                  weight="fill"
+                  class="text-xl"
+                  :class="target === option.value ? 'text-primary' : 'text-white/40'"
+                />
+                <span class="text-[13px] font-bold">{{ option.label }}</span>
+              </button>
+            </div>
+          </div>
+
+          <BaseSelect
+            v-if="target === 'role'"
+            v-model="form.targetRole"
+            label="Vai trò nhận thông báo"
+            placeholder="Chọn vai trò"
+            :options="roleOptions"
+            :error="errors.targetRole"
+          />
+
+          <div v-if="target === 'user'" class="flex flex-col gap-2 w-full">
+            <label for="recipient-id" class="text-[12px] font-bold text-white/50 uppercase tracking-widest">
+              ID người nhận
+            </label>
+            <input
+              id="recipient-id"
+              v-model.trim="form.recipientUserId"
+              type="text"
+              placeholder="Ví dụ: 3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              class="w-full rounded-2xl px-5 py-3 text-[14px] font-medium bg-white/5 border border-white/10 text-white outline-none transition-all hover:border-white/20 focus:border-primary/50 focus:bg-white/10 placeholder:text-white/25 font-mono"
+              :class="{ '!border-danger/50 !bg-danger/5': errors.recipientUserId }"
+            />
+            <span v-if="errors.recipientUserId" class="text-[12px] font-medium text-danger">{{ errors.recipientUserId }}</span>
+            <span v-else class="text-[12px] text-white/30">Lấy ID từ trang Người dùng.</span>
+          </div>
+
+          <!-- Title -->
+          <div class="flex flex-col gap-2 w-full">
+            <div class="flex items-center justify-between">
+              <label for="notif-title" class="text-[12px] font-bold text-white/50 uppercase tracking-widest">Tiêu đề</label>
+              <span class="text-[11px] font-bold" :class="form.title.length > 200 ? 'text-danger' : 'text-white/30'">
+                {{ form.title.length }}/200
+              </span>
+            </div>
+            <input
+              id="notif-title"
+              v-model="form.title"
+              type="text"
+              maxlength="220"
+              placeholder="Bảo trì hệ thống ngày 10/08"
+              class="w-full rounded-2xl px-5 py-3 text-[14px] font-bold bg-white/5 border border-white/10 text-white outline-none transition-all hover:border-white/20 focus:border-primary/50 focus:bg-white/10 placeholder:text-white/25"
+              :class="{ '!border-danger/50 !bg-danger/5': errors.title }"
+            />
+            <span v-if="errors.title" class="text-[12px] font-medium text-danger">{{ errors.title }}</span>
+          </div>
+
+          <!-- Message -->
+          <div class="flex flex-col gap-2 w-full">
+            <div class="flex items-center justify-between">
+              <label for="notif-message" class="text-[12px] font-bold text-white/50 uppercase tracking-widest">Nội dung</label>
+              <span class="text-[11px] font-bold" :class="form.message.length > 1000 ? 'text-danger' : 'text-white/30'">
+                {{ form.message.length }}/1000
+              </span>
+            </div>
+            <textarea
+              id="notif-message"
+              v-model="form.message"
+              rows="4"
+              maxlength="1100"
+              placeholder="Hệ thống sẽ tạm ngưng từ 02:00 đến 04:00 để nâng cấp..."
+              class="w-full rounded-2xl px-5 py-3.5 text-[14px] font-medium leading-relaxed bg-white/5 border border-white/10 text-white outline-none transition-all resize-none hover:border-white/20 focus:border-primary/50 focus:bg-white/10 placeholder:text-white/25"
+              :class="{ '!border-danger/50 !bg-danger/5': errors.message }"
+            ></textarea>
+            <span v-if="errors.message" class="text-[12px] font-medium text-danger">{{ errors.message }}</span>
+          </div>
+
+          <!-- Link -->
+          <div class="flex flex-col gap-2 w-full">
+            <label for="notif-link" class="text-[12px] font-bold text-white/50 uppercase tracking-widest">
+              Đường dẫn khi bấm vào <span class="normal-case tracking-normal text-white/30">(không bắt buộc)</span>
+            </label>
+            <input
+              id="notif-link"
+              v-model.trim="form.linkUrl"
+              type="text"
+              placeholder="/my-tickets"
+              class="w-full rounded-2xl px-5 py-3 text-[14px] font-medium bg-white/5 border border-white/10 text-white outline-none transition-all hover:border-white/20 focus:border-primary/50 focus:bg-white/10 placeholder:text-white/25 font-mono"
+              :class="{ '!border-danger/50 !bg-danger/5': errors.linkUrl }"
+            />
+            <span v-if="errors.linkUrl" class="text-[12px] font-medium text-danger">{{ errors.linkUrl }}</span>
+          </div>
+        </div>
+
+        <div class="p-6 border-t border-white/5 bg-white/[0.02] flex items-center justify-between gap-4">
+          <span class="text-[13px] text-white/40 font-medium">{{ targetSummary }}</span>
+          <BaseButton type="submit" variant="primary" size="lg" :loading="isSending">
+            <PhPaperPlaneTilt weight="fill" class="text-lg" /> Gửi thông báo
+          </BaseButton>
+        </div>
+      </form>
+
+      <div class="flex flex-col gap-8">
+        <!-- Preview -->
+        <div class="bg-[#111916]/50 border border-white/5 rounded-[2rem] overflow-hidden">
+          <div class="p-6 border-b border-white/5 bg-white/[0.02]">
+            <h3 class="text-xl font-bold font-heading text-white">Xem trước</h3>
+          </div>
+          <div class="p-6">
+            <div class="flex gap-4 p-5 bg-primary/[0.04] border border-primary/20 rounded-2xl">
+              <div class="w-11 h-11 flex-shrink-0 rounded-xl border flex items-center justify-center" :class="preset.tone">
+                <component :is="preset.icon" weight="fill" class="text-xl" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start gap-3">
+                  <h4 class="flex-1 text-[15px] font-bold text-white leading-snug">
+                    {{ form.title || 'Tiêu đề thông báo' }}
+                  </h4>
+                  <span class="mt-2 w-2 h-2 rounded-full bg-primary flex-shrink-0 shadow-[0_0_8px_rgba(0,200,83,0.6)]"></span>
+                </div>
+                <p class="text-[13px] text-muted leading-relaxed mt-1.5 whitespace-pre-line">
+                  {{ form.message || 'Nội dung thông báo sẽ hiển thị ở đây.' }}
+                </p>
+                <span class="text-[11px] text-white/30 font-medium mt-2 block">Vừa xong</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sent history -->
+        <div class="bg-[#111916]/50 border border-white/5 rounded-[2rem] overflow-hidden flex flex-col">
+          <div class="p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+            <h3 class="text-xl font-bold font-heading text-white">Đã gửi gần đây</h3>
+            <span class="text-[12px] text-white/50 font-bold uppercase tracking-widest">{{ totalSent }} thông báo</span>
+          </div>
+
+          <div
+            ref="historyRef"
+            @scroll.passive="handleHistoryScroll"
+            class="max-h-[520px] overflow-y-auto overscroll-contain divide-y divide-white/5"
+          >
+            <article v-for="item in sentItems" :key="item.id" class="p-5 hover:bg-white/[0.03] transition-colors">
+              <div class="flex items-center gap-2 mb-2">
+                <span
+                  class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest"
+                  :class="item.targetRole
+                    ? 'bg-sky-400/10 text-sky-400'
+                    : item.recipientUserId ? 'bg-white/10 text-white/60' : 'bg-primary/15 text-primary'"
+                >
+                  {{ describeTarget(item) }}
+                </span>
+                <span class="text-[11px] text-white/30 font-medium">{{ formatRelativeTime(item.createdAt) }}</span>
+              </div>
+              <h4 class="text-[14px] font-bold text-white leading-snug">{{ item.title }}</h4>
+              <p class="text-[12.5px] text-muted leading-relaxed mt-1">{{ item.message }}</p>
+            </article>
+
+            <div v-if="isLoadingHistory" class="p-5 text-center text-[12px] text-muted font-medium">Đang tải...</div>
+
+            <div v-else-if="sentItems.length === 0" class="p-12 text-center">
+              <PhMegaphone class="text-4xl text-white/15 mx-auto mb-3" weight="fill" />
+              <p class="text-[13px] text-white/50 font-bold">Chưa gửi thông báo nào.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed, onMounted, reactive, ref } from 'vue'
+import { PhGlobeHemisphereEast, PhMegaphone, PhPaperPlaneTilt, PhUser, PhUsersThree } from '@phosphor-icons/vue'
+import BaseButton from '../../components/ui/BaseButton.vue'
+import BaseSelect from '../../components/ui/BaseSelect.vue'
+import { addToast } from '../../stores/adminStore'
+import { notificationService } from '../../services/notification.service'
+import { formatRelativeTime, getNotificationPreset } from '../../utils/notificationDisplay'
+
+const PAGE_SIZE = 10
+const GUID_PATTERN = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+
+const targetOptions = [
+  { value: 'all', label: 'Tất cả người dùng', icon: PhGlobeHemisphereEast },
+  { value: 'role', label: 'Theo vai trò', icon: PhUsersThree },
+  { value: 'user', label: 'Người dùng cụ thể', icon: PhUser }
+]
+
+const roleOptions = [
+  { value: 'Customer', label: 'Khách hàng' },
+  { value: 'Organizer', label: 'Nhà tổ chức' },
+  { value: 'Moderator', label: 'Kiểm duyệt viên' },
+  { value: 'Staff', label: 'Nhân viên soát vé' },
+  { value: 'Admin', label: 'Quản trị viên' }
+]
+
+const target = ref('all')
+const isSending = ref(false)
+
+const form = reactive({
+  recipientUserId: '',
+  targetRole: '',
+  title: '',
+  message: '',
+  linkUrl: ''
+})
+
+const errors = reactive({
+  recipientUserId: '',
+  targetRole: '',
+  title: '',
+  message: '',
+  linkUrl: ''
+})
+
+const sentItems = ref([])
+const totalSent = ref(0)
+const historyPage = ref(0)
+const hasMoreHistory = ref(true)
+const isLoadingHistory = ref(false)
+const historyRef = ref(null)
+
+const preset = computed(() => getNotificationPreset('Announcement'))
+
+const targetSummary = computed(() => {
+  if (target.value === 'all') return 'Gửi tới toàn bộ người dùng của hệ thống.'
+  if (target.value === 'role') {
+    const role = roleOptions.find(option => option.value === form.targetRole)
+    return role ? `Gửi tới tất cả ${role.label.toLowerCase()}.` : 'Chọn một vai trò để tiếp tục.'
+  }
+  return 'Gửi riêng cho một người dùng.'
+})
+
+const selectTarget = (value) => {
+  target.value = value
+  form.targetRole = ''
+  form.recipientUserId = ''
+  errors.targetRole = ''
+  errors.recipientUserId = ''
+}
+
+const describeTarget = (item) => {
+  if (item.targetRole) {
+    return roleOptions.find(option => option.value === item.targetRole)?.label || item.targetRole
+  }
+  return item.recipientUserId ? 'Cá nhân' : 'Toàn hệ thống'
+}
+
+const validate = () => {
+  Object.keys(errors).forEach(key => { errors[key] = '' })
+
+  if (target.value === 'role' && !form.targetRole) {
+    errors.targetRole = 'Vui lòng chọn vai trò nhận thông báo.'
+  }
+
+  if (target.value === 'user') {
+    if (!form.recipientUserId) {
+      errors.recipientUserId = 'Vui lòng nhập ID người nhận.'
+    } else if (!GUID_PATTERN.test(form.recipientUserId)) {
+      errors.recipientUserId = 'ID người nhận không đúng định dạng GUID.'
+    }
+  }
+
+  if (!form.title.trim()) {
+    errors.title = 'Tiêu đề thông báo không được để trống.'
+  } else if (form.title.length > 200) {
+    errors.title = 'Tiêu đề thông báo không được vượt quá 200 ký tự.'
+  }
+
+  if (!form.message.trim()) {
+    errors.message = 'Nội dung thông báo không được để trống.'
+  } else if (form.message.length > 1000) {
+    errors.message = 'Nội dung thông báo không được vượt quá 1000 ký tự.'
+  }
+
+  if (form.linkUrl && form.linkUrl.length > 500) {
+    errors.linkUrl = 'Đường dẫn không được vượt quá 500 ký tự.'
+  }
+
+  return Object.values(errors).every(value => !value)
+}
+
+const handleSubmit = async () => {
+  if (!validate()) return
+
+  isSending.value = true
+  try {
+    await notificationService.sendAsAdmin({
+      recipientUserId: target.value === 'user' ? form.recipientUserId : null,
+      targetRole: target.value === 'role' ? form.targetRole : null,
+      title: form.title.trim(),
+      message: form.message.trim(),
+      linkUrl: form.linkUrl || null
+    })
+
+    addToast('Đã gửi thông báo thành công.', 'success')
+
+    form.title = ''
+    form.message = ''
+    form.linkUrl = ''
+
+    await reloadHistory()
+  } catch (err) {
+    addToast(err.response?.data?.message || 'Không thể gửi thông báo. Vui lòng thử lại.', 'error')
+  } finally {
+    isSending.value = false
+  }
+}
+
+const loadMoreHistory = async () => {
+  if (isLoadingHistory.value || !hasMoreHistory.value) return
+
+  isLoadingHistory.value = true
+  try {
+    const nextPage = historyPage.value + 1
+    const result = await notificationService.getSentByAdmin({ pageNumber: nextPage, pageSize: PAGE_SIZE })
+
+    sentItems.value.push(...(result?.data ?? []))
+    totalSent.value = result?.totalCount ?? 0
+    historyPage.value = nextPage
+    hasMoreHistory.value = result ? nextPage < result.totalPages : false
+  } catch (err) {
+    hasMoreHistory.value = false
+    console.error('[Notification] Không thể tải lịch sử thông báo đã gửi:', err)
+  } finally {
+    isLoadingHistory.value = false
+  }
+}
+
+const reloadHistory = async () => {
+  sentItems.value = []
+  historyPage.value = 0
+  hasMoreHistory.value = true
+  await loadMoreHistory()
+}
+
+const handleHistoryScroll = () => {
+  const el = historyRef.value
+  if (!el) return
+
+  if (el.scrollTop + el.clientHeight >= el.scrollHeight - 80) loadMoreHistory()
+}
+
+onMounted(loadMoreHistory)
+</script>
