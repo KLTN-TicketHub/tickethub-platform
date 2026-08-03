@@ -1,5 +1,7 @@
 using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Events.Email;
+using BuildingBlocks.Contracts.Events.Notification;
 using BuildingBlocks.Contracts.Models.Pagination;
 using Finance.Common.Dtos.Payouts;
 using Finance.Infrastructure.Entities;
@@ -50,6 +52,16 @@ namespace Finance.Infrastructure.Services
 
             PayoutRequest request = new PayoutRequest(eventId, summary.EventTitle, summary.CategoryId, organizerId, summary.WalletId);
             await _unitOfWork.PayoutRequestRepository.CreateAsync(request, cancellationToken);
+
+            await _eventPublisher.PublishAsync(new NotificationRequestedEvent
+            {
+                TargetRole = Roles.Moderator,
+                Type = "PayoutRequested",
+                Title = "Có yêu cầu giải ngân mới",
+                Message = $"Sự kiện \"{summary.EventTitle}\" vừa gửi yêu cầu giải ngân doanh thu.",
+                LinkUrl = "/moderator/payouts",
+                ReferenceId = request.Id
+            }, cancellationToken: cancellationToken);
 
             return (true, "Đã gửi yêu cầu giải ngân thành công. Moderator sẽ xem xét và phản hồi sớm.");
         }
@@ -170,6 +182,16 @@ namespace Finance.Infrastructure.Services
                 {
                     _logger.LogWarning("OrganizerSnapshot not found for OrganizerId {OrganizerId}, skipping payout notification email.", payoutRequest.OrganizerId);
                 }
+
+                await _eventPublisher.PublishAsync(new NotificationRequestedEvent
+                {
+                    RecipientUserId = payout.OrganizerId,
+                    Type = "PayoutProposed",
+                    Title = "Có đề xuất giải ngân",
+                    Message = $"Sự kiện \"{payout.EventTitle}\" có đề xuất giải ngân {payout.NetAmount:N0} VNĐ đang chờ bạn xác nhận.",
+                    LinkUrl = "/organizer/wallet",
+                    ReferenceId = payout.Id
+                }, cancellationToken: cancellationToken);
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);

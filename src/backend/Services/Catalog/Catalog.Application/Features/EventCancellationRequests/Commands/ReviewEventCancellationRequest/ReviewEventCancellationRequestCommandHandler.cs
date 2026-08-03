@@ -1,6 +1,7 @@
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Events.Email;
 using BuildingBlocks.Contracts.Events.Event;
+using BuildingBlocks.Contracts.Events.Notification;
 using BuildingBlocks.Domain.Exceptions;
 using Catalog.Application.Features.EventCancellationRequests.Requests;
 using Catalog.Domain.Entities;
@@ -84,6 +85,16 @@ namespace Catalog.Application.Features.EventCancellationRequests.Commands.Review
                     OrganizerName = eventEntity.Organizer?.OrganizerName ?? string.Empty,
                     Reason = cancellationRequest.Reason
                 }, cancellationToken: cancellation);
+
+                await _eventPublisher.PublishAsync(new NotificationRequestedEvent
+                {
+                    RecipientUserId = eventEntity.OrganizerId,
+                    Type = "EventCancellationApproved",
+                    Title = "Yêu cầu huỷ sự kiện được chấp thuận",
+                    Message = $"Yêu cầu huỷ sự kiện \"{eventEntity.Title}\" đã được chấp thuận. Hệ thống sẽ tiến hành hoàn tiền cho các đơn hàng liên quan.",
+                    LinkUrl = $"/organizer/events/{eventEntity.Id}",
+                    ReferenceId = eventEntity.Id
+                }, cancellationToken: cancellation);
             }
             else
             {
@@ -97,6 +108,16 @@ namespace Catalog.Application.Features.EventCancellationRequests.Commands.Review
                     OrganizerName = eventEntity.Organizer?.OrganizerName ?? string.Empty,
                     IsApproved = false,
                     Reason = request.Reason
+                }, cancellationToken: cancellation);
+
+                await _eventPublisher.PublishAsync(new NotificationRequestedEvent
+                {
+                    RecipientUserId = eventEntity.OrganizerId,
+                    Type = "EventCancellationRejected",
+                    Title = "Yêu cầu huỷ sự kiện bị từ chối",
+                    Message = $"Yêu cầu huỷ sự kiện \"{eventEntity.Title}\" đã bị từ chối. Lý do: {request.Reason}",
+                    LinkUrl = $"/organizer/events/{eventEntity.Id}",
+                    ReferenceId = eventEntity.Id
                 }, cancellationToken: cancellation);
             }
 

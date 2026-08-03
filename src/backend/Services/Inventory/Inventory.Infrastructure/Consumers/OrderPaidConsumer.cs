@@ -1,4 +1,5 @@
 using BuildingBlocks.Contracts.Events.Inventory;
+using BuildingBlocks.Contracts.Events.Notification;
 using BuildingBlocks.Contracts.Events.Order;
 using Inventory.Infrastructure.Entities;
 using Inventory.Infrastructure.Interfaces;
@@ -98,6 +99,16 @@ namespace Inventory.Infrastructure.Consumers
                     CustomerName = message.CustomerName,
                     CustomerEmail = message.CustomerEmail,
                     Tickets = issuedTicketDtos
+                });
+
+                await context.Publish(new NotificationRequestedEvent
+                {
+                    RecipientUserId = message.UserId,
+                    Type = "TicketsIssued",
+                    Title = "Vé điện tử đã sẵn sàng",
+                    Message = $"{issuedTicketDtos.Count} vé cho sự kiện \"{message.EventTitle}\" đã được phát hành. Xuất trình mã QR để check-in tại sự kiện.",
+                    LinkUrl = "/my-tickets",
+                    ReferenceId = message.OrderId
                 });
 
                 _logger.LogInformation("Issued {Count} ticket(s) and published TicketsIssuedEvent for OrderId={OrderId}",

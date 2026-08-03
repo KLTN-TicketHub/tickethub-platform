@@ -1,6 +1,7 @@
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Events.Email;
 using BuildingBlocks.Contracts.Events.Event;
+using BuildingBlocks.Contracts.Events.Notification;
 using BuildingBlocks.Domain.Exceptions;
 using Catalog.Domain.Entities;
 using Catalog.Domain.Enums;
@@ -62,6 +63,16 @@ namespace Catalog.Application.Features.Events.Commands.CancelEvent
                 OrganizerEmail = eventEntity.Organizer?.Email ?? string.Empty,
                 OrganizerName = eventEntity.Organizer?.OrganizerName ?? string.Empty,
                 Reason = null
+            }, cancellationToken: cancellation);
+
+            await _eventPublisher.PublishAsync(new NotificationRequestedEvent
+            {
+                RecipientUserId = eventEntity.OrganizerId,
+                Type = "EventCancelled",
+                Title = "Sự kiện đã bị huỷ",
+                Message = $"Sự kiện \"{eventEntity.Title}\" đã bị huỷ bởi quản trị viên. Hệ thống sẽ tiến hành hoàn tiền cho các đơn hàng liên quan.",
+                LinkUrl = $"/organizer/events/{eventEntity.Id}",
+                ReferenceId = eventEntity.Id
             }, cancellationToken: cancellation);
 
             await _unitOfWork.EventRepository.SaveChangeAsync(cancellation);

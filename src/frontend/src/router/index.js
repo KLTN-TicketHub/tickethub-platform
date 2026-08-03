@@ -8,6 +8,7 @@ import SearchPage from '../pages/SearchPage.vue'
 import CategoryPage from '../pages/CategoryPage.vue'
 import EventDetailPage from '../pages/EventDetailPage.vue'
 import MyTicketsPage from '../pages/MyTicketsPage.vue'
+import NotificationsPage from '../pages/NotificationsPage.vue'
 import ProfilePage from '../pages/ProfilePage.vue'
 import OrganizerPage from '../pages/OrganizerPage.vue'
 import OrganizerCreateEventPage from '../pages/organizer/OrganizerCreateEventPage.vue'
@@ -60,6 +61,7 @@ const routes = [
   { path: '/:type(concerts|arts|sports|experiences|workshops|others)', name: 'category', component: CategoryPage },
   { path: '/event/:id', name: 'event-detail', component: EventDetailPage },
   { path: '/my-tickets', name: 'my-tickets', component: MyTicketsPage },
+  { path: '/notifications', name: 'notifications', component: NotificationsPage },
   { path: '/profile', name: 'profile', component: ProfilePage },
   { path: '/create-event', redirect: '/organizer/create-event' },
   { path: '/early-bird', name: 'early-bird', component: EarlyBirdPage },
@@ -91,6 +93,7 @@ const routes = [
       { path: 'event-categories', name: 'admin-event-categories', component: () => import('../pages/admin/EventCategoriesAdmin.vue') },
       { path: 'moderators', name: 'admin-moderators', component: ModeratorsAdmin },
       { path: 'orders', name: 'admin-orders', component: OrdersAdmin },
+      { path: 'notifications', name: 'admin-notifications', component: NotificationsPage },
     ]
   },
 
@@ -111,7 +114,8 @@ const routes = [
       { path: 'events', name: 'moderator-events', component: ModeratorEventsPage },
       { path: 'events/:id', name: 'moderator-event-detail', component: ModeratorEventDetailPage },
       { path: 'payouts', name: 'moderator-payouts', component: ModeratorPayoutsPage },
-      { path: 'event-cancellation-requests', name: 'moderator-event-cancellation-requests', component: ModeratorEventCancellationRequestsPage }
+      { path: 'event-cancellation-requests', name: 'moderator-event-cancellation-requests', component: ModeratorEventCancellationRequestsPage },
+      { path: 'notifications', name: 'moderator-notifications', component: NotificationsPage }
     ]
   },
 
@@ -128,7 +132,8 @@ const routes = [
       { path: 'events/:id/ratings', name: 'organizer-event-ratings', component: () => import('../pages/organizer/OrganizerEventRatingsPage.vue') },
       { path: 'insights', name: 'organizer-insights', component: () => import('../pages/organizer/OrganizerInsightsPage.vue') },
       { path: 'wallet', name: 'organizer-wallet', component: () => import('../pages/organizer/OrganizerWalletPage.vue') },
-      { path: 'staffs', name: 'organizer-staffs', component: () => import('../pages/organizer/OrganizerStaffsPage.vue') }
+      { path: 'staffs', name: 'organizer-staffs', component: () => import('../pages/organizer/OrganizerStaffsPage.vue') },
+      { path: 'notifications', name: 'organizer-notifications', component: NotificationsPage }
     ]
   },
 

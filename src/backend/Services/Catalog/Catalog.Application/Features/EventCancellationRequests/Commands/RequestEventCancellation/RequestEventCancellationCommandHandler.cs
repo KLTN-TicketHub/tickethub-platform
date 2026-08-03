@@ -1,3 +1,6 @@
+using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Contracts.Constants;
+using BuildingBlocks.Contracts.Events.Notification;
 using BuildingBlocks.Domain.Exceptions;
 using Catalog.Application.Features.EventCancellationRequests.Requests;
 using Catalog.Domain.Entities;
@@ -11,10 +14,12 @@ namespace Catalog.Application.Features.EventCancellationRequests.Commands.Reques
     public class RequestEventCancellationCommandHandler : IRequestHandler<RequestEventCancellationCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IEventPublisher _eventPublisher;
 
-        public RequestEventCancellationCommandHandler(IUnitOfWork unitOfWork)
+        public RequestEventCancellationCommandHandler(IUnitOfWork unitOfWork, IEventPublisher eventPublisher)
         {
             _unitOfWork = unitOfWork;
+            _eventPublisher = eventPublisher;
         }
 
         public async Task<bool> Handle(RequestEventCancellationCommand command, CancellationToken cancellationToken)
@@ -55,6 +60,16 @@ namespace Catalog.Application.Features.EventCancellationRequests.Commands.Reques
             EventCancellationRequest cancellationRequest = new EventCancellationRequest(eventId, eventEntity.Title, organizerId, request.Reason);
 
             await _unitOfWork.EventCancellationRequestRepository.CreateAsync(cancellationRequest, cancellation);
+
+            await _eventPublisher.PublishAsync(new NotificationRequestedEvent
+            {
+                TargetRole = Roles.Moderator,
+                Type = "EventCancellationRequested",
+                Title = "Có yêu cầu huỷ sự kiện mới",
+                Message = $"Sự kiện \"{eventEntity.Title}\" vừa có yêu cầu huỷ. Lý do: {request.Reason}",
+                LinkUrl = "/moderator/events",
+                ReferenceId = cancellationRequest.Id
+            }, cancellationToken: cancellation);
 
             return true;
         }

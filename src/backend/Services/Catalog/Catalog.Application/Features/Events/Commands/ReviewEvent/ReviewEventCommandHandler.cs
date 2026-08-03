@@ -1,6 +1,7 @@
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Events.Email;
 using BuildingBlocks.Contracts.Events.Event;
+using BuildingBlocks.Contracts.Events.Notification;
 using BuildingBlocks.Domain.Exceptions;
 using Catalog.Application.Features.Events.Requests;
 using Catalog.Domain.Entities;
@@ -69,6 +70,8 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
                 Reason = request.Reason
             }, cancellationToken: cancellation);
 
+            await PublishReviewNotificationAsync(eventEntity, request.IsApproved, request.Reason, cancellation);
+
             if (request.IsApproved)
             {
                 var eventPublished = new EventPublishedEvent
@@ -104,6 +107,25 @@ namespace Catalog.Application.Features.Events.Commands.ReviewEvent
             await _unitOfWork.EventRepository.SaveChangeAsync(cancellation);
 
             return true;
+        }
+
+        private async Task PublishReviewNotificationAsync(
+            Event eventEntity,
+            bool isApproved,
+            string? reason,
+            CancellationToken cancellation)
+        {
+            await _eventPublisher.PublishAsync(new NotificationRequestedEvent
+            {
+                RecipientUserId = eventEntity.OrganizerId,
+                Type = isApproved ? "EventApproved" : "EventRejected",
+                Title = isApproved ? "Sự kiện đã được duyệt" : "Sự kiện bị từ chối",
+                Message = isApproved
+                    ? $"Sự kiện \"{eventEntity.Title}\" đã được duyệt và sẽ được mở bán theo lịch."
+                    : $"Sự kiện \"{eventEntity.Title}\" đã bị từ chối. Lý do: {reason}",
+                LinkUrl = $"/organizer/events/{eventEntity.Id}",
+                ReferenceId = eventEntity.Id
+            }, cancellationToken: cancellation);
         }
     }
 }

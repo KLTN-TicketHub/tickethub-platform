@@ -95,6 +95,23 @@
             "PathPattern": "/api/v{version}/{**catch-all}"
           }
         ]
+      },
+      "notification-route": {
+        "ClusterId": "notification-cluster",
+        "Match": {
+          "Path": "/api/v{version}/notification/{**catch-all}"
+        },
+        "Transforms": [
+          {
+            "PathPattern": "/api/v{version}/{**catch-all}"
+          }
+        ]
+      },
+      "notification-hub-route": {
+        "ClusterId": "notification-cluster",
+        "Match": {
+          "Path": "/hubs/notifications/{**catch-all}"
+        }
       }
     },
     "Clusters": {
@@ -144,6 +161,13 @@
         "Destinations": {
           "ai-destination": {
             "Address": "http://ai-api:8080"
+          }
+        }
+      },
+      "notification-cluster": {
+        "Destinations": {
+          "notification-destination": {
+            "Address": "http://notification-api:8080"
           }
         }
       }

@@ -1,5 +1,7 @@
 using AutoMapper;
 using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Contracts.Constants;
+using BuildingBlocks.Contracts.Events.Notification;
 using BuildingBlocks.Domain.Exceptions;
 using Catalog.Application.Common.DTOs.Events;
 using Catalog.Application.Common.DTOs.Profiles;
@@ -16,12 +18,18 @@ namespace Catalog.Application.Features.Events.Commands.CreateEvent
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IFileService _fileService;
+        private readonly IEventPublisher _eventPublisher;
 
-        public CreateEventCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, IFileService fileService)
+        public CreateEventCommandHandler(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            IFileService fileService,
+            IEventPublisher eventPublisher)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _fileService = fileService;
+            _eventPublisher = eventPublisher;
         }
 
         public async Task<EventDto> Handle(CreateEventCommand command, CancellationToken cancellation = default)
@@ -122,12 +130,30 @@ namespace Catalog.Application.Features.Events.Commands.CreateEvent
 
             Event created = await _unitOfWork.EventRepository.CreateAsync(newEvent, cancellation);
 
+            await PublishPendingReviewNotificationAsync(created, organizer, cancellation);
+
             EventDto result = _mapper.Map<EventDto>(created);
             result.CategoryName = category.CategoryName;
             result.OrganizerProfile = _mapper.Map<OrganizerProfileDto>(organizer);
             result.CoverImageUrl = _fileService.GetFileUrl(newEvent.CoverImageUrl);
 
             return result;
+        }
+
+        private async Task PublishPendingReviewNotificationAsync(
+            Event created,
+            OrganizerSnapshot organizer,
+            CancellationToken cancellation)
+        {
+            await _eventPublisher.PublishAsync(new NotificationRequestedEvent
+            {
+                TargetRole = Roles.Moderator,
+                Type = "EventPendingReview",
+                Title = "Có sự kiện mới chờ duyệt",
+                Message = $"Nhà tổ chức {organizer.OrganizerName} vừa gửi sự kiện \"{created.Title}\" để chờ duyệt.",
+                LinkUrl = $"/moderator/events/{created.Id}",
+                ReferenceId = created.Id
+            }, cancellationToken: cancellation);
         }
     }
 }

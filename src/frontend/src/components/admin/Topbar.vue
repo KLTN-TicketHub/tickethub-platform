@@ -47,6 +47,8 @@
           />
         </div>
 
+        <NotificationBell />
+
         <button @click="handleLogout" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-danger hover:border-danger/30 hover:bg-danger/10 transition-all group">
           <PhSignOut class="text-lg group-hover:scale-110 transition-transform" weight="bold" />
         </button>
@@ -86,6 +88,8 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { adminSearch } from '../../stores/adminStore'
 import { logout as authLogout } from '../../services/auth/auth.service'
+import { resetNotifications } from '../../stores/notificationStore'
+import NotificationBell from '../layout/NotificationBell.vue'
 import { PhCrown, PhSquaresFour, PhTicket, PhUsers, PhShieldCheck, PhReceipt, PhMagnifyingGlass, PhSignOut, PhCheckSquareOffset, PhMapPin, PhList, PhX, PhSuitcase, PhPlus, PhFolderOpen, PhHandCoins, PhWallet, PhChartLineUp, PhProhibit, PhIdentificationBadge } from '@phosphor-icons/vue'
 
 const props = defineProps({
@@ -151,6 +155,7 @@ const handleInput = () => {
 
 const handleLogout = async () => {
   await authLogout()
+  await resetNotifications()
   router.replace(props.role === 'admin' ? '/admin/login' : props.role === 'moderator' ? '/moderator/login' : '/organizer/login')
 }
 </script>

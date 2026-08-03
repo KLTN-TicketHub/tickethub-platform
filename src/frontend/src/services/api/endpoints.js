@@ -108,6 +108,15 @@ export const AI_SUGGESTIONS_EVENT = (eventId) => `/ai/organizer/suggestions/even
 // AI Chat (Customer)
 export const AI_CHAT_SEND = '/ai/chat'
 
+// Notifications (in-app inbox)
+export const NOTIFICATIONS = '/notification/notifications'
+export const NOTIFICATION_UNREAD_COUNT = '/notification/notifications/unread-count'
+export const NOTIFICATION_MARK_READ = (id) => `/notification/notifications/${id}/read`
+export const NOTIFICATION_MARK_ALL_READ = '/notification/notifications/read-all'
+export const NOTIFICATION_DELETE = (id) => `/notification/notifications/${id}`
+export const ADMIN_NOTIFICATION_SEND = '/notification/admin/notifications'
+export const ADMIN_NOTIFICATION_SENT_LIST = '/notification/admin/notifications'
+
 // Finance - Moderator Payouts
 export const MODERATOR_PAYOUT_REQUESTS = '/finance/moderator/payouts/requests'
 export const MODERATOR_PAYOUT_PROPOSE = (payoutRequestId) => `/finance/moderator/payouts/requests/${payoutRequestId}/propose`

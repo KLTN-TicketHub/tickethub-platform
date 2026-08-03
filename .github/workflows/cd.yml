@@ -32,6 +32,8 @@ jobs:
             dockerfile: src/backend/Services/Finance/Finance.API/Dockerfile
           - service: ai-api
             dockerfile: src/backend/Services/AI/AI.API/Dockerfile
+          - service: notification-api
+            dockerfile: src/backend/Services/Notification/Notification.API/Dockerfile
           - service: notification-worker
             dockerfile: src/backend/Services/Notification/Notification.Worker/Dockerfile
           - service: gateway

@@ -1,5 +1,6 @@
 using BuildingBlocks.Contracts.Commands.Inventory;
 using BuildingBlocks.Contracts.Commands.Order;
+using BuildingBlocks.Contracts.Events.Notification;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -48,6 +49,16 @@ namespace Ordering.Infrastructure.Consumers
                         SeatIds = seatIds,
                         TicketTypeId = standingItem?.TicketTypeId,
                         Quantity = standingItem?.Quantity ?? 0
+                    });
+
+                    await context.Publish(new NotificationRequestedEvent
+                    {
+                        RecipientUserId = order.UserId,
+                        Type = "OrderCancelled",
+                        Title = "Đơn hàng đã bị huỷ",
+                        Message = $"Đơn hàng cho sự kiện \"{order.EventTitle}\" đã bị huỷ do chưa hoàn tất thanh toán. Ghế đã được trả lại hệ thống.",
+                        LinkUrl = "/my-tickets",
+                        ReferenceId = order.Id
                     });
 
                     await _unitOfWork.SaveChangesAsync();

@@ -41,6 +41,7 @@
     <Project Path="Services/Inventory/Inventory.Infrastructure/Inventory.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Services/Notification/">
+    <Project Path="Services/Notification/Notification.API/Notification.API.csproj" />
     <Project Path="Services/Notification/Notification.Common/Notification.Common.csproj" />
     <Project Path="Services/Notification/Notification.Infrastructure/Notification.Infrastructure.csproj" />
     <Project Path="Services/Notification/Notification.Worker/Notification.Worker.csproj" />

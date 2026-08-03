@@ -1,5 +1,6 @@
 using BuildingBlocks.Contracts.Commands.Inventory;
 using BuildingBlocks.Contracts.Commands.Order;
+using BuildingBlocks.Contracts.Events.Notification;
 using BuildingBlocks.Contracts.Events.Order;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -86,6 +87,26 @@ namespace Ordering.Infrastructure.Consumers
                         EventImage = order.EventImage,
                         ShowtimeEndAt = order.ShowtimeEndAt,
                         Items = eventItems
+                    });
+
+                    await context.Publish(new NotificationRequestedEvent
+                    {
+                        RecipientUserId = order.UserId,
+                        Type = "OrderPaid",
+                        Title = "Đặt vé thành công",
+                        Message = $"Đơn hàng cho sự kiện \"{order.EventTitle}\" đã được thanh toán thành công. Vé điện tử sẽ sẵn sàng trong giây lát.",
+                        LinkUrl = "/my-tickets",
+                        ReferenceId = order.Id
+                    });
+
+                    await context.Publish(new NotificationRequestedEvent
+                    {
+                        RecipientUserId = order.OrganizerId,
+                        Type = "OrderPaid",
+                        Title = "Có đơn hàng mới",
+                        Message = $"Sự kiện \"{order.EventTitle}\" vừa có một đơn hàng mới trị giá {order.TotalPrice:N0} VNĐ.",
+                        LinkUrl = $"/organizer/events/{order.EventId}",
+                        ReferenceId = order.Id
                     });
 
                     await _unitOfWork.SaveChangesAsync();

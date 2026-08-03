@@ -1,5 +1,6 @@
 using BuildingBlocks.Contracts.Commands.Order;
 using BuildingBlocks.Contracts.Events.Email;
+using BuildingBlocks.Contracts.Events.Notification;
 using BuildingBlocks.Contracts.Events.Order;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -52,6 +53,16 @@ namespace Ordering.Infrastructure.Consumers
                     CustomerEmail = order.CustomerEmail,
                     RefundedAmount = message.RefundedAmount,
                     RefundedAt = DateTime.UtcNow
+                });
+
+                await context.Publish(new NotificationRequestedEvent
+                {
+                    RecipientUserId = order.UserId,
+                    Type = "OrderRefunded",
+                    Title = "Hoàn tiền thành công",
+                    Message = $"Đơn hàng cho sự kiện \"{order.EventTitle}\" đã được hoàn {message.RefundedAmount:N0} VNĐ về phương thức thanh toán của bạn.",
+                    LinkUrl = "/my-tickets",
+                    ReferenceId = order.Id
                 });
 
                 await _unitOfWork.SaveChangesAsync(context.CancellationToken);

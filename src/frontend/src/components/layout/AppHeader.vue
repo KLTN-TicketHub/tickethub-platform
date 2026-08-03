@@ -107,7 +107,9 @@
           </Transition>
         </div>
 
-        <button 
+        <NotificationBell v-if="store.user" />
+
+        <button
           @click="router.push('/my-tickets')"
           class="relative w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-primary/40 transition-all group active:scale-95"
         >
@@ -170,6 +172,8 @@ import { useRouter } from 'vue-router'
 import { store, selectEvent, openAuth, logout } from '../../stores/eventStore'
 import { getEvents } from '../../stores/eventStore'
 import { logout as authLogout } from '../../services/auth/auth.service'
+import { resetNotifications } from '../../stores/notificationStore'
+import NotificationBell from './NotificationBell.vue'
 import { 
   PhTicket, PhMagnifyingGlass, PhMapPin, PhCheck, PhCaretDown, 
   PhSignOut, PhHeart, PhUser, PhMicrophoneStage, PhMaskHappy, 
@@ -213,6 +217,7 @@ const goToEvent = (event) => {
 const handleLogout = async () => {
   await authLogout()
   logout()
+  await resetNotifications()
   showDropdown.value = false
 }
 

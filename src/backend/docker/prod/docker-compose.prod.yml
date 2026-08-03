@@ -275,6 +275,34 @@ services:
       retries: 5
       start_period: 30s
 
+  notification-api:
+    image: ghcr.io/kltn-tickethub/tickethub-platform-notification-api:latest
+    build:
+      context: ../../
+      dockerfile: Services/Notification/Notification.API/Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+    volumes:
+      - ${SECRETS_DIR}/notification-api/appsettings.Production.json:/app/appsettings.Production.json:ro
+      - ../../Services/Notification/Notification.API/Keys:/app/Keys:ro
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    networks:
+      - tickethub-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   notification-worker:
     image: ghcr.io/kltn-tickethub/tickethub-platform-notification-worker:latest
     build:
@@ -316,6 +344,8 @@ services:
       finance-api:
         condition: service_healthy
       ai-api:
+        condition: service_healthy
+      notification-api:
         condition: service_healthy
     networks:
       - tickethub-net
