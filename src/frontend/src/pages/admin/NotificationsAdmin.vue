@@ -56,19 +56,44 @@
           />
 
           <div v-if="target === 'user'" class="flex flex-col gap-2 w-full">
-            <label for="recipient-id" class="text-[12px] font-bold text-white/50 uppercase tracking-widest">
-              ID người nhận
+            <label class="text-[12px] font-bold text-white/50 uppercase tracking-widest">
+              Người nhận
             </label>
-            <input
-              id="recipient-id"
-              v-model.trim="form.recipientUserId"
-              type="text"
-              placeholder="Ví dụ: 3fa85f64-5717-4562-b3fc-2c963f66afa6"
-              class="w-full rounded-2xl px-5 py-3 text-[14px] font-medium bg-white/5 border border-white/10 text-white outline-none transition-all hover:border-white/20 focus:border-primary/50 focus:bg-white/10 placeholder:text-white/25 font-mono"
-              :class="{ '!border-danger/50 !bg-danger/5': errors.recipientUserId }"
-            />
-            <span v-if="errors.recipientUserId" class="text-[12px] font-medium text-danger">{{ errors.recipientUserId }}</span>
-            <span v-else class="text-[12px] text-white/30">Lấy ID từ trang Người dùng.</span>
+
+            <div
+              v-if="isPrefilledRecipient"
+              class="flex items-center justify-between gap-4 px-5 py-3 rounded-2xl bg-primary/5 border border-primary/20"
+            >
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-9 h-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[13px] font-bold text-primary uppercase flex-shrink-0">
+                  {{ (prefilledUser.name || '?').charAt(0) }}
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[13px] font-bold text-white truncate">{{ prefilledUser.name }}</span>
+                  <span class="text-[12px] text-white/40 truncate">{{ prefilledUser.email }}</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                @click="clearPrefilledRecipient"
+                class="text-[12px] font-bold text-primary hover:text-white transition-colors flex-shrink-0"
+              >
+                Đổi
+              </button>
+            </div>
+
+            <template v-else>
+              <input
+                id="recipient-id"
+                v-model.trim="form.recipientUserId"
+                type="text"
+                placeholder="Ví dụ: 3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                class="w-full rounded-2xl px-5 py-3 text-[14px] font-medium bg-white/5 border border-white/10 text-white outline-none transition-all hover:border-white/20 focus:border-primary/50 focus:bg-white/10 placeholder:text-white/25 font-mono"
+                :class="{ '!border-danger/50 !bg-danger/5': errors.recipientUserId }"
+              />
+              <span v-if="errors.recipientUserId" class="text-[12px] font-medium text-danger">{{ errors.recipientUserId }}</span>
+              <span v-else class="text-[12px] text-white/30">Bấm biểu tượng chuông cạnh một người dùng ở trang Người dùng, hoặc dán ID thủ công.</span>
+            </template>
           </div>
 
           <!-- Title -->
@@ -297,6 +322,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { PhClock, PhGlobeHemisphereEast, PhMegaphone, PhPaperPlaneTilt, PhUser, PhUsersThree } from '@phosphor-icons/vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseSelect from '../../components/ui/BaseSelect.vue'
@@ -333,20 +359,33 @@ const STATUS_LABELS = {
   Cancelled: 'Đã huỷ'
 }
 
-const target = ref('all')
+const route = useRoute()
+const router = useRouter()
+
+const prefilledUser = ref(null)
+
+const target = ref(route.query.userId ? 'user' : 'all')
 const isScheduled = ref(false)
 const isSending = ref(false)
 const activeTab = ref('sent')
 const statsPanelRef = ref(null)
 
 const form = reactive({
-  recipientUserId: '',
+  recipientUserId: typeof route.query.userId === 'string' ? route.query.userId : '',
   targetRole: '',
   title: '',
   message: '',
   linkUrl: '',
   scheduledAt: ''
 })
+
+if (route.query.userId) {
+  prefilledUser.value = {
+    id: String(route.query.userId),
+    name: route.query.userName ? String(route.query.userName) : 'Người dùng',
+    email: route.query.userEmail ? String(route.query.userEmail) : ''
+  }
+}
 
 const errors = reactive({
   recipientUserId: '',
@@ -371,6 +410,10 @@ const scheduledRef = ref(null)
 
 const preset = computed(() => getNotificationPreset('Announcement'))
 
+const isPrefilledRecipient = computed(() =>
+  !!prefilledUser.value && form.recipientUserId === prefilledUser.value.id
+)
+
 const pendingCount = computed(() => scheduledItems.value.filter(item => item.status === 'Pending').length)
 
 const minScheduleValue = computed(() => toLocalInputValue(new Date(Date.now() + 60 * 1000)))
@@ -388,8 +431,14 @@ const selectTarget = (value) => {
   target.value = value
   form.targetRole = ''
   form.recipientUserId = ''
+  prefilledUser.value = null
   errors.targetRole = ''
   errors.recipientUserId = ''
+}
+
+const clearPrefilledRecipient = () => {
+  prefilledUser.value = null
+  form.recipientUserId = ''
 }
 
 const toggleSchedule = () => {
@@ -581,6 +630,10 @@ const handleScheduledScroll = () => {
 }
 
 onMounted(async () => {
+  if (route.query.userId) {
+    router.replace({ path: route.path })
+  }
+
   await Promise.all([loadMoreSent(), loadMoreScheduled()])
 })
 </script>

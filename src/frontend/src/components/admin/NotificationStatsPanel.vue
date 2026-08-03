@@ -54,8 +54,22 @@
           <line v-for="tick in gridTicks" :key="tick.value" x1="50" :y1="tick.y" x2="960" :y2="tick.y" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
           <line x1="50" y1="250" x2="960" y2="250" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
 
-          <path :d="sentPath" fill="none" :stroke="SENT_COLOR" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
-          <path :d="readPath" fill="none" :stroke="READ_COLOR" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
+          <path v-if="daily.length > 1" :d="sentPath" fill="none" :stroke="SENT_COLOR" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
+          <path v-if="daily.length > 1" :d="readPath" fill="none" :stroke="READ_COLOR" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
+
+          <!-- Chấm luôn hiển thị ở mỗi điểm, kể cả khi chỉ có 1 ngày dữ liệu (path một điểm không vẽ được nét nào) -->
+          <circle
+            v-for="(point, index) in daily"
+            :key="`sent-dot-${index}`"
+            :cx="pointX(index)" :cy="pointY(point.sent)" r="4"
+            :fill="SENT_COLOR" stroke="#141B16" stroke-width="1.5"
+          />
+          <circle
+            v-for="(point, index) in daily"
+            :key="`read-dot-${index}`"
+            :cx="pointX(index)" :cy="pointY(point.readCount)" r="4"
+            :fill="READ_COLOR" stroke="#141B16" stroke-width="1.5"
+          />
 
           <line
             v-if="hoveredIndex !== null"
@@ -64,8 +78,8 @@
           />
 
           <template v-if="hoveredIndex !== null">
-            <circle :cx="pointX(hoveredIndex)" :cy="pointY(daily[hoveredIndex].sent)" r="5" :fill="SENT_COLOR" stroke="#141B16" stroke-width="2" />
-            <circle :cx="pointX(hoveredIndex)" :cy="pointY(daily[hoveredIndex].readCount)" r="5" :fill="READ_COLOR" stroke="#141B16" stroke-width="2" />
+            <circle :cx="pointX(hoveredIndex)" :cy="pointY(daily[hoveredIndex].sent)" r="6" :fill="SENT_COLOR" stroke="#141B16" stroke-width="2" />
+            <circle :cx="pointX(hoveredIndex)" :cy="pointY(daily[hoveredIndex].readCount)" r="6" :fill="READ_COLOR" stroke="#141B16" stroke-width="2" />
           </template>
 
           <rect

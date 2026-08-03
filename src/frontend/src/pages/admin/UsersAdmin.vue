@@ -72,6 +72,9 @@
           </template>
           <template #actions="{ row }">
             <div class="flex justify-end gap-2">
+              <BaseButton variant="ghost" size="sm" class="!px-3 hover:!bg-primary/10 hover:!text-primary" @click="goToSendNotification(row)" title="Gửi thông báo">
+                <PhBellRinging weight="bold" class="text-primary/70 hover:text-primary" />
+              </BaseButton>
               <BaseButton variant="ghost" size="sm" class="!px-3 hover:!bg-warning/10 hover:!text-warning" @click="openEditModal(row)">
                 <PhPencilSimple weight="bold" class="text-warning/70 hover:text-warning" />
               </BaseButton>
@@ -174,6 +177,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { openConfirm, addToast } from '../../stores/adminStore'
 import {
   getAdminUsers,
@@ -187,8 +191,10 @@ import BaseSelect from '../../components/ui/BaseSelect.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
 import {
   PhMagnifyingGlass, PhProhibit, PhPencilSimple, PhUsers,
-  PhSpinner, PhCaretLeft, PhCaretRight
+  PhSpinner, PhCaretLeft, PhCaretRight, PhBellRinging
 } from '@phosphor-icons/vue'
+
+const router = useRouter()
 
 const localSearch = ref('')
 const roleFilter = ref('all')
@@ -301,6 +307,17 @@ const resetFilters = () => {
 const formatDate = (dateStr) => {
   if (!dateStr) return '—'
   return new Date(dateStr).toLocaleDateString('vi-VN')
+}
+
+const goToSendNotification = (user) => {
+  router.push({
+    path: '/admin/notifications/send',
+    query: {
+      userId: user.id,
+      userName: user.fullName || user.userName,
+      userEmail: user.email
+    }
+  })
 }
 
 const openEditModal = (user) => {
