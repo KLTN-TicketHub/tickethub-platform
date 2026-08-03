@@ -8,5 +8,6 @@ namespace Notification.Infrastructure.Interfaces
         IAuditLogRepository AuditLogRepository { get; }
         IUserNotificationRepository UserNotificationRepository { get; }
         IUserNotificationReadRepository UserNotificationReadRepository { get; }
+        IScheduledNotificationRepository ScheduledNotificationRepository { get; }
     }
 }

@@ -1,12 +1,14 @@
 <template>
-  <div class="flex flex-col gap-8 animate-fade-up pb-12">
+  <div class="flex flex-col gap-10 animate-fade-up pb-12">
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
       <div class="flex flex-col gap-2">
-        <h1 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight">Gửi thông báo</h1>
-        <p class="text-white/50 font-medium text-lg">Gửi thông báo in-app tới toàn hệ thống, một nhóm vai trò hoặc một người dùng cụ thể.</p>
+        <h1 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight">Thông báo hệ thống</h1>
+        <p class="text-white/50 font-medium text-lg">Gửi thông báo in-app, hẹn giờ gửi và theo dõi mức độ tiếp cận.</p>
       </div>
     </div>
+
+    <NotificationStatsPanel ref="statsPanelRef" />
 
     <div class="grid grid-cols-1 xl:grid-cols-[1.15fr_1fr] gap-8 items-start">
       <!-- Compose form -->
@@ -124,12 +126,49 @@
             />
             <span v-if="errors.linkUrl" class="text-[12px] font-medium text-danger">{{ errors.linkUrl }}</span>
           </div>
+
+          <!-- Schedule -->
+          <div class="flex flex-col gap-3 pt-2 border-t border-white/5">
+            <label class="flex items-center gap-3 cursor-pointer mt-4">
+              <span
+                class="w-10 h-6 rounded-full p-1 transition-colors flex-shrink-0"
+                :class="isScheduled ? 'bg-primary' : 'bg-white/10'"
+                @click.prevent="toggleSchedule"
+              >
+                <span
+                  class="block w-4 h-4 rounded-full bg-white transition-transform"
+                  :class="isScheduled ? 'translate-x-4' : 'translate-x-0'"
+                ></span>
+              </span>
+              <span class="flex flex-col">
+                <span class="text-[13px] font-bold text-white">Hẹn giờ gửi</span>
+                <span class="text-[12px] text-white/40">Bật để gửi vào một thời điểm trong tương lai.</span>
+              </span>
+            </label>
+
+            <div v-if="isScheduled" class="flex flex-col gap-2 w-full">
+              <label for="notif-schedule" class="text-[12px] font-bold text-white/50 uppercase tracking-widest">
+                Thời điểm gửi
+              </label>
+              <input
+                id="notif-schedule"
+                v-model="form.scheduledAt"
+                type="datetime-local"
+                :min="minScheduleValue"
+                class="w-full rounded-2xl px-5 py-3 text-[14px] font-bold bg-white/5 border border-white/10 text-white outline-none transition-all hover:border-white/20 focus:border-primary/50 focus:bg-white/10 [color-scheme:dark]"
+                :class="{ '!border-danger/50 !bg-danger/5': errors.scheduledAt }"
+              />
+              <span v-if="errors.scheduledAt" class="text-[12px] font-medium text-danger">{{ errors.scheduledAt }}</span>
+              <span v-else class="text-[12px] text-white/30">Hệ thống quét mỗi 30 giây nên có thể gửi trễ tối đa 30 giây.</span>
+            </div>
+          </div>
         </div>
 
         <div class="p-6 border-t border-white/5 bg-white/[0.02] flex items-center justify-between gap-4">
           <span class="text-[13px] text-white/40 font-medium">{{ targetSummary }}</span>
           <BaseButton type="submit" variant="primary" size="lg" :loading="isSending">
-            <PhPaperPlaneTilt weight="fill" class="text-lg" /> Gửi thông báo
+            <component :is="isScheduled ? PhClock : PhPaperPlaneTilt" weight="fill" class="text-lg" />
+            {{ isScheduled ? 'Hẹn giờ gửi' : 'Gửi thông báo' }}
           </BaseButton>
         </div>
       </form>
@@ -161,26 +200,38 @@
           </div>
         </div>
 
-        <!-- Sent history -->
+        <!-- History -->
         <div class="bg-[#111916]/50 border border-white/5 rounded-[2rem] overflow-hidden flex flex-col">
-          <div class="p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
-            <h3 class="text-xl font-bold font-heading text-white">Đã gửi gần đây</h3>
-            <span class="text-[12px] text-white/50 font-bold uppercase tracking-widest">{{ totalSent }} thông báo</span>
+          <div class="px-6 pt-5 border-b border-white/5 bg-white/[0.02] flex items-center gap-6">
+            <button
+              v-for="tab in historyTabs"
+              :key="tab.id"
+              type="button"
+              @click="activeTab = tab.id"
+              class="pb-4 text-[14px] font-bold transition-all relative flex items-center gap-2"
+              :class="activeTab === tab.id ? 'text-primary' : 'text-white/50 hover:text-white'"
+            >
+              {{ tab.label }}
+              <span
+                v-if="tab.id === 'scheduled' && pendingCount > 0"
+                class="px-2 py-0.5 rounded-full bg-primary/15 text-primary text-[10px] font-black"
+              >
+                {{ pendingCount }}
+              </span>
+              <div v-if="activeTab === tab.id" class="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full"></div>
+            </button>
           </div>
 
+          <!-- Sent -->
           <div
-            ref="historyRef"
-            @scroll.passive="handleHistoryScroll"
+            v-show="activeTab === 'sent'"
+            ref="sentRef"
+            @scroll.passive="handleSentScroll"
             class="max-h-[520px] overflow-y-auto overscroll-contain divide-y divide-white/5"
           >
             <article v-for="item in sentItems" :key="item.id" class="p-5 hover:bg-white/[0.03] transition-colors">
               <div class="flex items-center gap-2 mb-2">
-                <span
-                  class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest"
-                  :class="item.targetRole
-                    ? 'bg-sky-400/10 text-sky-400'
-                    : item.recipientUserId ? 'bg-white/10 text-white/60' : 'bg-primary/15 text-primary'"
-                >
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest" :class="targetBadgeClass(item)">
                   {{ describeTarget(item) }}
                 </span>
                 <span class="text-[11px] text-white/30 font-medium">{{ formatRelativeTime(item.createdAt) }}</span>
@@ -189,11 +240,53 @@
               <p class="text-[12.5px] text-muted leading-relaxed mt-1">{{ item.message }}</p>
             </article>
 
-            <div v-if="isLoadingHistory" class="p-5 text-center text-[12px] text-muted font-medium">Đang tải...</div>
+            <div v-if="isLoadingSent" class="p-5 text-center text-[12px] text-muted font-medium">Đang tải...</div>
 
             <div v-else-if="sentItems.length === 0" class="p-12 text-center">
               <PhMegaphone class="text-4xl text-white/15 mx-auto mb-3" weight="fill" />
               <p class="text-[13px] text-white/50 font-bold">Chưa gửi thông báo nào.</p>
+            </div>
+          </div>
+
+          <!-- Scheduled -->
+          <div
+            v-show="activeTab === 'scheduled'"
+            ref="scheduledRef"
+            @scroll.passive="handleScheduledScroll"
+            class="max-h-[520px] overflow-y-auto overscroll-contain divide-y divide-white/5"
+          >
+            <article v-for="item in scheduledItems" :key="item.id" class="p-5 hover:bg-white/[0.03] transition-colors">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest" :class="statusBadgeClass(item.status)">
+                  {{ describeStatus(item.status) }}
+                </span>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest" :class="targetBadgeClass(item)">
+                  {{ describeTarget(item) }}
+                </span>
+              </div>
+              <h4 class="text-[14px] font-bold text-white leading-snug">{{ item.title }}</h4>
+              <p class="text-[12.5px] text-muted leading-relaxed mt-1">{{ item.message }}</p>
+
+              <div class="flex items-center justify-between gap-4 mt-3">
+                <span class="flex items-center gap-1.5 text-[12px] font-bold text-white/50">
+                  <PhClock weight="fill" class="text-white/30" /> {{ formatSchedule(item.scheduledAt) }}
+                </span>
+                <button
+                  v-if="item.status === 'Pending'"
+                  type="button"
+                  @click="handleCancel(item)"
+                  class="text-[12px] font-bold text-danger/80 hover:text-danger transition-colors"
+                >
+                  Huỷ
+                </button>
+              </div>
+            </article>
+
+            <div v-if="isLoadingScheduled" class="p-5 text-center text-[12px] text-muted font-medium">Đang tải...</div>
+
+            <div v-else-if="scheduledItems.length === 0" class="p-12 text-center">
+              <PhClock class="text-4xl text-white/15 mx-auto mb-3" weight="fill" />
+              <p class="text-[13px] text-white/50 font-bold">Chưa có thông báo hẹn giờ nào.</p>
             </div>
           </div>
         </div>
@@ -204,10 +297,11 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { PhGlobeHemisphereEast, PhMegaphone, PhPaperPlaneTilt, PhUser, PhUsersThree } from '@phosphor-icons/vue'
+import { PhClock, PhGlobeHemisphereEast, PhMegaphone, PhPaperPlaneTilt, PhUser, PhUsersThree } from '@phosphor-icons/vue'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseSelect from '../../components/ui/BaseSelect.vue'
-import { addToast } from '../../stores/adminStore'
+import NotificationStatsPanel from '../../components/admin/NotificationStatsPanel.vue'
+import { addToast, openConfirm } from '../../stores/adminStore'
 import { notificationService } from '../../services/notification.service'
 import { formatRelativeTime, getNotificationPreset } from '../../utils/notificationDisplay'
 
@@ -228,15 +322,30 @@ const roleOptions = [
   { value: 'Admin', label: 'Quản trị viên' }
 ]
 
+const historyTabs = [
+  { id: 'sent', label: 'Đã gửi' },
+  { id: 'scheduled', label: 'Hẹn giờ' }
+]
+
+const STATUS_LABELS = {
+  Pending: 'Chờ gửi',
+  Sent: 'Đã gửi',
+  Cancelled: 'Đã huỷ'
+}
+
 const target = ref('all')
+const isScheduled = ref(false)
 const isSending = ref(false)
+const activeTab = ref('sent')
+const statsPanelRef = ref(null)
 
 const form = reactive({
   recipientUserId: '',
   targetRole: '',
   title: '',
   message: '',
-  linkUrl: ''
+  linkUrl: '',
+  scheduledAt: ''
 })
 
 const errors = reactive({
@@ -244,17 +353,27 @@ const errors = reactive({
   targetRole: '',
   title: '',
   message: '',
-  linkUrl: ''
+  linkUrl: '',
+  scheduledAt: ''
 })
 
 const sentItems = ref([])
-const totalSent = ref(0)
-const historyPage = ref(0)
-const hasMoreHistory = ref(true)
-const isLoadingHistory = ref(false)
-const historyRef = ref(null)
+const sentPage = ref(0)
+const hasMoreSent = ref(true)
+const isLoadingSent = ref(false)
+const sentRef = ref(null)
+
+const scheduledItems = ref([])
+const scheduledPage = ref(0)
+const hasMoreScheduled = ref(true)
+const isLoadingScheduled = ref(false)
+const scheduledRef = ref(null)
 
 const preset = computed(() => getNotificationPreset('Announcement'))
+
+const pendingCount = computed(() => scheduledItems.value.filter(item => item.status === 'Pending').length)
+
+const minScheduleValue = computed(() => toLocalInputValue(new Date(Date.now() + 60 * 1000)))
 
 const targetSummary = computed(() => {
   if (target.value === 'all') return 'Gửi tới toàn bộ người dùng của hệ thống.'
@@ -273,11 +392,41 @@ const selectTarget = (value) => {
   errors.recipientUserId = ''
 }
 
+const toggleSchedule = () => {
+  isScheduled.value = !isScheduled.value
+  form.scheduledAt = ''
+  errors.scheduledAt = ''
+}
+
 const describeTarget = (item) => {
   if (item.targetRole) {
     return roleOptions.find(option => option.value === item.targetRole)?.label || item.targetRole
   }
   return item.recipientUserId ? 'Cá nhân' : 'Toàn hệ thống'
+}
+
+const targetBadgeClass = (item) => {
+  if (item.targetRole) return 'bg-sky-400/10 text-sky-400'
+  return item.recipientUserId ? 'bg-white/10 text-white/60' : 'bg-primary/15 text-primary'
+}
+
+const describeStatus = (status) => STATUS_LABELS[status] || status
+
+const statusBadgeClass = (status) => {
+  if (status === 'Pending') return 'bg-warning/10 text-warning'
+  if (status === 'Sent') return 'bg-primary/15 text-primary'
+  return 'bg-white/10 text-white/40'
+}
+
+const formatSchedule = (value) => {
+  return new Date(value).toLocaleString('vi-VN', {
+    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+  })
+}
+
+function toLocalInputValue(date) {
+  const offset = date.getTimezoneOffset() * 60000
+  return new Date(date.getTime() - offset).toISOString().slice(0, 16)
 }
 
 const validate = () => {
@@ -311,6 +460,14 @@ const validate = () => {
     errors.linkUrl = 'Đường dẫn không được vượt quá 500 ký tự.'
   }
 
+  if (isScheduled.value) {
+    if (!form.scheduledAt) {
+      errors.scheduledAt = 'Vui lòng chọn thời điểm gửi.'
+    } else if (new Date(form.scheduledAt).getTime() <= Date.now()) {
+      errors.scheduledAt = 'Thời điểm hẹn giờ phải nằm trong tương lai.'
+    }
+  }
+
   return Object.values(errors).every(value => !value)
 }
 
@@ -324,16 +481,24 @@ const handleSubmit = async () => {
       targetRole: target.value === 'role' ? form.targetRole : null,
       title: form.title.trim(),
       message: form.message.trim(),
-      linkUrl: form.linkUrl || null
+      linkUrl: form.linkUrl || null,
+      scheduledAt: isScheduled.value ? new Date(form.scheduledAt).toISOString() : null
     })
 
-    addToast('Đã gửi thông báo thành công.', 'success')
+    addToast(isScheduled.value ? 'Đã hẹn giờ gửi thông báo.' : 'Đã gửi thông báo thành công.', 'success')
 
     form.title = ''
     form.message = ''
     form.linkUrl = ''
+    form.scheduledAt = ''
 
-    await reloadHistory()
+    if (isScheduled.value) {
+      activeTab.value = 'scheduled'
+      await reloadScheduled()
+    } else {
+      await reloadSent()
+      statsPanelRef.value?.loadStats()
+    }
   } catch (err) {
     addToast(err.response?.data?.message || 'Không thể gửi thông báo. Vui lòng thử lại.', 'error')
   } finally {
@@ -341,39 +506,81 @@ const handleSubmit = async () => {
   }
 }
 
-const loadMoreHistory = async () => {
-  if (isLoadingHistory.value || !hasMoreHistory.value) return
+const handleCancel = (item) => {
+  openConfirm('Huỷ thông báo hẹn giờ', `Bạn chắc chắn muốn huỷ thông báo "${item.title}"?`, async () => {
+    try {
+      await notificationService.cancelScheduled(item.id)
+      addToast('Đã huỷ thông báo hẹn giờ.', 'success')
+      await reloadScheduled()
+    } catch (err) {
+      addToast(err.response?.data?.message || 'Không thể huỷ thông báo hẹn giờ.', 'error')
+    }
+  })
+}
 
-  isLoadingHistory.value = true
+const loadMoreSent = async () => {
+  if (isLoadingSent.value || !hasMoreSent.value) return
+
+  isLoadingSent.value = true
   try {
-    const nextPage = historyPage.value + 1
+    const nextPage = sentPage.value + 1
     const result = await notificationService.getSentByAdmin({ pageNumber: nextPage, pageSize: PAGE_SIZE })
 
     sentItems.value.push(...(result?.data ?? []))
-    totalSent.value = result?.totalCount ?? 0
-    historyPage.value = nextPage
-    hasMoreHistory.value = result ? nextPage < result.totalPages : false
+    sentPage.value = nextPage
+    hasMoreSent.value = result ? nextPage < result.totalPages : false
   } catch (err) {
-    hasMoreHistory.value = false
+    hasMoreSent.value = false
     console.error('[Notification] Không thể tải lịch sử thông báo đã gửi:', err)
   } finally {
-    isLoadingHistory.value = false
+    isLoadingSent.value = false
   }
 }
 
-const reloadHistory = async () => {
+const loadMoreScheduled = async () => {
+  if (isLoadingScheduled.value || !hasMoreScheduled.value) return
+
+  isLoadingScheduled.value = true
+  try {
+    const nextPage = scheduledPage.value + 1
+    const result = await notificationService.getScheduled({ pageNumber: nextPage, pageSize: PAGE_SIZE })
+
+    scheduledItems.value.push(...(result?.data ?? []))
+    scheduledPage.value = nextPage
+    hasMoreScheduled.value = result ? nextPage < result.totalPages : false
+  } catch (err) {
+    hasMoreScheduled.value = false
+    console.error('[Notification] Không thể tải danh sách thông báo hẹn giờ:', err)
+  } finally {
+    isLoadingScheduled.value = false
+  }
+}
+
+const reloadSent = async () => {
   sentItems.value = []
-  historyPage.value = 0
-  hasMoreHistory.value = true
-  await loadMoreHistory()
+  sentPage.value = 0
+  hasMoreSent.value = true
+  await loadMoreSent()
 }
 
-const handleHistoryScroll = () => {
-  const el = historyRef.value
-  if (!el) return
-
-  if (el.scrollTop + el.clientHeight >= el.scrollHeight - 80) loadMoreHistory()
+const reloadScheduled = async () => {
+  scheduledItems.value = []
+  scheduledPage.value = 0
+  hasMoreScheduled.value = true
+  await loadMoreScheduled()
 }
 
-onMounted(loadMoreHistory)
+const handleSentScroll = () => {
+  const el = sentRef.value
+  if (el && el.scrollTop + el.clientHeight >= el.scrollHeight - 80) loadMoreSent()
+}
+
+const handleScheduledScroll = () => {
+  const el = scheduledRef.value
+  if (el && el.scrollTop + el.clientHeight >= el.scrollHeight - 80) loadMoreScheduled()
+}
+
+onMounted(async () => {
+  await Promise.all([loadMoreSent(), loadMoreScheduled()])
+})
 </script>

@@ -6,5 +6,9 @@ namespace Notification.Infrastructure.Interfaces.IRepositories
 {
     public interface IUserNotificationReadRepository : IBaseRepository<UserNotificationRead, NotificationDbContext>
     {
+        Task<int> GetDistinctReaderCountAsync(
+            DateTime fromUtc,
+            DateTime toUtc,
+            CancellationToken cancellation = default);
     }
 }

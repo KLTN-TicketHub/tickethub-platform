@@ -14,6 +14,7 @@ namespace Notification.Infrastructure.Data.Contexts
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<Entities.UserNotification> Notifications { get; set; }
         public DbSet<Entities.UserNotificationRead> NotificationReads { get; set; }
+        public DbSet<Entities.ScheduledNotification> ScheduledNotifications { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

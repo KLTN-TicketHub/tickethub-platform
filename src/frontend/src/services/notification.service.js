@@ -6,7 +6,10 @@ import {
   NOTIFICATION_MARK_ALL_READ,
   NOTIFICATION_DELETE,
   ADMIN_NOTIFICATION_SEND,
-  ADMIN_NOTIFICATION_SENT_LIST
+  ADMIN_NOTIFICATION_SENT_LIST,
+  ADMIN_NOTIFICATION_STATS,
+  ADMIN_NOTIFICATION_SCHEDULED,
+  ADMIN_NOTIFICATION_SCHEDULED_CANCEL
 } from './api/endpoints'
 
 export const notificationService = {
@@ -65,5 +68,35 @@ export const notificationService = {
 
     const response = await api.get(`${ADMIN_NOTIFICATION_SENT_LIST}?${query.toString()}`)
     return response.data?.data ?? null
+  },
+
+  /**
+   * Thống kê thông báo trong khoảng thời gian
+   * @param {Object} params
+   * @param {string} [params.from] - ISO string
+   * @param {string} [params.to] - ISO string
+   */
+  async getStats({ from, to } = {}) {
+    const query = new URLSearchParams()
+    if (from) query.append('from', from)
+    if (to) query.append('to', to)
+
+    const suffix = query.toString() ? `?${query.toString()}` : ''
+    const response = await api.get(`${ADMIN_NOTIFICATION_STATS}${suffix}`)
+    return response.data?.data ?? null
+  },
+
+  async getScheduled({ pageNumber = 1, pageSize = 10 } = {}) {
+    const query = new URLSearchParams()
+    query.append('pageNumber', pageNumber)
+    query.append('pageSize', pageSize)
+
+    const response = await api.get(`${ADMIN_NOTIFICATION_SCHEDULED}?${query.toString()}`)
+    return response.data?.data ?? null
+  },
+
+  async cancelScheduled(id) {
+    const response = await api.delete(ADMIN_NOTIFICATION_SCHEDULED_CANCEL(id))
+    return response.data
   }
 }

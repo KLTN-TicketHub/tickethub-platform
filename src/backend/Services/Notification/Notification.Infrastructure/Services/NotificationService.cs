@@ -5,6 +5,7 @@ using Notification.Common.Dtos.Notifications;
 using Notification.Infrastructure.Entities;
 using Notification.Infrastructure.Enums;
 using Notification.Infrastructure.Interfaces;
+using Notification.Infrastructure.Interfaces.IRepositories;
 using Notification.Infrastructure.Interfaces.IServices;
 using System.Linq.Expressions;
 
@@ -184,6 +185,178 @@ namespace Notification.Infrastructure.Services
             return new PaginatedResult<SentNotificationDto>(items, totalCount, pageNumber, pageSize);
         }
 
+        public async Task<NotificationStatsDto> GetStatsAsync(
+            DateTime fromUtc,
+            DateTime toUtc,
+            CancellationToken cancellationToken = default)
+        {
+            NotificationOverviewStats overview = await _unitOfWork.UserNotificationRepository.GetOverviewStatsAsync(
+                fromUtc, toUtc, cancellationToken);
+
+            IEnumerable<NotificationTypeStats> byType = await _unitOfWork.UserNotificationRepository.GetTypeStatsAsync(
+                fromUtc, toUtc, cancellationToken);
+
+            IEnumerable<NotificationDailyStats> daily = await _unitOfWork.UserNotificationRepository.GetDailyStatsAsync(
+                fromUtc, toUtc, cancellationToken);
+
+            int distinctReaders = await _unitOfWork.UserNotificationReadRepository.GetDistinctReaderCountAsync(
+                fromUtc, toUtc, cancellationToken);
+
+            return new NotificationStatsDto
+            {
+                FromUtc = fromUtc,
+                ToUtc = toUtc,
+                TotalSent = overview.TotalSent,
+                DirectSent = overview.DirectSent,
+                DirectRead = overview.DirectRead,
+                DirectReadRate = overview.DirectSent == 0
+                    ? 0
+                    : Math.Round((double)overview.DirectRead * 100 / overview.DirectSent, 1),
+                BroadcastSent = overview.BroadcastSent,
+                BroadcastReadTotal = overview.BroadcastReadTotal,
+                DistinctReaders = distinctReaders,
+                ByType = byType.Select(t => new NotificationTypeStatsDto
+                {
+                    Type = t.Type,
+                    Sent = t.Sent,
+                    ReadCount = t.ReadCount
+                }).ToList(),
+                Daily = daily.Select(d => new NotificationDailyStatsDto
+                {
+                    Date = d.Date,
+                    Sent = d.Sent,
+                    ReadCount = d.ReadCount
+                }).ToList()
+            };
+        }
+
+        public async Task<NotificationDetailStatsDto> GetDetailStatsAsync(
+            Guid notificationId,
+            CancellationToken cancellationToken = default)
+        {
+            NotificationDetailStats stats = await _unitOfWork.UserNotificationRepository.GetDetailStatsAsync(
+                notificationId, cancellationToken)
+                ?? throw new NotFoundException($"Không tìm thấy thông báo với ID {notificationId}.");
+
+            return new NotificationDetailStatsDto
+            {
+                Id = stats.Id,
+                Title = stats.Title,
+                Type = stats.Type,
+                RecipientUserId = stats.RecipientUserId,
+                TargetRole = stats.TargetRole,
+                IsBroadcast = stats.IsBroadcast,
+                ReadCount = stats.ReadCount,
+                CreatedAt = stats.CreatedAt,
+                FirstReadAt = stats.FirstReadAt,
+                LastReadAt = stats.LastReadAt
+            };
+        }
+
+        public async Task<ScheduledNotificationDto> ScheduleAsync(
+            NotificationRequestedEvent request,
+            DateTime scheduledAtUtc,
+            CancellationToken cancellationToken = default)
+        {
+            if (scheduledAtUtc <= DateTime.UtcNow)
+            {
+                throw new BusinessRuleException("Thời điểm hẹn giờ phải nằm trong tương lai.");
+            }
+
+            ScheduledNotification scheduled = new ScheduledNotification(
+                request.RecipientUserId,
+                NormalizeTargetRole(request.RecipientUserId, request.TargetRole),
+                ParseType(request.Type),
+                request.Title,
+                request.Message,
+                request.LinkUrl,
+                scheduledAtUtc);
+
+            _unitOfWork.ScheduledNotificationRepository.AddEntity(scheduled);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return ToScheduledDto(scheduled);
+        }
+
+        public async Task<PaginatedResult<ScheduledNotificationDto>> GetScheduledAsync(
+            int pageNumber,
+            int pageSize,
+            CancellationToken cancellationToken = default)
+        {
+            (IEnumerable<ScheduledNotificationDto> items, int totalCount) = await _unitOfWork.ScheduledNotificationRepository.GetPagedAsync(
+                selector: s => new ScheduledNotificationDto
+                {
+                    Id = s.Id,
+                    RecipientUserId = s.RecipientUserId,
+                    TargetRole = s.TargetRole,
+                    Type = s.Type.ToString(),
+                    Title = s.Title,
+                    Message = s.Message,
+                    LinkUrl = s.LinkUrl,
+                    ScheduledAt = s.ScheduledAt,
+                    Status = s.Status.ToString(),
+                    SentAt = s.SentAt,
+                    CreatedAt = s.CreatedAt
+                },
+                orderBy: q => q.OrderBy(s => s.Status).ThenBy(s => s.ScheduledAt),
+                pageNumber: pageNumber,
+                pageSize: pageSize,
+                cancellationToken: cancellationToken);
+
+            return new PaginatedResult<ScheduledNotificationDto>(items, totalCount, pageNumber, pageSize);
+        }
+
+        public async Task CancelScheduledAsync(
+            Guid scheduledNotificationId,
+            CancellationToken cancellationToken = default)
+        {
+            ScheduledNotification scheduled = await _unitOfWork.ScheduledNotificationRepository.GetByIdAsync(
+                scheduledNotificationId, cancellationToken)
+                ?? throw new NotFoundException($"Không tìm thấy thông báo hẹn giờ với ID {scheduledNotificationId}.");
+
+            if (scheduled.Status != ScheduledNotificationStatus.Pending)
+            {
+                throw new BusinessRuleException("Chỉ có thể huỷ thông báo đang ở trạng thái chờ gửi.");
+            }
+
+            scheduled.Cancel();
+            _unitOfWork.ScheduledNotificationRepository.UpdateEntity(scheduled);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<int> DispatchDueScheduledAsync(CancellationToken cancellationToken = default)
+        {
+            DateTime now = DateTime.UtcNow;
+
+            IEnumerable<ScheduledNotification> dueItems = await _unitOfWork.ScheduledNotificationRepository.GetAllAsync<ScheduledNotification>(
+                filter: s => s.Status == ScheduledNotificationStatus.Pending && s.ScheduledAt <= now,
+                orderBy: q => q.OrderBy(s => s.ScheduledAt),
+                cancellation: cancellationToken);
+
+            int dispatched = 0;
+
+            foreach (ScheduledNotification scheduled in dueItems)
+            {
+                NotificationDto created = await CreateAsync(new NotificationRequestedEvent
+                {
+                    RecipientUserId = scheduled.RecipientUserId,
+                    TargetRole = scheduled.TargetRole,
+                    Type = scheduled.Type.ToString(),
+                    Title = scheduled.Title,
+                    Message = scheduled.Message,
+                    LinkUrl = scheduled.LinkUrl
+                }, cancellationToken);
+
+                scheduled.MarkAsSent(created.Id);
+                _unitOfWork.ScheduledNotificationRepository.UpdateEntity(scheduled);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                dispatched++;
+            }
+
+            return dispatched;
+        }
+
         private async Task<UserNotification> GetVisibleNotificationAsync(
             Guid notificationId,
             Guid userId,
@@ -247,6 +420,24 @@ namespace Notification.Infrastructure.Services
                     ? n.IsRead
                     : n.Reads.Any(r => r.UserId == userId),
                 CreatedAt = n.CreatedAt
+            };
+        }
+
+        private static ScheduledNotificationDto ToScheduledDto(ScheduledNotification scheduled)
+        {
+            return new ScheduledNotificationDto
+            {
+                Id = scheduled.Id,
+                RecipientUserId = scheduled.RecipientUserId,
+                TargetRole = scheduled.TargetRole,
+                Type = scheduled.Type.ToString(),
+                Title = scheduled.Title,
+                Message = scheduled.Message,
+                LinkUrl = scheduled.LinkUrl,
+                ScheduledAt = scheduled.ScheduledAt,
+                Status = scheduled.Status.ToString(),
+                SentAt = scheduled.SentAt,
+                CreatedAt = scheduled.CreatedAt
             };
         }
 

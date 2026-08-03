@@ -11,5 +11,7 @@ namespace Notification.Common.Dtos.Notifications
         public string Message { get; set; } = string.Empty;
 
         public string? LinkUrl { get; set; }
+
+        public DateTime? ScheduledAt { get; set; }
     }
 }

@@ -39,6 +39,11 @@ namespace Notification.API.Validators
                 .Empty()
                 .When(x => x.RecipientUserId.HasValue)
                 .WithMessage("Không thể vừa chọn người nhận cụ thể vừa chọn vai trò nhận thông báo.");
+
+            RuleFor(x => x.ScheduledAt)
+                .Must(scheduledAt => scheduledAt!.Value.ToUniversalTime() > DateTime.UtcNow)
+                .When(x => x.ScheduledAt.HasValue)
+                .WithMessage("Thời điểm hẹn giờ phải nằm trong tương lai.");
         }
     }
 }

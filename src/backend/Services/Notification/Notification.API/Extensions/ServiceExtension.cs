@@ -37,6 +37,7 @@ namespace Notification.API.Extensions
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
             services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
             services.AddScoped<IUserNotificationReadRepository, UserNotificationReadRepository>();
+            services.AddScoped<IScheduledNotificationRepository, ScheduledNotificationRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }

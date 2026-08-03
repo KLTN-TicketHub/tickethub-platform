@@ -116,6 +116,9 @@ export const NOTIFICATION_MARK_ALL_READ = '/notification/notifications/read-all'
 export const NOTIFICATION_DELETE = (id) => `/notification/notifications/${id}`
 export const ADMIN_NOTIFICATION_SEND = '/notification/admin/notifications'
 export const ADMIN_NOTIFICATION_SENT_LIST = '/notification/admin/notifications'
+export const ADMIN_NOTIFICATION_STATS = '/notification/admin/notifications/stats'
+export const ADMIN_NOTIFICATION_SCHEDULED = '/notification/admin/notifications/scheduled'
+export const ADMIN_NOTIFICATION_SCHEDULED_CANCEL = (id) => `/notification/admin/notifications/scheduled/${id}`
 
 // Finance - Moderator Payouts
 export const MODERATOR_PAYOUT_REQUESTS = '/finance/moderator/payouts/requests'

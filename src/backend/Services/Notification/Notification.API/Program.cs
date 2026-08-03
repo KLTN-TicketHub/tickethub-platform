@@ -5,6 +5,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Notification.API.Extensions;
 using Notification.API.Hubs;
+using Notification.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,7 @@ builder.Services.AddCustomApiVersioning();
 
 builder.Services.AddCustomRedis(builder.Configuration);
 builder.Services.AddCustomHealthChecks(builder.Configuration);
+builder.Services.AddHostedService<ScheduledNotificationDispatcher>();
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);

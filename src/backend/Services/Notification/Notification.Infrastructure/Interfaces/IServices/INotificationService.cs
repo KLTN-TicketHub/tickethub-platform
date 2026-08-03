@@ -43,5 +43,31 @@ namespace Notification.Infrastructure.Interfaces.IServices
             int pageNumber,
             int pageSize,
             CancellationToken cancellationToken = default);
+
+        Task<NotificationStatsDto> GetStatsAsync(
+            DateTime fromUtc,
+            DateTime toUtc,
+            CancellationToken cancellationToken = default);
+
+        Task<NotificationDetailStatsDto> GetDetailStatsAsync(
+            Guid notificationId,
+            CancellationToken cancellationToken = default);
+
+        Task<ScheduledNotificationDto> ScheduleAsync(
+            NotificationRequestedEvent request,
+            DateTime scheduledAtUtc,
+            CancellationToken cancellationToken = default);
+
+        Task<PaginatedResult<ScheduledNotificationDto>> GetScheduledAsync(
+            int pageNumber,
+            int pageSize,
+            CancellationToken cancellationToken = default);
+
+        Task CancelScheduledAsync(
+            Guid scheduledNotificationId,
+            CancellationToken cancellationToken = default);
+
+        Task<int> DispatchDueScheduledAsync(
+            CancellationToken cancellationToken = default);
     }
 }
