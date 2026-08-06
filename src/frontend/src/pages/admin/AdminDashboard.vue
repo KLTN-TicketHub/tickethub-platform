@@ -28,6 +28,34 @@
       </router-link>
     </div>
 
+    <!-- Finance Summary Widget -->
+    <div class="bg-surface/50 border border-white/5 rounded-4xl p-8 flex flex-col gap-6">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xl font-bold font-heading text-white">Tổng quan tài chính <span class="text-white/40 font-medium text-sm">(30 ngày qua)</span></h3>
+        <router-link to="/admin/finance" class="text-[13px] font-bold text-primary hover:text-white transition-colors flex items-center gap-1 group">
+          Xem báo cáo chi tiết <PhArrowRight weight="bold" class="group-hover:translate-x-1 transition-transform" />
+        </router-link>
+      </div>
+
+      <div v-if="isLoadingFinance" class="py-6 flex justify-center">
+        <PhSpinner class="animate-spin text-primary text-2xl" weight="bold" />
+      </div>
+      <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div class="flex flex-col gap-1">
+          <span class="text-[12px] font-bold text-white/40 uppercase tracking-wider">Doanh thu gộp</span>
+          <span class="text-2xl font-black text-white font-heading">{{ formatPrice(financeSummary.grossRevenue) }}</span>
+        </div>
+        <div class="flex flex-col gap-1">
+          <span class="text-[12px] font-bold text-white/40 uppercase tracking-wider">Phí sàn</span>
+          <span class="text-2xl font-black text-white font-heading">{{ formatPrice(financeSummary.platformFee) }}</span>
+        </div>
+        <div class="flex flex-col gap-1">
+          <span class="text-[12px] font-bold text-white/40 uppercase tracking-wider">Đã trả Organizer</span>
+          <span class="text-2xl font-black text-white font-heading">{{ formatPrice(financeSummary.netPaidToOrganizers) }}</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Main Content Area -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
       
@@ -114,17 +142,43 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { getEvents } from '../../stores/eventStore'
 import { usersData, ordersData } from '../../stores/adminStore'
+import { getFinanceSummary } from '../../services/admin-finance.service'
 import BaseBadge from '../../components/ui/BaseBadge.vue'
 import BaseTable from '../../components/ui/BaseTable.vue'
-import { 
-  PhTicket, PhUsers, PhReceipt, PhCoins, PhArrowRight,
-  PhMicrophoneStage, PhTrophy, PhMaskHappy, PhCompass, PhBooks 
+import {
+  PhTicket, PhUsers, PhReceipt, PhCoins, PhArrowRight, PhSpinner,
+  PhMicrophoneStage, PhTrophy, PhMaskHappy, PhCompass, PhBooks
 } from '@phosphor-icons/vue'
 
 const allEvents = computed(() => getEvents())
+
+const isLoadingFinance = ref(true)
+const financeSummary = ref({ grossRevenue: 0, platformFee: 0, netPaidToOrganizers: 0 })
+
+const loadFinanceSummary = async () => {
+  isLoadingFinance.value = true
+  try {
+    const today = new Date()
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(today.getDate() - 30)
+    const res = await getFinanceSummary({
+      dateFrom: thirtyDaysAgo.toISOString().slice(0, 10),
+      dateTo: today.toISOString().slice(0, 10)
+    })
+    if (res && res.success) financeSummary.value = res.data
+  } catch (err) {
+    console.error('Error fetching finance summary:', err)
+  } finally {
+    isLoadingFinance.value = false
+  }
+}
+
+onMounted(() => {
+  loadFinanceSummary()
+})
 
 const eventColumns = [
   { key: 'event', label: 'Sự kiện' },

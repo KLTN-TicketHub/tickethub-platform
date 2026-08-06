@@ -133,5 +133,11 @@ export const ORGANIZER_PAYOUT_PROPOSED = '/finance/organizer/payouts/proposed'
 export const ORGANIZER_PAYOUT_ACCEPT = (payoutId) => `/finance/organizer/payouts/${payoutId}/accept`
 export const ORGANIZER_PAYOUT_REJECT = (payoutId) => `/finance/organizer/payouts/${payoutId}/reject`
 
+// Admin - Finance & Payment Reports
+export const ADMIN_FINANCE_SUMMARY = '/finance/admin/finance/reports/summary'
+export const ADMIN_FINANCE_TREND = '/finance/admin/finance/reports/trend'
+export const ADMIN_FINANCE_BY_CATEGORY = '/finance/admin/finance/reports/by-category'
+export const ADMIN_PAYMENT_GATEWAY_STATS = '/payment/admin/payment/reports/gateway-stats'
+
 
 

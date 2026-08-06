@@ -109,6 +109,7 @@ const adminMenuItems = [
   { label: 'Người dùng', path: '/admin/users', icon: PhUsers },
   { label: 'Kiểm duyệt', path: '/admin/moderators', icon: PhShieldCheck },
   { label: 'Đơn hàng', path: '/admin/orders', icon: PhReceipt },
+  { label: 'Tài chính', path: '/admin/finance', icon: PhChartLineUp },
   { label: 'Thông báo', path: '/admin/notifications/send', icon: PhMegaphone },
 ]
 

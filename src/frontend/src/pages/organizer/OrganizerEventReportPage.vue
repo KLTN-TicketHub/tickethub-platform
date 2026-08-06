@@ -132,111 +132,8 @@
           Không có dữ liệu thống kê cho khoảng thời gian này.
         </div>
 
-        <div v-else class="relative w-full h-80 select-none">
-          <!-- Custom SVG Chart -->
-          <svg class="w-full h-full" viewBox="0 0 1000 300" preserveAspectRatio="none">
-            <defs>
-              <!-- Area Gradient -->
-              <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="var(--color-primary, #00c853)" stop-opacity="0.25" />
-                <stop offset="100%" stop-color="var(--color-primary, #00c853)" stop-opacity="0.0" />
-              </linearGradient>
-              <!-- Line Gradient -->
-              <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="var(--color-primary, #00c853)" />
-                <stop offset="100%" stop-color="#00E676" />
-              </linearGradient>
-            </defs>
-
-            <!-- Y-Axis Grid Lines -->
-            <line x1="50" y1="50" x2="950" y2="50" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
-            <line x1="50" y1="125" x2="950" y2="125" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
-            <line x1="50" y1="200" x2="950" y2="200" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
-            <line x1="50" y1="250" x2="950" y2="250" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
-
-            <!-- Y-Axis Labels -->
-            <text x="40" y="55" fill="rgba(255,255,255,0.2)" font-size="9" text-anchor="end" font-weight="bold">{{ formatCurrencyCompact(maxChartValue) }}</text>
-            <text x="40" y="130" fill="rgba(255,255,255,0.2)" font-size="9" text-anchor="end" font-weight="bold">{{ formatCurrencyCompact(maxChartValue * 0.625) }}</text>
-            <text x="40" y="205" fill="rgba(255,255,255,0.2)" font-size="9" text-anchor="end" font-weight="bold">{{ formatCurrencyCompact(maxChartValue * 0.25) }}</text>
-            <text x="40" y="255" fill="rgba(255,255,255,0.2)" font-size="9" text-anchor="end" font-weight="bold">0</text>
-
-            <!-- Chart Line & Area -->
-            <!-- Area Path -->
-            <path :d="svgAreaPath" fill="url(#areaGradient)" />
-            <!-- Line Path -->
-            <path :d="svgLinePath" fill="none" stroke="url(#lineGradient)" stroke-width="3" stroke-linecap="round" />
-
-            <!-- Interactive Hover Lines -->
-            <line 
-              v-if="hoveredIndex !== null"
-              :x1="svgPoints[hoveredIndex]?.x" 
-              y1="50" 
-              :x2="svgPoints[hoveredIndex]?.x" 
-              y2="250" 
-              stroke="rgba(0,200,83,0.15)" 
-              stroke-width="1.5" 
-              stroke-dasharray="4,4" 
-            />
-
-            <!-- Data Dots -->
-            <g v-for="(p, idx) in svgPoints" :key="idx">
-              <!-- Background hover circle -->
-              <circle 
-                :cx="p.x" 
-                :cy="p.y" 
-                r="10" 
-                fill="rgba(0,200,83,0.15)" 
-                class="opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
-                @mouseenter="hoveredIndex = idx"
-                @mouseleave="hoveredIndex = null"
-              />
-              <!-- Standard circle -->
-              <circle 
-                :cx="p.x" 
-                :cy="p.y" 
-                r="4.5" 
-                :fill="hoveredIndex === idx ? '#00c853' : '#111916'" 
-                :stroke="hoveredIndex === idx ? '#ffffff' : '#00c853'" 
-                stroke-width="2.5" 
-                style="pointer-events: none; transition: all 0.2s;"
-              />
-            </g>
-          </svg>
-
-          <!-- Tooltip overlay -->
-          <div 
-            v-if="hoveredIndex !== null && chartData[hoveredIndex]"
-            class="absolute bg-[#182019] border border-primary/20 text-white rounded-xl p-3 shadow-[0_10px_30px_rgba(0,0,0,0.5)] pointer-events-none transition-all duration-100 z-35"
-            :style="{ 
-              left: tooltipPosition.x + '%', 
-              top: tooltipPosition.y + '%',
-              transform: 'translate(-50%, -115%)'
-            }"
-          >
-            <div class="text-[11px] font-black text-primary uppercase tracking-wider mb-1.5">{{ chartData[hoveredIndex].legend }}</div>
-            <div class="flex flex-col gap-1 text-xs">
-              <div class="flex items-center justify-between gap-6">
-                <span class="text-white/40">Doanh thu:</span>
-                <span class="font-bold text-white">{{ formatCurrency(chartData[hoveredIndex].totalAmount) }}</span>
-              </div>
-              <div class="flex items-center justify-between gap-6">
-                <span class="text-white/40">Vé đã bán:</span>
-                <span class="font-bold text-white">{{ chartData[hoveredIndex].ticketSold }} vé</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- X-Axis Labels (Timeline) -->
-          <div class="absolute bottom-0 left-0 right-0 h-8 flex justify-between pl-[50px] pr-[50px] pointer-events-none">
-            <span 
-              v-for="(label, idx) in visibleXAxisLabels" 
-              :key="idx" 
-              class="text-[9px] font-black text-white/30 uppercase tracking-wider transform -translate-x-1/2 mt-2"
-              :style="{ left: label.percentage + '%' }"
-            >
-              {{ label.text }}
-            </span>
-          </div>
+        <div v-else class="relative w-full h-80">
+          <Line :data="revenueChartJsData" :options="revenueChartOptions" />
         </div>
       </section>
 
@@ -489,11 +386,13 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { Line } from 'vue-chartjs'
 import { getEventReport, getEventOrders, getEventChartData } from '../../services/order.service'
 import { requestPayout } from '../../services/organizer-wallet.service'
 import { getEventClickTrend } from '../../services/insights.service'
 import { getEventSuggestions } from '../../services/ai-insights.service'
 import { addToast } from '../../stores/adminStore'
+import { createAreaGradient } from '../../lib/chartSetup'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import TrendMiniChart from '../../components/organizer/TrendMiniChart.vue'
 import AiSuggestionSection from '../../components/organizer/AiSuggestionSection.vue'
@@ -524,7 +423,6 @@ const expandedOrders = ref([])
 const chartRange = ref('30d')
 const isLoadingChart = ref(false)
 const chartData = ref([])
-const hoveredIndex = ref(null)
 
 const fetchChart = async () => {
   isLoadingChart.value = true
@@ -583,77 +481,87 @@ const formatClickTrendLabel = (point) => {
   return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`
 }
 
-const maxChartValue = computed(() => {
-  if (chartData.value.length === 0) return 1000000
-  const max = Math.max(...chartData.value.map(d => d.totalAmount))
-  return max > 0 ? max : 1000000
-})
+const revenueChartJsData = computed(() => ({
+  labels: chartData.value.map(d => d.legend),
+  datasets: [
+    {
+      data: chartData.value.map(d => d.totalAmount),
+      borderColor: '#00C853',
+      borderWidth: 3,
+      pointRadius: 0,
+      pointHoverRadius: 5,
+      pointHoverBackgroundColor: '#00C853',
+      pointHoverBorderColor: '#ffffff',
+      pointHoverBorderWidth: 2,
+      tension: 0.35,
+      fill: true,
+      backgroundColor: (context) => {
+        const { ctx, chartArea } = context.chart
+        if (!chartArea) return '#00C85320'
+        return createAreaGradient(ctx, chartArea, '#00C853')
+      }
+    }
+  ]
+}))
 
-const svgPoints = computed(() => {
-  if (chartData.value.length === 0) return []
-  const width = 900 // x range: 50 to 950
-  const height = 200 // y range: 50 to 250
-  const maxVal = maxChartValue.value
-  
-  return chartData.value.map((d, index) => {
-    const x = 50 + (index / (chartData.value.length - 1)) * width
-    const y = 250 - (d.totalAmount / maxVal) * height
-    return { x, y }
-  })
-})
-
-const svgLinePath = computed(() => {
-  const pts = svgPoints.value
-  if (pts.length === 0) return ''
-  return pts.map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(' ')
-})
-
-const svgAreaPath = computed(() => {
-  const pts = svgPoints.value
-  if (pts.length === 0) return ''
-  const linePath = svgLinePath.value
-  const firstX = pts[0].x
-  const lastX = pts[pts.length - 1].x
-  return `${linePath} L ${lastX} 250 L ${firstX} 250 Z`
-})
-
-const visibleXAxisLabels = computed(() => {
-  if (chartData.value.length === 0) return []
-  const total = chartData.value.length
-  const indices = []
-  
-  let step = 1
-  if (total > 20) step = 5
-  else if (total > 10) step = 3
-  
-  for (let i = 0; i < total; i++) {
-    if (i === 0 || i === total - 1 || i % step === 0) {
-      indices.push(i)
+const revenueChartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  interaction: { mode: 'index', intersect: false },
+  scales: {
+    x: {
+      grid: { display: false },
+      border: { display: false },
+      ticks: {
+        color: 'rgba(255,255,255,0.3)',
+        font: { size: 9, weight: 'bold' },
+        maxRotation: 0,
+        autoSkip: true,
+        maxTicksLimit: 10,
+        callback: function (value) {
+          const label = this.getLabelForValue(value)
+          return chartRange.value === '24h' ? label.split(' ')[0] : label
+        }
+      }
+    },
+    y: {
+      grid: { color: 'rgba(255,255,255,0.03)' },
+      border: { display: false },
+      beginAtZero: true,
+      ticks: {
+        color: 'rgba(255,255,255,0.2)',
+        font: { size: 9, weight: 'bold' },
+        maxTicksLimit: 5,
+        callback: (value) => formatCurrencyCompact(value)
+      }
+    }
+  },
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: '#182019',
+      borderColor: 'rgba(0,200,83,0.2)',
+      borderWidth: 1,
+      titleColor: '#00C853',
+      titleFont: { size: 11, weight: 'bold' },
+      bodyColor: '#ffffff',
+      bodyFont: { size: 12, weight: 'bold' },
+      padding: 12,
+      cornerRadius: 12,
+      displayColors: false,
+      callbacks: {
+        title: (items) => chartData.value[items[0].dataIndex]?.legend || '',
+        label: (item) => {
+          const point = chartData.value[item.dataIndex]
+          return [
+            `Doanh thu: ${formatCurrency(point.totalAmount)}`,
+            `Vé đã bán: ${point.ticketSold} vé`
+          ]
+        }
+      }
     }
   }
-  
-  return indices.map(i => {
-    const percentage = (i / (total - 1)) * 90 + 5
-    let text = chartData.value[i].legend
-    if (chartRange.value === '24h') {
-      text = text.split(' ')[0] // Keep "HH:00"
-    }
-    return { percentage, text }
-  })
-})
-
-const tooltipPosition = computed(() => {
-  if (hoveredIndex.value === null) return { x: 0, y: 0 }
-  const index = hoveredIndex.value
-  const total = chartData.value.length
-  const pctX = (index / (total - 1)) * 90 + 5
-  
-  const maxVal = maxChartValue.value
-  const val = chartData.value[index].totalAmount
-  const pctY = 100 - (val / maxVal) * 66.6 - 16.6
-  
-  return { x: pctX, y: pctY }
-})
+}))
 
 const fetchOrders = async () => {
   isLoadingOrders.value = true

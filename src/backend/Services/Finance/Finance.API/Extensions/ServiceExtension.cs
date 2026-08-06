@@ -25,6 +25,7 @@ namespace Finance.API.Extensions
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<Finance.Infrastructure.Interfaces.IServices.IPayoutService, Finance.Infrastructure.Services.PayoutService>();
             services.AddScoped<Finance.Infrastructure.Interfaces.IServices.IWalletService, Finance.Infrastructure.Services.WalletService>();
+            services.AddScoped<Finance.Infrastructure.Interfaces.IServices.IAdminFinanceReportService, Finance.Infrastructure.Services.AdminFinanceReportService>();
 
             return services;
         }
