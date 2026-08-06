@@ -94,7 +94,6 @@ namespace Catalog.API.Controllers.V1.Moderator
         {
             await _sender.Send(new DeleteSeatMapCommand(venueId, id), cancellation);
 
-            // Remove specific seatmap details cache
             await _cacheService.RemoveAsync($"catalog:seatmap:id:{id}", cancellation);
 
             return Ok(new ApiResponse<bool>

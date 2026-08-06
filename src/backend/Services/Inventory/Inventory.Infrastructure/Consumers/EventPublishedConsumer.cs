@@ -21,7 +21,7 @@ namespace Inventory.Infrastructure.Consumers
 
         public async Task Consume(ConsumeContext<EventPublishedEvent> context)
         {
-            var message = context.Message;
+            EventPublishedEvent message = context.Message;
 
             _logger.LogInformation(
                 "Received EventPublishedEvent: EventId={EventId}, CorrelationId={CorrelationId}",
@@ -38,7 +38,7 @@ namespace Inventory.Infrastructure.Consumers
                         continue;
                     }
 
-                    var existingInventory = await _unitOfWork.ShowtimeTicketInventoryRepository.GetOneAsync<ShowtimeTicketInventory>(
+                    ShowtimeTicketInventory? existingInventory = await _unitOfWork.ShowtimeTicketInventoryRepository.GetOneAsync<ShowtimeTicketInventory>(
                         filter: x => x.ShowTimeId == showtime.ShowTimeId && x.TicketTypeId == ticketType.TicketTypeId,
                         cancellation: context.CancellationToken
                     );
