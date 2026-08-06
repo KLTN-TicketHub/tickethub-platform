@@ -104,6 +104,7 @@
             <!-- Konva Stage -->
             <div ref="konvaContainer" class="w-full h-[600px] cursor-grab active:cursor-grabbing">
               <v-stage :config="stageConfig" @wheel="handleWheel" @dragend="handleDragEnd">
+                <!-- Static layer: background + zone shapes/labels. Redraws only on pan/zoom, not on seat hover -->
                 <v-layer>
                   <!-- Background -->
                   <v-rect :config="{ x: 0, y: 0, width: realDimensions.width, height: realDimensions.height, fill: '#0b0f19' }" />
@@ -116,17 +117,6 @@
                         :config="buildPathConfig(el)" />
                       <v-text v-if="el.type === 'text' && el.text"
                         :config="buildTextConfig(el)" />
-                    </template>
-
-                    <!-- Reserved seats (circles) -->
-                    <template v-for="row in zone.rows" :key="`${zone.id}-row-${row.id}`">
-                      <v-circle
-                        v-for="seat in row.seats"
-                        :key="seat.id"
-                        :config="buildSeatConfig(seat, zone)"
-                        @mouseenter="onSeatEnter(seat, zone, row)"
-                        @mouseleave="onSeatLeave"
-                      />
                     </template>
 
                     <!-- GA zone label overlay -->
@@ -143,6 +133,21 @@
                         text: `GA · ${zone.capacity} người`,
                         fontSize: 11, fill: zone.color, fontStyle: 'bold', listening: false
                       }" />
+                    </template>
+                  </template>
+                </v-layer>
+
+                <!-- Seat layer: isolated so hovering a seat only redraws this layer, not zone shapes -->
+                <v-layer ref="seatLayerRef">
+                  <template v-for="zone in seatMap.zones" :key="`${zone.id}-seats`">
+                    <template v-for="row in zone.rows" :key="`${zone.id}-row-${row.id}`">
+                      <v-circle
+                        v-for="seat in row.seats"
+                        :key="seat.id"
+                        :config="buildSeatConfig(seat, zone)"
+                        @mouseenter="onSeatEnter(seat, zone, row)"
+                        @mouseleave="onSeatLeave"
+                      />
                     </template>
                   </template>
                 </v-layer>
@@ -290,6 +295,7 @@ const error = ref('')
 const deleteError = ref('')
 const hoveredSeat = ref(null)
 const konvaContainer = ref(null)
+const seatLayerRef = ref(null)
 const isConfirmingDelete = ref(false)
 const isDeleting = ref(false)
 
@@ -480,6 +486,19 @@ function formatPrice(val) {
 
 let resizeObserver = null
 let hasInitializedCenter = false
+let resizeDebounceTimer = null
+
+function cacheSeatLayer() {
+  if (!seatLayerRef.value || !realDimensions.value.width || !realDimensions.value.height) return
+  const layer = seatLayerRef.value.getNode()
+  layer.cache({
+    x: 0,
+    y: 0,
+    width: realDimensions.value.width,
+    height: realDimensions.value.height
+  })
+  layer.batchDraw()
+}
 
 // ── Fetch ──
 onMounted(async () => {
@@ -496,29 +515,37 @@ onMounted(async () => {
   } finally {
     isLoading.value = false
     await nextTick()
-    
+
+    // Cache seat layer as a bitmap: with 10k+ seats, redrawing every circle as a vector
+    // on each pan/zoom frame is the main source of lag. Caching trades sharpness at
+    // deep zoom (>3-4x) for a single cheap image draw per frame instead.
+    cacheSeatLayer()
+
     if (konvaContainer.value && !resizeObserver) {
       resizeObserver = new ResizeObserver((entries) => {
-        const entry = entries[0]
-        const containerW = entry.contentRect.width
-        const containerH = entry.contentRect.height || 600
-        
-        if (containerW > 0) {
-          stageConfig.width = containerW
-          stageConfig.height = containerH
-          
-          if (!hasInitializedCenter && seatMap.value) {
-            const svgW = realDimensions.value.width || 999
-            const svgH = realDimensions.value.height || 666
-            const scale = Math.min(containerW / svgW, containerH / svgH) * 0.95
-            
-            stageConfig.scaleX = scale
-            stageConfig.scaleY = scale
-            stageConfig.x = (containerW - svgW * scale) / 2
-            stageConfig.y = (containerH - svgH * scale) / 2
-            hasInitializedCenter = true
+        clearTimeout(resizeDebounceTimer)
+        resizeDebounceTimer = setTimeout(() => {
+          const entry = entries[0]
+          const containerW = entry.contentRect.width
+          const containerH = entry.contentRect.height || 600
+
+          if (containerW > 0) {
+            stageConfig.width = containerW
+            stageConfig.height = containerH
+
+            if (!hasInitializedCenter && seatMap.value) {
+              const svgW = realDimensions.value.width || 999
+              const svgH = realDimensions.value.height || 666
+              const scale = Math.min(containerW / svgW, containerH / svgH) * 0.95
+
+              stageConfig.scaleX = scale
+              stageConfig.scaleY = scale
+              stageConfig.x = (containerW - svgW * scale) / 2
+              stageConfig.y = (containerH - svgH * scale) / 2
+              hasInitializedCenter = true
+            }
           }
-        }
+        }, 100)
       })
       resizeObserver.observe(konvaContainer.value)
     }
@@ -527,5 +554,6 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (resizeObserver) resizeObserver.disconnect()
+  clearTimeout(resizeDebounceTimer)
 })
 </script>

@@ -548,6 +548,7 @@
       <div class="bg-[#0A0F0D] border border-white/10 rounded-[2rem] overflow-hidden">
         <div ref="konvaContainer" class="w-full h-[600px] cursor-grab active:cursor-grabbing">
           <v-stage ref="stageRef" :config="stageConfig" @wheel="handleWheel" @dragend="handleDragEnd">
+            <!-- Static layer: background + zone shapes. Redraws only on pan/zoom, not on seat hover -->
             <v-layer ref="layerRef">
               <!-- Background -->
               <v-rect :config="{ x: 0, y: 0, width: parsedData?.svgWidth || 0, height: parsedData?.svgHeight || 0, fill: '#0b0f19' }" />
@@ -561,7 +562,12 @@
                   <v-text v-if="el.type === 'text' && el.text"
                     :config="buildTextConfig(el)" />
                 </template>
-                <!-- Seats (circles) -->
+              </template>
+            </v-layer>
+
+            <!-- Seat layer: isolated so hovering a seat only redraws this layer, not zone shapes -->
+            <v-layer ref="seatLayerRef">
+              <template v-for="zone in parsedData?.zones" :key="zone.zoneName + '-seats'">
                 <template v-for="row in zone.rows" :key="'row-' + zone.zoneName + '-' + row.rowLabel">
                   <v-circle v-for="seat in row.seatRequests" :key="zone.zoneName + '-' + seat.svgElementId"
                     :config="buildSeatConfig(seat, zone)"
@@ -890,6 +896,7 @@ const isSuccess = ref(false)
 
 const hoveredSeat = ref(null)
 const konvaContainer = ref(null)
+const seatLayerRef = ref(null)
 
 // ── Computed ──
 const totalStats = computed(() => {
@@ -1017,36 +1024,57 @@ function onDrop(e) {
 
 let resizeObserver = null
 let hasInitializedCenter = false
+let resizeDebounceTimer = null
+
+function cacheSeatLayer() {
+  if (!seatLayerRef.value || !parsedData.value?.svgWidth || !parsedData.value?.svgHeight) return
+  const layer = seatLayerRef.value.getNode()
+  layer.cache({
+    x: 0,
+    y: 0,
+    width: parsedData.value.svgWidth,
+    height: parsedData.value.svgHeight
+  })
+  layer.batchDraw()
+}
 
 function goToStep(step) {
   currentStep.value = step
   if (step === 1) {
     hasInitializedCenter = false
     nextTick(() => {
+      // Cache seat layer as a bitmap: with 10k+ seats, redrawing every circle as a vector
+      // on each pan/zoom frame is the main source of lag. Caching trades sharpness at
+      // deep zoom (>3-4x) for a single cheap image draw per frame instead.
+      cacheSeatLayer()
+
       if (konvaContainer.value) {
         if (resizeObserver) resizeObserver.disconnect()
-        
+
         resizeObserver = new ResizeObserver((entries) => {
-          const entry = entries[0]
-          const containerW = entry.contentRect.width
-          const containerH = entry.contentRect.height || 600
-          
-          if (containerW > 0) {
-            stageConfig.width = containerW
-            stageConfig.height = containerH
-            
-            if (!hasInitializedCenter && parsedData.value) {
-              const svgW = parsedData.value.svgWidth || 999
-              const svgH = parsedData.value.svgHeight || 666
-              const scale = Math.min(containerW / svgW, containerH / svgH) * 0.95
-              
-              stageConfig.scaleX = scale
-              stageConfig.scaleY = scale
-              stageConfig.x = (containerW - svgW * scale) / 2
-              stageConfig.y = (containerH - svgH * scale) / 2
-              hasInitializedCenter = true
+          clearTimeout(resizeDebounceTimer)
+          resizeDebounceTimer = setTimeout(() => {
+            const entry = entries[0]
+            const containerW = entry.contentRect.width
+            const containerH = entry.contentRect.height || 600
+
+            if (containerW > 0) {
+              stageConfig.width = containerW
+              stageConfig.height = containerH
+
+              if (!hasInitializedCenter && parsedData.value) {
+                const svgW = parsedData.value.svgWidth || 999
+                const svgH = parsedData.value.svgHeight || 666
+                const scale = Math.min(containerW / svgW, containerH / svgH) * 0.95
+
+                stageConfig.scaleX = scale
+                stageConfig.scaleY = scale
+                stageConfig.x = (containerW - svgW * scale) / 2
+                stageConfig.y = (containerH - svgH * scale) / 2
+                hasInitializedCenter = true
+              }
             }
-          }
+          }, 100)
         })
         resizeObserver.observe(konvaContainer.value)
       }
@@ -1056,11 +1084,13 @@ function goToStep(step) {
       resizeObserver.disconnect()
       resizeObserver = null
     }
+    clearTimeout(resizeDebounceTimer)
   }
 }
 
 onUnmounted(() => {
   if (resizeObserver) resizeObserver.disconnect()
+  clearTimeout(resizeDebounceTimer)
 })
 
 function goToReview() {
