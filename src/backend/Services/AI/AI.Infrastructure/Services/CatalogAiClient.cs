@@ -239,5 +239,41 @@ namespace AI.Infrastructure.Services
                 return new EventDetailResult { IsSuccess = false, Message = $"Lỗi kết nối gRPC tới Catalog: {ex.Status.Detail}" };
             }
         }
+
+        public async Task<GetUserEventClicksResult> GetUserEventClicksAsync(DateOnly from, DateOnly to)
+        {
+            try
+            {
+                GetUserEventClicksRequest request = new GetUserEventClicksRequest
+                {
+                    From = from.ToString("yyyy-MM-dd"),
+                    To = to.ToString("yyyy-MM-dd")
+                };
+
+                GetUserEventClicksResponse response = await _client.GetUserEventClicksAsync(request);
+
+                if (!response.IsSuccess)
+                    return new GetUserEventClicksResult { IsSuccess = false, Message = response.Message };
+
+                GetUserEventClicksResult result = new GetUserEventClicksResult { IsSuccess = true, Message = response.Message };
+
+                foreach (var c in response.Clicks)
+                {
+                    result.Clicks.Add(new UserEventClickResult
+                    {
+                        UserId = Guid.Parse(c.UserId),
+                        EventId = Guid.Parse(c.EventId),
+                        ClickType = c.ClickType,
+                        ClickedAt = DateTime.Parse(c.ClickedAt)
+                    });
+                }
+
+                return result;
+            }
+            catch (RpcException ex)
+            {
+                return new GetUserEventClicksResult { IsSuccess = false, Message = $"Lỗi kết nối gRPC tới Catalog: {ex.Status.Detail}" };
+            }
+        }
     }
 }

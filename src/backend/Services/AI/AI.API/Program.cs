@@ -1,7 +1,9 @@
 using AI.API.Extensions;
+using AI.Infrastructure.Interfaces.IServices;
 using BuildingBlocks.API.Extensions;
 using BuildingBlocks.API.Middlewares;
 using BuildingBlocks.Contracts.Options;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,10 @@ builder.Services.AddCustomControllers();
 builder.Services.AddCustomOptions(builder.Configuration);
 
 builder.Services.AddCustomGrpc(builder.Configuration);
+
+builder.Services.AddCustomDb(builder.Configuration);
+
+builder.Services.AddCustomHangfire(builder.Configuration.GetConnectionString("HangfireDbConnection")!);
 
 builder.Services.AddCustomRateLimit(
     builder.Configuration.GetSection("AppSettings:RateLimit").Get<RateLimitConfig>());
@@ -36,10 +42,17 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseCustomSwaggerUI();
+    app.UseHangfireDashboard("/hangfire");
 }
 
 app.UseExceptionHandling();
 app.UseRequestResponseLogging();
+await app.UseDatabaseInitialization();
+
+RecurringJob.AddOrUpdate<IRecommendationService>(
+    "recommendation-sync-and-train",
+    service => service.SyncAndTrainAsync(default),
+    Cron.Daily());
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

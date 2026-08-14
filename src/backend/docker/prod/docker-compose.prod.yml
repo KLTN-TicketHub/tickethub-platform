@@ -260,6 +260,10 @@ services:
       - ${SECRETS_DIR}/ai/appsettings.Production.json:/app/appsettings.Production.json:ro
       - ../../Services/AI/AI.API/Keys:/app/Keys:ro
     depends_on:
+      sqlserver:
+        condition: service_healthy
+      sqlserver-init:
+        condition: service_completed_successfully
       redis:
         condition: service_started
       catalog-api:

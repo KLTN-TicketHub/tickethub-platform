@@ -111,6 +111,21 @@ namespace AI.Infrastructure.Interfaces.IServices
         public List<EventShowtimeResult> Showtimes { get; set; } = new();
     }
 
+    public class UserEventClickResult
+    {
+        public Guid UserId { get; set; }
+        public Guid EventId { get; set; }
+        public string ClickType { get; set; } = string.Empty;
+        public DateTime ClickedAt { get; set; }
+    }
+
+    public class GetUserEventClicksResult
+    {
+        public bool IsSuccess { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public List<UserEventClickResult> Clicks { get; set; } = new();
+    }
+
     public interface ICatalogAiClient
     {
         Task<CategoryTrendResult> GetCategoryTrendAsync(DateOnly from, DateOnly to);
@@ -122,5 +137,7 @@ namespace AI.Infrastructure.Interfaces.IServices
         Task<SearchEventsResult> SearchEventsAsync(string search, Guid? categoryId, string? provinceCity, int pageSize);
 
         Task<EventDetailResult> GetEventDetailAsync(Guid eventId);
+
+        Task<GetUserEventClicksResult> GetUserEventClicksAsync(DateOnly from, DateOnly to);
     }
 }

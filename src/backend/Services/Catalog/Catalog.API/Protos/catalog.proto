@@ -20,6 +20,8 @@ service CatalogGrpc {
   rpc SearchEvents (SearchEventsRequest) returns (SearchEventsResponse);
 
   rpc GetEventDetail (GetEventDetailRequest) returns (GetEventDetailResponse);
+
+  rpc GetUserEventClicks (GetUserEventClicksRequest) returns (GetUserEventClicksResponse);
 }
 
 message GetCheckoutDataRequest {
@@ -208,4 +210,22 @@ message GetEventDetailResponse {
   string venueName = 7;
   string addressLine = 8;
   repeated EventShowtimeItem showtimes = 9;
+}
+
+message GetUserEventClicksRequest {
+  string from = 1;
+  string to = 2;
+}
+
+message UserEventClickItem {
+  string userId = 1;
+  string eventId = 2;
+  string clickType = 3;
+  string clickedAt = 4;
+}
+
+message GetUserEventClicksResponse {
+  bool isSuccess = 1;
+  string message = 2;
+  repeated UserEventClickItem clicks = 3;
 }

@@ -11,6 +11,68 @@
       </BaseButton>
     </div>
 
+    <!-- KPI Bento Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-[#111916] border border-white/5 p-6 rounded-[2rem] shadow-xl relative overflow-hidden group hover:border-primary/20 transition-all duration-300">
+        <div class="absolute -right-8 -bottom-8 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:scale-125 transition-transform"></div>
+        <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary text-2xl mb-4">
+          <PhCalendarBlank weight="duotone" />
+        </div>
+        <span class="text-[12px] font-bold text-white/40 uppercase tracking-wider block mb-1">Tổng sự kiện</span>
+        <span class="text-2xl md:text-3xl font-black text-white font-heading leading-tight">{{ summary.totalEvents }}</span>
+      </div>
+
+      <div class="bg-[#111916] border border-white/5 p-6 rounded-[2rem] shadow-xl relative overflow-hidden group hover:border-warning/20 transition-all duration-300">
+        <div class="absolute -right-8 -bottom-8 w-24 h-24 bg-warning/10 rounded-full blur-2xl group-hover:scale-125 transition-transform"></div>
+        <div class="w-12 h-12 rounded-2xl bg-warning/10 flex items-center justify-center text-warning text-2xl mb-4">
+          <PhClock weight="duotone" />
+        </div>
+        <span class="text-[12px] font-bold text-white/40 uppercase tracking-wider block mb-1">Chờ duyệt</span>
+        <span class="text-2xl md:text-3xl font-black text-white font-heading leading-tight">{{ summary.pendingApprovalCount }}</span>
+      </div>
+
+      <div class="bg-[#111916] border border-white/5 p-6 rounded-[2rem] shadow-xl relative overflow-hidden group hover:border-[#818cf8]/20 transition-all duration-300">
+        <div class="absolute -right-8 -bottom-8 w-24 h-24 bg-[#818cf8]/10 rounded-full blur-2xl group-hover:scale-125 transition-transform"></div>
+        <div class="w-12 h-12 rounded-2xl bg-[#818cf8]/10 flex items-center justify-center text-[#818cf8] text-2xl mb-4">
+          <PhCheckCircle weight="duotone" />
+        </div>
+        <span class="text-[12px] font-bold text-white/40 uppercase tracking-wider block mb-1">Đang mở</span>
+        <span class="text-2xl md:text-3xl font-black text-white font-heading leading-tight">{{ summary.publishedCount }}</span>
+      </div>
+
+      <div class="bg-[#111916] border border-white/5 p-6 rounded-[2rem] shadow-xl relative overflow-hidden group hover:border-danger/20 transition-all duration-300">
+        <div class="absolute -right-8 -bottom-8 w-24 h-24 bg-danger/10 rounded-full blur-2xl group-hover:scale-125 transition-transform"></div>
+        <div class="w-12 h-12 rounded-2xl bg-danger/10 flex items-center justify-center text-danger text-2xl mb-4">
+          <PhXCircle weight="duotone" />
+        </div>
+        <span class="text-[12px] font-bold text-white/40 uppercase tracking-wider block mb-1">Đã hủy</span>
+        <span class="text-2xl md:text-3xl font-black text-white font-heading leading-tight">{{ summary.cancelledCount }}</span>
+      </div>
+    </div>
+
+    <!-- Sự kiện theo danh mục -->
+    <div class="bg-[#111916] border border-white/5 rounded-[2rem] p-8 flex flex-col gap-8">
+      <h3 class="text-xl font-bold font-heading text-white">Sự kiện theo danh mục</h3>
+
+      <div v-if="isLoadingByCategory" class="py-8 flex justify-center">
+        <PhSpinner class="animate-spin text-primary text-2xl" weight="bold" />
+      </div>
+      <div v-else-if="byCategory.length === 0" class="py-8 text-center text-white/30 font-bold text-[13px]">
+        Không có dữ liệu cho khoảng thời gian này.
+      </div>
+      <div v-else class="flex flex-col gap-6">
+        <div v-for="cat in byCategoryWithPercent" :key="cat.categoryId" class="flex flex-col gap-3 group">
+          <div class="flex justify-between items-center">
+            <span class="text-[14px] font-bold text-white/80">{{ cat.categoryName }}</span>
+            <span class="text-[13px] font-bold text-white">{{ cat.eventCount }} sự kiện</span>
+          </div>
+          <div class="h-1.5 bg-white/5 rounded-full overflow-hidden relative">
+            <div class="absolute top-0 left-0 h-full bg-primary rounded-full transition-all duration-1000" :style="{ width: cat.percent + '%' }"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Filter Bar -->
     <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-6 bg-[#111916] border border-white/5 rounded-[2rem] p-4 lg:px-6">
       <div class="flex-1 flex items-center gap-3 bg-white/5 border border-white/10 rounded-full px-4 group focus-within:border-primary/50 transition-all w-full max-w-md">
@@ -84,17 +146,65 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { getEvents, addEvent, updateEvent, deleteEvent } from '../../stores/eventStore'
 import { adminSearch, openConfirm, addToast } from '../../stores/adminStore'
+import { getEventSummary, getEventsByCategory } from '../../services/admin-event.service'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseTable from '../../components/ui/BaseTable.vue'
 import BaseBadge from '../../components/ui/BaseBadge.vue'
 import BaseSelect from '../../components/ui/BaseSelect.vue'
 import EventFormModal from '../../components/admin/EventFormModal.vue'
-import { PhPlus, PhMagnifyingGlass, PhPencilSimple, PhTrash } from '@phosphor-icons/vue'
+import {
+  PhPlus, PhMagnifyingGlass, PhPencilSimple, PhTrash,
+  PhCalendarBlank, PhClock, PhCheckCircle, PhXCircle, PhSpinner
+} from '@phosphor-icons/vue'
 
 const allEvents = computed(() => getEvents())
+
+// Thống kê (KPI + theo danh mục) — nguồn dữ liệu thật, độc lập với bảng danh sách bên dưới (vẫn đang mock)
+const summary = ref({
+  totalEvents: 0,
+  pendingApprovalCount: 0,
+  publishedCount: 0,
+  rejectedCount: 0,
+  cancelledCount: 0,
+  archivedCount: 0
+})
+const byCategory = ref([])
+const isLoadingByCategory = ref(false)
+
+const byCategoryWithPercent = computed(() => {
+  const max = Math.max(...byCategory.value.map(c => c.eventCount), 1)
+  return byCategory.value.map(c => ({ ...c, percent: Math.round((c.eventCount / max) * 100) }))
+})
+
+const loadSummary = async () => {
+  try {
+    const res = await getEventSummary({})
+    if (res && res.success) summary.value = res.data
+  } catch (err) {
+    console.error('Error fetching event summary:', err)
+  }
+}
+
+const loadByCategory = async () => {
+  isLoadingByCategory.value = true
+  try {
+    const res = await getEventsByCategory({})
+    byCategory.value = (res && res.success) ? (res.data || []) : []
+  } catch (err) {
+    console.error('Error fetching events by category:', err)
+    byCategory.value = []
+  } finally {
+    isLoadingByCategory.value = false
+  }
+}
+
+onMounted(() => {
+  loadSummary()
+  loadByCategory()
+})
 
 const localSearch = ref('')
 const statusFilter = ref('all')

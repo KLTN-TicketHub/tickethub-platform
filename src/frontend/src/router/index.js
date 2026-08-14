@@ -94,6 +94,7 @@ const routes = [
       { path: 'moderators', name: 'admin-moderators', component: ModeratorsAdmin },
       { path: 'orders', name: 'admin-orders', component: OrdersAdmin },
       { path: 'finance', name: 'admin-finance', component: () => import('../pages/admin/AdminFinancePage.vue') },
+      { path: 'recommendations', name: 'admin-recommendations', component: () => import('../pages/admin/RecommendationsAdmin.vue') },
       { path: 'notifications', name: 'admin-notifications', component: NotificationsPage },
       { path: 'notifications/send', name: 'admin-notifications-send', component: () => import('../pages/admin/NotificationsAdmin.vue') },
     ]

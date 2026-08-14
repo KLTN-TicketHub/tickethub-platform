@@ -6,6 +6,7 @@ using Catalog.Application.Features.Grpc.Queries.GetCategoryTrend;
 using Catalog.Application.Features.Grpc.Queries.GetCheckoutData;
 using Catalog.Application.Features.Grpc.Queries.GetEventInsight;
 using Catalog.Application.Features.Grpc.Queries.GetOrganizerPortfolio;
+using Catalog.Application.Features.Grpc.Queries.GetUserEventClicks;
 using Catalog.Application.Features.Grpc.Queries.ValidateSeatLock;
 using Catalog.Application.Features.Grpc.Queries.ValidateTicketTypes;
 using Grpc.Core;
@@ -428,6 +429,49 @@ namespace Catalog.API.Services
             catch (Exception ex)
             {
                 return new GetEventDetailResponse
+                {
+                    IsSuccess = false,
+                    Message = $"Lỗi xử lý hệ thống: {ex.Message}"
+                };
+            }
+        }
+
+        public override async Task<GetUserEventClicksResponse> GetUserEventClicks(
+            GetUserEventClicksRequest request,
+            ServerCallContext context)
+        {
+            try
+            {
+                if (!DateOnly.TryParse(request.From, out var from))
+                    return new GetUserEventClicksResponse { IsSuccess = false, Message = "From không đúng định dạng ngày." };
+
+                if (!DateOnly.TryParse(request.To, out var to))
+                    return new GetUserEventClicksResponse { IsSuccess = false, Message = "To không đúng định dạng ngày." };
+
+                var query = new GetUserEventClicksQuery(from, to);
+                var result = await _mediator.Send(query, context.CancellationToken);
+
+                if (!result.IsSuccess)
+                    return new GetUserEventClicksResponse { IsSuccess = false, Message = result.Message };
+
+                var response = new GetUserEventClicksResponse { IsSuccess = true, Message = result.Message };
+
+                foreach (var c in result.Clicks)
+                {
+                    response.Clicks.Add(new UserEventClickItem
+                    {
+                        UserId = c.UserId.ToString(),
+                        EventId = c.EventId.ToString(),
+                        ClickType = c.ClickType,
+                        ClickedAt = c.ClickedAt.ToString("O")
+                    });
+                }
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new GetUserEventClicksResponse
                 {
                     IsSuccess = false,
                     Message = $"Lỗi xử lý hệ thống: {ex.Message}"

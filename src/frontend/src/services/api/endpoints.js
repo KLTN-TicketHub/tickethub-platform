@@ -49,6 +49,8 @@ export const MODERATOR_EVENT_CANCELLATION_REVIEW = (requestId) => `/catalog/mode
 // Admin Events & Categories
 export const ADMIN_EVENT_CATEGORIES = '/catalog/admin/event-categories'
 export const ADMIN_EVENT_CATEGORY_DETAIL = (id) => `/catalog/admin/event-categories/${id}`
+export const ADMIN_EVENT_REPORT_SUMMARY = '/catalog/admin/events/reports/summary'
+export const ADMIN_EVENT_REPORT_BY_CATEGORY = '/catalog/admin/events/reports/by-category'
 
 // Admin Users
 export const ADMIN_USERS = '/auth/admin/users'
@@ -107,6 +109,10 @@ export const AI_SUGGESTIONS_EVENT = (eventId) => `/ai/organizer/suggestions/even
 
 // AI Chat (Customer)
 export const AI_CHAT_SEND = '/ai/chat'
+
+// AI Recommendations (Admin)
+export const ADMIN_RECOMMENDATIONS_TRAIN = '/ai/admin/recommendations/train'
+export const ADMIN_RECOMMENDATIONS_STATUS = '/ai/admin/recommendations/status'
 
 // Notifications (in-app inbox)
 export const NOTIFICATIONS = '/notification/notifications'

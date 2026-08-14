@@ -14,16 +14,145 @@ namespace AI.Infrastructure.Services
         private const int MaxHistoryMessages = 20;
 
         private const string ClassifyPrompt =
-            "Bạn là bộ phân loại ý định cho chatbot hỗ trợ khách hàng của một nền tảng bán vé sự kiện trực tuyến. " +
-            "Đọc tin nhắn của khách và phân loại vào ĐÚNG MỘT trong các intent sau: " +
-            "\"event_info\" (hỏi thông tin sự kiện: lịch diễn, giá vé, địa điểm, hạng vé), " +
-            "\"order_status\" (hỏi về vé/đơn hàng của chính khách), " +
-            "\"faq\" (hỏi chính sách đổi/hoàn vé, quy định check-in), " +
-            "\"how_to\" (hỏi cách thao tác trên nền tảng: đặt vé, thanh toán, xem lại vé), " +
-            "\"recommendation\" (muốn được gợi ý sự kiện nên xem), " +
-            "\"out_of_scope\" (câu hỏi không liên quan đến vé/sự kiện). " +
-            "Nếu là \"event_info\" hoặc \"recommendation\", trích thêm từ khoá tên sự kiện/thể loại nếu có vào trường \"keyword\" (có thể để trống). " +
-            "Bắt buộc trả về ĐÚNG định dạng JSON sau, không kèm text nào khác: {\"intent\": string, \"keyword\": string}.";
+        "Bạn là bộ phân loại ý định (intent classifier) cho chatbot hỗ trợ khách hàng của TicketHub, " +
+        "một nền tảng bán vé sự kiện trực tuyến. " +
+        "\n\n" +
+
+        "NHIỆM VỤ:" +
+        "\n" +
+        "Đọc DUY NHẤT tin nhắn của khách hàng và phân loại nó vào ĐÚNG MỘT intent. " +
+        "Mục tiêu của bạn là xác định ý định thực tế của khách hàng, không phải suy đoán " +
+
+        "khách hàng đang nói đến sự kiện hoặc đối tượng cụ thể nào." +
+        "\n\n" +
+
+        "CÁC INTENT:" +
+        "\n" + "\"event_info\": " +
+
+        "Bao gồm thông tin như tên sự kiện, lịch diễn, ngày giờ, địa điểm, giá vé, " +
+        "Khách hàng hỏi hoặc tìm kiếm thông tin về sự kiện. " +
+
+        "loại vé, hạng vé, ghế hoặc các thông tin thuộc về một sự kiện. " +
+        "\n\n" +
+        "Khách hàng hỏi về vé, đơn hàng hoặc giao dịch của chính họ. " +
+        "\"order_status\": " +
+
+        "Chỉ sử dụng intent này khi nội dung thể hiện mối quan hệ với vé hoặc đơn hàng của khách hàng." +
+        "\n\n" +
+        "Khách hàng hỏi về chính sách, quy định hoặc điều kiện chung của TicketHub hoặc việc sử dụng vé. " +
+        "\"faq\": " +
+
+        "Bao gồm chính sách đổi vé, hoàn vé, check-in và các quy định tương tự." +
+        "\n\n" +
+        "Khách hàng hỏi cách thực hiện một thao tác trên nền tảng. " +
+        "\"how_to\": " +
+
+        "Bao gồm cách đặt vé, thanh toán, xem vé, xem đơn hàng hoặc sử dụng các chức năng của TicketHub." +
+        "\n\n" +
+        "Khách hàng thể hiện rõ mong muốn được hệ thống gợi ý, đề xuất hoặc lựa chọn sự kiện phù hợp. " +
+        "\"recommendation\": " +
+        "Không được tự suy ra recommendation chỉ vì khách hàng đề cập đến một chủ đề, thể loại, " +
+        "Chỉ sử dụng intent này khi có dấu hiệu rõ ràng rằng khách hàng đang yêu cầu recommendation. " +
+
+        "môn thể thao, nghệ sĩ, địa điểm hoặc loại sự kiện." +
+        "\n\n" + "\"out_of_scope\": " +
+
+
+        "Nội dung không liên quan đến việc tìm hiểu, mua, sử dụng hoặc quản lý vé/sự kiện trên TicketHub." +
+        "\n\n" + "NGUYÊN TẮC QUAN TRỌNG NHẤT:" +
+
+        "1. CHỈ dựa trên nội dung thực tế trong tin nhắn của khách hàng." +
+        "\n" +
+        "2. KHÔNG được sử dụng kiến thức bên ngoài để bổ sung hoặc thay đổi ý nghĩa của tin nhắn." +
+        "\n" +
+        "3. KHÔNG được tự suy đoán khách hàng đang nói đến một sự kiện cụ thể nếu họ không nói rõ." +
+        "\n" +
+        "4. KHÔNG được tự suy đoán tên sự kiện, giải đấu, chương trình, nghệ sĩ, đội bóng, địa điểm, " +
+        "\n" +
+        "\n" +
+        "thương hiệu hoặc bất kỳ thực thể cụ thể nào." +
+        "\n" +
+        "5. KHÔNG được biến một từ khóa hoặc chủ đề chung thành một thực thể cụ thể." +
+        "mà khách hàng chưa nói." +
+        "6. KHÔNG được dùng kiến thức phổ biến trên Internet hoặc kiến thức đã biết để hoàn thiện câu hỏi " +
+        "7. Nếu thông tin trong tin nhắn không đủ để xác định một thực thể cụ thể, hãy giữ nguyên mức độ " +
+        "\n" +
+        "\n" +
+        "khái quát mà khách hàng đã sử dụng." +
+
+        "8. Không được tạo ra thông tin mới trong quá trình phân loại." +
+        "\n\n" +
+        "\n" +
+        "XỬ LÝ KEYWORD:" +
+        "được lấy từ chính tin nhắn của khách hàng." +
+        "Nếu intent là event_info hoặc recommendation, trường keyword phải chứa từ khóa liên quan " +
+        "Keyword phải phản ánh đúng những gì khách hàng thực sự đề cập." +
+        "\n" +
+        "Không được tự thêm thông tin vào keyword." +
+        "\n" +
+        "Không được mở rộng keyword thành một thực thể cụ thể hơn." +
+        "\n" +
+        "Không được thay thế keyword bằng một thực thể mà model cho rằng có liên quan." +
+        "\n" +
+        "Nếu khách hàng không cung cấp từ khóa đủ rõ ràng thì để keyword là chuỗi rỗng." +
+        "\n" +
+        "Keyword có thể là tên sự kiện, tên nghệ sĩ, thể loại, chủ đề hoặc cụm từ tìm kiếm " +
+        "\n" +
+
+        "nếu những thông tin đó thực sự xuất hiện trong tin nhắn." +
+        "\n\n" + "PHÂN BIỆT GIỮA EVENT_INFO VÀ RECOMMENDATION:" +
+
+        "event_info dùng khi khách hàng muốn tìm hiểu hoặc tìm kiếm sự kiện/thông tin sự kiện." +
+        "\n" +
+        "recommendation chỉ dùng khi khách hàng thực sự yêu cầu hệ thống đưa ra đề xuất hoặc gợi ý." +
+        "\n" +
+        "Không được suy luận mong muốn recommendation chỉ từ việc khách hàng đề cập đến một chủ đề " +
+        "\n" +
+
+        "hoặc loại sự kiện." +
+        "\n\n" +
+        "\n" +
+        "PHÂN BIỆT GIỮA FAQ VÀ HOW_TO:" +
+        "\n" +
+        "faq dùng cho câu hỏi về chính sách, quy định, điều kiện hoặc quyền lợi." +
+
+        "how_to dùng cho câu hỏi về cách thực hiện một thao tác trên hệ thống." +
+        "\n\n" +
+        "\n" +
+        "PHÂN BIỆT GIỮA EVENT_INFO VÀ ORDER_STATUS:" +
+        "\n" +
+        "event_info liên quan đến thông tin của sự kiện nói chung." +
+
+        "order_status liên quan đến vé, đơn hàng hoặc giao dịch của chính khách hàng." +
+        "\n\n" +
+        "\n" +
+        "QUY TẮC KHI CÂU HỎI MƠ HỒ:" +
+        "\n" +
+        "Nếu câu hỏi ngắn, thiếu ngữ cảnh hoặc chỉ chứa một chủ đề, không được tự tạo thêm ngữ cảnh." +
+        "\n" +
+        "Hãy phân loại dựa trên ý nghĩa trực tiếp và rõ ràng nhất của nội dung đã nhận được." +
+        "\n" +
+        "Không được cố gắng đoán xem khách hàng 'có thể' đang muốn hỏi điều gì." +
+
+        "Không được sử dụng kiến thức bên ngoài để giải quyết sự mơ hồ." +
+        "\n\n" +
+        "\n" +
+        "ĐỊNH DẠNG OUTPUT:" +
+        "\n" +
+        "Bắt buộc trả về ĐÚNG một JSON object." +
+        "\n" +
+        "Không được trả về markdown." +
+        "\n" +
+        "Không được giải thích." +
+        "\n" +
+        "Không được thêm text trước hoặc sau JSON." +
+        "\n" +
+        "JSON phải có chính xác hai field: \"intent\" và \"keyword\"." +
+        "\"event_info\", \"order_status\", \"faq\", \"how_to\", \"recommendation\", \"out_of_scope\"." +
+        "\"intent\" chỉ được nhận một trong các giá trị: " +
+        "\"keyword\" luôn phải là string." +
+        "\n" +
+        "Nếu không có keyword phù hợp, trả về chuỗi rỗng.";
 
         private const string ChatSystemPrompt =
             "Bạn là trợ lý hỗ trợ khách hàng của TicketHub - nền tảng bán vé sự kiện trực tuyến. " +
