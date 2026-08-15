@@ -6,10 +6,16 @@
         <h1 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight">Quản lý danh mục</h1>
         <p class="text-white/50 font-medium text-lg">Quản lý các loại phân loại sự kiện trên toàn hệ thống</p>
       </div>
-      <BaseButton variant="primary" class="!rounded-2xl !py-3.5 !px-6 flex items-center gap-2 self-start sm:self-auto" @click="openCreateModal">
-        <PhPlus weight="bold" />
-        Thêm danh mục
-      </BaseButton>
+      <div class="flex items-center gap-3 self-start sm:self-auto">
+        <BaseButton variant="outline" class="!rounded-2xl !py-3.5 !px-6 flex items-center gap-2" @click="openReorderModal">
+          <PhArrowsDownUp weight="bold" />
+          Sắp xếp thứ tự
+        </BaseButton>
+        <BaseButton variant="primary" class="!rounded-2xl !py-3.5 !px-6 flex items-center gap-2" @click="openCreateModal">
+          <PhPlus weight="bold" />
+          Thêm danh mục
+        </BaseButton>
+      </div>
     </div>
 
     <!-- Filter Bar -->
@@ -40,6 +46,9 @@
           </template>
           <template #categoryName="{ row }">
             <span class="font-bold text-white">{{ row.categoryName }}</span>
+          </template>
+          <template #displayOrder="{ row }">
+            <span class="inline-flex items-center justify-center min-w-[2rem] px-2 py-1 rounded-lg bg-white/5 text-white/70 font-mono text-xs">{{ row.displayOrder }}</span>
           </template>
           <template #recommendedCommissionRate="{ row }">
             <span class="font-bold text-primary">{{ row.recommendedCommissionRate }}%</span>
@@ -181,6 +190,71 @@
         </form>
       </div>
     </div>
+
+    <!-- Reorder Modal -->
+    <div v-if="isReorderModalOpen" class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+      <!-- Backdrop -->
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="closeReorderModal"></div>
+
+      <!-- Modal Content -->
+      <div class="relative bg-card/90 backdrop-blur-2xl border border-border-main rounded-[32px] w-full max-w-lg overflow-hidden shadow-2xl shadow-black/60 p-8 animate-in zoom-in-95 fade-in duration-300">
+        <h3 class="text-2xl font-bold text-main mb-2 font-heading">Sắp xếp thứ tự danh mục</h3>
+        <p class="text-white/50 text-[13px] font-medium mb-6">Thứ tự này quyết định vị trí hiển thị danh mục trên trang chủ và menu điều hướng.</p>
+
+        <div v-if="isReorderLoading" class="py-16 flex flex-col items-center justify-center gap-3">
+          <PhSpinner class="animate-spin text-primary text-4xl" weight="bold" />
+        </div>
+
+        <div v-else class="flex flex-col gap-2 max-h-[50vh] overflow-y-auto pr-1">
+          <div
+            v-for="(category, index) in reorderList"
+            :key="category.id"
+            class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-3"
+          >
+            <span class="font-mono text-xs text-white/40 w-6 text-center">{{ index }}</span>
+            <span class="flex-1 font-bold text-white text-[14px] line-clamp-1">{{ category.categoryName }}</span>
+            <div class="flex items-center gap-1">
+              <button
+                type="button"
+                :disabled="index === 0"
+                @click="moveReorderItem(index, -1)"
+                class="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all disabled:opacity-20 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer"
+              >
+                <PhCaretUp weight="bold" />
+              </button>
+              <button
+                type="button"
+                :disabled="index === reorderList.length - 1"
+                @click="moveReorderItem(index, 1)"
+                class="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all disabled:opacity-20 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer"
+              >
+                <PhCaretDown weight="bold" />
+              </button>
+            </div>
+          </div>
+
+          <div v-if="reorderList.length === 0" class="py-10 text-center text-white/40 text-[14px]">
+            Không có danh mục nào để sắp xếp.
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-6">
+          <BaseButton type="button" variant="outline" class="flex-1 !rounded-2xl" @click="closeReorderModal">
+            Hủy bỏ
+          </BaseButton>
+          <BaseButton
+            type="button"
+            variant="primary"
+            class="flex-1 !rounded-2xl"
+            :disabled="isReorderSaving || isReorderLoading || reorderList.length === 0"
+            @click="saveReorder"
+          >
+            <PhSpinner v-if="isReorderSaving" class="animate-spin text-lg" />
+            <span v-else>Lưu thứ tự</span>
+          </BaseButton>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -191,13 +265,15 @@ import {
   getAdminEventCategories,
   createAdminEventCategory,
   updateAdminEventCategory,
-  deleteAdminEventCategory
+  deleteAdminEventCategory,
+  reorderAdminEventCategories
 } from '../../services/admin-category.service'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseTable from '../../components/ui/BaseTable.vue'
-import { 
-  PhMagnifyingGlass, PhPlus, PhPencilSimple, PhTrash, 
-  PhFolderOpen, PhSpinner, PhCaretLeft, PhCaretRight 
+import {
+  PhMagnifyingGlass, PhPlus, PhPencilSimple, PhTrash,
+  PhFolderOpen, PhSpinner, PhCaretLeft, PhCaretRight,
+  PhArrowsDownUp, PhCaretUp, PhCaretDown
 } from '@phosphor-icons/vue'
 
 const localSearch = ref('')
@@ -212,6 +288,7 @@ const pageSize = 10
 const columns = [
   { key: 'id', label: 'Mã danh mục' },
   { key: 'categoryName', label: 'Tên danh mục' },
+  { key: 'displayOrder', label: 'Thứ tự' },
   { key: 'recommendedCommissionRate', label: 'Tỷ lệ hoa hồng' },
   { key: 'description', label: 'Mô tả' },
   { key: 'actions', label: '', class: 'w-32' },
@@ -334,6 +411,68 @@ const handleSubmit = async () => {
     addToast(errorMsg, 'error')
   } finally {
     isSubmitting.value = false
+  }
+}
+
+// Reorder Modal
+const isReorderModalOpen = ref(false)
+const isReorderLoading = ref(false)
+const isReorderSaving = ref(false)
+const reorderList = ref([])
+
+const openReorderModal = async () => {
+  isReorderModalOpen.value = true
+  isReorderLoading.value = true
+  try {
+    const res = await getAdminEventCategories({ pageNumber: 1, pageSize: 100 })
+    if (res && res.success && res.data) {
+      reorderList.value = (res.data.data || []).map(c => ({ id: c.id, categoryName: c.categoryName }))
+    } else {
+      reorderList.value = []
+    }
+  } catch (err) {
+    console.error('Error fetching categories for reorder:', err)
+    reorderList.value = []
+    addToast('Không thể tải danh sách danh mục để sắp xếp.', 'error')
+  } finally {
+    isReorderLoading.value = false
+  }
+}
+
+const closeReorderModal = () => {
+  isReorderModalOpen.value = false
+}
+
+const moveReorderItem = (index, direction) => {
+  const targetIndex = index + direction
+  if (targetIndex < 0 || targetIndex >= reorderList.value.length) return
+  const list = [...reorderList.value]
+  const [moved] = list.splice(index, 1)
+  list.splice(targetIndex, 0, moved)
+  reorderList.value = list
+}
+
+const saveReorder = async () => {
+  isReorderSaving.value = true
+  try {
+    const payload = reorderList.value.map((c, index) => ({
+      categoryId: c.id,
+      displayOrder: index
+    }))
+    const res = await reorderAdminEventCategories(payload)
+    if (res && res.success) {
+      addToast('Cập nhật thứ tự hiển thị thành công.', 'success')
+      closeReorderModal()
+      await fetchCategories()
+    } else {
+      addToast(res?.message || 'Cập nhật thứ tự thất bại.', 'error')
+    }
+  } catch (err) {
+    console.error('Error saving reorder:', err)
+    const errorMsg = err.response?.data?.message || 'Có lỗi xảy ra khi lưu thứ tự hiển thị.'
+    addToast(errorMsg, 'error')
+  } finally {
+    isReorderSaving.value = false
   }
 }
 

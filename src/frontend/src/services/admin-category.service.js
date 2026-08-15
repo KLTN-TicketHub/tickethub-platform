@@ -1,5 +1,5 @@
 import api from './api/axios'
-import { ADMIN_EVENT_CATEGORIES, ADMIN_EVENT_CATEGORY_DETAIL } from './api/endpoints'
+import { ADMIN_EVENT_CATEGORIES, ADMIN_EVENT_CATEGORY_DETAIL, ADMIN_EVENT_CATEGORIES_REORDER } from './api/endpoints'
 
 /**
  * Lấy danh sách danh mục sự kiện có phân trang & tìm kiếm cho Admin
@@ -54,5 +54,16 @@ export async function updateAdminEventCategory(id, data) {
  */
 export async function deleteAdminEventCategory(id) {
   const response = await api.delete(ADMIN_EVENT_CATEGORY_DETAIL(id))
+  return response.data
+}
+
+/**
+ * Cập nhật thứ tự hiển thị của danh sách danh mục sự kiện
+ * PUT /catalog/admin/event-categories/reorder
+ * @param {Array<{ categoryId: string, displayOrder: number }>} data
+ * @returns {{ success, message }}
+ */
+export async function reorderAdminEventCategories(data) {
+  const response = await api.put(ADMIN_EVENT_CATEGORIES_REORDER, data)
   return response.data
 }

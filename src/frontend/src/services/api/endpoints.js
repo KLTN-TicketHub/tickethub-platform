@@ -49,6 +49,7 @@ export const MODERATOR_EVENT_CANCELLATION_REVIEW = (requestId) => `/catalog/mode
 // Admin Events & Categories
 export const ADMIN_EVENT_CATEGORIES = '/catalog/admin/event-categories'
 export const ADMIN_EVENT_CATEGORY_DETAIL = (id) => `/catalog/admin/event-categories/${id}`
+export const ADMIN_EVENT_CATEGORIES_REORDER = '/catalog/admin/event-categories/reorder'
 export const ADMIN_EVENT_REPORT_SUMMARY = '/catalog/admin/events/reports/summary'
 export const ADMIN_EVENT_REPORT_BY_CATEGORY = '/catalog/admin/events/reports/by-category'
 

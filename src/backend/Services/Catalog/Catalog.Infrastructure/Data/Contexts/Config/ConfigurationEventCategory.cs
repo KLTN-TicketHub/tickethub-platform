@@ -1,4 +1,4 @@
-﻿using Catalog.Domain.Entities;
+using Catalog.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -34,6 +34,10 @@ namespace Catalog.Infrastructure.Data.Contexts.Config
             builder.Property(ec => ec.Status)
                 .IsRequired()
                 .HasConversion<string>();
+
+            builder.Property(ec => ec.DisplayOrder)
+                .IsRequired()
+                .HasDefaultValue(0);
 
             builder.Property(ec => ec.RowVersion)
                 .IsRowVersion();

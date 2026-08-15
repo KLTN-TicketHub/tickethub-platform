@@ -36,6 +36,7 @@ namespace Catalog.Application.Features.EventCategories.Commands.UpdateEventCateg
 
             _mapper.Map(request, category);
             category.UpdateCommissionRate(request.RecommendedCommissionRate);
+            category.UpdateDisplayOrder(request.DisplayOrder);
 
             EventCategory updatedCategory = await _unitOfWork.EventCategoryRepository.UpdateAsync(category, cancellationToken);
 

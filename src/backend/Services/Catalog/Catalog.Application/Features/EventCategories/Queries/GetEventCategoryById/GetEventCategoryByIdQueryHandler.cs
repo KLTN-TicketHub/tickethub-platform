@@ -34,6 +34,8 @@ namespace Catalog.Application.Features.EventCategories.Queries.GetEventCategoryB
                     Description = ec.Description,
                     Status = ec.Status.ToString(),
                     CreatedAt = ec.CreatedAt,
+                    RecommendedCommissionRate = ec.RecommendedCommissionRate,
+                    DisplayOrder = ec.DisplayOrder,
                     RowVersion = ec.RowVersion
                 },
                 cancellation: cancellationToken) ?? throw new NotFoundException("Không tìm thấy danh mục sự kiện");

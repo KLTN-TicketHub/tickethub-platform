@@ -17,6 +17,9 @@ namespace Catalog.Application.Features.EventCategories.Validators
 
             RuleFor(x => x.RecommendedCommissionRate)
                 .InclusiveBetween(0, 100).WithMessage("Phần trăm hoa hồng tham khảo phải nằm trong khoảng từ 0 đến 100.");
+
+            RuleFor(x => x.DisplayOrder)
+                .GreaterThanOrEqualTo(0).WithMessage("Thứ tự hiển thị phải lớn hơn hoặc bằng 0.");
         }
     }
 }

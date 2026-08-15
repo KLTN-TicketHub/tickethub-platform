@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Contracts.Extensions;
+using BuildingBlocks.Contracts.Extensions;
 using BuildingBlocks.Contracts.Models.Pagination;
 using Catalog.Application.Common.DTOs.EventCategories;
 using Catalog.Application.Features.EventCategories.Requests;
@@ -25,7 +25,7 @@ namespace Catalog.Application.Features.EventCategories.Queries.GetEventCategorie
         {
             (IEnumerable<EventCategoryDto> eventCategories, int totalCount) = await _unitOfWork.EventCategoryRepository.GetPagedAsync(
                 filter: e => !e.IsDeleted,
-                orderBy: e => e.OrderBy(e => e.CategoryName),
+                orderBy: e => e.OrderBy(e => e.DisplayOrder).ThenBy(e => e.CategoryName),
                 selector: e => new EventCategoryDto
                 {
                     Id = e.Id,
@@ -36,6 +36,7 @@ namespace Catalog.Application.Features.EventCategories.Queries.GetEventCategorie
                     Status = e.Status.GetDisplayName(),
                     CreatedAt = e.CreatedAt,
                     RecommendedCommissionRate = e.RecommendedCommissionRate,
+                    DisplayOrder = e.DisplayOrder,
                     RowVersion = e.RowVersion
                 },
                 pageNumber: request.PageNumber,

@@ -5,6 +5,7 @@ using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Application.Common.DTOs.EventCategories;
 using Catalog.Application.Features.EventCategories.Commands.CreateEventCategory;
 using Catalog.Application.Features.EventCategories.Commands.DeleteEventCategory;
+using Catalog.Application.Features.EventCategories.Commands.ReorderEventCategories;
 using Catalog.Application.Features.EventCategories.Commands.UpdateEventCategory;
 using Catalog.Application.Features.EventCategories.Queries.GetEventCategories;
 using Catalog.Application.Features.EventCategories.Queries.GetEventCategoryById;
@@ -92,6 +93,21 @@ namespace Catalog.API.Controllers.V1.Admin
             {
                 Success = true,
                 Message = "Xóa danh mục sự kiện thành công"
+            });
+        }
+
+        [EnableRateLimiting(RateLimitPolicies.PerUser)]
+        [HttpPut("reorder")]
+        public async Task<IActionResult> ReorderEventCategoriesAsync(
+            [FromBody] List<CategoryOrderDto> request,
+            CancellationToken cancellationToken = default)
+        {
+            await _sender.Send(new ReorderEventCategoriesCommand(request), cancellationToken);
+
+            return Ok(new ApiResponse
+            {
+                Success = true,
+                Message = "Cập nhật thứ tự hiển thị thành công"
             });
         }
 

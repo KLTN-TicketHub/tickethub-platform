@@ -42,6 +42,7 @@ namespace Catalog.Application.Features.EventCategories.Commands.CreateEventCateg
             EventCategory category = _mapper.Map<EventCategory>(request);
 
             category.SetCategoryCode(categoryCode);
+            category.UpdateDisplayOrder(request.DisplayOrder);
 
             EventCategory createdCategory = await _unitOfWork.EventCategoryRepository.CreateAsync(category, cancellation);
 

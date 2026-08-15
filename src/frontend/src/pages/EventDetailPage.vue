@@ -1368,13 +1368,14 @@ async function onSeatClick(seat, zone, row) {
       if (res && res.success) {
         const price = getZonePrice(zone.id)
         const ticketTypeName = getZoneTicketTypeName(zone.id)
-        
+
         // Select seat and automatically focus selected tier index
-        const tierIndex = event.value.showtimes?.[selectedShowTimeIndex.value]?.ticketTypes?.findIndex(t => t.zoneId === zone.id) ?? -1
+        const zoneTicketTypes = event.value.showtimes?.[selectedShowTimeIndex.value]?.ticketTypes
+        const tierIndex = zoneTicketTypes?.findIndex(t => t.zoneId === zone.id) ?? -1
         if (tierIndex !== -1 && selectedTier.value !== tierIndex) {
           selectedTier.value = tierIndex
         }
-        
+
         selectedSeats.value.push({
           id: seat.id,
           seatName: seat.seatName,
@@ -1383,7 +1384,8 @@ async function onSeatClick(seat, zone, row) {
           zoneName: zone.zoneName,
           rowName: row.rowName,
           price: price,
-          ticketTypeName: ticketTypeName
+          ticketTypeName: ticketTypeName,
+          ticketTypeId: tierIndex !== -1 ? zoneTicketTypes[tierIndex].id : null
         })
         // Start client-side 58s safety auto-release timer
         startSeatTimer(seat.id, showtimeId)
@@ -1549,9 +1551,16 @@ const submitCheckout = async () => {
     let items = []
 
     if (event.value.seatMapId && isReservedTier(activeTier.value)) {
+      const seatWithoutTicketType = selectedSeats.value.find(seat => !seat.ticketTypeId)
+      if (seatWithoutTicketType) {
+        store.toast = { message: `Không xác định được loại vé cho ghế '${seatWithoutTicketType.seatName}'. Vui lòng bỏ chọn và chọn lại ghế.`, icon: '⚠️' }
+        isCheckingOut.value = false
+        return
+      }
+
       items = selectedSeats.value.map(seat => ({
         seatId: seat.id,
-        ticketTypeId: activeTier.value.id,
+        ticketTypeId: seat.ticketTypeId,
         quantity: 1
       }))
     } else {

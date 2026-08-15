@@ -20,6 +20,8 @@ namespace Catalog.Domain.Entities
 
         public decimal RecommendedCommissionRate { get; private set; }
 
+        public int DisplayOrder { get; private set; } = 0;
+
         public byte[] RowVersion { get; set; } = default!;
 
         private readonly List<Event> _events = new List<Event>();
@@ -36,6 +38,11 @@ namespace Catalog.Domain.Entities
         public void UpdateCommissionRate(decimal recommendedCommissionRate)
         {
             RecommendedCommissionRate = recommendedCommissionRate;
+        }
+
+        public void UpdateDisplayOrder(int displayOrder)
+        {
+            DisplayOrder = displayOrder;
         }
 
         public static string NormalizeCategoryCode(string name, int maxLen = 40)
