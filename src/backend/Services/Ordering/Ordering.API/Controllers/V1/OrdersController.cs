@@ -1,4 +1,5 @@
 using BuildingBlocks.Contracts.Models.Responses;
+using BuildingBlocks.Domain.Exceptions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,14 +43,9 @@ namespace Ordering.API.Controllers.V1
 
             request.CustomerEmail = emailFromJwt ?? string.Empty;
 
-            (bool isSuccess, Guid orderId, string message) = await _orderService.CheckoutAsync(request, Guid.Parse(userIdClaim!));
+            Guid orderId = await _orderService.CheckoutAsync(request, Guid.Parse(userIdClaim!));
 
-            if (!isSuccess)
-            {
-                return BadRequest(new ApiResponse(false, message));
-            }
-
-            return Ok(new ApiResponse<Guid>(true, message, orderId));
+            return Ok(new ApiResponse<Guid>(true, "Đơn hàng đã được tạo thành công.", orderId));
         }
 
         [HttpGet("{orderId}/payment-link")]
@@ -60,14 +56,14 @@ namespace Ordering.API.Controllers.V1
 
             if (sagaState == null)
             {
-                return NotFound(new ApiResponse(false, "Không tìm thấy thông tin thanh toán cho đơn hàng này."));
+                throw new NotFoundException("Không tìm thấy thông tin thanh toán cho đơn hàng này.");
             }
 
             if (string.IsNullOrEmpty(sagaState.PaymentLink))
             {
                 if (sagaState.CurrentState == "Failed")
                 {
-                    return BadRequest(new ApiResponse(false, "Đơn hàng đã bị hủy hoặc hết hạn thanh toán."));
+                    throw new BusinessRuleException("Đơn hàng đã bị hủy hoặc hết hạn thanh toán.");
                 }
 
                 return Ok(new ApiResponse<object>(true, "Đang khởi tạo liên kết thanh toán, vui lòng đợi...", new
@@ -90,28 +86,15 @@ namespace Ordering.API.Controllers.V1
             string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             {
-                return Unauthorized(new ApiResponse(false, "Không xác định được danh tính người dùng."));
+                throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không xác định được danh tính người dùng.");
             }
 
             bool isAdminOrMod = User.IsInRole(BuildingBlocks.Contracts.Constants.Roles.Admin) ||
                                  User.IsInRole(BuildingBlocks.Contracts.Constants.Roles.Moderator);
 
-            var (isSuccess, message, reportData) = await _reportService.GetEventReportAsync(eventId, userId, isAdminOrMod, cancellationToken);
+            var reportData = await _reportService.GetEventReportAsync(eventId, userId, isAdminOrMod, cancellationToken);
 
-            if (!isSuccess)
-            {
-                if (message.Contains("Không tìm thấy"))
-                {
-                    return NotFound(new ApiResponse(false, message));
-                }
-                if (message.Contains("không có quyền"))
-                {
-                    return Forbid();
-                }
-                return BadRequest(new ApiResponse(false, message));
-            }
-
-            return Ok(new ApiResponse<object>(true, message, reportData!));
+            return Ok(new ApiResponse<object>(true, "Lấy báo cáo chi tiết sự kiện thành công.", reportData));
         }
 
         [HttpGet("reports/events/{eventId}/orders")]
@@ -123,28 +106,15 @@ namespace Ordering.API.Controllers.V1
             string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             {
-                return Unauthorized(new ApiResponse(false, "Không xác định được danh tính người dùng."));
+                throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không xác định được danh tính người dùng.");
             }
 
             bool isAdminOrMod = User.IsInRole(BuildingBlocks.Contracts.Constants.Roles.Admin) ||
                                  User.IsInRole(BuildingBlocks.Contracts.Constants.Roles.Moderator);
 
-            var (isSuccess, message, result) = await _reportService.GetEventOrdersAsync(eventId, userId, isAdminOrMod, request, cancellationToken);
+            var result = await _reportService.GetEventOrdersAsync(eventId, userId, isAdminOrMod, request, cancellationToken);
 
-            if (!isSuccess)
-            {
-                if (message.Contains("Không tìm thấy"))
-                {
-                    return NotFound(new ApiResponse(false, message));
-                }
-                if (message.Contains("không có quyền"))
-                {
-                    return Forbid();
-                }
-                return BadRequest(new ApiResponse(false, message));
-            }
-
-            return Ok(new ApiResponse<object>(true, message, result!));
+            return Ok(new ApiResponse<object>(true, "Lấy danh sách đơn hàng thành công.", result));
         }
 
         [HttpGet("reports/events/{eventId}/charts")]
@@ -156,28 +126,15 @@ namespace Ordering.API.Controllers.V1
             string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             {
-                return Unauthorized(new ApiResponse(false, "Không xác định được danh tính người dùng."));
+                throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không xác định được danh tính người dùng.");
             }
 
             bool isAdminOrMod = User.IsInRole(BuildingBlocks.Contracts.Constants.Roles.Admin) ||
                                  User.IsInRole(BuildingBlocks.Contracts.Constants.Roles.Moderator);
 
-            var (isSuccess, message, result) = await _reportService.GetEventChartDataAsync(eventId, userId, isAdminOrMod, range, cancellationToken);
+            var result = await _reportService.GetEventChartDataAsync(eventId, userId, isAdminOrMod, range, cancellationToken);
 
-            if (!isSuccess)
-            {
-                if (message.Contains("Không tìm thấy"))
-                {
-                    return NotFound(new ApiResponse(false, message));
-                }
-                if (message.Contains("không có quyền"))
-                {
-                    return Forbid();
-                }
-                return BadRequest(new ApiResponse(false, message));
-            }
-
-            return Ok(new ApiResponse<object>(true, message, result!));
+            return Ok(new ApiResponse<object>(true, "Lấy dữ liệu thống kê sự kiện thành công.", result));
         }
     }
 }

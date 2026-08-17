@@ -30,6 +30,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { PhSpinner } from '@phosphor-icons/vue'
 import SuggestionCard from './SuggestionCard.vue'
+import { getErrorMessage } from '../../utils/apiError'
 
 const props = defineProps({
   title: {
@@ -62,7 +63,7 @@ const load = async () => {
     }
   } catch (err) {
     console.error('Error fetching AI suggestions:', err)
-    error.value = 'Không thể tạo gợi ý AI lúc này. Vui lòng thử lại sau.'
+    error.value = getErrorMessage(err, 'Không thể tạo gợi ý AI lúc này. Vui lòng thử lại sau.')
   } finally {
     isLoading.value = false
   }

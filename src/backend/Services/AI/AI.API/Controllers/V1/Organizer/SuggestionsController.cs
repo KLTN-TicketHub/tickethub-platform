@@ -29,7 +29,7 @@ namespace AI.API.Controllers.V1.Organizer
         public async Task<IActionResult> GetMarketDirection([FromQuery] string range, CancellationToken cancellationToken)
         {
             Guid organizerId = _currentUserService.UserId
-                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
 
             (bool isSuccess, string message, AiSuggestionResultDto? data) =
                 await _suggestionService.GetMarketDirectionSuggestionsAsync(organizerId, NormalizeRange(range), cancellationToken);
@@ -44,7 +44,7 @@ namespace AI.API.Controllers.V1.Organizer
         public async Task<IActionResult> GetPortfolio([FromQuery] string range, CancellationToken cancellationToken)
         {
             Guid organizerId = _currentUserService.UserId
-                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
 
             (bool isSuccess, string message, AiSuggestionResultDto? data) =
                 await _suggestionService.GetOrganizerPortfolioSuggestionsAsync(organizerId, NormalizeRange(range), cancellationToken);
@@ -59,7 +59,7 @@ namespace AI.API.Controllers.V1.Organizer
         public async Task<IActionResult> GetEventSuggestions(Guid eventId, [FromQuery] string range, CancellationToken cancellationToken)
         {
             Guid organizerId = _currentUserService.UserId
-                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
 
             (bool isSuccess, string message, AiSuggestionResultDto? data) =
                 await _suggestionService.GetEventSuggestionsAsync(organizerId, eventId, NormalizeRange(range), cancellationToken);

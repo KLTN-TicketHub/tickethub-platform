@@ -245,6 +245,8 @@
 import { ref, computed, onMounted, markRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { store } from '../stores/eventStore'
+import { addToast } from '../stores/adminStore'
+import { getErrorMessage } from '../utils/apiError'
 import BaseButton from '../components/ui/BaseButton.vue'
 import { getOrganizerEvents, getEventStatuses } from '../services/organizer.service'
 import { 
@@ -285,6 +287,7 @@ onMounted(async () => {
     }
   } catch (err) {
     console.error('Error fetching event statuses:', err)
+    addToast(getErrorMessage(err, 'Không thể tải danh sách trạng thái sự kiện.'), 'error')
     eventStatuses.value = [
       { id: 1, name: 'Chờ duyệt' },
       { id: 2, name: 'Đã xuất bản' },
@@ -320,6 +323,7 @@ const fetchData = async () => {
     }
   } catch (err) {
     console.error('Error fetching events:', err)
+    addToast(getErrorMessage(err, 'Không thể tải danh sách sự kiện.'), 'error')
     events.value = []
     totalPages.value = 1
     totalCount.value = 0

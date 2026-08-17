@@ -132,6 +132,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { getOrganizerEventDetail } from '../../services/eventService'
 import { getOrganizerEventRatings } from '../../services/rating.service'
 import { addToast } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseTable from '../../components/ui/BaseTable.vue'
 import {
@@ -220,7 +221,7 @@ onMounted(async () => {
     }
   } catch (err) {
     console.error('Error fetching event detail:', err)
-    error.value = 'Lỗi kết nối khi tải dữ liệu sự kiện.'
+    error.value = getErrorMessage(err, 'Lỗi kết nối khi tải dữ liệu sự kiện.')
   } finally {
     isLoading.value = false
   }

@@ -422,6 +422,7 @@ import { getOrganizerEventDetail, requestEventCancellation } from '../../service
 import { getOrganizerSeatMapDetail } from '../../services/venue.service'
 import { store } from '../../stores/eventStore'
 import { addToast } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import {
   PhCalendarBlank, PhMapPin, PhTicket, PhMapPinLine, PhSpinner,
@@ -466,7 +467,7 @@ onMounted(async () => {
       error.value = res?.message || 'Không thể lấy thông tin sự kiện.'
     }
   } catch (err) {
-    error.value = 'Lỗi kết nối khi tải chi tiết sự kiện.'
+    error.value = getErrorMessage(err, 'Lỗi kết nối khi tải chi tiết sự kiện.')
     console.error(err)
   } finally {
     isLoading.value = false
@@ -489,7 +490,7 @@ const loadSeatMapLayout = async () => {
     }
   } catch (err) {
     console.error('Error loading seatmap details:', err)
-    seatMapError.value = err.message || 'Không thể tải sơ đồ ghế ngồi.'
+    seatMapError.value = getErrorMessage(err, 'Không thể tải sơ đồ ghế ngồi.')
   } finally {
     isLoadingSeatMap.value = false
   }

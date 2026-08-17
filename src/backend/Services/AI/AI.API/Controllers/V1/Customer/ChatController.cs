@@ -27,7 +27,7 @@ namespace AI.API.Controllers.V1.Customer
         public async Task<IActionResult> SendMessage([FromBody] ChatRequestDto request, CancellationToken cancellationToken)
         {
             Guid userId = _currentUserService.UserId
-                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
 
             (bool isSuccess, string message, ChatResponseDto? data) =
                 await _chatService.SendMessageAsync(userId, request.SessionId, request.Message, cancellationToken);

@@ -32,14 +32,11 @@ namespace Finance.API.Controllers.V1.Organizer
             CancellationToken cancellationToken)
         {
             Guid organizerId = _currentUserService.UserId
-                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
 
-            (bool isSuccess, string message) = await _payoutService.RequestPayoutAsync(eventId, organizerId, cancellationToken);
+            await _payoutService.RequestPayoutAsync(eventId, organizerId, cancellationToken);
 
-            if (!isSuccess)
-                return BadRequest(new ApiResponse(false, message));
-
-            return Ok(new ApiResponse(true, message));
+            return Ok(new ApiResponse(true, "Đã gửi yêu cầu giải ngân thành công. Moderator sẽ xem xét và phản hồi sớm."));
         }
 
         [HttpGet("proposed")]
@@ -49,7 +46,7 @@ namespace Finance.API.Controllers.V1.Organizer
             CancellationToken cancellationToken)
         {
             Guid organizerId = _currentUserService.UserId
-                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
 
             PaginatedResult<ProposedPayoutDto> result = await _payoutService.GetProposedPayoutsAsync(
                 organizerId,
@@ -66,15 +63,12 @@ namespace Finance.API.Controllers.V1.Organizer
             CancellationToken cancellationToken)
         {
             Guid organizerId = _currentUserService.UserId
-                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
 
-            (bool isSuccess, string message, EventPayoutResultDto? data) = await _payoutService.AcceptPayoutAsync(
+            EventPayoutResultDto data = await _payoutService.AcceptPayoutAsync(
                 payoutId, organizerId, cancellationToken);
 
-            if (!isSuccess)
-                return BadRequest(new ApiResponse(false, message));
-
-            return Ok(new ApiResponse<EventPayoutResultDto>(true, message, data!));
+            return Ok(new ApiResponse<EventPayoutResultDto>(true, "Đã chấp nhận giải ngân, số dư ví đã được cập nhật.", data));
         }
 
         [HttpPost("{payoutId:guid}/reject")]
@@ -84,15 +78,12 @@ namespace Finance.API.Controllers.V1.Organizer
             CancellationToken cancellationToken)
         {
             Guid organizerId = _currentUserService.UserId
-                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
 
-            (bool isSuccess, string message) = await _payoutService.RejectPayoutAsync(
+            await _payoutService.RejectPayoutAsync(
                 payoutId, organizerId, request.Reason, cancellationToken);
 
-            if (!isSuccess)
-                return BadRequest(new ApiResponse(false, message));
-
-            return Ok(new ApiResponse(true, message));
+            return Ok(new ApiResponse(true, "Đã từ chối đề xuất giải ngân. Yêu cầu đã được chuyển lại cho Moderator xem xét."));
         }
     }
 }

@@ -148,6 +148,8 @@ import { Line } from 'vue-chartjs'
 import { PhCoins, PhPercent, PhHandCoins, PhWallet, PhSpinner } from '@phosphor-icons/vue'
 import { getFinanceSummary, getFinanceTrend, getFinanceByCategory, getPaymentGatewayStats } from '../../services/admin-finance.service'
 import { createAreaGradient } from '../../lib/chartSetup'
+import { addToast } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 import BaseButton from '../../components/ui/BaseButton.vue'
 
 const toDateInputValue = (d) => d.toISOString().slice(0, 10)
@@ -185,6 +187,7 @@ const loadSummary = async () => {
     if (res && res.success) summary.value = res.data
   } catch (err) {
     console.error('Error fetching finance summary:', err)
+    addToast(getErrorMessage(err, 'Không thể tải tổng quan doanh thu.'), 'error')
   } finally {
     isLoadingSummary.value = false
   }
@@ -197,6 +200,7 @@ const loadTrend = async () => {
     trend.value = (res && res.success) ? (res.data || []) : []
   } catch (err) {
     console.error('Error fetching finance trend:', err)
+    addToast(getErrorMessage(err, 'Không thể tải biểu đồ xu hướng doanh thu.'), 'error')
     trend.value = []
   } finally {
     isLoadingTrend.value = false
@@ -210,6 +214,7 @@ const loadByCategory = async () => {
     byCategory.value = (res && res.success) ? (res.data || []) : []
   } catch (err) {
     console.error('Error fetching finance by category:', err)
+    addToast(getErrorMessage(err, 'Không thể tải doanh thu theo danh mục.'), 'error')
     byCategory.value = []
   } finally {
     isLoadingByCategory.value = false
@@ -223,6 +228,7 @@ const loadGatewayStats = async () => {
     gatewayStats.value = (res && res.success) ? (res.data || []) : []
   } catch (err) {
     console.error('Error fetching payment gateway stats:', err)
+    addToast(getErrorMessage(err, 'Không thể tải thống kê cổng thanh toán.'), 'error')
     gatewayStats.value = []
   } finally {
     isLoadingGatewayStats.value = false

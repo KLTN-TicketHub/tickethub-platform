@@ -218,6 +218,7 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getProvinces, getDistricts, getWards } from '../../services/location.service'
 import { getModeratorVenueById, updateModeratorVenue } from '../../services/venue.service'
+import { getErrorMessage } from '../../utils/apiError'
 import { PhCircleNotch, PhCheckCircle, PhWarningCircle, PhMapPin, PhGlobeHemisphereWest, PhArrowLeft, PhSquaresFour } from '@phosphor-icons/vue'
 
 const router = useRouter()
@@ -280,7 +281,7 @@ const fetchVenueData = async () => {
       apiError.value = "Không thể tải dữ liệu địa điểm."
     }
   } catch (err) {
-    apiError.value = "Đã xảy ra lỗi khi tải dữ liệu."
+    apiError.value = getErrorMessage(err, "Đã xảy ra lỗi khi tải dữ liệu.")
   } finally {
     isPageLoading.value = false
   }

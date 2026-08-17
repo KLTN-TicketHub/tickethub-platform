@@ -261,6 +261,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { openConfirm, addToast } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 import {
   getAdminEventCategories,
   createAdminEventCategory,
@@ -327,7 +328,7 @@ const fetchCategories = async () => {
   } catch (err) {
     console.error('Error fetching categories:', err)
     categoriesList.value = []
-    addToast('Không thể tải danh sách danh mục sự kiện.', 'error')
+    addToast(getErrorMessage(err, 'Không thể tải danh sách danh mục sự kiện.'), 'error')
   } finally {
     isLoading.value = false
   }
@@ -433,7 +434,7 @@ const openReorderModal = async () => {
   } catch (err) {
     console.error('Error fetching categories for reorder:', err)
     reorderList.value = []
-    addToast('Không thể tải danh sách danh mục để sắp xếp.', 'error')
+    addToast(getErrorMessage(err, 'Không thể tải danh sách danh mục để sắp xếp.'), 'error')
   } finally {
     isReorderLoading.value = false
   }

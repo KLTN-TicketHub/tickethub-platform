@@ -177,6 +177,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { addToast } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 import { getPayoutRequests, proposePayout } from '../../services/moderator-payout.service'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseTable from '../../components/ui/BaseTable.vue'
@@ -220,7 +221,7 @@ const fetchRequests = async () => {
   } catch (err) {
     console.error('Error fetching payout requests:', err)
     requestsList.value = []
-    addToast('Không thể tải danh sách yêu cầu giải ngân.', 'error')
+    addToast(getErrorMessage(err, 'Không thể tải danh sách yêu cầu giải ngân.'), 'error')
   } finally {
     isLoading.value = false
   }

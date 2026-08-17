@@ -147,6 +147,8 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { notificationService } from '../../services/notification.service'
+import { addToast } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 
 const SENT_COLOR = '#00A040'
 const READ_COLOR = '#0284C7'
@@ -294,6 +296,7 @@ const loadStats = async () => {
     })
   } catch (err) {
     console.error('[Notification] Không thể tải thống kê:', err)
+    addToast(getErrorMessage(err, 'Không thể tải thống kê thông báo.'), 'error')
   } finally {
     isLoading.value = false
   }

@@ -1,6 +1,7 @@
 using AI.Common.Dtos.Suggestions;
 using AI.Infrastructure.Interfaces.IServices;
 using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Domain.Exceptions;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text;
@@ -44,7 +45,7 @@ namespace AI.Infrastructure.Services
 
             CategoryTrendResult trend = await _catalogAiClient.GetCategoryTrendAsync(from, to);
             if (!trend.IsSuccess)
-                return (false, trend.Message, null);
+                throw new BusinessRuleException(trend.Message);
 
             OrganizerPortfolioResult portfolio = await _catalogAiClient.GetOrganizerPortfolioAsync(organizerId, from, to);
 
@@ -77,7 +78,7 @@ namespace AI.Infrastructure.Services
 
             OrganizerPortfolioResult portfolio = await _catalogAiClient.GetOrganizerPortfolioAsync(organizerId, from, to);
             if (!portfolio.IsSuccess)
-                return (false, portfolio.Message, null);
+                throw new BusinessRuleException(portfolio.Message);
 
             var promptData = new
             {
@@ -105,7 +106,7 @@ namespace AI.Infrastructure.Services
 
             EventInsightResult insight = await _catalogAiClient.GetEventInsightAsync(eventId, organizerId, from, to);
             if (!insight.IsSuccess)
-                return (false, insight.Message, null);
+                throw new BusinessRuleException(insight.Message);
 
             var promptData = new
             {

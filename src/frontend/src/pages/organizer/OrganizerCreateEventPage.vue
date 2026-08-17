@@ -1159,6 +1159,8 @@ import {
 import { getEventCategories, uploadCoverImage, createEventWithLocation, createEventWithSeatMap, getSeatMapZones } from '../../services/organizer.service'
 import { getOrganizerVenues, getOrganizerVenueSeatMaps, getOrganizerSeatMapDetail } from '../../services/venue.service'
 import { getProvinces, getDistricts, getWards } from '../../services/location.service'
+import { addToast } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 
 const router = useRouter()
 
@@ -1242,6 +1244,7 @@ async function loadCategories() {
     }
   } catch (e) {
     console.error('Không thể tải danh mục:', e)
+    addToast(getErrorMessage(e, 'Không thể tải danh mục sự kiện.'), 'error')
   } finally {
     isLoadingCategories.value = false
   }
@@ -1415,6 +1418,7 @@ async function loadVenues() {
     }
   } catch (e) {
     console.error(e)
+    addToast(getErrorMessage(e, 'Không thể tải danh sách địa điểm.'), 'error')
   } finally {
     isLoadingVenues.value = false
   }
@@ -1450,6 +1454,7 @@ async function selectVenue(venue) {
     }
   } catch (e) {
     console.error(e)
+    addToast(getErrorMessage(e, 'Không thể tải danh sách sơ đồ ghế của địa điểm.'), 'error')
   } finally {
     isLoadingSeatMaps.value = false
   }
@@ -1639,6 +1644,7 @@ async function loadZones() {
     }
   } catch (e) {
     console.error(e)
+    addToast(getErrorMessage(e, 'Không thể tải dữ liệu khu vực sơ đồ ghế.'), 'error')
   } finally {
     isLoadingZones.value = false
   }

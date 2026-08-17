@@ -179,6 +179,7 @@
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { openConfirm, addToast } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 import {
   getAdminUsers,
   updateAdminUser,
@@ -270,7 +271,7 @@ const fetchUsers = async () => {
   } catch (err) {
     console.error('Error fetching users:', err)
     usersList.value = []
-    addToast('Không thể tải danh sách người dùng.', 'error')
+    addToast(getErrorMessage(err, 'Không thể tải danh sách người dùng.'), 'error')
   } finally {
     isLoading.value = false
   }

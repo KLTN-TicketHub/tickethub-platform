@@ -30,7 +30,7 @@ namespace Finance.API.Controllers.V1.Organizer
         public async Task<IActionResult> GetWalletAsync(CancellationToken cancellationToken)
         {
             Guid organizerId = _currentUserService.UserId
-                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
 
             WalletDto result = await _walletService.GetWalletAsync(organizerId, cancellationToken);
 
@@ -44,7 +44,7 @@ namespace Finance.API.Controllers.V1.Organizer
             CancellationToken cancellationToken)
         {
             Guid organizerId = _currentUserService.UserId
-                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
 
             PaginatedResult<WalletTransactionDto> result = await _walletService.GetWalletTransactionsAsync(
                 organizerId,

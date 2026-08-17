@@ -391,7 +391,7 @@ export async function logout() {
   try {
     const currentToken = tokenService.getToken()
     if (currentToken) {
-      await api.post(AUTH_LOGOUT, {}, { withCredentials: true })
+      await api.post(AUTH_LOGOUT, {}, { withCredentials: true }).catch(() => {})
     }
   } finally {
     tokenService.clearLogin()

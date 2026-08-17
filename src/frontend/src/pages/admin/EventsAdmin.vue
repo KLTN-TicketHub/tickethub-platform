@@ -150,6 +150,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { getEvents, addEvent, updateEvent, deleteEvent } from '../../stores/eventStore'
 import { adminSearch, openConfirm, addToast } from '../../stores/adminStore'
 import { getEventSummary, getEventsByCategory } from '../../services/admin-event.service'
+import { getErrorMessage } from '../../utils/apiError'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseTable from '../../components/ui/BaseTable.vue'
 import BaseBadge from '../../components/ui/BaseBadge.vue'
@@ -185,6 +186,7 @@ const loadSummary = async () => {
     if (res && res.success) summary.value = res.data
   } catch (err) {
     console.error('Error fetching event summary:', err)
+    addToast(getErrorMessage(err, 'Không thể tải tổng quan sự kiện.'), 'error')
   }
 }
 
@@ -195,6 +197,7 @@ const loadByCategory = async () => {
     byCategory.value = (res && res.success) ? (res.data || []) : []
   } catch (err) {
     console.error('Error fetching events by category:', err)
+    addToast(getErrorMessage(err, 'Không thể tải sự kiện theo danh mục.'), 'error')
     byCategory.value = []
   } finally {
     isLoadingByCategory.value = false

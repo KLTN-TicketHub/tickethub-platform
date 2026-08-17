@@ -192,6 +192,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { addToast, openConfirm } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 import { getWallet, getWalletTransactions, getProposedPayouts, acceptPayout, rejectPayout } from '../../services/organizer-wallet.service'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseTable from '../../components/ui/BaseTable.vue'
@@ -241,7 +242,7 @@ const fetchWallet = async () => {
     }
   } catch (err) {
     console.error('Error fetching wallet:', err)
-    addToast('Không thể tải thông tin ví.', 'error')
+    addToast(getErrorMessage(err, 'Không thể tải thông tin ví.'), 'error')
   } finally {
     isLoadingWallet.value = false
   }
@@ -262,7 +263,7 @@ const fetchTransactions = async () => {
   } catch (err) {
     console.error('Error fetching wallet transactions:', err)
     txList.value = []
-    addToast('Không thể tải lịch sử giao dịch.', 'error')
+    addToast(getErrorMessage(err, 'Không thể tải lịch sử giao dịch.'), 'error')
   } finally {
     isLoadingTx.value = false
   }
@@ -283,7 +284,7 @@ const fetchProposedPayouts = async () => {
   } catch (err) {
     console.error('Error fetching proposed payouts:', err)
     proposedList.value = []
-    addToast('Không thể tải danh sách đề xuất giải ngân.', 'error')
+    addToast(getErrorMessage(err, 'Không thể tải danh sách đề xuất giải ngân.'), 'error')
   } finally {
     isLoadingProposed.value = false
   }

@@ -188,6 +188,8 @@ import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getPublicEvents, getPublicEventCategories } from '../services/eventService'
 import { getProvinces } from '../services/location.service'
+import { store } from '../stores/eventStore'
+import { getErrorMessage } from '../utils/apiError'
 import SearchEventCard from '../components/SearchEventCard.vue'
 import { PhMagnifyingGlass, PhCalendarBlank, PhCaretDown, PhFunnel, PhXCircle, PhCaretLeft, PhCaretRight } from '@phosphor-icons/vue'
 
@@ -312,6 +314,7 @@ const fetchCategories = async () => {
     }
   } catch (error) {
     console.error('Failed to fetch categories', error)
+    store.toast = { message: getErrorMessage(error, 'Không thể tải danh mục sự kiện.'), icon: '❌' }
   }
 }
 
@@ -352,6 +355,7 @@ const loadEvents = async () => {
     }
   } catch (error) {
     console.error('Failed to load events:', error)
+    store.toast = { message: getErrorMessage(error, 'Không thể tải danh sách sự kiện.'), icon: '❌' }
     events.value = []
   } finally {
     isLoading.value = false

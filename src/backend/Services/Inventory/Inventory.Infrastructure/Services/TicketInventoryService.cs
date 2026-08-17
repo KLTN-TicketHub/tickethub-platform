@@ -1,6 +1,7 @@
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Events.Inventory;
 using BuildingBlocks.Contracts.Models.Pagination;
+using BuildingBlocks.Domain.Exceptions;
 using Inventory.Infrastructure.Dtos;
 using Inventory.Infrastructure.Entities;
 using Inventory.Infrastructure.Interfaces;
@@ -25,17 +26,12 @@ namespace Inventory.Infrastructure.Services
             _eventPublisher = eventPublisher;
         }
 
-        public async Task<TicketInventoryStateDto?> GetTicketInventoryStateAsync(Guid showtimeId, Guid ticketTypeId, CancellationToken cancellationToken = default)
+        public async Task<TicketInventoryStateDto> GetTicketInventoryStateAsync(Guid showtimeId, Guid ticketTypeId, CancellationToken cancellationToken = default)
         {
-            ShowtimeTicketInventory? inventory = await _unitOfWork.ShowtimeTicketInventoryRepository.GetOneAsync<ShowtimeTicketInventory>(
+            ShowtimeTicketInventory inventory = await _unitOfWork.ShowtimeTicketInventoryRepository.GetOneAsync<ShowtimeTicketInventory>(
                 filter: x => x.ShowTimeId == showtimeId && x.TicketTypeId == ticketTypeId,
                 cancellation: cancellationToken
-            );
-
-            if (inventory == null)
-            {
-                return null;
-            }
+            ) ?? throw new NotFoundException("Không tìm thấy cấu hình tồn kho cho loại vé này.");
 
             int lockedQty = await _redisLockService.GetLockedTicketsQuantityAsync(showtimeId, ticketTypeId);
 
@@ -94,26 +90,18 @@ namespace Inventory.Infrastructure.Services
             return await _redisLockService.UnlockTicketsAsync(showtimeId, ticketTypeId, userId);
         }
 
-        public async Task<(bool Success, string Message, IssuedTicket? Ticket)> CheckInTicketAsync(string qrToken, CancellationToken cancellationToken = default)
+        public async Task<IssuedTicket> CheckInTicketAsync(string qrToken, CancellationToken cancellationToken = default)
         {
-            var ticket = await _unitOfWork.IssuedTicketRepository.GetOneAsync<IssuedTicket>(
+            IssuedTicket ticket = await _unitOfWork.IssuedTicketRepository.GetOneAsync<IssuedTicket>(
                 filter: t => t.QrCodeToken == qrToken,
-                cancellation: cancellationToken);
-
-            if (ticket == null)
-            {
-                return (false, "Vé không hợp lệ hoặc không tồn tại.", null);
-            }
+                cancellation: cancellationToken)
+                ?? throw new NotFoundException("Vé không hợp lệ hoặc không tồn tại.");
 
             if (ticket.Status == IssuedTicketStatus.Used)
-            {
-                return (false, "Vé này đã được check-in trước đó.", ticket);
-            }
+                throw new BusinessRuleException("Vé này đã được check-in trước đó.");
 
             if (ticket.Status == IssuedTicketStatus.Cancelled)
-            {
-                return (false, "Vé này đã bị hủy.", ticket);
-            }
+                throw new BusinessRuleException("Vé này đã bị hủy.");
 
             ticket.Status = IssuedTicketStatus.Used;
 
@@ -128,7 +116,7 @@ namespace Inventory.Infrastructure.Services
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return (true, "Check-in thành công.", ticket);
+            return ticket;
         }
 
         public async Task<PaginatedResult<UserTicketDto>> GetMyTicketsAsync(Guid userId, IssuedTicketStatus? status, int pageIndex, int pageSize, CancellationToken cancellationToken = default)

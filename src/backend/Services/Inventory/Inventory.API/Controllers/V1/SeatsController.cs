@@ -36,16 +36,10 @@ namespace Inventory.API.Controllers.V1
         [HttpPost("seats/lock")]
         public async Task<IActionResult> LockSeat([FromBody] LockSeatRequest request)
         {
-            if (_currentUserService.UserId == null)
-            {
-                return Unauthorized(new ApiResponse(false, "Bạn cần đăng nhập để thực hiện chức năng này."));
-            }
+            Guid userId = _currentUserService.UserId
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Bạn cần đăng nhập để thực hiện chức năng này.");
 
-            var success = await _seatStateService.LockSeatAsync(request.ShowtimeId, request.SeatId, _currentUserService.UserId.Value);
-            if (!success)
-            {
-                return BadRequest(new ApiResponse(false, "Ghế đang được chọn bởi người khác hoặc đã bán."));
-            }
+            await _seatStateService.LockSeatAsync(request.ShowtimeId, request.SeatId, userId);
 
             return Ok(new ApiResponse(true, "Khóa ghế thành công."));
         }
@@ -53,25 +47,12 @@ namespace Inventory.API.Controllers.V1
         [HttpPost("seats/unlock")]
         public async Task<IActionResult> UnlockSeat([FromBody] LockSeatRequest request)
         {
-            if (_currentUserService.UserId == null)
-            {
-                return Unauthorized(new ApiResponse(false, "Bạn cần đăng nhập để thực hiện chức năng này."));
-            }
+            Guid userId = _currentUserService.UserId
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Bạn cần đăng nhập để thực hiện chức năng này.");
 
-            try
-            {
-                var success = await _seatStateService.UnlockSeatAsync(request.ShowtimeId, request.SeatId, _currentUserService.UserId.Value);
-                if (!success)
-                {
-                    return BadRequest(new ApiResponse(false, "Bạn không thể hủy khóa ghế của người khác."));
-                }
+            await _seatStateService.UnlockSeatAsync(request.ShowtimeId, request.SeatId, userId);
 
-                return Ok(new ApiResponse(true, "Hủy khóa ghế thành công."));
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new ApiResponse(false, ex.Message));
-            }
+            return Ok(new ApiResponse(true, "Hủy khóa ghế thành công."));
         }
     }
 

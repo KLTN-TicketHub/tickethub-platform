@@ -151,6 +151,8 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { getModeratorEvents, getEventStatusesForModerator } from '../../services/eventService'
+import { addToast } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 import { PhArrowLeft, PhMagnifyingGlass, PhCaretDown, PhTicket, PhCalendarBlank, PhMapPin } from '@phosphor-icons/vue'
 
 const events = ref([])
@@ -182,6 +184,7 @@ const loadStatuses = async () => {
     }
   } catch (error) {
     console.error("Failed to load statuses", error)
+    addToast(getErrorMessage(error, 'Không thể tải danh sách trạng thái.'), 'error')
   }
 }
 
@@ -202,6 +205,7 @@ const loadEvents = async () => {
     }
   } catch (error) {
     console.error("Failed to load events", error)
+    addToast(getErrorMessage(error, 'Không thể tải danh sách sự kiện.'), 'error')
   } finally {
     isLoading.value = false
   }

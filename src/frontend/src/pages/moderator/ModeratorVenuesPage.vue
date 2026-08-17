@@ -173,6 +173,8 @@
 import { ref, reactive, onMounted } from 'vue'
 import { getModeratorVenues, deleteModeratorVenue } from '../../services/venue.service'
 import { getProvinces, getDistricts } from '../../services/location.service'
+import { addToast } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 import { PhPlus, PhMagnifyingGlass, PhPencilSimple, PhTrash, PhSquaresFour, PhArrowLeft } from '@phosphor-icons/vue'
 
 const venues = ref([])
@@ -233,6 +235,7 @@ const loadVenues = async () => {
     }
   } catch (error) {
     console.error("Failed to load venues", error)
+    addToast(getErrorMessage(error, 'Không thể tải danh sách địa điểm.'), 'error')
   } finally {
     isLoading.value = false
   }
@@ -296,10 +299,10 @@ const confirmDelete = async (venue) => {
   if (window.confirm(`Bạn có chắc chắn muốn xóa địa điểm "${venue.venueName}" không?`)) {
     try {
       await deleteModeratorVenue(venue.id)
-      alert('Xóa địa điểm thành công')
+      addToast('Xóa địa điểm thành công.', 'success')
       loadVenues()
     } catch (error) {
-      alert('Lỗi khi xóa địa điểm')
+      addToast(getErrorMessage(error, 'Lỗi khi xóa địa điểm.'), 'error')
     }
   }
 }

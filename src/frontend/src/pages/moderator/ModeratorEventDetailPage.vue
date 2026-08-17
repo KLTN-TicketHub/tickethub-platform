@@ -271,6 +271,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getModeratorEventDetail, reviewModeratorEvent, cancelModeratorEvent } from '../../services/eventService'
 import { addToast, openConfirm } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 import { PhArrowLeft, PhCheckCircle, PhWarningCircle, PhClockClockwise, PhCheck, PhCalendarStar, PhMapPin, PhEnvelope, PhPhone, PhTicket, PhMapTrifold, PhClock, PhProhibit } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -300,6 +301,7 @@ const loadEventDetail = async () => {
     }
   } catch (error) {
     console.error("Error loading event details", error)
+    addToast(getErrorMessage(error, 'Không thể tải thông tin sự kiện.'), 'error')
   } finally {
     isLoading.value = false
   }
@@ -345,14 +347,14 @@ const approveEvent = async () => {
     try {
       const res = await reviewModeratorEvent(event.value.id, { isApproved: true, reason: "" })
       if (res.success) {
-        alert("Đã duyệt sự kiện thành công!")
+        addToast('Đã duyệt sự kiện thành công!', 'success')
         await loadEventDetail()
       } else {
-        alert(res.message || "Lỗi khi duyệt sự kiện")
+        addToast(res.message || 'Lỗi khi duyệt sự kiện.', 'error')
       }
     } catch (e) {
       console.error(e)
-      alert("Đã có lỗi xảy ra. Vui lòng thử lại sau.")
+      addToast(getErrorMessage(e, 'Đã có lỗi xảy ra. Vui lòng thử lại sau.'), 'error')
     }
   }
 }
@@ -397,15 +399,15 @@ const submitReject = async () => {
   try {
     const res = await reviewModeratorEvent(event.value.id, { isApproved: false, reason: rejectReason.value })
     if (res.success) {
-      alert("Đã từ chối sự kiện!")
+      addToast('Đã từ chối sự kiện!', 'success')
       closeRejectModal()
       await loadEventDetail()
     } else {
-      alert(res.message || "Lỗi khi từ chối sự kiện")
+      addToast(res.message || 'Lỗi khi từ chối sự kiện.', 'error')
     }
   } catch (e) {
     console.error(e)
-    alert("Đã có lỗi xảy ra. Vui lòng thử lại sau.")
+    addToast(getErrorMessage(e, 'Đã có lỗi xảy ra. Vui lòng thử lại sau.'), 'error')
   }
 }
 

@@ -385,6 +385,7 @@ import NotificationStatsPanel from '../../components/admin/NotificationStatsPane
 import { addToast, openConfirm } from '../../stores/adminStore'
 import { notificationService } from '../../services/notification.service'
 import { formatRelativeTime, getNotificationPreset } from '../../utils/notificationDisplay'
+import { getErrorMessage } from '../../utils/apiError'
 
 const PAGE_SIZE = 10
 const GUID_PATTERN = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
@@ -660,6 +661,7 @@ const loadMoreSent = async () => {
   } catch (err) {
     hasMoreSent.value = false
     console.error('[Notification] Không thể tải lịch sử thông báo đã gửi:', err)
+    addToast(getErrorMessage(err, 'Không thể tải lịch sử thông báo đã gửi.'), 'error')
   } finally {
     isLoadingSent.value = false
   }
@@ -679,6 +681,7 @@ const loadMoreScheduled = async () => {
   } catch (err) {
     hasMoreScheduled.value = false
     console.error('[Notification] Không thể tải danh sách thông báo hẹn giờ:', err)
+    addToast(getErrorMessage(err, 'Không thể tải danh sách thông báo hẹn giờ.'), 'error')
   } finally {
     isLoadingScheduled.value = false
   }

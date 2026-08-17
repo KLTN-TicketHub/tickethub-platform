@@ -277,6 +277,7 @@ import { ref, reactive, computed, onMounted, nextTick, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Stage as VStage, Layer as VLayer, Rect as VRect, Path as VPath, Text as VText, Circle as VCircle } from 'vue-konva'
 import { getModeratorSeatMapDetail, deleteModeratorSeatMap } from '../../services/venue.service.js'
+import { getErrorMessage } from '../../utils/apiError'
 import { PhArrowLeft, PhWarningCircle, PhMapPin, PhTrash, PhSpinner } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -491,7 +492,7 @@ onMounted(async () => {
       error.value = res?.message || 'Không thể tải thông tin sơ đồ ghế.'
     }
   } catch (err) {
-    error.value = 'Lỗi kết nối máy chủ. Vui lòng thử lại.'
+    error.value = getErrorMessage(err, 'Lỗi kết nối máy chủ. Vui lòng thử lại.')
     console.error(err)
   } finally {
     isLoading.value = false

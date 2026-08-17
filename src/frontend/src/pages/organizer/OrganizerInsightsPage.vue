@@ -103,6 +103,7 @@ import { ref, onMounted } from 'vue'
 import { PhSpinner } from '@phosphor-icons/vue'
 import { getOrganizerInsights } from '../../services/insights.service'
 import { getMarketDirectionSuggestions, getPortfolioSuggestions } from '../../services/ai-insights.service'
+import { getErrorMessage } from '../../utils/apiError'
 import TrendMiniChart from '../../components/organizer/TrendMiniChart.vue'
 import AiSuggestionSection from '../../components/organizer/AiSuggestionSection.vue'
 
@@ -124,7 +125,7 @@ const fetchInsights = async () => {
     }
   } catch (err) {
     console.error('Error fetching organizer insights:', err)
-    error.value = 'Lỗi kết nối khi tải dữ liệu thống kê.'
+    error.value = getErrorMessage(err, 'Lỗi kết nối khi tải dữ liệu thống kê.')
   } finally {
     isLoading.value = false
   }

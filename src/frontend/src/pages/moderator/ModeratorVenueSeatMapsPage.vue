@@ -113,6 +113,8 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getModeratorVenueById, getModeratorVenueSeatMaps } from '../../services/venue.service'
+import { addToast } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 import { PhArrowLeft, PhSquaresFour, PhPlus, PhArrowSquareOut } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -143,6 +145,7 @@ const fetchVenueInfo = async () => {
     }
   } catch (err) {
     console.error('Lỗi khi tải thông tin địa điểm:', err)
+    addToast(getErrorMessage(err, 'Không thể tải thông tin địa điểm.'), 'error')
   }
 }
 
@@ -158,6 +161,7 @@ const fetchSeatMaps = async () => {
     }
   } catch (err) {
     console.error('Lỗi khi tải danh sách sơ đồ chỗ ngồi:', err)
+    addToast(getErrorMessage(err, 'Không thể tải danh sách sơ đồ chỗ ngồi.'), 'error')
   } finally {
     isLoading.value = false
   }

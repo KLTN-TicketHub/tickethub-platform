@@ -592,6 +592,7 @@ import { HubConnectionBuilder, HttpTransportType } from '@microsoft/signalr'
 import { getToken } from '../services/auth/token.service'
 import { API_BASE_URL } from '../services/api/axios'
 import { store } from '../stores/eventStore'
+import { getErrorMessage } from '../utils/apiError'
 import BaseButton from '../components/ui/BaseButton.vue'
 import { 
   PhCalendarBlank, PhMapPin, PhTicket, PhStar, PhArrowRight, 
@@ -657,6 +658,7 @@ const loadTicketInventoryStates = async (showtimeId) => {
         }
       } catch (err) {
         console.error('Lỗi khi tải số lượng vé còn lại:', err);
+        store.toast = { message: getErrorMessage(err, 'Không thể tải số lượng vé còn lại.'), icon: '⚠️' }
       }
     }
   }
@@ -744,6 +746,7 @@ const loadSeatStates = async () => {
     })
   } catch (err) {
     console.error('[SeatStates] Lỗi khi tải trạng thái ghế từ Inventory:', err)
+    store.toast = { message: getErrorMessage(err, 'Không thể tải trạng thái ghế mới nhất.'), icon: '⚠️' }
   }
 }
 
@@ -944,7 +947,7 @@ onMounted(async () => {
       error.value = res?.message || 'Không thể lấy thông tin sự kiện.'
     }
   } catch (err) {
-    error.value = 'Lỗi kết nối khi tải chi tiết sự kiện.'
+    error.value = getErrorMessage(err, 'Lỗi kết nối khi tải chi tiết sự kiện.')
     console.error(err)
   } finally {
     isLoading.value = false
@@ -978,7 +981,7 @@ const loadSeatMapLayout = async () => {
     }
   } catch (err) {
     console.error('Error loading seatmap details:', err)
-    seatMapError.value = err.message || 'Không thể tải sơ đồ ghế ngồi.'
+    seatMapError.value = getErrorMessage(err, 'Không thể tải sơ đồ ghế ngồi.')
   } finally {
     isLoadingSeatMap.value = false
   }
@@ -1052,8 +1055,7 @@ const removeSelectedSeat = async (id) => {
     }
   } catch (err) {
     console.error(err)
-    const msg = err.response?.data?.message || 'Lỗi khi hủy khóa ghế.'
-    alert('Error caught: ' + msg) // Debug alert
+    const msg = getErrorMessage(err, 'Lỗi khi hủy khóa ghế.')
     store.toast = { message: msg, icon: '⚠️' }
   } finally {
     setTimeout(() => localUnlocks.delete(id), 2000)
@@ -1350,8 +1352,7 @@ async function onSeatClick(seat, zone, row) {
       }
     } catch (err) {
       console.error(err)
-      const msg = err.response?.data?.message || 'Lỗi khi hủy khóa ghế.'
-      alert('Error caught: ' + msg) // Debug alert
+      const msg = getErrorMessage(err, 'Lỗi khi hủy khóa ghế.')
       store.toast = { message: msg, icon: '⚠️' }
     } finally {
       setTimeout(() => localUnlocks.delete(seat.id), 2000)
@@ -1395,7 +1396,7 @@ async function onSeatClick(seat, zone, row) {
       }
     } catch (err) {
       console.error(err)
-      store.toast = { message: 'Lỗi khi chọn khóa ghế.', icon: '⚠️' }
+      store.toast = { message: getErrorMessage(err, 'Lỗi khi chọn khóa ghế.'), icon: '⚠️' }
     } finally {
       pendingLocks.delete(seat.id)
     }
@@ -1594,7 +1595,7 @@ const submitCheckout = async () => {
     }
   } catch (err) {
     console.error('[Checkout] Lỗi:', err)
-    store.toast = { message: 'Lỗi khi kết nối đến hệ thống thanh toán. Vui lòng thử lại.', icon: '❌' }
+    store.toast = { message: getErrorMessage(err, 'Lỗi khi kết nối đến hệ thống thanh toán. Vui lòng thử lại.'), icon: '❌' }
   } finally {
     isCheckingOut.value = false
   }

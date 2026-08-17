@@ -5,7 +5,7 @@ namespace Finance.Infrastructure.Interfaces.IServices
 {
     public interface IPayoutService
     {
-        Task<(bool IsSuccess, string Message)> RequestPayoutAsync(
+        Task RequestPayoutAsync(
             Guid eventId,
             Guid organizerId,
             CancellationToken cancellationToken = default);
@@ -16,12 +16,12 @@ namespace Finance.Infrastructure.Interfaces.IServices
             int pageSize,
             CancellationToken cancellationToken = default);
 
-        Task<(bool IsSuccess, string Message, EventPayoutResultDto? Data)> AcceptPayoutAsync(
+        Task<EventPayoutResultDto> AcceptPayoutAsync(
             Guid payoutId,
             Guid organizerId,
             CancellationToken cancellationToken = default);
 
-        Task<(bool IsSuccess, string Message)> RejectPayoutAsync(
+        Task RejectPayoutAsync(
             Guid payoutId,
             Guid organizerId,
             string? reason,
@@ -32,7 +32,7 @@ namespace Finance.Infrastructure.Interfaces.IServices
             int pageSize,
             CancellationToken cancellationToken = default);
 
-        Task<(bool IsSuccess, string Message, EventPayoutResultDto? Data)> ProposePayoutAsync(
+        Task<EventPayoutResultDto> ProposePayoutAsync(
             Guid payoutRequestId,
             decimal appliedRate,
             Guid reviewerUserId,

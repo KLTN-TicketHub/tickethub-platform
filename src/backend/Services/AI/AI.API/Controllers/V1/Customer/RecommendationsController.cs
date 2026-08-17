@@ -28,7 +28,7 @@ namespace AI.API.Controllers.V1.Customer
         public async Task<IActionResult> GetMyRecommendationsAsync([FromQuery] int topN, CancellationToken cancellationToken)
         {
             Guid userId = _currentUserService.UserId
-                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
 
             List<RecommendationItemResult> recommendations = await _recommendationService.GetRecommendationsAsync(
                 userId,

@@ -300,6 +300,7 @@ import {
 } from '@phosphor-icons/vue'
 import { ticketService } from '../services/ticket.service'
 import { submitEventRating } from '../services/rating.service'
+import { getErrorMessage } from '../utils/apiError'
 
 const activeTab = ref('upcoming')
 const selectedTicket = ref(null)
@@ -328,7 +329,7 @@ const fetchTickets = async () => {
     }
   } catch (error) {
     console.error('Failed to fetch tickets:', error);
-    store.toast = { message: 'Không thể tải danh sách vé. Vui lòng thử lại.', icon: '❌' };
+    store.toast = { message: getErrorMessage(error, 'Không thể tải danh sách vé. Vui lòng thử lại.'), icon: '❌' };
   } finally {
     isLoading.value = false;
   }

@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Exceptions;
 using Inventory.Infrastructure.Interfaces.IServices;
 using StackExchange.Redis;
 using System.Net;
@@ -61,7 +62,7 @@ namespace Inventory.Infrastructure.Services
 
             if ((int)result == -1)
             {
-                throw new InvalidOperationException("Ghế đang trong quá trình thanh toán, không thể hủy.");
+                throw new BusinessRuleException("Ghế đang trong quá trình thanh toán, không thể hủy.");
             }
 
             return (int)result == 1;

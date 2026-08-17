@@ -392,6 +392,7 @@ import { requestPayout } from '../../services/organizer-wallet.service'
 import { getEventClickTrend } from '../../services/insights.service'
 import { getEventSuggestions } from '../../services/ai-insights.service'
 import { addToast } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 import { createAreaGradient } from '../../lib/chartSetup'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import TrendMiniChart from '../../components/organizer/TrendMiniChart.vue'
@@ -435,6 +436,7 @@ const fetchChart = async () => {
     }
   } catch (err) {
     console.error('Error fetching chart data:', err)
+    addToast(getErrorMessage(err, 'Không thể tải dữ liệu biểu đồ.'), 'error')
     chartData.value = []
   } finally {
     isLoadingChart.value = false
@@ -463,6 +465,7 @@ const fetchClickTrend = async () => {
     }
   } catch (err) {
     console.error('Error fetching event click trend:', err)
+    addToast(getErrorMessage(err, 'Không thể tải xu hướng lượt xem.'), 'error')
     clickTrend.value = []
   } finally {
     isLoadingClickTrend.value = false
@@ -584,6 +587,7 @@ const fetchOrders = async () => {
     }
   } catch (err) {
     console.error('Error fetching event orders:', err)
+    addToast(getErrorMessage(err, 'Không thể tải danh sách đơn hàng.'), 'error')
     ordersList.value = []
   } finally {
     isLoadingOrders.value = false
@@ -618,7 +622,7 @@ onMounted(async () => {
     }
   } catch (err) {
     console.error('Error fetching event report:', err)
-    error.value = 'Lỗi kết nối khi tải dữ liệu báo cáo.'
+    error.value = getErrorMessage(err, 'Lỗi kết nối khi tải dữ liệu báo cáo.')
   } finally {
     isLoading.value = false
   }

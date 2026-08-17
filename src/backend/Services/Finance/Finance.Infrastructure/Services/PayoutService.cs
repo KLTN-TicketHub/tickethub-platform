@@ -3,6 +3,7 @@ using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Events.Email;
 using BuildingBlocks.Contracts.Events.Notification;
 using BuildingBlocks.Contracts.Models.Pagination;
+using BuildingBlocks.Domain.Exceptions;
 using Finance.Common.Dtos.Payouts;
 using Finance.Infrastructure.Entities;
 using Finance.Infrastructure.Interfaces;
@@ -25,7 +26,7 @@ namespace Finance.Infrastructure.Services
             _logger = logger;
         }
 
-        public async Task<(bool IsSuccess, string Message)> RequestPayoutAsync(
+        public async Task RequestPayoutAsync(
             Guid eventId,
             Guid organizerId,
             CancellationToken cancellationToken = default)
@@ -33,22 +34,22 @@ namespace Finance.Infrastructure.Services
             bool hasUnreleasedRevenue = await _unitOfWork.WalletTransactionRepository.HasUnreleasedRevenueAsync(eventId, cancellationToken);
 
             if (hasUnreleasedRevenue)
-                return (false, "Sự kiện chưa kết thúc hoặc vẫn còn trong thời gian chờ đối soát. Chỉ có thể yêu cầu giải ngân sau khi toàn bộ sự kiện đã kết thúc.");
+                throw new BusinessRuleException("Sự kiện chưa kết thúc hoặc vẫn còn trong thời gian chờ đối soát. Chỉ có thể yêu cầu giải ngân sau khi toàn bộ sự kiện đã kết thúc.");
 
             PendingPayoutSummary? summary = await _unitOfWork.WalletTransactionRepository.GetEventPendingSummaryAsync(eventId, cancellationToken);
 
             if (summary == null)
-                return (false, "Không có doanh thu nào sẵn sàng để yêu cầu giải ngân cho sự kiện này.");
+                throw new BusinessRuleException("Không có doanh thu nào sẵn sàng để yêu cầu giải ngân cho sự kiện này.");
 
             if (summary.OrganizerId != organizerId)
-                return (false, "Bạn không có quyền yêu cầu giải ngân cho sự kiện này.");
+                throw new ForbiddenAccessException("Bạn không có quyền yêu cầu giải ngân cho sự kiện này.");
 
             PayoutRequest? existingRequest = await _unitOfWork.PayoutRequestRepository.GetOneUntrackedAsync<PayoutRequest>(
                 filter: pr => pr.EventId == eventId && pr.Status == PayoutRequestStatus.Pending,
                 cancellation: cancellationToken);
 
             if (existingRequest != null)
-                return (false, "Đã có yêu cầu giải ngân đang chờ xử lý cho sự kiện này.");
+                throw new BusinessRuleException("Đã có yêu cầu giải ngân đang chờ xử lý cho sự kiện này.");
 
             PayoutRequest request = new PayoutRequest(eventId, summary.EventTitle, summary.CategoryId, organizerId, summary.WalletId);
             await _unitOfWork.PayoutRequestRepository.CreateAsync(request, cancellationToken);
@@ -62,8 +63,6 @@ namespace Finance.Infrastructure.Services
                 LinkUrl = "/moderator/payouts",
                 ReferenceId = request.Id
             }, cancellationToken: cancellationToken);
-
-            return (true, "Đã gửi yêu cầu giải ngân thành công. Moderator sẽ xem xét và phản hồi sớm.");
         }
 
         public async Task<PaginatedResult<PayoutRequestDto>> GetPayoutRequestsAsync(
@@ -95,7 +94,7 @@ namespace Finance.Infrastructure.Services
             return new PaginatedResult<PayoutRequestDto>(data, totalCount, pageNumber, pageSize);
         }
 
-        public async Task<(bool IsSuccess, string Message, EventPayoutResultDto? Data)> ProposePayoutAsync(
+        public async Task<EventPayoutResultDto> ProposePayoutAsync(
             Guid payoutRequestId,
             decimal appliedRate,
             Guid reviewerUserId,
@@ -103,16 +102,14 @@ namespace Finance.Infrastructure.Services
             CancellationToken cancellationToken = default)
         {
             if (appliedRate < 0 || appliedRate > 100)
-                return (false, "Phần trăm hoa hồng áp dụng phải nằm trong khoảng từ 0 đến 100.", null);
+                throw new ValidatorException("appliedRate", "Phần trăm hoa hồng áp dụng phải nằm trong khoảng từ 0 đến 100.");
 
-            PayoutRequest? payoutRequest = await _unitOfWork.PayoutRequestRepository.GetOneAsync<PayoutRequest>(
-                filter: pr => pr.Id == payoutRequestId, cancellation: cancellationToken);
-
-            if (payoutRequest == null)
-                return (false, $"Không tìm thấy yêu cầu giải ngân với ID {payoutRequestId}.", null);
+            PayoutRequest payoutRequest = await _unitOfWork.PayoutRequestRepository.GetOneAsync<PayoutRequest>(
+                filter: pr => pr.Id == payoutRequestId, cancellation: cancellationToken)
+                ?? throw new NotFoundException($"Không tìm thấy yêu cầu giải ngân với ID {payoutRequestId}.");
 
             if (payoutRequest.Status != PayoutRequestStatus.Pending)
-                return (false, "Yêu cầu giải ngân này đã được xử lý.", null);
+                throw new BusinessRuleException("Yêu cầu giải ngân này đã được xử lý.");
 
             List<WalletTransaction> pendingTransactions = (await _unitOfWork.WalletTransactionRepository.GetAllAsync<WalletTransaction>(
                 filter: t => t.EventId == payoutRequest.EventId
@@ -123,13 +120,12 @@ namespace Finance.Infrastructure.Services
                 cancellation: cancellationToken)).ToList();
 
             if (!pendingTransactions.Any())
-                return (false, $"Không tìm thấy giao dịch doanh thu nào đang chờ giải ngân cho sự kiện {payoutRequest.EventId}.", null);
+                throw new BusinessRuleException($"Không tìm thấy giao dịch doanh thu nào đang chờ giải ngân cho sự kiện {payoutRequest.EventId}.");
 
             decimal grossAmount = pendingTransactions.Sum(t => t.Amount);
 
-            Wallet? wallet = await _unitOfWork.WalletRepository.GetByIdAsync(payoutRequest.WalletId, cancellationToken);
-            if (wallet == null)
-                return (false, $"Không tìm thấy ví với ID {payoutRequest.WalletId}.", null);
+            Wallet wallet = await _unitOfWork.WalletRepository.GetByIdAsync(payoutRequest.WalletId, cancellationToken)
+                ?? throw new NotFoundException($"Không tìm thấy ví với ID {payoutRequest.WalletId}.");
 
             CommissionSetting? setting = await _unitOfWork.CommissionSettingRepository.GetOneUntrackedAsync<CommissionSetting>(
                 filter: cs => cs.CategoryId == payoutRequest.CategoryId,
@@ -203,7 +199,7 @@ namespace Finance.Infrastructure.Services
                 throw;
             }
 
-            return (true, "Đã đề xuất giải ngân thành công. Đang chờ Organizer xác nhận.", MapToResultDto(payout));
+            return MapToResultDto(payout);
         }
 
         public async Task<PaginatedResult<ProposedPayoutDto>> GetProposedPayoutsAsync(
@@ -234,30 +230,27 @@ namespace Finance.Infrastructure.Services
             return new PaginatedResult<ProposedPayoutDto>(items, totalCount, pageNumber, pageSize);
         }
 
-        public async Task<(bool IsSuccess, string Message, EventPayoutResultDto? Data)> AcceptPayoutAsync(
+        public async Task<EventPayoutResultDto> AcceptPayoutAsync(
             Guid payoutId,
             Guid organizerId,
             CancellationToken cancellationToken = default)
         {
-            EventPayout? payout = await _unitOfWork.EventPayoutRepository.GetOneAsync<EventPayout>(
-                filter: p => p.Id == payoutId, cancellation: cancellationToken);
-
-            if (payout == null)
-                return (false, $"Không tìm thấy đề xuất giải ngân với ID {payoutId}.", null);
+            EventPayout payout = await _unitOfWork.EventPayoutRepository.GetOneAsync<EventPayout>(
+                filter: p => p.Id == payoutId, cancellation: cancellationToken)
+                ?? throw new NotFoundException($"Không tìm thấy đề xuất giải ngân với ID {payoutId}.");
 
             if (payout.OrganizerId != organizerId)
-                return (false, "Bạn không có quyền chấp nhận đề xuất giải ngân này.", null);
+                throw new ForbiddenAccessException("Bạn không có quyền chấp nhận đề xuất giải ngân này.");
 
             if (payout.Status != EventPayoutStatus.Proposed)
-                return (false, "Đề xuất giải ngân này đã được xử lý.", null);
+                throw new BusinessRuleException("Đề xuất giải ngân này đã được xử lý.");
 
             List<WalletTransaction> attachedTransactions = (await _unitOfWork.WalletTransactionRepository.GetAllAsync<WalletTransaction>(
                 filter: t => t.EventPayoutId == payout.Id && t.Status == WalletTransactionStatus.Pending,
                 cancellation: cancellationToken)).ToList();
 
-            Wallet? wallet = await _unitOfWork.WalletRepository.GetByIdAsync(payout.WalletId, cancellationToken);
-            if (wallet == null)
-                return (false, $"Không tìm thấy ví với ID {payout.WalletId}.", null);
+            Wallet wallet = await _unitOfWork.WalletRepository.GetByIdAsync(payout.WalletId, cancellationToken)
+                ?? throw new NotFoundException($"Không tìm thấy ví với ID {payout.WalletId}.");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -301,26 +294,24 @@ namespace Finance.Infrastructure.Services
                 throw;
             }
 
-            return (true, "Đã chấp nhận giải ngân, số dư ví đã được cập nhật.", MapToResultDto(payout));
+            return MapToResultDto(payout);
         }
 
-        public async Task<(bool IsSuccess, string Message)> RejectPayoutAsync(
+        public async Task RejectPayoutAsync(
             Guid payoutId,
             Guid organizerId,
             string? reason,
             CancellationToken cancellationToken = default)
         {
-            EventPayout? payout = await _unitOfWork.EventPayoutRepository.GetOneAsync<EventPayout>(
-                filter: p => p.Id == payoutId, cancellation: cancellationToken);
-
-            if (payout == null)
-                return (false, $"Không tìm thấy đề xuất giải ngân với ID {payoutId}.");
+            EventPayout payout = await _unitOfWork.EventPayoutRepository.GetOneAsync<EventPayout>(
+                filter: p => p.Id == payoutId, cancellation: cancellationToken)
+                ?? throw new NotFoundException($"Không tìm thấy đề xuất giải ngân với ID {payoutId}.");
 
             if (payout.OrganizerId != organizerId)
-                return (false, "Bạn không có quyền từ chối đề xuất giải ngân này.");
+                throw new ForbiddenAccessException("Bạn không có quyền từ chối đề xuất giải ngân này.");
 
             if (payout.Status != EventPayoutStatus.Proposed)
-                return (false, "Đề xuất giải ngân này đã được xử lý.");
+                throw new BusinessRuleException("Đề xuất giải ngân này đã được xử lý.");
 
             List<WalletTransaction> attachedTransactions = (await _unitOfWork.WalletTransactionRepository.GetAllAsync<WalletTransaction>(
                 filter: t => t.EventPayoutId == payout.Id && t.Status == WalletTransactionStatus.Pending,
@@ -357,7 +348,6 @@ namespace Finance.Infrastructure.Services
                 throw;
             }
 
-            return (true, "Đã từ chối đề xuất giải ngân. Yêu cầu đã được chuyển lại cho Moderator xem xét.");
         }
 
         private static EventPayoutResultDto MapToResultDto(EventPayout payout)

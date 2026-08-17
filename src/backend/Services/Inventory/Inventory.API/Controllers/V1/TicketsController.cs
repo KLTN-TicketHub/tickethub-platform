@@ -28,10 +28,6 @@ namespace Inventory.API.Controllers.V1
         public async Task<IActionResult> GetTicketInventoryState([FromRoute] Guid showtimeId, [FromRoute] Guid ticketTypeId)
         {
             var result = await _ticketInventoryService.GetTicketInventoryStateAsync(showtimeId, ticketTypeId);
-            if (result == null)
-            {
-                return NotFound(new ApiResponse(false, "Không tìm thấy cấu hình tồn kho cho loại vé này."));
-            }
             return Ok(new ApiResponse<TicketInventoryStateDto>(true, "Lấy thông tin tồn kho thành công.", result));
         }
 
@@ -44,14 +40,9 @@ namespace Inventory.API.Controllers.V1
                 return BadRequest(new ApiResponse(false, "Mã QR không được để trống."));
             }
 
-            var (success, message, ticket) = await _ticketInventoryService.CheckInTicketAsync(qrToken);
+            var ticket = await _ticketInventoryService.CheckInTicketAsync(qrToken);
 
-            if (!success)
-            {
-                return BadRequest(new ApiResponse(false, message));
-            }
-
-            return Ok(new ApiResponse<object>(true, message, ticket));
+            return Ok(new ApiResponse<object>(true, "Check-in thành công.", ticket));
         }
 
         [HttpGet("me")]
@@ -60,7 +51,7 @@ namespace Inventory.API.Controllers.V1
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(userIdStr, out Guid userId))
             {
-                return Unauthorized(new ApiResponse(false, "Không thể xác định người dùng."));
+                throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không thể xác định người dùng.");
             }
 
             var result = await _ticketInventoryService.GetMyTicketsAsync(userId, request.Status, request.PageNumber, request.PageSize);

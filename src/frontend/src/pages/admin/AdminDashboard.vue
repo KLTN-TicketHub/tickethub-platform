@@ -144,8 +144,9 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { getEvents } from '../../stores/eventStore'
-import { usersData, ordersData } from '../../stores/adminStore'
+import { usersData, ordersData, addToast } from '../../stores/adminStore'
 import { getFinanceSummary } from '../../services/admin-finance.service'
+import { getErrorMessage } from '../../utils/apiError'
 import BaseBadge from '../../components/ui/BaseBadge.vue'
 import BaseTable from '../../components/ui/BaseTable.vue'
 import {
@@ -171,6 +172,7 @@ const loadFinanceSummary = async () => {
     if (res && res.success) financeSummary.value = res.data
   } catch (err) {
     console.error('Error fetching finance summary:', err)
+    addToast(getErrorMessage(err, 'Không thể tải tổng quan doanh thu.'), 'error')
   } finally {
     isLoadingFinance.value = false
   }

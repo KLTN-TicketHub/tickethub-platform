@@ -3,6 +3,8 @@ import { HubConnectionBuilder } from '@microsoft/signalr'
 import { API_BASE_URL } from '../services/api/axios'
 import { getToken, isLoggedIn } from '../services/auth/token.service'
 import { notificationService } from '../services/notification.service'
+import { getErrorMessage } from '../utils/apiError'
+import { showToast } from '../utils/roleToast'
 
 const PAGE_SIZE = 12
 const TOAST_AUTO_DISMISS_MS = 6000
@@ -114,6 +116,7 @@ export async function loadMore() {
     notificationStore.hasMore = result ? nextPage < result.totalPages : false
   } catch (err) {
     console.error('[Notification] Không thể tải danh sách thông báo:', err)
+    showToast(getErrorMessage(err, 'Không thể tải danh sách thông báo.'))
     notificationStore.hasMore = false
   } finally {
     notificationStore.isLoading = false
@@ -157,10 +160,14 @@ export async function markRead(id) {
     notification.isRead = false
     notificationStore.unreadCount += 1
     console.error('[Notification] Không thể đánh dấu đã đọc:', err)
+    showToast(getErrorMessage(err, 'Không thể đánh dấu thông báo đã đọc.'))
   }
 }
 
 export async function markAllRead() {
+  const previousItemsReadState = notificationStore.items.map(item => item.isRead)
+  const previousUnreadCount = notificationStore.unreadCount
+
   try {
     await notificationService.markAllAsRead()
     notificationStore.items.forEach(item => { item.isRead = true })
@@ -172,7 +179,10 @@ export async function markAllRead() {
       notificationStore.hasMore = false
     }
   } catch (err) {
+    notificationStore.items.forEach((item, index) => { item.isRead = previousItemsReadState[index] })
+    notificationStore.unreadCount = previousUnreadCount
     console.error('[Notification] Không thể đánh dấu tất cả đã đọc:', err)
+    showToast(getErrorMessage(err, 'Không thể đánh dấu tất cả thông báo đã đọc.'))
   }
 }
 
@@ -188,6 +198,7 @@ export async function removeNotification(id) {
     }
   } catch (err) {
     console.error('[Notification] Không thể xoá thông báo:', err)
+    showToast(getErrorMessage(err, 'Không thể xoá thông báo.'))
   }
 }
 

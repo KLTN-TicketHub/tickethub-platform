@@ -1,5 +1,7 @@
 import api from './api/axios'
 import { LOCATION_PROVINCES, LOCATION_DISTRICTS, LOCATION_WARDS } from './api/endpoints'
+import { getErrorMessage } from '../utils/apiError'
+import { showToast } from '../utils/roleToast'
 
 export async function getProvinces() {
   try {
@@ -10,6 +12,7 @@ export async function getProvinces() {
     return []
   } catch (error) {
     console.error('Failed to get provinces:', error)
+    showToast(getErrorMessage(error, 'Không thể tải danh sách tỉnh/thành.'))
     return []
   }
 }
@@ -24,6 +27,7 @@ export async function getDistricts(provinceCode) {
     return []
   } catch (error) {
     console.error('Failed to get districts:', error)
+    showToast(getErrorMessage(error, 'Không thể tải danh sách quận/huyện.'))
     return []
   }
 }
@@ -38,6 +42,7 @@ export async function getWards(districtCode) {
     return []
   } catch (error) {
     console.error('Failed to get wards:', error)
+    showToast(getErrorMessage(error, 'Không thể tải danh sách phường/xã.'))
     return []
   }
 }

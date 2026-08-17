@@ -47,15 +47,12 @@ namespace Finance.API.Controllers.V1.Moderator
             CancellationToken cancellationToken)
         {
             Guid reviewerId = _currentUserService.UserId
-                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người duyệt.");
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không thể xác định danh tính người duyệt.");
 
-            (bool isSuccess, string message, EventPayoutResultDto? data) = await _payoutService.ProposePayoutAsync(
+            EventPayoutResultDto data = await _payoutService.ProposePayoutAsync(
                 payoutRequestId, request.AppliedRate, reviewerId, _currentUserService.UserName, cancellationToken);
 
-            if (!isSuccess)
-                return BadRequest(new ApiResponse(false, message));
-
-            return Ok(new ApiResponse<EventPayoutResultDto>(true, message, data!));
+            return Ok(new ApiResponse<EventPayoutResultDto>(true, "Đã đề xuất giải ngân thành công. Đang chờ Organizer xác nhận.", data));
         }
     }
 }

@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Exceptions;
 using Inventory.Infrastructure.Dtos;
 using Inventory.Infrastructure.Entities;
 using Inventory.Infrastructure.Interfaces;
@@ -51,37 +52,34 @@ namespace Inventory.Infrastructure.Services
             return result;
         }
 
-        public async Task<bool> LockSeatAsync(Guid showtimeId, Guid seatId, Guid userId, CancellationToken cancellationToken = default)
+        public async Task LockSeatAsync(Guid showtimeId, Guid seatId, Guid userId, CancellationToken cancellationToken = default)
         {
             bool isSold = await _unitOfWork.ShowtimeSeatRepository.GetCountAsync(
                 filters: x => x.ShowTimeId == showtimeId && x.SeatId == seatId && x.SeatStatus == SeatStatus.Sold,
                 cancellation: cancellationToken
             ) > 0;
 
-            if (isSold) return false;
+            if (isSold)
+                throw new BusinessRuleException("Ghế đang được chọn bởi người khác hoặc đã bán.");
 
             bool success = await _redisLockService.LockSeatAsync(showtimeId, seatId, userId, TimeSpan.FromSeconds(60));
             if (!success)
             {
-                return false;
+                throw new BusinessRuleException("Ghế đang được chọn bởi người khác hoặc đã bán.");
             }
 
             await _hubNotificationService.NotifySeatStateChangedAsync(showtimeId, seatId, "Selecting");
-
-            return true;
         }
 
-        public async Task<bool> UnlockSeatAsync(Guid showtimeId, Guid seatId, Guid userId, CancellationToken cancellationToken = default)
+        public async Task UnlockSeatAsync(Guid showtimeId, Guid seatId, Guid userId, CancellationToken cancellationToken = default)
         {
             bool success = await _redisLockService.UnlockSeatAsync(showtimeId, seatId, userId);
             if (!success)
             {
-                return false;
+                throw new BusinessRuleException("Bạn không thể hủy khóa ghế của người khác.");
             }
 
             await _hubNotificationService.NotifySeatStateChangedAsync(showtimeId, seatId, "Available");
-
-            return true;
         }
     }
 }

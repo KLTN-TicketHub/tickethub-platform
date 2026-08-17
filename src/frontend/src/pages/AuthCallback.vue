@@ -27,6 +27,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { handleGooglePopupCallback } from '../services/auth/auth.service'
+import { getErrorMessage } from '../utils/apiError'
 import { PhGoogleLogo, PhWarningCircle } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -43,7 +44,7 @@ const finishFlow = async () => {
     }
     await router.replace(next)
   } catch (error) {
-    errorMessage.value = 'Không thể hoàn tất đăng nhập Google. Vui lòng thử lại.'
+    errorMessage.value = getErrorMessage(error, 'Không thể hoàn tất đăng nhập Google. Vui lòng thử lại.')
     if (window.opener && window.opener !== window) {
       window.opener.postMessage({ type: 'ticket-hub:auth-error' }, window.location.origin)
       window.close()

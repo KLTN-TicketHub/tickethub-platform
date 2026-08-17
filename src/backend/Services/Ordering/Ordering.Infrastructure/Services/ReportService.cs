@@ -1,4 +1,5 @@
 using BuildingBlocks.Contracts.Models.Pagination;
+using BuildingBlocks.Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ordering.Common.Dtos.Reports;
@@ -19,7 +20,7 @@ namespace Ordering.Infrastructure.Services
             _logger = logger;
         }
 
-        public async Task<(bool IsSuccess, string Message, EventReportDto? Data)> GetEventReportAsync(
+        public async Task<EventReportDto> GetEventReportAsync(
             Guid eventId,
             Guid userId,
             bool isAdminOrMod,
@@ -34,12 +35,12 @@ namespace Ordering.Infrastructure.Services
 
                 if (eventSnapshot == null)
                 {
-                    return (false, "Không tìm thấy thông tin sự kiện hoặc sự kiện chưa được phê duyệt.", null);
+                    throw new NotFoundException("Không tìm thấy thông tin sự kiện hoặc sự kiện chưa được phê duyệt.");
                 }
 
                 if (!isAdminOrMod && eventSnapshot.OrganizerId != userId)
                 {
-                    return (false, "Bạn không có quyền xem báo cáo của sự kiện này.", null);
+                    throw new ForbiddenAccessException("Bạn không có quyền xem báo cáo của sự kiện này.");
                 }
 
                 List<Order> paidOrders = await _dbContext.Orders
@@ -84,16 +85,16 @@ namespace Ordering.Infrastructure.Services
                     Showtimes = showtimesReport
                 };
 
-                return (true, "Lấy báo cáo chi tiết sự kiện thành công.", reportDto);
+                return reportDto;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not BaseCustomException)
             {
                 _logger.LogError(ex, "[ReportService] Error retrieving report for EventId={EventId}", eventId);
-                return (false, $"Lỗi xử lý hệ thống: {ex.Message}", null);
+                throw new BusinessRuleException($"Lỗi xử lý hệ thống: {ex.Message}");
             }
         }
 
-        public async Task<(bool IsSuccess, string Message, PaginatedResult<EventOrderListItemDto>? Data)> GetEventOrdersAsync(
+        public async Task<PaginatedResult<EventOrderListItemDto>> GetEventOrdersAsync(
             Guid eventId,
             Guid userId,
             bool isAdminOrMod,
@@ -107,12 +108,12 @@ namespace Ordering.Infrastructure.Services
 
                 if (eventSnapshot == null)
                 {
-                    return (false, "Không tìm thấy thông tin sự kiện hoặc sự kiện chưa được phê duyệt.", null);
+                    throw new NotFoundException("Không tìm thấy thông tin sự kiện hoặc sự kiện chưa được phê duyệt.");
                 }
 
                 if (!isAdminOrMod && eventSnapshot.OrganizerId != userId)
                 {
-                    return (false, "Bạn không có quyền xem danh sách đơn hàng của sự kiện này.", null);
+                    throw new ForbiddenAccessException("Bạn không có quyền xem danh sách đơn hàng của sự kiện này.");
                 }
 
                 var query = _dbContext.Orders
@@ -162,16 +163,16 @@ namespace Ordering.Infrastructure.Services
                 }).ToList();
 
                 var result = new PaginatedResult<EventOrderListItemDto>(dtos, totalCount, request.PageNumber, request.PageSize);
-                return (true, "Lấy danh sách đơn hàng thành công.", result);
+                return result;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not BaseCustomException)
             {
                 _logger.LogError(ex, "[ReportService] Error retrieving order list for EventId={EventId}", eventId);
-                return (false, $"Lỗi xử lý hệ thống: {ex.Message}", null);
+                throw new BusinessRuleException($"Lỗi xử lý hệ thống: {ex.Message}");
             }
         }
 
-        public async Task<(bool IsSuccess, string Message, List<EventChartDataPointDto>? Data)> GetEventChartDataAsync(
+        public async Task<List<EventChartDataPointDto>> GetEventChartDataAsync(
             Guid eventId,
             Guid userId,
             bool isAdminOrMod,
@@ -185,12 +186,12 @@ namespace Ordering.Infrastructure.Services
 
                 if (eventSnapshot == null)
                 {
-                    return (false, "Không tìm thấy thông tin sự kiện hoặc sự kiện chưa được phê duyệt.", null);
+                    throw new NotFoundException("Không tìm thấy thông tin sự kiện hoặc sự kiện chưa được phê duyệt.");
                 }
 
                 if (!isAdminOrMod && eventSnapshot.OrganizerId != userId)
                 {
-                    return (false, "Bạn không có quyền xem dữ liệu thống kê của sự kiện này.", null);
+                    throw new ForbiddenAccessException("Bạn không có quyền xem dữ liệu thống kê của sự kiện này.");
                 }
 
                 var chartPoints = new List<EventChartDataPointDto>();
@@ -252,12 +253,12 @@ namespace Ordering.Infrastructure.Services
                     }
                 }
 
-                return (true, "Lấy dữ liệu thống kê sự kiện thành công.", chartPoints);
+                return chartPoints;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not BaseCustomException)
             {
                 _logger.LogError(ex, "[ReportService] Error retrieving chart statistics for EventId={EventId}", eventId);
-                return (false, $"Lỗi xử lý hệ thống: {ex.Message}", null);
+                throw new BusinessRuleException($"Lỗi xử lý hệ thống: {ex.Message}");
             }
         }
     }

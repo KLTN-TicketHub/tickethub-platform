@@ -1,5 +1,6 @@
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Events.Order;
+using BuildingBlocks.Domain.Exceptions;
 using Microsoft.Extensions.Logging;
 using Ordering.Common.Dtos;
 using Ordering.Infrastructure.Entities;
@@ -30,7 +31,7 @@ namespace Ordering.Infrastructure.Services
             _logger = logger;
         }
 
-        public async Task<(bool IsSuccess, Guid OrderId, string Message)> CheckoutAsync(CheckoutRequestDto request, Guid userId)
+        public async Task<Guid> CheckoutAsync(CheckoutRequestDto request, Guid userId)
         {
             List<Guid> seatIds = request.Items
                 .Where(x => x.SeatId.HasValue)
@@ -43,7 +44,7 @@ namespace Ordering.Infrastructure.Services
                 _logger.LogError(
                     "[OrderService] EventSnapshot not found for ShowtimeId={ShowtimeId}. Event has not been approved or the snapshot has not been replicated yet.",
                     request.ShowtimeId);
-                return (false, Guid.Empty, "Thông tin suất diễn chưa sẵn sàng. Vui lòng thử lại sau.");
+                throw new BusinessRuleException("Thông tin suất diễn chưa sẵn sàng. Vui lòng thử lại sau.");
             }
 
             EventSnapshot eventSnap = showtimeSnapshot.EventSnapshot;
@@ -62,7 +63,7 @@ namespace Ordering.Infrastructure.Services
                     items: request.Items);
 
                 if (!checkoutData.IsSuccess)
-                    return (false, Guid.Empty, $"Dữ liệu ghế không hợp lệ: {checkoutData.Message}");
+                    throw new BusinessRuleException($"Dữ liệu ghế không hợp lệ: {checkoutData.Message}");
 
                 resolvedItems = checkoutData.TicketItems.Select(t => new ResolvedOrderItem
                 {
@@ -81,18 +82,14 @@ namespace Ordering.Infrastructure.Services
                     "[OrderService] GA ticket checkout, using local EventSnapshot for ShowtimeId={ShowtimeId}",
                     request.ShowtimeId);
 
-                var validationResult = ValidateGAItemsFromSnapshot(request.Items, showtimeSnapshot);
-                if (!validationResult.IsSuccess)
-                    return (false, Guid.Empty, validationResult.Message);
-
-                resolvedItems = validationResult.Items;
+                resolvedItems = ValidateGAItemsFromSnapshot(request.Items, showtimeSnapshot);
             }
 
             if (seatIds.Any())
             {
                 var (isLockSuccess, lockMessage) = await _inventoryService.UpgradeSeatLocksAsync(request.ShowtimeId, seatIds, userId);
                 if (!isLockSuccess)
-                    return (false, Guid.Empty, $"Khóa ghế thất bại: {lockMessage}");
+                    throw new BusinessRuleException($"Khóa ghế thất bại: {lockMessage}");
             }
             else
             {
@@ -102,7 +99,7 @@ namespace Ordering.Infrastructure.Services
 
                 var (isLockSuccess, lockMessage) = await _inventoryService.LockTicketQuantitiesAsync(request.ShowtimeId, ticketQuantities, userId);
                 if (!isLockSuccess)
-                    return (false, Guid.Empty, $"Khóa số lượng vé thất bại: {lockMessage}");
+                    throw new BusinessRuleException($"Khóa số lượng vé thất bại: {lockMessage}");
             }
 
             decimal totalPrice = resolvedItems.Sum(x => x.Price * x.Quantity);
@@ -160,21 +157,19 @@ namespace Ordering.Infrastructure.Services
             await _eventPublisher.PublishAsync(checkoutEvent);
             await _unitOfWork.SaveChangesAsync();
 
-            return (true, order.Id, "Đơn hàng đã được tạo thành công.");
+            return order.Id;
         }
 
-        private (bool IsSuccess, string Message, List<ResolvedOrderItem> Items) ValidateGAItemsFromSnapshot(
+        private List<ResolvedOrderItem> ValidateGAItemsFromSnapshot(
             List<CheckoutItemDto> requestItems, ShowtimeSnapshot showtimeSnapshot)
         {
             var result = new List<ResolvedOrderItem>();
 
             foreach (var item in requestItems)
             {
-                TicketTypeSnapshot? ttSnapshot = showtimeSnapshot.TicketTypes
-                    .FirstOrDefault(t => t.TicketTypeId == item.TicketTypeId);
-
-                if (ttSnapshot == null)
-                    return (false, $"Loại vé {item.TicketTypeId} không tồn tại trong suất diễn.", new());
+                TicketTypeSnapshot ttSnapshot = showtimeSnapshot.TicketTypes
+                    .FirstOrDefault(t => t.TicketTypeId == item.TicketTypeId)
+                    ?? throw new NotFoundException($"Loại vé {item.TicketTypeId} không tồn tại trong suất diễn.");
 
                 result.Add(new ResolvedOrderItem
                 {
@@ -188,7 +183,7 @@ namespace Ordering.Infrastructure.Services
                 });
             }
 
-            return (true, string.Empty, result);
+            return result;
         }
 
         private class ResolvedOrderItem
