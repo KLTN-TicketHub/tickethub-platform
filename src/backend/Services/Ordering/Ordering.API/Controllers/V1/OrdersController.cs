@@ -48,6 +48,34 @@ namespace Ordering.API.Controllers.V1
             return Ok(new ApiResponse<Guid>(true, "Đơn hàng đã được tạo thành công.", orderId));
         }
 
+        [HttpGet("my-pending")]
+        public async Task<IActionResult> GetMyPendingOrder([FromQuery] Guid showtimeId)
+        {
+            string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không xác định được danh tính người dùng.");
+            }
+
+            PendingOrderDto? pendingOrder = await _orderService.GetMyPendingOrderAsync(userId, showtimeId);
+
+            return Ok(new ApiResponse<PendingOrderDto?>(true, "Lấy thông tin đơn hàng đang chờ thanh toán thành công.", pendingOrder));
+        }
+
+        [HttpPost("{orderId}/cancel")]
+        public async Task<IActionResult> CancelPendingOrder(Guid orderId)
+        {
+            string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không xác định được danh tính người dùng.");
+            }
+
+            await _orderService.CancelPendingOrderAsync(orderId, userId);
+
+            return Ok(new ApiResponse(true, "Hủy đơn hàng thành công."));
+        }
+
         [HttpGet("{orderId}/payment-link")]
         public async Task<IActionResult> GetPaymentLink(Guid orderId)
         {

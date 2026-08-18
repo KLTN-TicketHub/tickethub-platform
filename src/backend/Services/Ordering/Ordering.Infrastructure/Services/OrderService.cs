@@ -1,4 +1,5 @@
 using BuildingBlocks.Application.Interfaces;
+using BuildingBlocks.Contracts.Commands.Order;
 using BuildingBlocks.Contracts.Events.Order;
 using BuildingBlocks.Domain.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -48,6 +49,8 @@ namespace Ordering.Infrastructure.Services
             }
 
             EventSnapshot eventSnap = showtimeSnapshot.EventSnapshot;
+
+            await CheckPendingOrderAsync(userId, request.ShowtimeId);
 
             List<ResolvedOrderItem> resolvedItems;
 
@@ -158,6 +161,60 @@ namespace Ordering.Infrastructure.Services
             await _unitOfWork.SaveChangesAsync();
 
             return order.Id;
+        }
+
+        public async Task<PendingOrderDto?> GetMyPendingOrderAsync(Guid userId, Guid showtimeId)
+        {
+            return await GetPendingOrderAsync(userId, showtimeId);
+        }
+
+        public async Task CancelPendingOrderAsync(Guid orderId, Guid userId)
+        {
+            await CancelOrderAsync(orderId, userId);
+        }
+
+        private async Task CheckPendingOrderAsync(Guid userId, Guid showtimeId)
+        {
+            PendingOrderDto? pendingOrder = await GetPendingOrderAsync(userId, showtimeId);
+
+            if (pendingOrder != null)
+            {
+                throw new BusinessRuleException("Bạn đang có một đơn hàng chưa hoàn tất thanh toán cho suất diễn này. Vui lòng hoàn tất thanh toán hoặc hủy đơn hàng đó trước khi đặt vé mới.");
+            }
+        }
+
+        private async Task<PendingOrderDto?> GetPendingOrderAsync(Guid userId, Guid showtimeId)
+        {
+            // ExpiresAt phải khớp với Schedule(PaymentTimeout) 10 phút trong OrderBookingStateMachine
+            return await _unitOfWork.OrderRepository.GetOneAsync(
+                filter: x => x.UserId == userId && x.ShowTimeId == showtimeId && x.Status == OrderStatus.Pending,
+                selector: x => new PendingOrderDto
+                {
+                    OrderId = x.Id,
+                    ShowtimeId = x.ShowTimeId,
+                    EventTitle = x.EventTitle,
+                    TotalPrice = x.TotalPrice,
+                    CreatedAt = x.CreatedAt,
+                    ExpiresAt = x.CreatedAt.AddMinutes(10)
+                });
+        }
+
+        private async Task CancelOrderAsync(Guid orderId, Guid userId)
+        {
+            Order order = await _unitOfWork.OrderRepository.GetByIdAsync(orderId, include: null)
+                ?? throw new NotFoundException($"Không tìm thấy đơn hàng với ID {orderId}.");
+
+            if (order.UserId != userId)
+                throw new ForbiddenAccessException("Bạn không có quyền hủy đơn hàng này.");
+
+            if (order.Status != OrderStatus.Pending)
+                throw new BusinessRuleException("Đơn hàng này không còn ở trạng thái chờ thanh toán nên không thể hủy.");
+
+            await _eventPublisher.PublishAsync(new CancelOrderCommand
+            {
+                OrderId = order.Id,
+                Reason = "Người dùng huỷ đơn hàng"
+            });
         }
 
         private List<ResolvedOrderItem> ValidateGAItemsFromSnapshot(

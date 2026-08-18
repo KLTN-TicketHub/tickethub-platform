@@ -83,6 +83,8 @@ export const LOCATION_WARDS = (districtCode) => `/catalog/locations/districts/${
 
 // Ordering / Checkout
 export const ORDER_CHECKOUT = '/ordering/orders/checkout'
+export const ORDER_MY_PENDING = (showtimeId) => `/ordering/orders/my-pending?showtimeId=${showtimeId}`
+export const ORDER_CANCEL = (orderId) => `/ordering/orders/${orderId}/cancel`
 export const ORDER_PAYMENT_LINK = (orderId) => `/ordering/orders/${orderId}/payment-link`
 export const ORDER_EVENT_REPORT = (eventId) => `/ordering/orders/reports/events/${eventId}`
 export const ORDER_EVENT_ORDERS = (eventId) => `/ordering/orders/reports/events/${eventId}/orders`

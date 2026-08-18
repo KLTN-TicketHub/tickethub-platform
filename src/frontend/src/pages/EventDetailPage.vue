@@ -409,6 +409,38 @@
                 </template>
               </div>
 
+              <!-- Pending order banner: user has an unpaid order for this showtime -->
+              <div v-if="pendingOrder" class="mb-6 p-4 rounded-2xl bg-warning/10 border border-warning/20 flex flex-col gap-3 relative z-10">
+                <div class="flex items-start gap-2.5">
+                  <PhWarningCircle class="text-warning text-lg shrink-0 mt-0.5" weight="fill" />
+                  <div class="flex flex-col gap-0.5">
+                    <span class="text-[13px] font-bold text-white">Bạn có đơn hàng đang chờ thanh toán</span>
+                    <span class="text-[12px] text-white/50 font-medium">
+                      {{ formatCurrency(pendingOrder.totalPrice) }} · Hết hạn giữ chỗ lúc {{ formatTimeOnly(pendingOrder.expiresAt) }}
+                    </span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2.5">
+                  <BaseButton
+                    variant="primary"
+                    size="sm"
+                    class="flex-1 !rounded-xl"
+                    @click="resumePendingOrder"
+                  >
+                    Tiếp tục thanh toán
+                  </BaseButton>
+                  <BaseButton
+                    variant="danger"
+                    size="sm"
+                    class="flex-1 !rounded-xl"
+                    :loading="isCancellingPendingOrder"
+                    @click="cancelPendingOrder"
+                  >
+                    Hủy đơn
+                  </BaseButton>
+                </div>
+              </div>
+
               <!-- Summary & Checkout -->
               <div class="space-y-6 pt-6 border-t border-white/10 relative z-10">
                 <div class="flex justify-between items-end">
@@ -587,7 +619,7 @@ import { Stage as VStage, Layer as VLayer, Rect as VRect, Path as VPath, Text as
 import { getEventDetail, trackEventClick } from '../services/eventService'
 import { getVenues, getSeatMapDetail } from '../services/venue.service'
 import { getSeatStates, lockSeat, unlockSeat, getTicketInventoryState } from '../services/seat.service'
-import { checkout } from '../services/order.service'
+import { checkout, getMyPendingOrder, cancelOrder } from '../services/order.service'
 import { HubConnectionBuilder, HttpTransportType } from '@microsoft/signalr'
 import { getToken } from '../services/auth/token.service'
 import { API_BASE_URL } from '../services/api/axios'
@@ -620,6 +652,8 @@ const selectedTier = ref(0)
 const selectedShowTimeIndex = ref(0)
 const qty = ref(1)
 const isCheckingOut = ref(false)
+const pendingOrder = ref(null)
+const isCancellingPendingOrder = ref(false)
 // Checkout modal state
 const showCheckoutModal = ref(false)
 const checkoutForm = reactive({ customerName: '', customerPhone: '' })
@@ -747,6 +781,53 @@ const loadSeatStates = async () => {
   } catch (err) {
     console.error('[SeatStates] Lỗi khi tải trạng thái ghế từ Inventory:', err)
     store.toast = { message: getErrorMessage(err, 'Không thể tải trạng thái ghế mới nhất.'), icon: '⚠️' }
+  }
+}
+
+// Kiểm tra xem người dùng có đơn hàng đang chờ thanh toán cho suất chiếu đang chọn không
+const checkPendingOrder = async () => {
+  const showtimeId = selectedShowtimeId.value
+  if (!showtimeId || !getToken()) {
+    pendingOrder.value = null
+    return
+  }
+
+  try {
+    const res = await getMyPendingOrder(showtimeId)
+    pendingOrder.value = (res && res.success && res.data) ? res.data : null
+  } catch (err) {
+    console.error('[PendingOrder] Lỗi khi kiểm tra đơn hàng đang chờ thanh toán:', err)
+    pendingOrder.value = null
+  }
+}
+
+const resumePendingOrder = () => {
+  if (!pendingOrder.value) return
+  router.push({ name: 'payment', query: { orderId: pendingOrder.value.orderId } })
+}
+
+const cancelPendingOrder = async () => {
+  if (!pendingOrder.value) return
+
+  isCancellingPendingOrder.value = true
+  try {
+    const res = await cancelOrder(pendingOrder.value.orderId)
+    if (res && res.success) {
+      pendingOrder.value = null
+      selectedSeats.value = []
+      clearAllSeatTimers()
+      store.toast = { message: 'Đã hủy đơn hàng. Bạn có thể chọn vé và đặt lại.', icon: '✅' }
+      if (saleStatus.value === 'open') {
+        await loadSeatStates()
+      }
+    } else {
+      store.toast = { message: res?.message || 'Không thể hủy đơn hàng.', icon: '⚠️' }
+    }
+  } catch (err) {
+    console.error('[PendingOrder] Lỗi khi hủy đơn hàng:', err)
+    store.toast = { message: getErrorMessage(err, 'Không thể hủy đơn hàng.'), icon: '❌' }
+  } finally {
+    isCancellingPendingOrder.value = false
   }
 }
 
@@ -943,6 +1024,8 @@ onMounted(async () => {
       if (selectedShowtimeId.value && saleStatus.value === 'open') {
         await loadTicketInventoryStates(selectedShowtimeId.value)
       }
+
+      await checkPendingOrder()
     } else {
       error.value = res?.message || 'Không thể lấy thông tin sự kiện.'
     }
@@ -1006,6 +1089,7 @@ const totalPrice = computed(() => {
 
 // Check if checkout button should be disabled
 const isCheckoutDisabled = computed(() => {
+  if (pendingOrder.value) return true
   if (!activeTier.value) return true
   if (event.value?.seatMapId && isReservedTier(activeTier.value)) {
     return selectedSeats.value.length === 0
@@ -1213,9 +1297,11 @@ watch(selectedShowtimeId, async (newShowtimeId, oldShowtimeId) => {
     if (saleStatus.value === 'open') {
       await loadTicketInventoryStates(newShowtimeId)
     }
+    await checkPendingOrder()
   } else {
     selectedSeats.value = []
     clearAllSeatTimers()
+    pendingOrder.value = null
     await stopHubConnection()
   }
 })

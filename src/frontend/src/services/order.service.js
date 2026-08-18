@@ -1,5 +1,5 @@
 import api from './api/axios'
-import { ORDER_CHECKOUT, ORDER_PAYMENT_LINK, ORDER_EVENT_REPORT, ORDER_EVENT_ORDERS, ORDER_EVENT_CHARTS } from './api/endpoints'
+import { ORDER_CHECKOUT, ORDER_MY_PENDING, ORDER_CANCEL, ORDER_PAYMENT_LINK, ORDER_EVENT_REPORT, ORDER_EVENT_ORDERS, ORDER_EVENT_CHARTS } from './api/endpoints'
 
 /**
  * Lấy báo cáo chi tiết sự kiện
@@ -44,6 +44,28 @@ export async function getEventChartData(eventId, range) {
  */
 export async function checkout(payload) {
   const response = await api.post(ORDER_CHECKOUT, payload)
+  return response.data
+}
+
+/**
+ * Lấy đơn hàng đang chờ thanh toán (nếu có) của người dùng cho 1 suất chiếu
+ * GET /ordering/orders/my-pending?showtimeId=...
+ * @param {string} showtimeId
+ * @returns {{ success, data: { orderId, showtimeId, eventTitle, totalPrice, createdAt, expiresAt } | null, message }}
+ */
+export async function getMyPendingOrder(showtimeId) {
+  const response = await api.get(ORDER_MY_PENDING(showtimeId))
+  return response.data
+}
+
+/**
+ * Hủy đơn hàng đang chờ thanh toán của chính mình
+ * POST /ordering/orders/{orderId}/cancel
+ * @param {string} orderId
+ * @returns {{ success, message }}
+ */
+export async function cancelOrder(orderId) {
+  const response = await api.post(ORDER_CANCEL(orderId))
   return response.data
 }
 
