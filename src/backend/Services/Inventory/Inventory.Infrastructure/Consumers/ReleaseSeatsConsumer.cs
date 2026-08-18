@@ -32,7 +32,7 @@ namespace Inventory.Infrastructure.Consumers
                 {
                     foreach (var seatId in message.SeatIds)
                     {
-                        await _redisLockService.UnlockSeatAsync(message.ShowtimeId, seatId, message.UserId);
+                        await _redisLockService.UnlockSeatAsync(message.ShowtimeId, seatId, message.UserId, force: true);
 
                         await _hubNotificationService.NotifySeatStateChangedAsync(message.ShowtimeId, seatId, "Available");
                     }
