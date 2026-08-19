@@ -4,7 +4,23 @@ networks:
 
 volumes:
   sqlserver_data:
+  sqlserver_notification_data:
+  sqlserver_identity_data:
+  sqlserver_catalog_data:
+  sqlserver_inventory_data:
+  sqlserver_ordering_data:
+  sqlserver_payment_data:
+  sqlserver_finance_data:
+  sqlserver_ai_data:
   redis_data:
+  redis_identity_data:
+  redis_catalog_data:
+  redis_inventory_data:
+  redis_ordering_data:
+  redis_payment_data:
+  redis_finance_data:
+  redis_ai_data:
+  redis_notification_data:
   rabbitmq_data:
   caddy_data:
   caddy_config:
@@ -43,6 +59,142 @@ services:
     entrypoint: ["/opt/mssql-tools18/bin/sqlcmd", "-S", "sqlserver", "-U", "sa", "-P", "${SA_PASSWORD}", "-C", "-i", "/init-hangfire-db.sql"]
     restart: "no"
 
+  sqlserver-notification:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Express
+      MSSQL_SA_PASSWORD: ${NOTIFICATION_SA_PASSWORD}
+    volumes:
+      - sqlserver_notification_data:/var/opt/mssql
+    networks:
+      - tickethub-net
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  sqlserver-identity:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Express
+      MSSQL_SA_PASSWORD: ${IDENTITY_SA_PASSWORD}
+    volumes:
+      - sqlserver_identity_data:/var/opt/mssql
+    networks:
+      - tickethub-net
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  sqlserver-catalog:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Express
+      MSSQL_SA_PASSWORD: ${CATALOG_SA_PASSWORD}
+    volumes:
+      - sqlserver_catalog_data:/var/opt/mssql
+    networks:
+      - tickethub-net
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  sqlserver-inventory:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Express
+      MSSQL_SA_PASSWORD: ${INVENTORY_SA_PASSWORD}
+    volumes:
+      - sqlserver_inventory_data:/var/opt/mssql
+    networks:
+      - tickethub-net
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  sqlserver-ordering:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Express
+      MSSQL_SA_PASSWORD: ${ORDERING_SA_PASSWORD}
+    volumes:
+      - sqlserver_ordering_data:/var/opt/mssql
+    networks:
+      - tickethub-net
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  sqlserver-payment:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Express
+      MSSQL_SA_PASSWORD: ${PAYMENT_SA_PASSWORD}
+    volumes:
+      - sqlserver_payment_data:/var/opt/mssql
+    networks:
+      - tickethub-net
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  sqlserver-finance:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Express
+      MSSQL_SA_PASSWORD: ${FINANCE_SA_PASSWORD}
+    volumes:
+      - sqlserver_finance_data:/var/opt/mssql
+    networks:
+      - tickethub-net
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  sqlserver-ai:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Express
+      MSSQL_SA_PASSWORD: ${AI_SA_PASSWORD}
+    volumes:
+      - sqlserver_ai_data:/var/opt/mssql
+    networks:
+      - tickethub-net
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   redis:
     image: redis:7-alpine
     restart: unless-stopped
@@ -54,6 +206,118 @@ services:
       - Ex
     volumes:
       - redis_data:/data
+    networks:
+      - tickethub-net
+
+  redis-identity:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --notify-keyspace-events
+      - Ex
+    volumes:
+      - redis_identity_data:/data
+    networks:
+      - tickethub-net
+
+  redis-catalog:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --notify-keyspace-events
+      - Ex
+    volumes:
+      - redis_catalog_data:/data
+    networks:
+      - tickethub-net
+
+  redis-inventory:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --notify-keyspace-events
+      - Ex
+    volumes:
+      - redis_inventory_data:/data
+    networks:
+      - tickethub-net
+
+  redis-ordering:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --notify-keyspace-events
+      - Ex
+    volumes:
+      - redis_ordering_data:/data
+    networks:
+      - tickethub-net
+
+  redis-payment:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --notify-keyspace-events
+      - Ex
+    volumes:
+      - redis_payment_data:/data
+    networks:
+      - tickethub-net
+
+  redis-finance:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --notify-keyspace-events
+      - Ex
+    volumes:
+      - redis_finance_data:/data
+    networks:
+      - tickethub-net
+
+  redis-ai:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --notify-keyspace-events
+      - Ex
+    volumes:
+      - redis_ai_data:/data
+    networks:
+      - tickethub-net
+
+  redis-notification:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --notify-keyspace-events
+      - Ex
+    volumes:
+      - redis_notification_data:/data
     networks:
       - tickethub-net
 
@@ -83,11 +347,9 @@ services:
       - identity_dataprotection_keys:/root/.aspnet/DataProtection-Keys
       - identity_uploads:/app/wwwroot/uploads
     depends_on:
-      sqlserver:
+      sqlserver-identity:
         condition: service_healthy
-      sqlserver-init:
-        condition: service_completed_successfully
-      redis:
+      redis-identity:
         condition: service_started
       rabbitmq:
         condition: service_started
@@ -114,9 +376,9 @@ services:
       - ../../Services/Catalog/Catalog.API/Keys:/app/Keys:ro
       - catalog_uploads:/app/wwwroot/uploads
     depends_on:
-      sqlserver:
+      sqlserver-catalog:
         condition: service_healthy
-      redis:
+      redis-catalog:
         condition: service_started
       rabbitmq:
         condition: service_started
@@ -142,9 +404,9 @@ services:
       - ${SECRETS_DIR}/inventory/appsettings.Production.json:/app/appsettings.Production.json:ro
       - ../../Services/Inventory/Inventory.API/Keys:/app/Keys:ro
     depends_on:
-      sqlserver:
+      sqlserver-inventory:
         condition: service_healthy
-      redis:
+      redis-inventory:
         condition: service_started
       rabbitmq:
         condition: service_started
@@ -172,9 +434,9 @@ services:
       - ${SECRETS_DIR}/ordering/appsettings.Production.json:/app/appsettings.Production.json:ro
       - ../../Services/Ordering/Ordering.API/Keys:/app/Keys:ro
     depends_on:
-      sqlserver:
+      sqlserver-ordering:
         condition: service_healthy
-      redis:
+      redis-ordering:
         condition: service_started
       rabbitmq:
         condition: service_started
@@ -204,9 +466,9 @@ services:
       - ${SECRETS_DIR}/payment/appsettings.Production.json:/app/appsettings.Production.json:ro
       - ../../Services/Payment/Payment.API/Keys:/app/Keys:ro
     depends_on:
-      sqlserver:
+      sqlserver-payment:
         condition: service_healthy
-      redis:
+      redis-payment:
         condition: service_started
       rabbitmq:
         condition: service_started
@@ -232,9 +494,9 @@ services:
       - ${SECRETS_DIR}/finance/appsettings.Production.json:/app/appsettings.Production.json:ro
       - ../../Services/Finance/Finance.API/Keys:/app/Keys:ro
     depends_on:
-      sqlserver:
+      sqlserver-finance:
         condition: service_healthy
-      redis:
+      redis-finance:
         condition: service_started
       rabbitmq:
         condition: service_started
@@ -260,11 +522,9 @@ services:
       - ${SECRETS_DIR}/ai/appsettings.Production.json:/app/appsettings.Production.json:ro
       - ../../Services/AI/AI.API/Keys:/app/Keys:ro
     depends_on:
-      sqlserver:
+      sqlserver-ai:
         condition: service_healthy
-      sqlserver-init:
-        condition: service_completed_successfully
-      redis:
+      redis-ai:
         condition: service_started
       catalog-api:
         condition: service_healthy
@@ -292,9 +552,9 @@ services:
       - ${SECRETS_DIR}/notification-api/appsettings.Production.json:/app/appsettings.Production.json:ro
       - ../../Services/Notification/Notification.API/Keys:/app/Keys:ro
     depends_on:
-      sqlserver:
+      sqlserver-notification:
         condition: service_healthy
-      redis:
+      redis-notification:
         condition: service_started
       rabbitmq:
         condition: service_started
