@@ -185,7 +185,6 @@ namespace Ordering.Infrastructure.Services
 
         private async Task<PendingOrderDto?> GetPendingOrderAsync(Guid userId, Guid showtimeId)
         {
-            // ExpiresAt phải khớp với Schedule(PaymentTimeout) 10 phút trong OrderBookingStateMachine
             return await _unitOfWork.OrderRepository.GetOneAsync(
                 filter: x => x.UserId == userId && x.ShowTimeId == showtimeId && x.Status == OrderStatus.Pending,
                 selector: x => new PendingOrderDto
@@ -215,6 +214,7 @@ namespace Ordering.Infrastructure.Services
                 OrderId = order.Id,
                 Reason = "Người dùng huỷ đơn hàng"
             });
+            await _unitOfWork.SaveChangesAsync();
         }
 
         private List<ResolvedOrderItem> ValidateGAItemsFromSnapshot(
