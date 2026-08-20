@@ -167,17 +167,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, markRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { store, selectEvent, openAuth, logout } from '../../stores/eventStore'
 import { getEvents } from '../../stores/eventStore'
 import { logout as authLogout } from '../../services/auth/auth.service'
 import { resetNotifications } from '../../stores/notificationStore'
+import { getPublicEventCategories } from '../../services/eventService'
 import NotificationBell from './NotificationBell.vue'
-import { 
-  PhTicket, PhMagnifyingGlass, PhMapPin, PhCheck, PhCaretDown, 
-  PhSignOut, PhHeart, PhUser, PhMicrophoneStage, PhMaskHappy, 
-  PhTrophy, PhBooks, PhPlus 
+import {
+  PhTicket, PhMagnifyingGlass, PhMapPin, PhCheck, PhCaretDown,
+  PhSignOut, PhHeart, PhUser, PhMicrophoneStage, PhMaskHappy,
+  PhTrophy, PhBooks, PhPlus
 } from '@phosphor-icons/vue'
 
 const router = useRouter()
@@ -193,12 +194,46 @@ const isScrolled = ref(false)
 
 const CITIES = ['Toàn quốc', 'Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng', 'Đà Lạt']
 
-const NAV_LINKS = [
-  { icon: PhMicrophoneStage, label: 'Concerts', path: '/concerts' },
-  { icon: PhMaskHappy, label: 'Sân khấu', path: '/arts' },
-  { icon: PhTrophy, label: 'Thể thao', path: '/sports' },
-  { icon: PhBooks, label: 'Workshop', path: '/workshops' },
+// Icon không có trong dữ liệu category từ BE nên map cứng theo slug ở FE
+const NAV_ICON_BY_SLUG = {
+  concerts: markRaw(PhMicrophoneStage),
+  arts: markRaw(PhMaskHappy),
+  sports: markRaw(PhTrophy),
+  workshops: markRaw(PhBooks),
+}
+
+// Dùng khi chưa tải xong hoặc API lỗi, tránh header mất nav
+const FALLBACK_NAV_LINKS = [
+  { icon: markRaw(PhMicrophoneStage), label: 'Concerts', path: '/concerts' },
+  { icon: markRaw(PhMaskHappy), label: 'Sân khấu', path: '/arts' },
+  { icon: markRaw(PhTrophy), label: 'Thể thao', path: '/sports' },
+  { icon: markRaw(PhBooks), label: 'Workshop', path: '/workshops' },
 ]
+
+const NAV_LINKS = ref(FALLBACK_NAV_LINKS)
+
+const loadNavCategories = async () => {
+  try {
+    const res = await getPublicEventCategories()
+    const categories = res?.data?.data ?? res?.data ?? (Array.isArray(res) ? res : [])
+
+    const links = categories
+      .filter(c => NAV_ICON_BY_SLUG[c.slug])
+      .sort((a, b) => a.displayOrder - b.displayOrder)
+      .slice(0, 4)
+      .map(c => ({
+        icon: NAV_ICON_BY_SLUG[c.slug],
+        label: c.categoryName,
+        path: `/${c.slug}`
+      }))
+
+    if (links.length > 0) {
+      NAV_LINKS.value = links
+    }
+  } catch (err) {
+    console.error('[AppHeader] Không thể tải danh mục điều hướng:', err)
+  }
+}
 
 const dropdownItems = [
   { icon: PhTicket, label: 'Vé của tôi', path: '/my-tickets' },
@@ -269,6 +304,7 @@ onMounted(() => {
   document.addEventListener('click', handleClickOutside)
   window.addEventListener('scroll', handleScroll, { passive: true })
   handleScroll()
+  loadNavCategories()
 })
 
 onUnmounted(() => {
