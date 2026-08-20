@@ -1,4 +1,3 @@
-using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Domain.Exceptions;
 using Catalog.Domain.Entities;
 using Catalog.Domain.Interfaces;

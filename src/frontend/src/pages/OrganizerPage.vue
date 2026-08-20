@@ -2,12 +2,29 @@
   <div class="max-w-[1400px] mx-auto py-12 px-6 lg:px-10 min-h-[80vh]">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 animate-fade-up">
-      <div class="space-y-4">
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-black tracking-widest uppercase shadow-[0_0_20px_rgba(0,200,83,0.15)]">
-          <PhSuitcase weight="fill" /> Organizer Dashboard
+      <div class="flex items-center gap-6">
+        <div class="relative shrink-0">
+          <div class="w-20 h-20 rounded-3xl overflow-hidden border border-white/10 bg-surface">
+            <img :src="store.user?.imageUrl || defaultAvatarUrl" alt="Ảnh đại diện Ban tổ chức" class="w-full h-full object-cover" />
+          </div>
+          <button
+            @click="triggerAvatarUpload"
+            :disabled="isUploadingAvatar"
+            title="Ảnh đại diện kích thước 275×275 px"
+            class="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-full bg-primary text-black flex items-center justify-center border-2 border-bg hover:scale-110 transition-transform cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <PhSpinner v-if="isUploadingAvatar" class="animate-spin text-sm" weight="bold" />
+            <PhCamera v-else class="text-sm" weight="fill" />
+          </button>
+          <input ref="avatarInputRef" type="file" accept="image/png,image/jpeg,image/webp" class="hidden" @change="handleAvatarChange" />
         </div>
-        <h1 class="font-heading text-4xl lg:text-5xl font-black text-white tracking-tight uppercase">Trung tâm Tổ chức</h1>
-        <p class="text-white/50 font-medium text-lg max-w-xl">Quản lý các sự kiện và theo dõi hiệu suất bán vé của bạn một cách trực quan nhất.</p>
+        <div class="space-y-4">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-black tracking-widest uppercase shadow-[0_0_20px_rgba(0,200,83,0.15)]">
+            <PhSuitcase weight="fill" /> Organizer Dashboard
+          </div>
+          <h1 class="font-heading text-4xl lg:text-5xl font-black text-white tracking-tight uppercase">Trung tâm Tổ chức</h1>
+          <p class="text-white/50 font-medium text-lg max-w-xl">Quản lý các sự kiện và theo dõi hiệu suất bán vé của bạn một cách trực quan nhất.</p>
+        </div>
       </div>
       <router-link to="/organizer/create-event">
         <BaseButton variant="primary" size="lg" class="!px-8 !rounded-2xl shadow-[0_0_30px_rgba(0,200,83,0.3)] hover:scale-105 transition-transform flex items-center gap-2">
@@ -248,12 +265,12 @@ import { store } from '../stores/eventStore'
 import { addToast } from '../stores/adminStore'
 import { getErrorMessage } from '../utils/apiError'
 import BaseButton from '../components/ui/BaseButton.vue'
-import { getOrganizerEvents, getEventStatuses } from '../services/organizer.service'
-import { 
-  PhSuitcase, PhPlus, PhTicket, PhTrendUp, PhCurrencyCircleDollar, 
-  PhEye, PhCalendarBlank, PhPencilSimple, PhMagnifyingGlass, PhMapPin, 
-  PhChartPie, PhUsers, PhReceipt, PhArmchair, PhCaretLeft, PhCaretRight, 
-  PhWarningCircle 
+import { getOrganizerEvents, getEventStatuses, updateOrganizerAvatar } from '../services/organizer.service'
+import {
+  PhSuitcase, PhPlus, PhTicket, PhTrendUp, PhCurrencyCircleDollar,
+  PhEye, PhCalendarBlank, PhPencilSimple, PhMagnifyingGlass, PhMapPin,
+  PhChartPie, PhUsers, PhReceipt, PhArmchair, PhCaretLeft, PhCaretRight,
+  PhWarningCircle, PhCamera, PhSpinner
 } from '@phosphor-icons/vue'
 
 const router = useRouter()
@@ -266,6 +283,40 @@ const currentPage = ref(1)
 const totalPages = ref(1)
 const totalCount = ref(0)
 const pageSize = 12
+const avatarInputRef = ref(null)
+const isUploadingAvatar = ref(false)
+
+const defaultAvatarUrl = computed(() => {
+  const name = store.user?.name || 'Organizer'
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00E05D&color=000`
+})
+
+const triggerAvatarUpload = () => {
+  if (isUploadingAvatar.value) return
+  avatarInputRef.value?.click()
+}
+
+const handleAvatarChange = async (e) => {
+  const file = e.target.files?.[0]
+  e.target.value = ''
+  if (!file) return
+
+  isUploadingAvatar.value = true
+  try {
+    const res = await updateOrganizerAvatar(file)
+    if (res && res.success && res.data) {
+      store.user = { ...store.user, imageUrl: res.data }
+      addToast('Cập nhật ảnh đại diện thành công.', 'success')
+    } else {
+      addToast(res?.message || 'Không thể cập nhật ảnh đại diện.', 'error')
+    }
+  } catch (err) {
+    console.error('[OrganizerPage] Lỗi khi cập nhật ảnh đại diện:', err)
+    addToast(getErrorMessage(err, 'Không thể cập nhật ảnh đại diện.'), 'error')
+  } finally {
+    isUploadingAvatar.value = false
+  }
+}
 
 // Dynamically fetch event statuses and initial events
 onMounted(async () => {

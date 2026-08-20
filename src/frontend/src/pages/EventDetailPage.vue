@@ -302,6 +302,23 @@
               </div>
             </div>
           </section>
+
+          <!-- Organizer Section -->
+          <section id="organizer" class="animate-fade-up [animation-delay:550ms] scroll-mt-24">
+            <h2 class="font-heading text-3xl font-black text-white mb-8 flex items-center gap-4">
+              <PhBuildings weight="fill" class="text-primary" />
+              Ban tổ chức
+            </h2>
+            <div class="flex items-center gap-5 p-6 bg-[#111916] border border-white/5 rounded-[2rem]">
+              <div class="w-16 h-16 rounded-2xl overflow-hidden border border-white/10 bg-[#0A0F0D] flex-shrink-0">
+                <img :src="organizerAvatarUrl" :alt="event.organizerProfile?.organizerName || 'Ban tổ chức'" class="w-full h-full object-cover" />
+              </div>
+              <div class="min-w-0">
+                <h4 class="text-lg font-bold text-white truncate">{{ event.organizerProfile?.organizerName || 'Đang cập nhật' }}</h4>
+                <p class="text-white/50 text-[13px] font-medium">Đơn vị tổ chức sự kiện</p>
+              </div>
+            </div>
+          </section>
         </div>
 
         <!-- Right Column: Checkout Sidebar Card -->
@@ -633,7 +650,7 @@ import {
   PhLightning, PhHeart, PhShareNetwork, PhMagnifyingGlass,
   PhMusicNotes, PhCamera, PhBeerBottle, PhGift, PhCrown, PhCompass, 
   PhSuitcaseRolling, PhSpinner, PhWarningCircle, PhX, PhClock,
-  PhCreditCard, PhCheckCircle
+  PhCreditCard, PhCheckCircle, PhBuildings
 } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -642,6 +659,13 @@ const router = useRouter()
 const event = ref(null)
 const isLoading = ref(true)
 const error = ref('')
+
+const organizerAvatarUrl = computed(() => {
+  const profile = event.value?.organizerProfile
+  if (profile?.imageUrl) return profile.imageUrl
+  const name = profile?.organizerName || 'Ban tổ chức'
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00E05D&color=000`
+})
 
 const seatMapData = ref(null)
 const isLoadingSeatMap = ref(false)

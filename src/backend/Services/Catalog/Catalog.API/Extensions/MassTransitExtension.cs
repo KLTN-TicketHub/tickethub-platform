@@ -19,6 +19,7 @@ namespace Catalog.API.Extensions
                 });
 
                 x.AddConsumer<OrganizerActivatedConsumer>();
+                x.AddConsumer<OrganizerAvatarUpdatedConsumer>();
                 x.AddConsumer<TicketCheckedInConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
@@ -40,6 +41,11 @@ namespace Catalog.API.Extensions
                     cfg.ReceiveEndpoint("catalog-organizer-activated", e =>
                     {
                         e.ConfigureConsumer<OrganizerActivatedConsumer>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("catalog-organizer-avatar-updated", e =>
+                    {
+                        e.ConfigureConsumer<OrganizerAvatarUpdatedConsumer>(context);
                     });
 
                     cfg.ConfigureEndpoints(context);

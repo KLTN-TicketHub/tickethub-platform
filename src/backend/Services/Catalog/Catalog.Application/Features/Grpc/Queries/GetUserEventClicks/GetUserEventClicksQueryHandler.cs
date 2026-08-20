@@ -1,4 +1,3 @@
-using Catalog.Domain.Entities;
 using Catalog.Domain.Interfaces;
 using MediatR;
 

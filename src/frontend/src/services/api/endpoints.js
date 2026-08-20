@@ -10,6 +10,7 @@ export const MODERATOR_ACTIVATE_ACCOUNT = '/auth/moderator/activate-account'
 export const ORGANIZER_AUTH_LOGIN = '/auth/organizer/login'
 export const ORGANIZER_AUTH_REGISTER = '/auth/organizer'
 export const ORGANIZER_STAFF_REGISTER = '/auth/organizer/staffs/register'
+export const ORGANIZER_PROFILE_AVATAR = '/auth/organizer/profile/avatar'
 export const STAFF_AUTH_LOGIN = '/auth/staff/login'
 export const STAFF_ACTIVATE_ACCOUNT = '/auth/staff/activate-account'
 

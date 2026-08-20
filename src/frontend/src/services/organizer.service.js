@@ -1,5 +1,5 @@
 import api from './api/axios'
-import { COMMON_EVENT_CATEGORIES, UPLOAD_COVER_IMAGE, ORGANIZER_EVENT_CREATE, ORGANIZER_VENUE_SEATMAP_DETAIL, ORGANIZER_EVENTS_LIST, EVENT_STATUSES_LOOKUP } from './api/endpoints'
+import { COMMON_EVENT_CATEGORIES, UPLOAD_COVER_IMAGE, ORGANIZER_EVENT_CREATE, ORGANIZER_VENUE_SEATMAP_DETAIL, ORGANIZER_EVENTS_LIST, EVENT_STATUSES_LOOKUP, ORGANIZER_PROFILE_AVATAR } from './api/endpoints'
 
 /**
  * Lấy danh sách danh mục sự kiện (phân trang)
@@ -69,6 +69,21 @@ export async function getOrganizerEvents(params = {}) {
  */
 export async function getEventStatuses() {
   const response = await api.get(EVENT_STATUSES_LOOKUP)
+  return response.data
+}
+
+/**
+ * Cập nhật ảnh đại diện của Organizer
+ * PUT /auth/organizer/profile/avatar
+ * @param {File} file - File ảnh cần upload
+ * @returns {Promise<{success, data: string, message}>} URL ảnh đại diện sau khi upload
+ */
+export async function updateOrganizerAvatar(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  const response = await api.put(ORGANIZER_PROFILE_AVATAR, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
   return response.data
 }
 
