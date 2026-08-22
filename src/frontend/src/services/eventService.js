@@ -9,7 +9,7 @@ import {
   MODERATOR_EVENTS_LIST, EVENT_STATUSES_FOR_MODERATOR, MODERATOR_EVENT_REVIEW,
   PUBLIC_EVENTS, CATALOG_EVENT_DETAIL, COMMON_EVENT_CATEGORIES, EVENT_CLICK_TRACK,
   MODERATOR_EVENT_CANCEL, MODERATOR_EVENT_CANCELLATION_REQUESTS, MODERATOR_EVENT_CANCELLATION_REVIEW,
-  ORGANIZER_EVENT_CANCELLATION_REQUEST
+  ORGANIZER_EVENT_CANCELLATION_REQUEST, EVENTS_TRENDING, ORGANIZERS_FEATURED
 } from './api/endpoints'
 import { MOCK_EVENTS } from '../mocks/eventMock'
 
@@ -154,6 +154,26 @@ export async function getPublicEvents(params) {
  */
 export async function getPublicEventCategories() {
   const response = await api.get(COMMON_EVENT_CATEGORIES)
+  return response.data
+}
+
+/**
+ * Lấy danh sách sự kiện xu hướng (xếp hạng theo lượt click)
+ * GET /catalog/events/trending
+ * @param {number} count - Số lượng sự kiện cần lấy (mặc định 4)
+ */
+export async function getTrendingEvents(count = 4) {
+  const response = await api.get(EVENTS_TRENDING, { params: { count } })
+  return response.data
+}
+
+/**
+ * Lấy danh sách ban tổ chức nổi bật
+ * GET /catalog/organizers/featured
+ * @param {number} count - Số lượng organizer cần lấy (mặc định 4)
+ */
+export async function getFeaturedOrganizers(count = 4) {
+  const response = await api.get(ORGANIZERS_FEATURED, { params: { count } })
   return response.data
 }
 

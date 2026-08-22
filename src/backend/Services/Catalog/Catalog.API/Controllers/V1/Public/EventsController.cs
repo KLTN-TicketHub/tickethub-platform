@@ -5,6 +5,7 @@ using Catalog.Application.Common.DTOs.Events;
 using Catalog.Application.Features.EventClicks.Commands.TrackEventClick;
 using Catalog.Application.Features.Events.Queries.GetEventById;
 using Catalog.Application.Features.Events.Queries.GetEvents;
+using Catalog.Application.Features.Events.Queries.GetTrendingEvents;
 using Catalog.Application.Features.Events.Requests;
 using Catalog.Domain.Enums;
 using MediatR;
@@ -37,6 +38,20 @@ namespace Catalog.API.Controllers.V1.Public
             {
                 Success = true,
                 Message = "Lấy danh sách sự kiện thành công",
+                Data = result,
+            });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("trending")]
+        public async Task<IActionResult> GetTrendingEventsAsync([FromQuery] int count = 4, CancellationToken cancellationToken = default)
+        {
+            var result = await _sender.Send(new GetTrendingEventsQuery(count), cancellationToken);
+
+            return Ok(new ApiResponse<List<EventListItemDto>>
+            {
+                Success = true,
+                Message = "Lấy danh sách sự kiện xu hướng thành công",
                 Data = result,
             });
         }

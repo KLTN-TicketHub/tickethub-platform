@@ -76,6 +76,8 @@ export const UPLOAD_COVER_IMAGE = '/catalog/common/files/upload-cover-image'
 export const EVENT_STATUSES_LOOKUP = '/catalog/common/lookup/event-statuses'
 export const EVENT_STATUSES_FOR_MODERATOR = '/catalog/common/lookup/event-statuses-for-moderator'
 export const COMMON_EVENT_CATEGORIES = '/catalog/event-categories'
+export const EVENTS_TRENDING = '/catalog/events/trending'
+export const ORGANIZERS_FEATURED = '/catalog/organizers/featured'
 
 // Locations API
 export const LOCATION_PROVINCES = '/catalog/locations/provinces'

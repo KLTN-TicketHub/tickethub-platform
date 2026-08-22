@@ -16,5 +16,9 @@ namespace Catalog.Domain.Interfaces.IRepositories
             DateTime from,
             DateTime to,
             CancellationToken cancellation = default);
+
+        Task<List<(Guid Id, string Title, string Slug, DateTime StartAt, DateTime EndAt, string CoverImageUrl, string CategoryName, decimal MinPrice, string ProvinceCity)>> GetTrendingEventsAsync(
+            int count,
+            CancellationToken cancellation = default);
     }
 }

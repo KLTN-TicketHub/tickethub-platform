@@ -5,12 +5,15 @@
   >
     <!-- Image Wrapper (16:9 ratio) -->
     <div class="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-white/5">
-      <img 
-        :src="event.coverImageUrl || event.image" 
-        :alt="event.title" 
+      <img
+        :src="event.coverImageUrl || event.image"
+        :alt="event.title"
         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         loading="lazy"
       />
+      <div v-if="rank" class="absolute top-3 left-3 w-9 h-9 rounded-lg bg-primary text-black font-heading font-black text-lg flex items-center justify-center shadow-[0_0_20px_rgba(0,200,83,0.4)]">
+        {{ rank }}
+      </div>
     </div>
 
     <!-- Details -->
@@ -41,7 +44,8 @@ import { selectEvent } from '../stores/eventStore'
 import { PhCalendarBlank } from '@phosphor-icons/vue'
 
 const props = defineProps({
-  event: { type: Object, required: true }
+  event: { type: Object, required: true },
+  rank: { type: Number, default: null }
 })
 const router = useRouter()
 
