@@ -9,11 +9,15 @@
         v-for="star in 5"
         :key="star"
         type="button"
-        class="text-2xl transition-transform hover:scale-110 cursor-pointer"
-        :class="(hoverValue || modelValue) >= star ? 'text-primary' : 'text-white/20'"
-        @mouseenter="hoverValue = star"
-        @mouseleave="hoverValue = 0"
-        @click="$emit('update:modelValue', star)"
+        class="text-2xl transition-transform"
+        :class="[
+          readonly ? 'cursor-default' : 'hover:scale-110 cursor-pointer',
+          (hoverValue || modelValue) >= star ? 'text-primary' : 'text-white/20'
+        ]"
+        :disabled="readonly"
+        @mouseenter="!readonly && (hoverValue = star)"
+        @mouseleave="!readonly && (hoverValue = 0)"
+        @click="!readonly && $emit('update:modelValue', star)"
       >
         <PhStar :weight="(hoverValue || modelValue) >= star ? 'fill' : 'regular'" />
       </button>
@@ -32,7 +36,8 @@ import { PhStar } from '@phosphor-icons/vue'
 defineProps({
   modelValue: { type: Number, default: 0 },
   label: { type: String, default: '' },
-  error: String
+  error: String,
+  readonly: { type: Boolean, default: false }
 })
 
 defineEmits(['update:modelValue'])

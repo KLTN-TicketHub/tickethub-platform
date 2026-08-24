@@ -99,6 +99,7 @@ export const TICKET_CHECKIN = (qrToken) => `/inventory/tickets/checkin/${qrToken
 
 // Event Ratings
 export const EVENT_RATINGS = (eventId) => `/catalog/events/${eventId}/ratings`
+export const EVENT_MY_RATING = (eventId) => `/catalog/events/${eventId}/ratings/me`
 export const ORGANIZER_EVENT_RATINGS = (eventId) => `/catalog/organizer/events/${eventId}/ratings`
 
 // Event Click Tracking

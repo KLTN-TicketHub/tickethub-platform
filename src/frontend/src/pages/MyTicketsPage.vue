@@ -42,99 +42,74 @@
       </button>
     </div>
 
-    <!-- TICKET WALLET LIST -->
-    <div v-if="filteredTickets.length > 0" class="grid grid-cols-1 gap-12 animate-fade-up [animation-delay:200ms]">
-      <div 
-        v-for="(ticket, idx) in filteredTickets" 
-        :key="ticket.id" 
-        class="group relative flex flex-col lg:flex-row bg-[#111916] border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-primary/30 transition-all duration-500 shadow-2xl cursor-pointer hover:-translate-y-1"
-        :style="`animation-delay: ${idx * 100}ms`"
+    <!-- TICKET LIST -->
+    <div v-if="filteredTickets.length > 0" class="flex flex-col gap-4 animate-fade-up [animation-delay:200ms]">
+      <div
+        v-for="(ticket, idx) in filteredTickets"
+        :key="ticket.id"
+        class="group flex items-center gap-5 bg-[#111916] border border-white/5 rounded-2xl p-4 hover:border-primary/30 transition-all duration-300 cursor-pointer"
+        :style="`animation-delay: ${idx * 50}ms`"
         @click="openTicketDetail(ticket)"
       >
-        <!-- Left: Poster Area -->
-        <div class="lg:w-[320px] h-64 lg:h-auto overflow-hidden relative border-r border-dashed border-white/10 shrink-0">
-          <img :src="ticket.eventImage" :alt="ticket.eventTitle" class="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" />
-          <div class="absolute inset-0 bg-gradient-to-t from-[#0A0F0D] via-transparent to-transparent opacity-80"></div>
-          
-          <div class="absolute top-6 left-6 flex flex-col gap-2">
-            <BaseBadge variant="primary" class="!bg-primary !text-black font-black uppercase tracking-[0.2em] shadow-lg shadow-primary/20">
-              {{ ticket.ticketTypeName }}
-            </BaseBadge>
-            <div class="px-3 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 text-[10px] text-white font-bold tracking-widest uppercase flex items-center gap-1.5">
-              <PhCheckCircle weight="fill" class="text-primary" /> CONFIRMED
-            </div>
+        <!-- Thumbnail -->
+        <div class="relative w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden shrink-0">
+          <img
+            :src="ticket.eventImage"
+            :alt="ticket.eventTitle"
+            class="w-full h-full object-cover transition-all duration-500"
+            :class="activeTab === 'past' ? 'grayscale opacity-60' : 'group-hover:scale-105'"
+          />
+        </div>
+
+        <!-- Info -->
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 text-primary/80 mb-1">
+            <PhCalendarBlank weight="bold" class="text-sm" />
+            <span class="text-[11px] font-bold uppercase tracking-[0.15em]">{{ formatDate(ticket.showtimeStartAt) }}</span>
+          </div>
+          <h3 class="text-lg md:text-xl font-black font-heading text-white leading-tight truncate group-hover:text-primary transition-colors">
+            {{ ticket.eventTitle }}
+          </h3>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[12px] text-white/50 font-medium">
+            <span class="flex items-center gap-1.5">
+              <PhTicket weight="bold" class="text-white/30" /> {{ ticket.ticketTypeName }}
+            </span>
+            <span class="flex items-center gap-1.5">
+              <PhArmchair weight="bold" class="text-white/30" />
+              {{ ticket.seatName ? (ticket.rowName + ticket.seatName) : 'Tự do' }}
+            </span>
+            <span class="hidden md:flex items-center gap-1.5 truncate">
+              <PhMapPin weight="bold" class="text-white/30" /> {{ ticket.organizerName || 'Ban tổ chức' }}
+            </span>
+            <span class="font-mono text-white/40">#{{ ticket.issuedTicketId?.substring(0,8).toUpperCase() }}</span>
           </div>
         </div>
 
-        <!-- Middle: Information Layer -->
-        <div class="flex-1 p-8 lg:p-10 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-dashed border-white/10 relative bg-[#0A0F0D]/40">
-          <!-- Ticket Notches for physical feel -->
-          <div class="hidden lg:block absolute -right-[16px] -top-[16px] w-8 h-8 rounded-full bg-[#0A0F0D] border border-white/5 z-10 shadow-inner"></div>
-          <div class="hidden lg:block absolute -right-[16px] -bottom-[16px] w-8 h-8 rounded-full bg-[#0A0F0D] border border-white/5 z-10 shadow-inner"></div>
-
-          <div class="space-y-8">
-            <div class="space-y-3">
-              <div class="flex items-center gap-3 text-primary">
-                <PhCalendarBlank weight="bold" class="text-xl" />
-                <span class="text-[13px] font-bold uppercase tracking-[0.2em]">{{ formatDate(ticket.showtimeStartAt) }}</span>
-              </div>
-              <h2 class="text-3xl font-black font-heading text-white leading-tight group-hover:text-primary transition-colors duration-500 tracking-tight">
-                {{ ticket.eventTitle }}
-              </h2>
-            </div>
-            
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-              <div class="flex flex-col">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Mã xác nhận</span>
-                <span class="font-mono text-[16px] font-black text-white tracking-widest">{{ ticket.issuedTicketId?.substring(0,8).toUpperCase() }}</span>
-              </div>
-              <div class="flex flex-col">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Cổng vào</span>
-                <span class="text-[16px] font-black text-white">Gate A1</span>
-              </div>
-              <div class="flex flex-col">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Số lượng</span>
-                <span class="text-[16px] font-black text-white">x1</span>
-              </div>
-              <div class="flex flex-col">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Chỗ ngồi</span>
-                <span class="text-[16px] font-black text-primary truncate">
-                  {{ ticket.seatName ? (ticket.rowName + ticket.seatName) : 'Tự do' }}
-                </span>
-              </div>
-            </div>
+        <!-- Status + Action -->
+        <div class="flex flex-col items-end gap-2.5 shrink-0">
+          <BaseBadge :variant="getStatusTag(ticket).variant" size="sm">
+            {{ getStatusTag(ticket).label }}
+          </BaseBadge>
+          <BaseButton
+            v-if="activeTab === 'upcoming'"
+            variant="outline"
+            size="sm"
+            class="!rounded-full !px-4 flex items-center gap-1.5"
+            @click.stop="openTicketDetail(ticket)"
+          >
+            <PhQrCode weight="bold" /> Mã QR
+          </BaseButton>
+          <div v-else-if="myRatings[ticket.eventId]" class="flex items-center gap-1 text-[13px] font-black text-primary">
+            <PhStar weight="fill" /> {{ myRatings[ticket.eventId].overallRating.toFixed(1) }}
+            <span class="text-[11px] font-bold text-white/40 uppercase tracking-widest ml-1">Đã đánh giá</span>
           </div>
-
-          <div class="mt-10 flex items-center gap-4 text-white/50 border-t border-white/5 pt-6">
-            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-primary">
-              <PhMapPin weight="fill" />
-            </div>
-            <div class="flex flex-col">
-              <span class="text-[11px] font-bold uppercase tracking-widest text-white/40">Ban tổ chức</span>
-              <span class="font-medium text-white">{{ ticket.organizerName || 'Ban tổ chức' }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: Stub / Scannable -->
-        <div class="w-full lg:w-[280px] p-8 flex flex-col items-center justify-center gap-8 bg-[#111916]/50 group/stub shrink-0">
-          <div class="relative w-32 h-32 lg:w-40 lg:h-40 bg-white rounded-3xl p-4 shadow-2xl group-hover/stub:scale-105 transition-transform duration-700">
-            <!-- Real QR or Mock -->
-            <img v-if="ticket.qrCodeBase64" :src="'data:image/png;base64,' + ticket.qrCodeBase64" class="w-full h-full object-contain" />
-            <div v-else class="w-full h-full bg-[repeating-linear-gradient(45deg,#000_0,#000_4px,transparent_4px,transparent_8px),repeating-linear-gradient(-45deg,#000_0,#000_4px,transparent_4px,transparent_8px)] opacity-90 rounded-xl"></div>
-            <div v-if="!ticket.qrCodeBase64" class="absolute inset-0 flex items-center justify-center">
-              <div class="bg-white px-3 py-1.5 rounded-lg text-[11px] font-black shadow-xl border border-black/10 tracking-widest text-black">ES-WALLET</div>
-            </div>
-          </div>
-          
-          <div class="space-y-4 w-full">
-            <BaseButton variant="primary" size="md" class="w-full !rounded-xl !bg-white !text-black hover:!bg-primary transition-colors flex items-center justify-center gap-2">
-              <PhQrCode weight="bold" class="text-lg" /> Mở mã QR
-            </BaseButton>
-            <div class="flex items-center justify-center gap-2 text-[10px] font-bold text-white/50 uppercase tracking-[0.2em]">
-              <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> Scannable Ticket
-            </div>
-          </div>
+          <button
+            v-else
+            class="text-[12px] font-bold text-white/40 hover:text-white uppercase tracking-widest transition-colors"
+            @click.stop="openTicketDetail(ticket)"
+          >
+            Chi tiết
+          </button>
         </div>
       </div>
     </div>
@@ -218,7 +193,7 @@
             </div>
           </div>
 
-          <div class="flex flex-col items-center justify-center p-8 bg-[#111916] rounded-[2rem] border border-white/5 shadow-inner">
+          <div v-if="selectedTicket.status !== 'Used'" class="flex flex-col items-center justify-center p-8 bg-[#111916] rounded-[2rem] border border-white/5 shadow-inner">
             <div class="w-56 h-56 bg-white p-4 rounded-[2rem] shadow-[0_0_50px_rgba(255,255,255,0.1)] mb-6 relative">
               <div class="absolute inset-0 border-4 border-dashed border-black/10 rounded-[2rem] m-2 pointer-events-none"></div>
               <img v-if="selectedTicket.qrCodeBase64" :src="'data:image/png;base64,' + selectedTicket.qrCodeBase64" class="w-full h-full object-contain" />
@@ -227,22 +202,52 @@
             <p class="text-[14px] font-mono font-black text-white tracking-[0.4em] uppercase">{{ selectedTicket.issuedTicketId?.substring(0,8).toUpperCase() }}</p>
             <p class="text-[11px] font-bold text-white/50 uppercase mt-2 tracking-widest">Mã QR chính chủ</p>
           </div>
+          <div v-else class="flex flex-col items-center justify-center p-8 bg-[#111916] rounded-[2rem] border border-white/5 shadow-inner gap-3">
+            <div class="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-3xl text-primary">
+              <PhCheckCircle weight="fill" />
+            </div>
+            <p class="text-[15px] font-black text-white">Vé đã được sử dụng</p>
+            <p class="text-[12px] font-medium text-white/50 text-center leading-relaxed">Vé này đã check-in tại sự kiện nên không còn hiển thị mã QR.</p>
+          </div>
         </div>
 
-        <div class="p-6 bg-primary/10 border border-primary/20 rounded-2xl flex gap-4 mt-2">
+        <div v-if="selectedTicket.status !== 'Used'" class="p-6 bg-primary/10 border border-primary/20 rounded-2xl flex gap-4 mt-2">
           <PhLightbulb class="text-3xl text-primary flex-shrink-0" weight="duotone" />
           <p class="text-[13px] font-medium text-white/80 leading-relaxed">
             Vui lòng xuất trình mã QR này tại cổng kiểm soát để vào sự kiện. Hãy chuẩn bị sẵn thiết bị có độ sáng màn hình cao nhất và <strong>không chia sẻ mã này</strong> với người khác.
+          </p>
+        </div>
+
+        <!-- Đánh giá đã gửi (nếu có) -->
+        <div v-if="myRatingForSelected" class="p-6 bg-[#111916] border border-white/5 rounded-2xl flex flex-col gap-5">
+          <div class="flex items-center justify-between">
+            <h4 class="text-[13px] font-black text-white uppercase tracking-widest flex items-center gap-2">
+              <PhStar weight="fill" class="text-primary" /> Đánh giá của bạn
+            </h4>
+            <span class="text-2xl font-black text-primary font-heading">
+              {{ myRatingForSelected.overallRating.toFixed(1) }}<span class="text-sm text-white/40">/5</span>
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+            <StarRatingInput :model-value="myRatingForSelected.soundRating" label="Âm thanh" readonly />
+            <StarRatingInput :model-value="myRatingForSelected.visualRating" label="Ánh sáng / Hình ảnh" readonly />
+            <StarRatingInput :model-value="myRatingForSelected.organizationRating" label="Tổ chức / Sắp xếp" readonly />
+            <StarRatingInput :model-value="myRatingForSelected.facilityRating" label="Trang thiết bị" readonly />
+            <StarRatingInput :model-value="myRatingForSelected.serviceRating" label="Nhân viên / Dịch vụ" readonly />
+            <StarRatingInput :model-value="myRatingForSelected.performanceRating" label="Nghệ sĩ / Chương trình" readonly />
+          </div>
+          <p v-if="myRatingForSelected.comment" class="text-[13px] font-medium text-white/70 leading-relaxed border-t border-white/5 pt-4">
+            "{{ myRatingForSelected.comment }}"
           </p>
         </div>
       </div>
 
       <template #footer>
         <BaseButton variant="outline" @click="selectedTicket = null" class="!px-6">Đóng</BaseButton>
-        <BaseButton v-if="activeTab === 'past'" variant="primary" class="!rounded-full shadow-lg shadow-primary/20 flex items-center gap-2" @click="openRatingModal">
+        <BaseButton v-if="selectedTicket?.status === 'Used' && !myRatingForSelected" variant="primary" class="!rounded-full shadow-lg shadow-primary/20 flex items-center gap-2" @click="openRatingModal">
           <PhStar weight="fill" /> Đánh giá sự kiện
         </BaseButton>
-        <BaseButton v-else variant="primary" class="!rounded-full shadow-lg shadow-primary/20 flex items-center gap-2">
+        <BaseButton v-else-if="selectedTicket?.status !== 'Used'" variant="primary" class="!rounded-full shadow-lg shadow-primary/20 flex items-center gap-2">
           <PhWallet weight="fill" /> Lưu vào Ví thiết bị
         </BaseButton>
       </template>
@@ -299,7 +304,7 @@ import {
   PhClock, PhArmchair, PhLightbulb, PhSpinner, PhStar
 } from '@phosphor-icons/vue'
 import { ticketService } from '../services/ticket.service'
-import { submitEventRating } from '../services/rating.service'
+import { submitEventRating, getMyEventRating } from '../services/rating.service'
 import { getErrorMessage } from '../utils/apiError'
 
 const activeTab = ref('upcoming')
@@ -316,6 +321,8 @@ const tabs = [
   { id: 'past', label: 'Lịch sử đã đi' },
 ]
 
+const myRatings = ref({})
+
 const fetchTickets = async () => {
   isLoading.value = true;
   try {
@@ -326,6 +333,9 @@ const fetchTickets = async () => {
       tickets.value = res.data.data || [];
       totalPages.value = res.data.totalPages || 1;
       totalCount.value = res.data.totalCount || 0;
+      if (activeTab.value === 'past') {
+        await fetchMyRatings(tickets.value);
+      }
     }
   } catch (error) {
     console.error('Failed to fetch tickets:', error);
@@ -333,6 +343,18 @@ const fetchTickets = async () => {
   } finally {
     isLoading.value = false;
   }
+}
+
+const fetchMyRatings = async (ticketList) => {
+  const eventIds = [...new Set(ticketList.map(t => t.eventId))].filter(id => !(id in myRatings.value));
+  await Promise.all(eventIds.map(async (eventId) => {
+    try {
+      const res = await getMyEventRating(eventId);
+      myRatings.value[eventId] = (res && res.success) ? res.data : null;
+    } catch (error) {
+      console.error('Failed to fetch my rating for event', eventId, error);
+    }
+  }));
 }
 
 watch(activeTab, () => {
@@ -347,6 +369,23 @@ onMounted(() => {
 const filteredTickets = computed(() => {
   return tickets.value;
 })
+
+const myRatingForSelected = computed(() => {
+  return selectedTicket.value ? myRatings.value[selectedTicket.value.eventId] : null;
+})
+
+const getStatusTag = (ticket) => {
+  if (ticket.status === 'Used') {
+    return { label: 'Đã sử dụng', variant: 'neutral' }
+  }
+  if (ticket.status === 'Cancelled') {
+    return { label: 'Đã huỷ', variant: 'danger' }
+  }
+  const isExpired = new Date(ticket.showtimeStartAt) < new Date()
+  return isExpired
+    ? { label: 'Đã hết hạn', variant: 'warning' }
+    : { label: 'Còn hiệu lực', variant: 'primary' }
+}
 
 const formatDate = (dateStr) => {
   if (!dateStr) return 'Gần đây'
@@ -399,6 +438,7 @@ const submitRating = async () => {
     const res = await submitEventRating(selectedTicket.value.eventId, ratingForm.value)
     if (res && res.success) {
       store.toast = { message: 'Cảm ơn bạn đã đánh giá sự kiện!', icon: '⭐' }
+      myRatings.value[selectedTicket.value.eventId] = res.data
       showRatingModal.value = false
       selectedTicket.value = null
     } else {

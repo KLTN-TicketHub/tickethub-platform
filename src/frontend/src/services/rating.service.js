@@ -1,5 +1,5 @@
 import api from './api/axios'
-import { EVENT_RATINGS, ORGANIZER_EVENT_RATINGS } from './api/endpoints'
+import { EVENT_RATINGS, EVENT_MY_RATING, ORGANIZER_EVENT_RATINGS } from './api/endpoints'
 
 /**
  * Gửi đánh giá cho sự kiện (yêu cầu đã check-in vé)
@@ -10,6 +10,17 @@ import { EVENT_RATINGS, ORGANIZER_EVENT_RATINGS } from './api/endpoints'
  */
 export async function submitEventRating(eventId, payload) {
   const response = await api.post(EVENT_RATINGS(eventId), payload)
+  return response.data
+}
+
+/**
+ * Lấy đánh giá của chính người dùng hiện tại cho 1 sự kiện (null nếu chưa đánh giá)
+ * GET /catalog/events/:eventId/ratings/me
+ * @param {string} eventId
+ * @returns {{ success, data: EventRatingDto|null, message }}
+ */
+export async function getMyEventRating(eventId) {
+  const response = await api.get(EVENT_MY_RATING(eventId))
   return response.data
 }
 

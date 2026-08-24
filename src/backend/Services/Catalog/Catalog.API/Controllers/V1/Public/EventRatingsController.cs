@@ -3,6 +3,7 @@ using BuildingBlocks.Contracts.Constants;
 using BuildingBlocks.Contracts.Models.Responses;
 using Catalog.Application.Common.DTOs.EventRatings;
 using Catalog.Application.Features.EventRatings.Commands.CreateEventRating;
+using Catalog.Application.Features.EventRatings.Queries.GetMyEventRating;
 using Catalog.Application.Features.EventRatings.Requests;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -40,6 +41,24 @@ namespace Catalog.API.Controllers.V1.Public
             {
                 Success = true,
                 Message = "Đánh giá sự kiện thành công.",
+                Data = result,
+            });
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(Roles = Roles.Customer)]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMyEventRatingAsync(Guid eventId, CancellationToken cancellationToken = default)
+        {
+            Guid userId = _currentUserService.UserId
+                ?? throw new UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
+
+            var result = await _sender.Send(new GetMyEventRatingQuery(eventId, userId), cancellationToken);
+
+            return Ok(new ApiResponse<EventRatingDto?>
+            {
+                Success = true,
+                Message = result == null ? "Bạn chưa đánh giá sự kiện này." : "Lấy đánh giá của bạn thành công.",
                 Data = result,
             });
         }
