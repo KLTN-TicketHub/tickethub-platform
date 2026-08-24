@@ -48,29 +48,24 @@ namespace Catalog.Infrastructure.Data.Repositories
         {
             DateTime now = DateTime.UtcNow;
 
-            var clicksByEvent = _dbContext.Set<EventClickStat>()
-                .GroupBy(cs => cs.EventId)
-                .Select(g => new { EventId = g.Key, TotalClicks = g.Sum(cs => (long)cs.ClickCount) });
-
             var trending = await _dbContext.Set<Event>()
                 .Where(e => !e.IsDeleted && e.Status == EventStatus.Published && e.EndAt >= now)
-                .GroupJoin(clicksByEvent, e => e.Id, c => c.EventId, (e, clicks) => new { Event = e, Clicks = clicks })
-                .SelectMany(x => x.Clicks.DefaultIfEmpty(), (x, c) => new { x.Event, TotalClicks = c != null ? c.TotalClicks : 0 })
-                .OrderByDescending(x => x.TotalClicks)
-                .ThenBy(x => x.Event.StartAt)
-                .Take(count)
-                .Select(x => new
+                .Select(e => new
                 {
-                    x.Event.Id,
-                    x.Event.Title,
-                    x.Event.Slug,
-                    x.Event.StartAt,
-                    x.Event.EndAt,
-                    x.Event.CoverImageUrl,
-                    CategoryName = x.Event.Category!.CategoryName,
-                    MinPrice = x.Event.ShowTimes.SelectMany(st => st.TicketTypes).Min(tt => tt.Price),
-                    ProvinceCity = x.Event.Location.ProvinceCity
+                    e.Id,
+                    e.Title,
+                    e.Slug,
+                    e.StartAt,
+                    e.EndAt,
+                    e.CoverImageUrl,
+                    CategoryName = e.Category!.CategoryName,
+                    MinPrice = e.ShowTimes.SelectMany(st => st.TicketTypes).Min(tt => tt.Price),
+                    ProvinceCity = e.Location.ProvinceCity,
+                    TotalClicks = _dbContext.Set<EventClickStat>().Where(cs => cs.EventId == e.Id).Sum(cs => (long?)cs.ClickCount) ?? 0
                 })
+                .OrderByDescending(x => x.TotalClicks)
+                .ThenBy(x => x.StartAt)
+                .Take(count)
                 .ToListAsync(cancellation);
 
             return trending
