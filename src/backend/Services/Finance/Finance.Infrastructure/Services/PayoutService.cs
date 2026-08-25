@@ -373,7 +373,12 @@ namespace Finance.Infrastructure.Services
                 filter: pr => pr.EventId == eventId && pr.OrganizerId == organizerId && pr.Status == PayoutRequestStatus.Pending,
                 cancellation: cancellationToken);
 
-            return new EventPayoutStatusDto { HasPendingRequest = pendingRequest != null };
+            if (pendingRequest != null)
+                return new EventPayoutStatusDto { HasPendingRequest = true };
+
+            bool hasUnreleasedRevenue = await _unitOfWork.WalletTransactionRepository.HasUnreleasedRevenueAsync(eventId, cancellationToken);
+
+            return new EventPayoutStatusDto { HasUnreleasedRevenue = hasUnreleasedRevenue };
         }
 
         private static EventPayoutResultDto MapToResultDto(EventPayout payout)

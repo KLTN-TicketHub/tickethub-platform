@@ -74,6 +74,10 @@ namespace Ordering.Infrastructure.Sagas
                     .TransitionTo(Failed)
                     .Finalize()
                 );
+
+            DuringAny(
+                When(PaymentTimeout!.Received)
+                    .Then(context => { }));
         }
 
         public State Reserved { get; private set; }

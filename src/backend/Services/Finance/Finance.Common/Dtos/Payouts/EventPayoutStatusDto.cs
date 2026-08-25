@@ -8,6 +8,8 @@ namespace Finance.Common.Dtos.Payouts
 
         public bool HasAcceptedPayout { get; set; }
 
+        public bool HasUnreleasedRevenue { get; set; }
+
         public Guid? ProposedPayoutId { get; set; }
     }
 }

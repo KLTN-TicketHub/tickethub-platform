@@ -67,6 +67,13 @@
           <PhClock weight="bold" />
           Đã yêu cầu giải ngân
         </span>
+        <span
+          v-else-if="payoutStatus && payoutStatus.hasUnreleasedRevenue"
+          class="shrink-0 px-6 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white/40 text-[13px] font-black uppercase tracking-widest flex items-center gap-2"
+        >
+          <PhClock weight="bold" />
+          Chưa tới ngày giải ngân
+        </span>
         <BaseButton
           v-else-if="payoutStatus"
           variant="primary"
