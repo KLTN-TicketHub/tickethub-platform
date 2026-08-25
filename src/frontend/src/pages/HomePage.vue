@@ -4,7 +4,7 @@
     <!-- HERO SECTION -->
     <section v-if="heroEvents.length > 0" class="w-full max-w-[1440px] mx-auto px-6 md:px-10 pt-10">
       <div
-        class="relative w-full h-[60vh] lg:h-[70vh] rounded-[2rem] overflow-hidden group cursor-pointer shadow-2xl"
+        class="relative w-full h-[220px] md:h-[300px] lg:h-[360px] rounded-2xl overflow-hidden group cursor-pointer border border-white/10 shadow-xl"
         @click="goToEvent(heroEvents[slide])"
       >
         <div
@@ -14,20 +14,20 @@
           :class="[i === slide ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none']"
         >
           <img :src="ev.coverImageUrl" :alt="ev.title" class="w-full h-full object-cover transition-transform duration-[8s] ease-linear" :class="[i === slide ? 'scale-105' : 'scale-100']" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent"></div>
         </div>
 
-        <div class="absolute bottom-7 left-7 z-20 px-5 py-3 rounded-2xl bg-black/50 backdrop-blur-md border border-white/10">
-          <div class="text-[11px] text-white/50 font-bold uppercase tracking-widest">Giá vé từ</div>
-          <div class="text-2xl font-heading font-black text-white">{{ formatPrice(heroEvents[slide]?.minPrice) }}</div>
+        <div class="absolute bottom-4 left-4 z-20 px-4 py-2 rounded-xl bg-black/40 backdrop-blur-md border border-white/10">
+          <div class="text-[9px] text-white/60 font-bold uppercase tracking-widest">Giá vé từ</div>
+          <div class="text-base font-heading font-black text-white">{{ formatPrice(heroEvents[slide]?.minPrice) }}</div>
         </div>
 
-        <div v-if="heroEvents.length > 1" class="absolute bottom-7 right-7 z-20 flex gap-2">
+        <div v-if="heroEvents.length > 1" class="absolute bottom-4 right-4 z-20 flex gap-1.5">
           <div
             v-for="(_, i) in heroEvents"
             :key="i"
-            class="h-1.5 rounded-full transition-all duration-700 cursor-pointer"
-            :class="[i === slide ? 'w-8 bg-primary' : 'w-3 bg-white/30 hover:bg-white/50']"
+            class="h-1 rounded-full transition-all duration-700 cursor-pointer"
+            :class="[i === slide ? 'w-6 bg-primary' : 'w-2 bg-white/30 hover:bg-white/50']"
             @click.stop="goSlide(i)"
           />
         </div>
