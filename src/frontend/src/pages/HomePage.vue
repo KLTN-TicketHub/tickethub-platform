@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-24 pb-20 overflow-hidden">
 
     <!-- HERO SECTION -->
-    <section v-if="heroEvents.length > 0" class="max-w-[1440px] mx-auto px-6 md:px-10 pt-10">
+    <section v-if="heroEvents.length > 0" class="w-full max-w-[1440px] mx-auto px-6 md:px-10 pt-10">
       <div
         class="relative w-full h-[60vh] lg:h-[70vh] rounded-[2rem] overflow-hidden group cursor-pointer shadow-2xl"
         @click="goToEvent(heroEvents[slide])"
@@ -35,7 +35,7 @@
     </section>
 
     <!-- SỰ KIỆN XU HƯỚNG -->
-    <section v-if="trendingEvents.length > 0" class="max-w-[1440px] mx-auto px-6 md:px-10">
+    <section v-if="trendingEvents.length > 0" class="w-full max-w-[1440px] mx-auto px-6 md:px-10">
       <h2 class="text-3xl lg:text-4xl font-bold font-heading text-white flex items-center gap-4 mb-10">
         <PhFire weight="fill" class="text-primary" /> Sự kiện xu hướng
       </h2>
@@ -45,7 +45,7 @@
     </section>
 
     <!-- CÁC KHỐI THEO DANH MỤC -->
-    <section v-for="cat in categorySections" :key="cat.id" class="max-w-[1440px] mx-auto px-6 md:px-10">
+    <section v-for="cat in categorySections" :key="cat.id" class="w-full max-w-[1440px] mx-auto px-6 md:px-10">
       <div class="flex items-center justify-between mb-10">
         <h2 class="text-3xl lg:text-4xl font-bold font-heading text-white">{{ cat.categoryName }}</h2>
         <router-link :to="{ path: '/search', query: { CategoryId: cat.id } }" class="text-sm font-bold text-white/50 hover:text-white flex items-center gap-2 transition-colors">
@@ -58,7 +58,7 @@
     </section>
 
     <!-- SỰ KIỆN MỚI ĐĂNG -->
-    <section v-if="newestEvents.length > 0" class="max-w-[1440px] mx-auto px-6 md:px-10">
+    <section v-if="newestEvents.length > 0" class="w-full max-w-[1440px] mx-auto px-6 md:px-10">
       <div class="flex items-center justify-between mb-10">
         <h2 class="text-3xl lg:text-4xl font-bold font-heading text-white">Sự kiện mới đăng</h2>
         <router-link to="/search" class="text-sm font-bold text-white/50 hover:text-white flex items-center gap-2 transition-colors">
@@ -71,7 +71,7 @@
     </section>
 
     <!-- KHÁM PHÁ THEO THÀNH PHỐ -->
-    <section class="max-w-[1440px] mx-auto px-6 md:px-10">
+    <section class="w-full max-w-[1440px] mx-auto px-6 md:px-10">
       <h2 class="text-3xl lg:text-4xl font-bold font-heading text-white flex items-center gap-4 mb-10">
         <PhMapPin weight="fill" class="text-primary" /> Khám phá theo thành phố
       </h2>
