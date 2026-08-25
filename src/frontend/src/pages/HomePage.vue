@@ -65,28 +65,6 @@
       </div>
     </section>
 
-    <!-- BAN TỔ CHỨC NỔI BẬT -->
-    <section v-if="featuredOrganizers.length > 0" class="max-w-[1440px] mx-auto px-6 md:px-10">
-      <h2 class="text-3xl lg:text-4xl font-bold font-heading text-white flex items-center gap-4 mb-10">
-        <PhBuildings weight="fill" class="text-primary" /> Ban tổ chức nổi bật
-      </h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div
-          v-for="org in featuredOrganizers"
-          :key="org.id"
-          class="flex flex-col items-center gap-4 p-6 bg-[#111916] border border-white/5 rounded-[2rem] text-center hover:border-primary/30 transition-colors"
-        >
-          <div class="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 bg-[#0A0F0D]">
-            <img :src="org.imageUrl || organizerFallback(org.organizerName)" :alt="org.organizerName" class="w-full h-full object-cover" />
-          </div>
-          <div class="min-w-0">
-            <div class="font-bold text-white text-[15px] truncate max-w-[180px]">{{ org.organizerName }}</div>
-            <div class="text-white/40 text-[12px] font-medium mt-1">{{ org.publishedEventCount }} sự kiện</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- SỰ KIỆN XU HƯỚNG -->
     <section v-if="trendingEvents.length > 0" class="max-w-[1440px] mx-auto px-6 md:px-10">
       <h2 class="text-3xl lg:text-4xl font-bold font-heading text-white flex items-center gap-4 mb-10">
@@ -128,16 +106,19 @@
       <h2 class="text-3xl lg:text-4xl font-bold font-heading text-white flex items-center gap-4 mb-10">
         <PhMapPin weight="fill" class="text-primary" /> Khám phá theo thành phố
       </h2>
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <router-link
           v-for="city in cityTiles"
           :key="city.name"
           :to="city.query ? { path: '/search', query: { ProvinceCity: city.query } } : '/search'"
-          class="relative aspect-[4/3] rounded-[1.5rem] overflow-hidden group cursor-pointer border border-white/5"
+          class="relative aspect-square rounded-[1.5rem] overflow-hidden group cursor-pointer border border-white/5"
         >
           <img :src="city.image" :alt="city.name" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent"></div>
-          <div class="absolute bottom-6 left-6 right-6 text-xl font-bold font-heading text-white">{{ city.name }}</div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+          <div class="absolute bottom-7 left-7 right-7 flex flex-col gap-2">
+            <PhMapPin weight="fill" class="text-primary text-2xl" />
+            <span class="text-2xl lg:text-3xl font-bold font-heading text-white leading-tight">{{ city.name }}</span>
+          </div>
         </router-link>
       </div>
     </section>
@@ -148,16 +129,15 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getPublicEvents, getPublicEventCategories, getTrendingEvents, getFeaturedOrganizers } from '../services/eventService'
+import { getPublicEvents, getPublicEventCategories, getTrendingEvents } from '../services/eventService'
 import { selectEvent } from '../stores/eventStore'
 import SearchEventCard from '../components/SearchEventCard.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
-import { PhArrowLeft, PhArrowRight, PhFire, PhBuildings, PhMapPin } from '@phosphor-icons/vue'
+import { PhArrowLeft, PhArrowRight, PhFire, PhMapPin } from '@phosphor-icons/vue'
 
 const router = useRouter()
 
 const heroEvents = ref([])
-const featuredOrganizers = ref([])
 const trendingEvents = ref([])
 const categorySections = ref([])
 const newestEvents = ref([])
@@ -189,8 +169,6 @@ const goToEvent = (ev) => {
   router.push('/event/' + ev.id)
 }
 
-const organizerFallback = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Organizer')}&background=00E05D&color=000`
-
 const formatPrice = (val) => {
   if (!val) return 'Miễn phí'
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(val)
@@ -205,15 +183,6 @@ const loadHero = async () => {
     }
   } catch (err) {
     console.error('[HomePage] Không thể tải sự kiện nổi bật cho hero:', err)
-  }
-}
-
-const loadFeaturedOrganizers = async () => {
-  try {
-    const res = await getFeaturedOrganizers(4)
-    if (res?.success && Array.isArray(res.data)) featuredOrganizers.value = res.data
-  } catch (err) {
-    console.error('[HomePage] Không thể tải ban tổ chức nổi bật:', err)
   }
 }
 
@@ -263,7 +232,6 @@ const loadNewestEvents = async () => {
 
 onMounted(() => {
   loadHero()
-  loadFeaturedOrganizers()
   loadTrendingEvents()
   loadCategorySections()
   loadNewestEvents()
