@@ -153,7 +153,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { adminSearch, addToast } from '../../stores/adminStore'
 import { getEventSummary, getEventsByCategory, getAdminEvents } from '../../services/admin-event.service'
 import { getPublicEventCategories } from '../../services/eventService'
