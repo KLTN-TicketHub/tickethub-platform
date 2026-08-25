@@ -1,4 +1,5 @@
 using AutoMapper;
+using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Contracts.Models.Pagination;
 using Identity.Application.Common.DTOs.Admin;
 using Identity.Application.Features.Admin.Users.Requests;
@@ -15,12 +16,14 @@ namespace Identity.Application.Features.Admin.Users.Queries.GetUsers
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
+        private readonly IFileService _fileService;
 
-        public GetUsersQueryHandler(IUnitOfWork unitOfWork, UserManager<User> userManager, IMapper mapper)
+        public GetUsersQueryHandler(IUnitOfWork unitOfWork, UserManager<User> userManager, IMapper mapper, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _mapper = mapper;
+            _fileService = fileService;
         }
 
         public async Task<PaginatedResult<UserListItemDto>> Handle(GetUsersQuery query, CancellationToken cancellationToken)
@@ -83,8 +86,20 @@ namespace Identity.Application.Features.Admin.Users.Queries.GetUsers
             UserListItemDto dto = _mapper.Map<UserListItemDto>(user);
             dto.Roles = (await _userManager.GetRolesAsync(user)).ToList();
             dto.IsLocked = await _userManager.IsLockedOutAsync(user);
+            dto.ImageUrl = ResolveImageUrl(user.ImageUrl);
 
             return dto;
+        }
+
+        private string? ResolveImageUrl(string? imageUrl)
+        {
+            if (string.IsNullOrWhiteSpace(imageUrl))
+                return null;
+
+            if (imageUrl.StartsWith("http://") || imageUrl.StartsWith("https://"))
+                return imageUrl;
+
+            return _fileService.GetAbsoluteUrl(imageUrl);
         }
     }
 }
