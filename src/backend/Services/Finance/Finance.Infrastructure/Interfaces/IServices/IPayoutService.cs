@@ -38,5 +38,10 @@ namespace Finance.Infrastructure.Interfaces.IServices
             Guid reviewerUserId,
             string? reviewerName,
             CancellationToken cancellationToken = default);
+
+        Task<EventPayoutStatusDto> GetEventPayoutStatusAsync(
+            Guid eventId,
+            Guid organizerId,
+            CancellationToken cancellationToken = default);
     }
 }

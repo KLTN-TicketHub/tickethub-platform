@@ -64,18 +64,20 @@
               <PhPencilSimple weight="bold" />
               Chỉnh sửa sự kiện
             </BaseButton>
-            <BaseButton variant="outline" class="w-full sm:w-auto !rounded-xl !py-3.5 !px-8 flex items-center justify-center gap-2" @click="handleReport">
-              <PhChartPie weight="bold" />
-              Xem báo cáo
-            </BaseButton>
-            <BaseButton variant="outline" class="w-full sm:w-auto !rounded-xl !py-3.5 !px-8 flex items-center justify-center gap-2" @click="handleRatings">
-              <PhStar weight="bold" />
-              Xem đánh giá
-            </BaseButton>
-            <BaseButton variant="primary" class="w-full sm:w-auto !rounded-xl !py-3.5 !px-8 flex items-center justify-center gap-2" @click="handleOrders">
-              <PhReceipt weight="bold" />
-              Xem đơn hàng
-            </BaseButton>
+            <template v-if="event.status !== 'Chờ duyệt'">
+              <BaseButton variant="outline" class="w-full sm:w-auto !rounded-xl !py-3.5 !px-8 flex items-center justify-center gap-2" @click="handleReport">
+                <PhChartPie weight="bold" />
+                Xem báo cáo
+              </BaseButton>
+              <BaseButton variant="outline" class="w-full sm:w-auto !rounded-xl !py-3.5 !px-8 flex items-center justify-center gap-2" @click="handleRatings">
+                <PhStar weight="bold" />
+                Xem đánh giá
+              </BaseButton>
+              <BaseButton variant="primary" class="w-full sm:w-auto !rounded-xl !py-3.5 !px-8 flex items-center justify-center gap-2" @click="handleOrders">
+                <PhReceipt weight="bold" />
+                Xem đơn hàng
+              </BaseButton>
+            </template>
             <BaseButton
               v-if="canRequestCancellation"
               variant="outline"
@@ -340,18 +342,20 @@
                   <PhPencilSimple weight="bold" />
                   Chỉnh sửa sự kiện
                 </BaseButton>
-                <BaseButton variant="outline" class="w-full !rounded-xl !py-3 flex items-center justify-center gap-2" @click="handleReport">
-                  <PhChartPie weight="bold" />
-                  Xem báo cáo
-                </BaseButton>
-                <BaseButton variant="outline" class="w-full !rounded-xl !py-3 flex items-center justify-center gap-2" @click="handleRatings">
-                  <PhStar weight="bold" />
-                  Xem đánh giá
-                </BaseButton>
-                <BaseButton variant="primary" class="w-full !rounded-xl !py-3 flex items-center justify-center gap-2" @click="handleOrders">
-                  <PhReceipt weight="bold" />
-                  Xem đơn hàng
-                </BaseButton>
+                <template v-if="event.status !== 'Chờ duyệt'">
+                  <BaseButton variant="outline" class="w-full !rounded-xl !py-3 flex items-center justify-center gap-2" @click="handleReport">
+                    <PhChartPie weight="bold" />
+                    Xem báo cáo
+                  </BaseButton>
+                  <BaseButton variant="outline" class="w-full !rounded-xl !py-3 flex items-center justify-center gap-2" @click="handleRatings">
+                    <PhStar weight="bold" />
+                    Xem đánh giá
+                  </BaseButton>
+                  <BaseButton variant="primary" class="w-full !rounded-xl !py-3 flex items-center justify-center gap-2" @click="handleOrders">
+                    <PhReceipt weight="bold" />
+                    Xem đơn hàng
+                  </BaseButton>
+                </template>
                 <BaseButton
                   v-if="canRequestCancellation"
                   variant="outline"
@@ -449,9 +453,21 @@ const cancelError = ref('')
 const isSubmittingCancel = ref(false)
 const hasPendingCancelRequest = ref(false)
 
+const isEventEnded = computed(() => {
+  if (!event.value?.startAt) return false
+  const now = new Date()
+  if (event.value.endAt) {
+    return now > new Date(event.value.endAt)
+  }
+  const start = new Date(event.value.startAt)
+  const estimatedEnd = new Date(start.getTime() + 4 * 60 * 60 * 1000)
+  return now > estimatedEnd
+})
+
 const canRequestCancellation = computed(() => {
   if (!event.value) return false
   if (hasPendingCancelRequest.value) return false
+  if (isEventEnded.value) return false
   return event.value.status === 'Published' || event.value.status === 'Đã xuất bản'
 })
 

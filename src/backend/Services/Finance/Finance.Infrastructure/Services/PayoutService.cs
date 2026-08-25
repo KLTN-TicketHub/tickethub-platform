@@ -350,6 +350,32 @@ namespace Finance.Infrastructure.Services
 
         }
 
+        public async Task<EventPayoutStatusDto> GetEventPayoutStatusAsync(
+            Guid eventId,
+            Guid organizerId,
+            CancellationToken cancellationToken = default)
+        {
+            EventPayout? acceptedPayout = await _unitOfWork.EventPayoutRepository.GetOneUntrackedAsync<EventPayout>(
+                filter: p => p.EventId == eventId && p.OrganizerId == organizerId && p.Status == EventPayoutStatus.Accepted,
+                cancellation: cancellationToken);
+
+            if (acceptedPayout != null)
+                return new EventPayoutStatusDto { HasAcceptedPayout = true };
+
+            EventPayout? proposedPayout = await _unitOfWork.EventPayoutRepository.GetOneUntrackedAsync<EventPayout>(
+                filter: p => p.EventId == eventId && p.OrganizerId == organizerId && p.Status == EventPayoutStatus.Proposed,
+                cancellation: cancellationToken);
+
+            if (proposedPayout != null)
+                return new EventPayoutStatusDto { HasProposedPayout = true, ProposedPayoutId = proposedPayout.Id };
+
+            PayoutRequest? pendingRequest = await _unitOfWork.PayoutRequestRepository.GetOneUntrackedAsync<PayoutRequest>(
+                filter: pr => pr.EventId == eventId && pr.OrganizerId == organizerId && pr.Status == PayoutRequestStatus.Pending,
+                cancellation: cancellationToken);
+
+            return new EventPayoutStatusDto { HasPendingRequest = pendingRequest != null };
+        }
+
         private static EventPayoutResultDto MapToResultDto(EventPayout payout)
         {
             return new EventPayoutResultDto

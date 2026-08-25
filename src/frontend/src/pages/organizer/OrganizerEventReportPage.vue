@@ -44,7 +44,36 @@
           </div>
         </div>
 
-        <BaseButton variant="primary" class="!rounded-2xl !py-3.5 !px-6 shrink-0 flex items-center gap-2" :disabled="isRequestingPayout" @click="handleRequestPayout">
+        <BaseButton
+          v-if="payoutStatus && payoutStatus.hasProposedPayout"
+          variant="primary"
+          class="!rounded-2xl !py-3.5 !px-6 shrink-0 flex items-center gap-2"
+          @click="router.push('/organizer/wallet')"
+        >
+          <PhHandCoins weight="bold" />
+          Xem đề xuất giải ngân
+        </BaseButton>
+        <span
+          v-else-if="payoutStatus && payoutStatus.hasAcceptedPayout"
+          class="shrink-0 px-6 py-3.5 rounded-2xl bg-primary/10 border border-primary/20 text-primary text-[13px] font-black uppercase tracking-widest flex items-center gap-2"
+        >
+          <PhCheckCircle weight="fill" />
+          Đã giải ngân
+        </span>
+        <span
+          v-else-if="payoutStatus && payoutStatus.hasPendingRequest"
+          class="shrink-0 px-6 py-3.5 rounded-2xl bg-warning/10 border border-warning/20 text-warning text-[13px] font-black uppercase tracking-widest flex items-center gap-2"
+        >
+          <PhClock weight="bold" />
+          Đã yêu cầu giải ngân
+        </span>
+        <BaseButton
+          v-else-if="payoutStatus"
+          variant="primary"
+          class="!rounded-2xl !py-3.5 !px-6 shrink-0 flex items-center gap-2"
+          :disabled="isRequestingPayout"
+          @click="handleRequestPayout"
+        >
           <PhSpinner v-if="isRequestingPayout" class="animate-spin text-lg" />
           <template v-else>
             <PhHandCoins weight="bold" />
@@ -388,7 +417,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Line } from 'vue-chartjs'
 import { getEventReport, getEventOrders, getEventChartData } from '../../services/order.service'
-import { requestPayout } from '../../services/organizer-wallet.service'
+import { requestPayout, getEventPayoutStatus } from '../../services/organizer-wallet.service'
 import { getEventClickTrend } from '../../services/insights.service'
 import { getEventSuggestions } from '../../services/ai-insights.service'
 import { addToast } from '../../stores/adminStore'
@@ -400,7 +429,7 @@ import AiSuggestionSection from '../../components/organizer/AiSuggestionSection.
 import {
   PhSpinner, PhWarningCircle, PhArrowLeft, PhCoins,
   PhTicket, PhUsers, PhChartPie, PhMagnifyingGlass,
-  PhCaretLeft, PhCaretRight, PhHandCoins
+  PhCaretLeft, PhCaretRight, PhHandCoins, PhCheckCircle, PhClock
 } from '@phosphor-icons/vue'
 
 const route = useRoute()
@@ -410,6 +439,7 @@ const reportData = ref(null)
 const isLoading = ref(true)
 const error = ref('')
 const isRequestingPayout = ref(false)
+const payoutStatus = ref(null)
 
 // Orders list properties
 const searchKeyword = ref('')
@@ -600,6 +630,7 @@ const handleRequestPayout = async () => {
     const res = await requestPayout(route.params.id)
     if (res && res.success) {
       addToast(res.message || 'Đã gửi yêu cầu giải ngân thành công.', 'success')
+      await fetchPayoutStatus()
     } else {
       addToast(res?.message || 'Không thể gửi yêu cầu giải ngân.', 'error')
     }
@@ -609,6 +640,20 @@ const handleRequestPayout = async () => {
     addToast(errorMsg, 'error')
   } finally {
     isRequestingPayout.value = false
+  }
+}
+
+const fetchPayoutStatus = async () => {
+  try {
+    const res = await getEventPayoutStatus(route.params.id)
+    if (res && res.success && res.data) {
+      payoutStatus.value = res.data
+    } else {
+      payoutStatus.value = { hasPendingRequest: false, hasProposedPayout: false, hasAcceptedPayout: false }
+    }
+  } catch (err) {
+    console.error('Error fetching event payout status:', err)
+    payoutStatus.value = { hasPendingRequest: false, hasProposedPayout: false, hasAcceptedPayout: false }
   }
 }
 
@@ -627,11 +672,12 @@ onMounted(async () => {
     isLoading.value = false
   }
 
-  // Also fetch chart, orders list, and engagement trend
+  // Also fetch chart, orders list, engagement trend, and payout status
   await Promise.all([
     fetchChart(),
     fetchOrders(),
-    fetchClickTrend()
+    fetchClickTrend(),
+    fetchPayoutStatus()
   ])
 })
 

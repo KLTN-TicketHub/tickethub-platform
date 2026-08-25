@@ -172,6 +172,12 @@
                     <div v-if="isEventEnded(event)" class="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/40 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
                       Đã qua
                     </div>
+                    <div v-if="activeStatusId === 2 && payoutStatuses[event.id]?.hasAcceptedPayout" class="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-primary text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
+                      Đã giải ngân
+                    </div>
+                    <div v-else-if="activeStatusId === 2 && payoutStatuses[event.id] && !payoutStatuses[event.id].hasAcceptedPayout" class="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/40 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
+                      Chưa giải ngân
+                    </div>
                   </div>
                 </div>
                 
@@ -270,6 +276,7 @@ import { getErrorMessage } from '../utils/apiError'
 import BaseButton from '../components/ui/BaseButton.vue'
 import { getOrganizerEvents, getEventStatuses, updateOrganizerAvatar } from '../services/organizer.service'
 import { getOrganizerOrderSummary } from '../services/order.service'
+import { getEventPayoutStatus } from '../services/organizer-wallet.service'
 import { getOrganizerInsights } from '../services/insights.service'
 import {
   PhSuitcase, PhPlus, PhTicket, PhTrendUp, PhCurrencyCircleDollar,
@@ -409,6 +416,10 @@ const fetchData = async () => {
       totalPages.value = 1
       totalCount.value = 0
     }
+
+    if (activeStatusId.value === 2) {
+      await fetchPayoutStatuses(events.value)
+    }
   } catch (err) {
     console.error('Error fetching events:', err)
     addToast(getErrorMessage(err, 'Không thể tải danh sách sự kiện.'), 'error')
@@ -418,6 +429,20 @@ const fetchData = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+const payoutStatuses = ref({})
+
+const fetchPayoutStatuses = async (eventList) => {
+  await Promise.all(eventList.map(async (ev) => {
+    if (payoutStatuses.value[ev.id]) return
+    try {
+      const res = await getEventPayoutStatus(ev.id)
+      payoutStatuses.value = { ...payoutStatuses.value, [ev.id]: (res && res.success) ? res.data : null }
+    } catch (err) {
+      console.error('Error fetching payout status for event', ev.id, err)
+    }
+  }))
 }
 
 // Stats computed dynamically

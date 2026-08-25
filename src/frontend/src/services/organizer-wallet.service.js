@@ -1,7 +1,7 @@
 import api from './api/axios'
 import {
   ORGANIZER_WALLET, ORGANIZER_WALLET_TRANSACTIONS, ORGANIZER_PAYOUT_REQUEST,
-  ORGANIZER_PAYOUT_PROPOSED, ORGANIZER_PAYOUT_ACCEPT, ORGANIZER_PAYOUT_REJECT
+  ORGANIZER_PAYOUT_EVENT_STATUS, ORGANIZER_PAYOUT_PROPOSED, ORGANIZER_PAYOUT_ACCEPT, ORGANIZER_PAYOUT_REJECT
 } from './api/endpoints'
 
 /**
@@ -33,6 +33,17 @@ export async function getWalletTransactions(params) {
  */
 export async function requestPayout(eventId) {
   const response = await api.post(ORGANIZER_PAYOUT_REQUEST(eventId))
+  return response.data
+}
+
+/**
+ * Lấy trạng thái giải ngân hiện tại của 1 sự kiện (chưa yêu cầu / đã yêu cầu / có đề xuất chờ xác nhận / đã giải ngân)
+ * GET /finance/organizer/payouts/events/{eventId}/status
+ * @param {string} eventId
+ * @returns {{ success, message, data: { hasPendingRequest, hasProposedPayout, hasAcceptedPayout, proposedPayoutId } }}
+ */
+export async function getEventPayoutStatus(eventId) {
+  const response = await api.get(ORGANIZER_PAYOUT_EVENT_STATUS(eventId))
   return response.data
 }
 

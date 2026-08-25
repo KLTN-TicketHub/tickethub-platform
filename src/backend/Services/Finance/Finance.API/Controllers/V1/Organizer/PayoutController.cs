@@ -39,6 +39,19 @@ namespace Finance.API.Controllers.V1.Organizer
             return Ok(new ApiResponse(true, "Đã gửi yêu cầu giải ngân thành công. Moderator sẽ xem xét và phản hồi sớm."));
         }
 
+        [HttpGet("events/{eventId:guid}/status")]
+        public async Task<IActionResult> GetEventPayoutStatusAsync(
+            [FromRoute] Guid eventId,
+            CancellationToken cancellationToken)
+        {
+            Guid organizerId = _currentUserService.UserId
+                ?? throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không thể xác định danh tính người dùng.");
+
+            EventPayoutStatusDto result = await _payoutService.GetEventPayoutStatusAsync(eventId, organizerId, cancellationToken);
+
+            return Ok(new ApiResponse<EventPayoutStatusDto>(true, "Lấy trạng thái giải ngân sự kiện thành công.", result));
+        }
+
         [HttpGet("proposed")]
         public async Task<IActionResult> GetProposedPayoutsAsync(
             [FromQuery] int pageNumber,

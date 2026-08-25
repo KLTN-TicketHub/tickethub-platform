@@ -143,6 +143,7 @@ export const MODERATOR_PAYOUT_PROPOSE = (payoutRequestId) => `/finance/moderator
 export const ORGANIZER_WALLET = '/finance/organizer/wallet'
 export const ORGANIZER_WALLET_TRANSACTIONS = '/finance/organizer/wallet/transactions'
 export const ORGANIZER_PAYOUT_REQUEST = (eventId) => `/finance/organizer/payouts/events/${eventId}/request`
+export const ORGANIZER_PAYOUT_EVENT_STATUS = (eventId) => `/finance/organizer/payouts/events/${eventId}/status`
 export const ORGANIZER_PAYOUT_PROPOSED = '/finance/organizer/payouts/proposed'
 export const ORGANIZER_PAYOUT_ACCEPT = (payoutId) => `/finance/organizer/payouts/${payoutId}/accept`
 export const ORGANIZER_PAYOUT_REJECT = (payoutId) => `/finance/organizer/payouts/${payoutId}/reject`
