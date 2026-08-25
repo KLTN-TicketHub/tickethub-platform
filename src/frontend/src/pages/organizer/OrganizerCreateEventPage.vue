@@ -50,6 +50,12 @@
       </template>
     </div>
 
+    <!-- API error: đặt ngoài các bước để luôn hiện được dù nhảy về bước nào -->
+    <div v-if="apiError" class="mb-6 px-5 py-4 rounded-2xl bg-danger/10 border border-danger/25 text-danger text-[13px] font-medium flex items-start gap-3">
+      <PhWarningCircle weight="fill" class="w-5 h-5 flex-shrink-0 mt-0.5" />
+      <span>{{ apiError }}</span>
+    </div>
+
     <!-- ── STEP 0: Chọn loại sự kiện ──────────────────────────────── -->
     <transition name="step-fade" mode="out-in">
       <div v-if="currentStep === 0" key="step0">
@@ -1115,12 +1121,6 @@
             </div>
           </div>
 
-          <!-- API error -->
-          <div v-if="apiError" class="px-5 py-4 rounded-2xl bg-danger/10 border border-danger/25 text-danger text-[13px] font-medium flex items-start gap-3">
-            <PhWarningCircle weight="fill" class="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <span>{{ apiError }}</span>
-          </div>
-
           <!-- Actions -->
           <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2">
             <button
@@ -1191,6 +1191,25 @@ function nextStep() {
     }
   }
 }
+// Xác định field lỗi trả về từ BE thuộc bước nào, để nhảy về đúng bước cho người dùng thấy
+function getStepForField(field) {
+  if (field === 'mode') return 0
+  if (['title', 'categoryId', 'description', 'showTimes', 'saleOpenAt', 'saleCloseAt'].includes(field)) return 1
+  if (field === 'coverImageUrl') return 2
+  if (field.startsWith('location.')) return 3
+  if (['selectedVenueId', 'seatMapId'].includes(field)) return 3
+  if (field.startsWith('showTimes[')) return 4
+  return null
+}
+
+function jumpToFirstErrorStep(errorFields) {
+  const steps = errorFields.map(getStepForField).filter(s => s !== null)
+  if (steps.length === 0) return
+  const earliestStep = Math.min(...steps)
+  currentStep.value = earliestStep
+  if (earliestStep > maxReachedStep.value) maxReachedStep.value = earliestStep
+}
+
 function prevStep() {
   if (currentStep.value > 0) currentStep.value--
 }
@@ -1848,6 +1867,7 @@ async function handleSubmit() {
         errors.value[err.field] = err.message
       })
       apiError.value = errData.message || 'Dữ liệu không hợp lệ, vui lòng kiểm tra lại.'
+      jumpToFirstErrorStep(errData.errors.map(err => err.field))
     } else {
       apiError.value = errData?.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.'
     }

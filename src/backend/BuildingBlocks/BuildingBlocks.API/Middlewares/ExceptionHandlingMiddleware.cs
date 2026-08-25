@@ -42,6 +42,33 @@ namespace BuildingBlocks.API.Middlewares
             }
         }
 
+        private static string ToCamelCasePropertyPath(string propertyName)
+        {
+            if (string.IsNullOrEmpty(propertyName))
+                return propertyName;
+
+            string[] segments = propertyName.Split('.');
+
+            for (int i = 0; i < segments.Length; i++)
+            {
+                string segment = segments[i];
+                int bracketIndex = segment.IndexOf('[');
+
+                if (bracketIndex > 0)
+                {
+                    string namePart = segment[..bracketIndex];
+                    string indexPart = segment[bracketIndex..];
+                    segments[i] = char.ToLowerInvariant(namePart[0]) + namePart[1..] + indexPart;
+                }
+                else if (segment.Length > 0)
+                {
+                    segments[i] = char.ToLowerInvariant(segment[0]) + segment[1..];
+                }
+            }
+
+            return string.Join('.', segments);
+        }
+
         private async Task HandleErrorAsync(HttpContext context, Exception ex)
         {
             int statusCode;
@@ -84,9 +111,7 @@ namespace BuildingBlocks.API.Middlewares
                         .SelectMany(kvp => (kvp.Value ?? [])
                             .Select(msg => new
                             {
-                                field = string.IsNullOrEmpty(kvp.Key)
-                                    ? kvp.Key
-                                    : char.ToLowerInvariant(kvp.Key[0]) + kvp.Key[1..],
+                                field = ToCamelCasePropertyPath(kvp.Key),
                                 message = msg
                             }))
                         .ToList();
