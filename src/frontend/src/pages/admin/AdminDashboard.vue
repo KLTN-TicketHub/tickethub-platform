@@ -67,20 +67,23 @@
             Xem tất cả <PhArrowRight weight="bold" class="group-hover:translate-x-1 transition-transform" />
           </router-link>
         </div>
-        <BaseTable :columns="eventColumns" :data="recentEvents">
+        <div v-if="isLoadingEvents" class="py-16 flex justify-center">
+          <PhSpinner class="animate-spin text-primary text-3xl" weight="bold" />
+        </div>
+        <BaseTable v-else :columns="eventColumns" :data="recentEvents">
           <template #event="{ row }">
             <div class="flex items-center gap-4">
               <div class="w-12 h-12 rounded-xl overflow-hidden border border-white/10 flex-shrink-0">
-                <img :src="row.image" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                <img :src="row.coverImageUrl" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               </div>
               <span class="font-bold text-white group-hover:text-primary transition-colors line-clamp-1">{{ row.title }}</span>
             </div>
           </template>
           <template #category="{ row }">
-            <span class="text-[13px] text-white/60 font-bold uppercase tracking-wider">{{ row.category }}</span>
+            <span class="text-[13px] text-white/60 font-bold uppercase tracking-wider">{{ row.categoryName }}</span>
           </template>
           <template #date="{ row }">
-            <span class="text-[14px] text-white/80 font-medium">{{ formatDate(row.dateStart) }}</span>
+            <span class="text-[14px] text-white/80 font-medium">{{ formatDate(row.startAt) }}</span>
           </template>
           <template #status="{ row }">
             <BaseBadge :variant="getStatusVariant(row.status)">{{ getStatusLabel(row.status) }}</BaseBadge>
@@ -94,14 +97,17 @@
         <!-- Revenue by category -->
         <div class="bg-[#111916]/50 border border-white/5 rounded-[2rem] p-8 flex flex-col gap-8">
           <h3 class="text-xl font-bold font-heading text-white">Doanh thu thể loại</h3>
-          <div class="flex flex-col gap-6">
-            <div v-for="cat in revenueByCategory" :key="cat.name" class="flex flex-col gap-3 group">
+          <div v-if="isLoadingByCategory" class="py-6 flex justify-center">
+            <PhSpinner class="animate-spin text-primary text-2xl" weight="bold" />
+          </div>
+          <div v-else class="flex flex-col gap-6">
+            <div v-for="cat in revenueByCategory" :key="cat.categoryId" class="flex flex-col gap-3 group">
               <div class="flex justify-between items-center">
                 <span class="text-[14px] font-bold text-white/80 flex items-center gap-3">
-                  <component :is="cat.icon" weight="fill" class="text-white/40 group-hover:text-primary transition-colors" />
-                  {{ cat.name }}
+                  <PhTag weight="fill" class="text-white/40 group-hover:text-primary transition-colors" />
+                  {{ cat.categoryName }}
                 </span>
-                <span class="text-[13px] font-bold text-white">{{ formatPrice(cat.revenue) }}</span>
+                <span class="text-[13px] font-bold text-white">{{ formatPrice(cat.grossRevenue) }}</span>
               </div>
               <div class="h-1.5 bg-white/5 rounded-full overflow-hidden relative">
                 <div class="absolute top-0 left-0 h-full bg-primary rounded-full transition-all duration-1000" :style="{ width: cat.percent + '%' }"></div>
@@ -115,21 +121,24 @@
           <div class="flex justify-between items-center">
             <h3 class="text-xl font-bold font-heading text-white">Đơn hàng mới</h3>
           </div>
-          <div class="flex flex-col gap-5">
-            <div v-for="order in recentOrders" :key="order.id" class="flex items-center justify-between group cursor-pointer">
+          <div v-if="isLoadingOrders" class="py-6 flex justify-center">
+            <PhSpinner class="animate-spin text-primary text-2xl" weight="bold" />
+          </div>
+          <div v-else class="flex flex-col gap-5">
+            <div v-for="order in recentOrders" :key="order.orderId" class="flex items-center justify-between group cursor-pointer">
               <div class="flex items-center gap-4">
                 <div class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[13px] font-bold text-white/60 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                  {{ order.user.name.charAt(0) }}
+                  {{ (order.customerName || '?').charAt(0) }}
                 </div>
                 <div class="flex flex-col">
-                  <span class="text-[14px] font-bold text-white leading-tight group-hover:text-primary transition-colors">{{ order.user.name }}</span>
-                  <span class="text-[12px] text-white/40 line-clamp-1 max-w-[120px] mt-0.5">{{ order.event.title }}</span>
+                  <span class="text-[14px] font-bold text-white leading-tight group-hover:text-primary transition-colors">{{ order.customerName }}</span>
+                  <span class="text-[12px] text-white/40 line-clamp-1 max-w-[120px] mt-0.5">{{ order.eventTitle }}</span>
                 </div>
               </div>
               <div class="flex flex-col items-end gap-1">
                 <span class="text-[14px] font-bold text-primary">{{ formatPrice(order.totalPrice) }}</span>
-                <BaseBadge :variant="order.status === 'confirmed' ? 'primary' : 'neutral'" size="sm">
-                  {{ order.status === 'confirmed' ? 'Xong' : 'Chờ' }}
+                <BaseBadge :variant="(order.status === 'Paid' || order.status === 'Completed') ? 'primary' : 'neutral'" size="sm">
+                  {{ (order.status === 'Paid' || order.status === 'Completed') ? 'Xong' : 'Chờ' }}
                 </BaseBadge>
               </div>
             </div>
@@ -143,18 +152,17 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { getEvents } from '../../stores/eventStore'
-import { usersData, ordersData, addToast } from '../../stores/adminStore'
-import { getFinanceSummary } from '../../services/admin-finance.service'
+import { addToast } from '../../stores/adminStore'
+import { getFinanceSummary, getFinanceByCategory } from '../../services/admin-finance.service'
+import { getEventSummary, getAdminEvents } from '../../services/admin-event.service'
+import { getAdminUsers } from '../../services/admin-user.service'
+import { getAdminOrders } from '../../services/order.service'
 import { getErrorMessage } from '../../utils/apiError'
 import BaseBadge from '../../components/ui/BaseBadge.vue'
 import BaseTable from '../../components/ui/BaseTable.vue'
 import {
-  PhTicket, PhUsers, PhReceipt, PhCoins, PhArrowRight, PhSpinner,
-  PhMicrophoneStage, PhTrophy, PhMaskHappy, PhCompass, PhBooks
+  PhTicket, PhUsers, PhReceipt, PhCoins, PhArrowRight, PhSpinner, PhTag
 } from '@phosphor-icons/vue'
-
-const allEvents = computed(() => getEvents())
 
 const isLoadingFinance = ref(true)
 const financeSummary = ref({ grossRevenue: 0, platformFee: 0, netPaidToOrganizers: 0 })
@@ -178,8 +186,82 @@ const loadFinanceSummary = async () => {
   }
 }
 
+const totalEventsCount = ref(0)
+const totalUsersCount = ref(0)
+const totalOrdersCount = ref(0)
+
+const loadMainStatsCounts = async () => {
+  try {
+    const [eventSummaryRes, usersRes, ordersRes] = await Promise.all([
+      getEventSummary({}),
+      getAdminUsers({ pageNumber: 1, pageSize: 1 }),
+      getAdminOrders({ pageNumber: 1, pageSize: 1 })
+    ])
+    if (eventSummaryRes && eventSummaryRes.success) totalEventsCount.value = eventSummaryRes.data.totalEvents || 0
+    if (usersRes && usersRes.success) totalUsersCount.value = usersRes.data.totalCount || 0
+    if (ordersRes && ordersRes.success) totalOrdersCount.value = ordersRes.data.totalCount || 0
+  } catch (err) {
+    console.error('Error fetching dashboard stat counts:', err)
+  }
+}
+
+const isLoadingEvents = ref(true)
+const recentEvents = ref([])
+
+const loadRecentEvents = async () => {
+  isLoadingEvents.value = true
+  try {
+    const res = await getAdminEvents({ pageNumber: 1, pageSize: 5 })
+    recentEvents.value = (res && res.success) ? (res.data.data || []) : []
+  } catch (err) {
+    console.error('Error fetching recent events:', err)
+    addToast(getErrorMessage(err, 'Không thể tải sự kiện mới đăng.'), 'error')
+    recentEvents.value = []
+  } finally {
+    isLoadingEvents.value = false
+  }
+}
+
+const isLoadingOrders = ref(true)
+const recentOrders = ref([])
+
+const loadRecentOrders = async () => {
+  isLoadingOrders.value = true
+  try {
+    const res = await getAdminOrders({ pageNumber: 1, pageSize: 5 })
+    recentOrders.value = (res && res.success) ? (res.data.data || []) : []
+  } catch (err) {
+    console.error('Error fetching recent orders:', err)
+    addToast(getErrorMessage(err, 'Không thể tải đơn hàng mới.'), 'error')
+    recentOrders.value = []
+  } finally {
+    isLoadingOrders.value = false
+  }
+}
+
+const isLoadingByCategory = ref(true)
+const byCategory = ref([])
+
+const loadRevenueByCategory = async () => {
+  isLoadingByCategory.value = true
+  try {
+    const res = await getFinanceByCategory({})
+    byCategory.value = (res && res.success) ? (res.data || []) : []
+  } catch (err) {
+    console.error('Error fetching revenue by category:', err)
+    addToast(getErrorMessage(err, 'Không thể tải doanh thu theo thể loại.'), 'error')
+    byCategory.value = []
+  } finally {
+    isLoadingByCategory.value = false
+  }
+}
+
 onMounted(() => {
   loadFinanceSummary()
+  loadMainStatsCounts()
+  loadRecentEvents()
+  loadRecentOrders()
+  loadRevenueByCategory()
 })
 
 const eventColumns = [
@@ -190,10 +272,10 @@ const eventColumns = [
 ]
 
 const mainStats = computed(() => [
-  { 
-    label: 'Tổng sự kiện', 
-    value: allEvents.value.length, 
-    sub: 'Đang mở',
+  {
+    label: 'Tổng sự kiện',
+    value: totalEventsCount.value,
+    sub: 'Hệ thống',
     icon: PhTicket,
     link: '/admin/events',
     bgClass: 'bg-[#111916] border border-white/5',
@@ -201,10 +283,10 @@ const mainStats = computed(() => [
     iconColorClass: 'text-primary',
     glowClass: 'bg-primary'
   },
-  { 
-    label: 'Người dùng', 
-    value: usersData.length, 
-    sub: 'Hoạt động',
+  {
+    label: 'Người dùng',
+    value: totalUsersCount.value,
+    sub: 'Hệ thống',
     icon: PhUsers,
     link: '/admin/users',
     bgClass: 'bg-[#111916] border border-white/5',
@@ -212,10 +294,10 @@ const mainStats = computed(() => [
     iconColorClass: 'text-[#818cf8]',
     glowClass: 'bg-[#818cf8]'
   },
-  { 
-    label: 'Đơn hàng', 
-    value: ordersData.length, 
-    sub: 'Thành công',
+  {
+    label: 'Đơn hàng',
+    value: totalOrdersCount.value,
+    sub: 'Hệ thống',
     icon: PhReceipt,
     link: '/admin/orders',
     bgClass: 'bg-[#111916] border border-white/5',
@@ -223,12 +305,12 @@ const mainStats = computed(() => [
     iconColorClass: 'text-yellow-500',
     glowClass: 'bg-yellow-500'
   },
-  { 
-    label: 'Doanh thu', 
-    value: formatPrice(ordersData.filter(o => o.status === 'confirmed').reduce((sum, o) => sum + o.totalPrice, 0)), 
-    sub: 'Tuần này',
+  {
+    label: 'Doanh thu',
+    value: formatPrice(financeSummary.value.grossRevenue),
+    sub: '30 ngày qua',
     icon: PhCoins,
-    link: '/admin/orders',
+    link: '/admin/finance',
     bgClass: 'bg-[#111916] border border-white/5',
     iconBgClass: 'bg-[#f472b6]/10',
     iconColorClass: 'text-[#f472b6]',
@@ -236,35 +318,28 @@ const mainStats = computed(() => [
   }
 ])
 
-const recentEvents = computed(() => allEvents.value.slice(0, 5))
-const recentOrders = computed(() => [...ordersData].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5))
-
 const revenueByCategory = computed(() => {
-  const cats = { concerts: 0, sports: 0, arts: 0, experiences: 0, workshops: 0 }
-  const labels = { concerts: 'Concert', sports: 'Thể thao', arts: 'Sân khấu', experiences: 'Trải nghiệm', workshops: 'Workshop' }
-  const icons = { concerts: PhMicrophoneStage, sports: PhTrophy, arts: PhMaskHappy, experiences: PhCompass, workshops: PhBooks }
-  
-  ordersData.filter(o => o.status === 'confirmed').forEach(o => {
-    const ev = allEvents.value.find(e => e.title === o.event.title)
-    if (ev && cats[ev.category] !== undefined) cats[ev.category] += o.totalPrice
-  })
-  const max = Math.max(...Object.values(cats), 1)
-  return Object.entries(cats).map(([key, val]) => ({
-    name: labels[key],
-    icon: icons[key],
-    revenue: val,
-    percent: Math.round((val / max) * 100)
-  })).sort((a,b) => b.revenue - a.revenue)
+  const max = Math.max(...byCategory.value.map(c => c.grossRevenue), 1)
+  return byCategory.value
+    .map(c => ({ ...c, percent: Math.round((c.grossRevenue / max) * 100) }))
+    .sort((a, b) => b.grossRevenue - a.grossRevenue)
 })
 
 const getStatusVariant = (status) => {
-  if (status === 'upcoming') return 'primary'
-  if (status === 'sold-out') return 'danger'
+  if (status === 'Published') return 'primary'
+  if (status === 'PendingApproval') return 'warning'
+  if (status === 'Rejected' || status === 'Cancelled') return 'danger'
   return 'neutral'
 }
 
 const getStatusLabel = (status) => {
-  const map = { 'upcoming': 'Sắp diễn ra', 'sold-out': 'Hết vé', 'ended': 'Đã kết thúc' }
+  const map = {
+    PendingApproval: 'Chờ duyệt',
+    Published: 'Đã xuất bản',
+    Archived: 'Đã qua',
+    Rejected: 'Bị từ chối',
+    Cancelled: 'Đã hủy'
+  }
   return map[status] || status
 }
 

@@ -16,10 +16,15 @@
       <div class="bg-[#111916]/50 border border-white/5 rounded-[2rem] overflow-hidden flex flex-col">
         <div class="p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
           <h3 class="text-xl font-bold font-heading text-white">Danh sách kiểm duyệt viên</h3>
-          <span class="text-[12px] text-white/50 font-bold uppercase tracking-widest">{{ moderatorsList.length }} người dùng</span>
+          <span class="text-[12px] text-white/50 font-bold uppercase tracking-widest">{{ totalCount }} người dùng</span>
         </div>
 
-        <div v-if="moderatorsList.length === 0" class="p-16 flex flex-col items-center justify-center text-center gap-4">
+        <div v-if="isLoading" class="p-16 flex flex-col items-center justify-center gap-3">
+          <PhSpinner class="animate-spin text-primary text-3xl" weight="bold" />
+          <span class="text-white/40 text-[12px] font-bold uppercase tracking-widest">Đang tải danh sách...</span>
+        </div>
+
+        <div v-else-if="moderatorsList.length === 0" class="p-16 flex flex-col items-center justify-center text-center gap-4">
           <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center text-4xl text-white/20 mb-2 shadow-inner">
             <PhShieldCheck weight="duotone" />
           </div>
@@ -33,7 +38,7 @@
           <div v-for="mod in moderatorsList" :key="mod.id" class="p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6 hover:bg-white/5 transition-all group">
             <div class="flex items-center gap-4">
               <div class="w-14 h-14 rounded-2xl overflow-hidden border border-white/10 flex-shrink-0">
-                <img :src="mod.imageUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(mod.fullName) + '&background=00E05D&color=000'" alt="Avatar" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                <img :src="mod.imageUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(mod.fullName) + '&background=00E05D&color=000'" alt="Avatar" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :class="mod.isLocked ? 'grayscale opacity-50' : ''" />
               </div>
               <div class="flex flex-col">
                 <span class="font-bold text-white text-[16px] leading-snug group-hover:text-primary transition-colors">{{ mod.fullName }}</span>
@@ -49,11 +54,31 @@
                 <PhPhone class="text-lg opacity-60" />
                 <span>{{ mod.phoneNumber }}</span>
               </div>
-              <div class="flex items-center gap-2">
-                <span class="text-[11px] bg-primary/10 text-primary font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-primary/20">Moderator</span>
-              </div>
+              <span
+                class="text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border"
+                :class="mod.isLocked ? 'bg-danger/10 text-danger border-danger/20' : 'bg-primary/10 text-primary border-primary/20'"
+              >
+                {{ mod.isLocked ? 'Đã khoá' : 'Đang hoạt động' }}
+              </span>
+              <BaseButton
+                :variant="mod.isLocked ? 'primary' : 'outline'"
+                size="sm"
+                :class="!mod.isLocked ? '!border-danger/30 !text-danger hover:!bg-danger/10' : ''"
+                :disabled="togglingModeratorId === mod.id"
+                @click="handleToggleLock(mod)"
+              >
+                <PhSpinner v-if="togglingModeratorId === mod.id" class="animate-spin" />
+                <template v-else>{{ mod.isLocked ? 'Mở khoá' : 'Khoá tài khoản' }}</template>
+              </BaseButton>
             </div>
           </div>
+        </div>
+
+        <!-- Pagination -->
+        <div v-if="totalPages > 1" class="flex items-center justify-between p-6 border-t border-white/5">
+          <BaseButton variant="outline" size="sm" :disabled="pageNumber <= 1" @click="pageNumber--; fetchModerators()">Trang trước</BaseButton>
+          <span class="text-[12px] font-bold text-white/40">Trang {{ pageNumber }} / {{ totalPages }}</span>
+          <BaseButton variant="outline" size="sm" :disabled="pageNumber >= totalPages" @click="pageNumber++; fetchModerators()">Trang sau</BaseButton>
         </div>
       </div>
     </div>
@@ -161,14 +186,66 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { registerModerator } from '../../services/auth/auth.service'
+import { getAdminUsers, setAdminUserLockStatus } from '../../services/admin-user.service'
 import { addToast } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
-import { PhPlus, PhShieldCheck, PhEnvelopeSimple, PhPhone, PhWarningCircle, PhCamera } from '@phosphor-icons/vue'
+import { PhPlus, PhShieldCheck, PhEnvelopeSimple, PhPhone, PhWarningCircle, PhCamera, PhSpinner } from '@phosphor-icons/vue'
 
 const moderatorsList = ref([])
+const isLoading = ref(true)
+const pageNumber = ref(1)
+const pageSize = 10
+const totalPages = ref(1)
+const totalCount = ref(0)
+const togglingModeratorId = ref(null)
+
+const fetchModerators = async () => {
+  isLoading.value = true
+  try {
+    const res = await getAdminUsers({ pageNumber: pageNumber.value, pageSize, role: 'Moderator' })
+    if (res && res.success && res.data) {
+      moderatorsList.value = res.data.data || []
+      totalPages.value = res.data.totalPages || 1
+      totalCount.value = res.data.totalCount || 0
+      pageNumber.value = res.data.pageNumber || 1
+    } else {
+      moderatorsList.value = []
+      totalCount.value = 0
+    }
+  } catch (err) {
+    console.error('Error fetching moderators:', err)
+    addToast(getErrorMessage(err, 'Không thể tải danh sách kiểm duyệt viên.'), 'error')
+    moderatorsList.value = []
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const handleToggleLock = async (mod) => {
+  togglingModeratorId.value = mod.id
+  try {
+    const res = await setAdminUserLockStatus(mod.id, !mod.isLocked)
+    if (res && res.success && res.data) {
+      mod.isLocked = res.data.isLocked
+      addToast(res.message || (mod.isLocked ? 'Đã khoá tài khoản.' : 'Đã mở khoá tài khoản.'), 'success')
+    } else {
+      addToast(res?.message || 'Không thể cập nhật trạng thái tài khoản.', 'error')
+    }
+  } catch (err) {
+    console.error('Error toggling moderator lock status:', err)
+    addToast(getErrorMessage(err, 'Không thể cập nhật trạng thái tài khoản.'), 'error')
+  } finally {
+    togglingModeratorId.value = null
+  }
+}
+
+onMounted(() => {
+  fetchModerators()
+})
 
 // Form states
 const isModalOpen = ref(false)
@@ -220,10 +297,11 @@ const handleSubmit = async () => {
     const res = await registerModerator(formData)
     if (res.success) {
       const createdMod = res.data
-      moderatorsList.value.unshift(createdMod)
       successData.value = createdMod
       isModalOpen.value = false
       addToast('Tạo tài khoản Moderator thành công!', 'success')
+      pageNumber.value = 1
+      await fetchModerators()
     } else {
       validationErrors.value.general = res.message || 'Có lỗi xảy ra khi tạo tài khoản.'
     }

@@ -12,5 +12,7 @@ namespace Ordering.Infrastructure.Interfaces.IServices
         Task<List<EventChartDataPointDto>> GetEventChartDataAsync(Guid eventId, Guid userId, bool isAdminOrMod, string range, CancellationToken cancellationToken = default);
 
         Task<OrganizerOrderSummaryDto> GetOrganizerSummaryAsync(Guid organizerId, CancellationToken cancellationToken = default);
+
+        Task<PaginatedResult<AdminOrderListItemDto>> GetAdminOrdersAsync(GetAdminOrdersRequest request, CancellationToken cancellationToken = default);
     }
 }

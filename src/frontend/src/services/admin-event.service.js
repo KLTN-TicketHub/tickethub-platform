@@ -1,5 +1,16 @@
 import api from './api/axios'
-import { ADMIN_EVENT_REPORT_SUMMARY, ADMIN_EVENT_REPORT_BY_CATEGORY } from './api/endpoints'
+import { ADMIN_EVENT_REPORT_SUMMARY, ADMIN_EVENT_REPORT_BY_CATEGORY, ADMIN_EVENTS_LIST } from './api/endpoints'
+
+/**
+ * Lấy danh sách sự kiện có phân trang, tìm kiếm, lọc theo trạng thái/danh mục cho Admin
+ * GET /catalog/admin/events
+ * @param {Object} params - { pageNumber, pageSize, search, status, categoryId }
+ * @returns {{ success, message, data: PaginatedResult<AdminEventListItemDto> }}
+ */
+export async function getAdminEvents(params) {
+  const response = await api.get(ADMIN_EVENTS_LIST, { params })
+  return response.data
+}
 
 /**
  * Lấy thống kê tổng quan sự kiện theo khoảng ngày

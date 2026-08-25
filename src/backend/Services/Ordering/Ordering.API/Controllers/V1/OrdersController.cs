@@ -178,5 +178,16 @@ namespace Ordering.API.Controllers.V1
 
             return Ok(new ApiResponse<object>(true, "Lấy dữ liệu thống kê sự kiện thành công.", result));
         }
+
+        [Authorize(Roles = BuildingBlocks.Contracts.Constants.Roles.Admin)]
+        [HttpGet("reports/admin")]
+        public async Task<IActionResult> GetAdminOrders(
+            [FromQuery] GetAdminOrdersRequest request,
+            CancellationToken cancellationToken)
+        {
+            var result = await _reportService.GetAdminOrdersAsync(request, cancellationToken);
+
+            return Ok(new ApiResponse<object>(true, "Lấy danh sách đơn hàng thành công.", result));
+        }
     }
 }

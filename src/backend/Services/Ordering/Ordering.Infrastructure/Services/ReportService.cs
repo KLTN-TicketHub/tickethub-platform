@@ -290,5 +290,60 @@ namespace Ordering.Infrastructure.Services
                 throw new BusinessRuleException($"Lỗi xử lý hệ thống: {ex.Message}");
             }
         }
+
+        public async Task<PaginatedResult<AdminOrderListItemDto>> GetAdminOrdersAsync(
+            GetAdminOrdersRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var query = _dbContext.Orders.AsQueryable();
+
+                if (!string.IsNullOrEmpty(request.Search))
+                {
+                    string search = request.Search.Trim().ToLower();
+                    query = query.Where(o => o.CustomerName.ToLower().Contains(search) ||
+                                             o.CustomerEmail.ToLower().Contains(search) ||
+                                             o.CustomerPhone.Contains(search) ||
+                                             o.EventTitle.ToLower().Contains(search) ||
+                                             o.Id.ToString().Contains(search));
+                }
+
+                if (!string.IsNullOrEmpty(request.Status) && Enum.TryParse<OrderStatus>(request.Status, true, out var status))
+                {
+                    query = query.Where(o => o.Status == status);
+                }
+
+                int totalCount = await query.CountAsync(cancellationToken);
+
+                var orders = await query
+                    .OrderByDescending(o => o.CreatedAt)
+                    .Skip((request.PageNumber - 1) * request.PageSize)
+                    .Take(request.PageSize)
+                    .ToListAsync(cancellationToken);
+
+                var dtos = orders.Select(o => new AdminOrderListItemDto
+                {
+                    OrderId = o.Id,
+                    EventId = o.EventId,
+                    EventTitle = o.EventTitle,
+                    OrganizerName = o.OrganizerName,
+                    CustomerName = o.CustomerName,
+                    CustomerEmail = o.CustomerEmail,
+                    CustomerPhone = o.CustomerPhone,
+                    TotalPrice = o.TotalPrice,
+                    PaymentMethod = o.PaymentMethod,
+                    Status = o.Status.ToString(),
+                    CreatedAt = o.CreatedAt
+                }).ToList();
+
+                return new PaginatedResult<AdminOrderListItemDto>(dtos, totalCount, request.PageNumber, request.PageSize);
+            }
+            catch (Exception ex) when (ex is not BaseCustomException)
+            {
+                _logger.LogError(ex, "[ReportService] Error retrieving admin order list");
+                throw new BusinessRuleException($"Lỗi xử lý hệ thống: {ex.Message}");
+            }
+        }
     }
 }

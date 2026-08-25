@@ -1,5 +1,16 @@
 import api from './api/axios'
-import { ORDER_CHECKOUT, ORDER_MY_PENDING, ORDER_CANCEL, ORDER_PAYMENT_LINK, ORDER_ORGANIZER_SUMMARY, ORDER_EVENT_REPORT, ORDER_EVENT_ORDERS, ORDER_EVENT_CHARTS } from './api/endpoints'
+import { ORDER_CHECKOUT, ORDER_MY_PENDING, ORDER_CANCEL, ORDER_PAYMENT_LINK, ORDER_ORGANIZER_SUMMARY, ORDER_EVENT_REPORT, ORDER_EVENT_ORDERS, ORDER_EVENT_CHARTS, ADMIN_ORDERS_LIST } from './api/endpoints'
+
+/**
+ * Lấy danh sách đơn hàng phân trang trên toàn hệ thống cho Admin
+ * GET /ordering/orders/reports/admin
+ * @param {Object} params - { pageNumber, pageSize, search, status }
+ * @returns {{ success, data: PaginatedResult<AdminOrderListItemDto>, message }}
+ */
+export async function getAdminOrders(params) {
+  const response = await api.get(ADMIN_ORDERS_LIST, { params })
+  return response.data
+}
 
 /**
  * Lấy tổng quan đơn hàng (tổng vé đã bán, tổng doanh thu) trên toàn bộ sự kiện của Organizer hiện tại

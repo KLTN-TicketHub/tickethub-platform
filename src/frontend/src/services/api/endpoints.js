@@ -55,6 +55,7 @@ export const ADMIN_EVENT_CATEGORY_DETAIL = (id) => `/catalog/admin/event-categor
 export const ADMIN_EVENT_CATEGORIES_REORDER = '/catalog/admin/event-categories/reorder'
 export const ADMIN_EVENT_REPORT_SUMMARY = '/catalog/admin/events/reports/summary'
 export const ADMIN_EVENT_REPORT_BY_CATEGORY = '/catalog/admin/events/reports/by-category'
+export const ADMIN_EVENTS_LIST = '/catalog/admin/events'
 
 // Admin Users
 export const ADMIN_USERS = '/auth/admin/users'
@@ -95,6 +96,7 @@ export const ORDER_ORGANIZER_SUMMARY = '/ordering/orders/reports/organizer/summa
 export const ORDER_EVENT_REPORT = (eventId) => `/ordering/orders/reports/events/${eventId}`
 export const ORDER_EVENT_ORDERS = (eventId) => `/ordering/orders/reports/events/${eventId}/orders`
 export const ORDER_EVENT_CHARTS = (eventId) => `/ordering/orders/reports/events/${eventId}/charts`
+export const ADMIN_ORDERS_LIST = '/ordering/orders/reports/admin'
 
 // Tickets
 export const MY_TICKETS = '/inventory/tickets/me'
