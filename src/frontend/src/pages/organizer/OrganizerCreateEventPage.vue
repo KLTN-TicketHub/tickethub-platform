@@ -1147,7 +1147,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, nextTick, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Stage as VStage, Layer as VLayer, Rect as VRect, Path as VPath, Text as VText, Circle as VCircle } from 'vue-konva'
 import {
@@ -1342,6 +1342,18 @@ function handleFileDrop(e) {
 
 // ── Rich text editor ──────────────────────────────────────────────────────
 const editorRef = ref(null)
+
+// contenteditable chỉ đồng bộ 1 chiều DOM -> form.description (qua onDescriptionInput).
+// Mỗi khi bước 1 bị huỷ rồi tạo lại (vd. nhảy step do lỗi validate), div contenteditable
+// là DOM mới hoàn toàn, rỗng — phải đổ lại nội dung từ form.description để không "mất" trên màn hình.
+watch(currentStep, async (step) => {
+  if (step === 1) {
+    await nextTick()
+    if (editorRef.value) {
+      editorRef.value.innerHTML = form.description || ''
+    }
+  }
+})
 
 const editorTools = [
   { cmd: 'bold',        label: 'B' },
