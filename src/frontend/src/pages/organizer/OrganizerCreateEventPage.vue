@@ -1346,13 +1346,20 @@ const editorRef = ref(null)
 // contenteditable chỉ đồng bộ 1 chiều DOM -> form.description (qua onDescriptionInput).
 // Mỗi khi bước 1 bị huỷ rồi tạo lại (vd. nhảy step do lỗi validate), div contenteditable
 // là DOM mới hoàn toàn, rỗng — phải đổ lại nội dung từ form.description để không "mất" trên màn hình.
-watch(currentStep, async (step) => {
-  if (step === 1) {
-    await nextTick()
+// Bước chuyển bằng <transition mode="out-in"> mất 200ms mới thật sự mount DOM bước mới,
+// nên chỉ nextTick() là chưa đủ — phải chờ tới khi editorRef thật sự xuất hiện.
+watch(currentStep, (step) => {
+  if (step !== 1) return
+  let attempts = 0
+  const trySetContent = () => {
     if (editorRef.value) {
       editorRef.value.innerHTML = form.description || ''
+    } else if (attempts < 30) {
+      attempts++
+      requestAnimationFrame(trySetContent)
     }
   }
+  requestAnimationFrame(trySetContent)
 })
 
 const editorTools = [

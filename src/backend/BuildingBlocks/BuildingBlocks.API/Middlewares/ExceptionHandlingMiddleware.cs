@@ -119,7 +119,7 @@ namespace BuildingBlocks.API.Middlewares
                     response = new
                     {
                         success = false,
-                        message = "One or more validation errors occurred.",
+                        message = ErrorMessages.ValidationError,
                         errors = flattenedErrors,
                         error = new
                         {
