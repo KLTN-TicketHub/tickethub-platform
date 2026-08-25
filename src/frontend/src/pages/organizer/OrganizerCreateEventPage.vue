@@ -340,10 +340,13 @@
               id="event-description"
               contenteditable="true"
               @input="onDescriptionInput"
-              class="min-h-[200px] bg-white/4 border border-white/10 border-t-0 rounded-b-xl px-4 py-3 text-[14px] text-white/80 leading-relaxed focus:outline-none focus:border-primary/50 transition-all prose-custom"
-              :class="{ 'rounded-b-xl': true }"
+              class="min-h-[200px] border border-t-0 rounded-b-xl px-4 py-3 text-[14px] text-white/80 leading-relaxed focus:outline-none transition-all prose-custom"
+              :class="errors.description ? 'bg-danger/5 border-danger/60 focus:border-danger/80' : 'bg-white/4 border-white/10 focus:border-primary/50'"
               :data-placeholder="'Mô tả chi tiết nội dung sự kiện, quy định, thông tin nghệ sĩ...'"
             />
+            <p v-if="errors.description" class="text-[12px] text-danger flex items-center gap-1.5">
+              <PhWarningCircle weight="fill" class="flex-shrink-0" />{{ errors.description }}
+            </p>
           </div>
 
           <div class="flex items-center justify-between pt-4 border-t border-white/5">
