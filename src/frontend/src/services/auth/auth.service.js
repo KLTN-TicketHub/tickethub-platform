@@ -1,6 +1,6 @@
 import axios from 'axios'
 import api from '../api/axios'
-import { GOOGLE_REDIRECT, AUTH_REFRESH, AUTH_PROFILE, AUTH_LOGOUT, ADMIN_AUTH_LOGIN, ADMIN_AUTH_CONFIRM, MODERATOR_AUTH_LOGIN, ADMIN_MODERATOR_REGISTER, MODERATOR_ACTIVATE_ACCOUNT, ORGANIZER_AUTH_LOGIN, ORGANIZER_AUTH_REGISTER, ORGANIZER_STAFF_REGISTER, STAFF_AUTH_LOGIN, STAFF_ACTIVATE_ACCOUNT } from '../api/endpoints'
+import { GOOGLE_REDIRECT, AUTH_REFRESH, AUTH_PROFILE, AUTH_LOGOUT, ADMIN_AUTH_LOGIN, ADMIN_AUTH_CONFIRM, MODERATOR_AUTH_LOGIN, ADMIN_MODERATOR_REGISTER, MODERATOR_ACTIVATE_ACCOUNT, ORGANIZER_AUTH_LOGIN, ORGANIZER_AUTH_REGISTER, ORGANIZER_STAFF_REGISTER, ORGANIZER_STAFF_LIST, ORGANIZER_STAFF_LOCK_STATUS, STAFF_AUTH_LOGIN, STAFF_ACTIVATE_ACCOUNT } from '../api/endpoints'
 import * as tokenService from './token.service'
 import { store } from '../../stores/eventStore'
 
@@ -370,6 +370,29 @@ export async function registerStaff(payload) {
   return response.data
 }
 
+/**
+ * Lấy danh sách nhân viên soát vé của Organizer hiện tại (phân trang)
+ * GET /auth/organizer/staffs
+ * @param {Object} params - { pageNumber, pageSize, search }
+ * @returns {{ success, data: PaginatedResult<StaffListItemDto>, message }}
+ */
+export async function getOrganizerStaffs(params = {}) {
+  const response = await api.get(ORGANIZER_STAFF_LIST, { params })
+  return response.data
+}
+
+/**
+ * Khoá / mở khoá tài khoản nhân viên soát vé
+ * PATCH /auth/organizer/staffs/{id}/lock-status
+ * @param {string} id
+ * @param {boolean} isLocked
+ * @returns {{ success, data: StaffListItemDto, message }}
+ */
+export async function setStaffLockStatus(id, isLocked) {
+  const response = await api.patch(ORGANIZER_STAFF_LOCK_STATUS(id), { isLocked })
+  return response.data
+}
+
 export async function loginStaff(username, password) {
   const response = await axios.post(buildApiUrl(STAFF_AUTH_LOGIN), {
     userName: username,
@@ -420,6 +443,8 @@ export default {
   loginOrganizer,
   registerOrganizer,
   registerStaff,
+  getOrganizerStaffs,
+  setStaffLockStatus,
   loginStaff,
   activateStaffAccount
 }

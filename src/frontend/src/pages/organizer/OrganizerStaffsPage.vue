@@ -16,10 +16,15 @@
       <div class="bg-[#111916]/50 border border-white/5 rounded-[2rem] overflow-hidden flex flex-col">
         <div class="p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
           <h3 class="text-xl font-bold font-heading text-white">Danh sách nhân viên</h3>
-          <span class="text-[12px] text-white/50 font-bold uppercase tracking-widest">{{ staffsList.length }} người dùng</span>
+          <span class="text-[12px] text-white/50 font-bold uppercase tracking-widest">{{ totalCount }} người dùng</span>
         </div>
 
-        <div v-if="staffsList.length === 0" class="p-16 flex flex-col items-center justify-center text-center gap-4">
+        <div v-if="isLoading" class="p-16 flex flex-col items-center justify-center gap-3">
+          <PhSpinner class="animate-spin text-primary text-3xl" weight="bold" />
+          <span class="text-white/40 text-[12px] font-bold uppercase tracking-widest">Đang tải danh sách...</span>
+        </div>
+
+        <div v-else-if="staffsList.length === 0" class="p-16 flex flex-col items-center justify-center text-center gap-4">
           <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center text-4xl text-white/20 mb-2 shadow-inner">
             <PhIdentificationBadge weight="duotone" />
           </div>
@@ -32,8 +37,8 @@
         <div v-else class="divide-y divide-white/5">
           <div v-for="staff in staffsList" :key="staff.id" class="p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6 hover:bg-white/5 transition-all group">
             <div class="flex items-center gap-4">
-              <div class="w-14 h-14 rounded-2xl overflow-hidden border border-white/10 flex-shrink-0">
-                <img :src="'https://ui-avatars.com/api/?name=' + encodeURIComponent(staff.fullName) + '&background=00E05D&color=000'" alt="Avatar" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <div class="w-14 h-14 rounded-2xl overflow-hidden border border-white/10 flex-shrink-0 relative">
+                <img :src="'https://ui-avatars.com/api/?name=' + encodeURIComponent(staff.fullName) + '&background=00E05D&color=000'" alt="Avatar" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" :class="staff.isLocked ? 'grayscale opacity-50' : ''" />
               </div>
               <div class="flex flex-col">
                 <span class="font-bold text-white text-[16px] leading-snug group-hover:text-primary transition-colors">{{ staff.fullName }}</span>
@@ -49,11 +54,31 @@
                 <PhPhone class="text-lg opacity-60" />
                 <span>{{ staff.phoneNumber }}</span>
               </div>
-              <div class="flex items-center gap-2">
-                <span class="text-[11px] bg-primary/10 text-primary font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-primary/20">Staff</span>
-              </div>
+              <span
+                class="text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border"
+                :class="staff.isLocked ? 'bg-danger/10 text-danger border-danger/20' : 'bg-primary/10 text-primary border-primary/20'"
+              >
+                {{ staff.isLocked ? 'Đã khoá' : 'Đang hoạt động' }}
+              </span>
+              <BaseButton
+                :variant="staff.isLocked ? 'primary' : 'outline'"
+                size="sm"
+                :class="!staff.isLocked ? '!border-danger/30 !text-danger hover:!bg-danger/10' : ''"
+                :disabled="togglingStaffId === staff.id"
+                @click="handleToggleLock(staff)"
+              >
+                <PhSpinner v-if="togglingStaffId === staff.id" class="animate-spin" />
+                <template v-else>{{ staff.isLocked ? 'Mở khoá' : 'Khoá tài khoản' }}</template>
+              </BaseButton>
             </div>
           </div>
+        </div>
+
+        <!-- Pagination -->
+        <div v-if="totalPages > 1" class="flex items-center justify-between p-6 border-t border-white/5">
+          <BaseButton variant="outline" size="sm" :disabled="pageNumber <= 1" @click="pageNumber--; fetchStaffs()">Trang trước</BaseButton>
+          <span class="text-[12px] font-bold text-white/40">Trang {{ pageNumber }} / {{ totalPages }}</span>
+          <BaseButton variant="outline" size="sm" :disabled="pageNumber >= totalPages" @click="pageNumber++; fetchStaffs()">Trang sau</BaseButton>
         </div>
       </div>
     </div>
@@ -139,14 +164,65 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { registerStaff } from '../../services/auth/auth.service'
+import { ref, onMounted } from 'vue'
+import { registerStaff, getOrganizerStaffs, setStaffLockStatus } from '../../services/auth/auth.service'
 import { addToast } from '../../stores/adminStore'
+import { getErrorMessage } from '../../utils/apiError'
 import BaseButton from '../../components/ui/BaseButton.vue'
 import BaseModal from '../../components/ui/BaseModal.vue'
-import { PhPlus, PhIdentificationBadge, PhEnvelopeSimple, PhPhone, PhWarningCircle } from '@phosphor-icons/vue'
+import { PhPlus, PhIdentificationBadge, PhEnvelopeSimple, PhPhone, PhWarningCircle, PhSpinner } from '@phosphor-icons/vue'
 
 const staffsList = ref([])
+const isLoading = ref(true)
+const pageNumber = ref(1)
+const pageSize = 10
+const totalPages = ref(1)
+const totalCount = ref(0)
+const togglingStaffId = ref(null)
+
+const fetchStaffs = async () => {
+  isLoading.value = true
+  try {
+    const res = await getOrganizerStaffs({ pageNumber: pageNumber.value, pageSize })
+    if (res && res.success && res.data) {
+      staffsList.value = res.data.data || []
+      totalPages.value = res.data.totalPages || 1
+      totalCount.value = res.data.totalCount || 0
+      pageNumber.value = res.data.pageNumber || 1
+    } else {
+      staffsList.value = []
+      totalCount.value = 0
+    }
+  } catch (err) {
+    console.error('Error fetching organizer staffs:', err)
+    addToast(getErrorMessage(err, 'Không thể tải danh sách nhân viên.'), 'error')
+    staffsList.value = []
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const handleToggleLock = async (staff) => {
+  togglingStaffId.value = staff.id
+  try {
+    const res = await setStaffLockStatus(staff.id, !staff.isLocked)
+    if (res && res.success && res.data) {
+      staff.isLocked = res.data.isLocked
+      addToast(res.message || (staff.isLocked ? 'Đã khoá tài khoản.' : 'Đã mở khoá tài khoản.'), 'success')
+    } else {
+      addToast(res?.message || 'Không thể cập nhật trạng thái tài khoản.', 'error')
+    }
+  } catch (err) {
+    console.error('Error toggling staff lock status:', err)
+    addToast(getErrorMessage(err, 'Không thể cập nhật trạng thái tài khoản.'), 'error')
+  } finally {
+    togglingStaffId.value = null
+  }
+}
+
+onMounted(() => {
+  fetchStaffs()
+})
 
 // Form states
 const isModalOpen = ref(false)
@@ -181,10 +257,11 @@ const handleSubmit = async () => {
     })
     if (res.success) {
       const createdStaff = res.data
-      staffsList.value.unshift(createdStaff)
       successData.value = createdStaff
       isModalOpen.value = false
       addToast('Tạo tài khoản nhân viên soát vé thành công!', 'success')
+      pageNumber.value = 1
+      await fetchStaffs()
     } else {
       validationErrors.value.general = res.message || 'Có lỗi xảy ra khi tạo tài khoản.'
     }
