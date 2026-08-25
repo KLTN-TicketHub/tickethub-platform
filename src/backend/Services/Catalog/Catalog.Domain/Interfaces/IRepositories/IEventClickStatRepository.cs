@@ -18,5 +18,7 @@ namespace Catalog.Domain.Interfaces.IRepositories
 
         Task<List<(Guid CategoryId, string CategoryName, long ViewCount, long PurchaseIntentCount, int ActiveEventCount)>> GetCategoryTrendAsync(
             DateOnly from, DateOnly to, CancellationToken cancellation = default);
+
+        Task<long> GetTotalViewsByOrganizerAsync(Guid organizerId, CancellationToken cancellation = default);
     }
 }

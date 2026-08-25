@@ -89,6 +89,7 @@ export const ORDER_CHECKOUT = '/ordering/orders/checkout'
 export const ORDER_MY_PENDING = (showtimeId) => `/ordering/orders/my-pending?showtimeId=${showtimeId}`
 export const ORDER_CANCEL = (orderId) => `/ordering/orders/${orderId}/cancel`
 export const ORDER_PAYMENT_LINK = (orderId) => `/ordering/orders/${orderId}/payment-link`
+export const ORDER_ORGANIZER_SUMMARY = '/ordering/orders/reports/organizer/summary'
 export const ORDER_EVENT_REPORT = (eventId) => `/ordering/orders/reports/events/${eventId}`
 export const ORDER_EVENT_ORDERS = (eventId) => `/ordering/orders/reports/events/${eventId}/orders`
 export const ORDER_EVENT_CHARTS = (eventId) => `/ordering/orders/reports/events/${eventId}/charts`

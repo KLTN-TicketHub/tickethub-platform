@@ -1,5 +1,15 @@
 import api from './api/axios'
-import { ORDER_CHECKOUT, ORDER_MY_PENDING, ORDER_CANCEL, ORDER_PAYMENT_LINK, ORDER_EVENT_REPORT, ORDER_EVENT_ORDERS, ORDER_EVENT_CHARTS } from './api/endpoints'
+import { ORDER_CHECKOUT, ORDER_MY_PENDING, ORDER_CANCEL, ORDER_PAYMENT_LINK, ORDER_ORGANIZER_SUMMARY, ORDER_EVENT_REPORT, ORDER_EVENT_ORDERS, ORDER_EVENT_CHARTS } from './api/endpoints'
+
+/**
+ * Lấy tổng quan đơn hàng (tổng vé đã bán, tổng doanh thu) trên toàn bộ sự kiện của Organizer hiện tại
+ * GET /ordering/orders/reports/organizer/summary
+ * @returns {{ success, data: { totalTicketsSold, totalRevenue }, message }}
+ */
+export async function getOrganizerOrderSummary() {
+  const response = await api.get(ORDER_ORGANIZER_SUMMARY)
+  return response.data
+}
 
 /**
  * Lấy báo cáo chi tiết sự kiện

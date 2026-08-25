@@ -12,7 +12,7 @@
       <div class="relative bg-[#111916] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col md:flex-row min-h-[380px] md:h-[400px] group">
         
         <!-- Left Column: Details -->
-        <div class="flex-1 p-8 lg:p-10 flex flex-col justify-between relative z-10">
+        <div class="flex-1 min-w-0 p-8 lg:p-10 flex flex-col justify-between relative z-10">
           <div class="space-y-4">
             <!-- Badges -->
             <div class="flex flex-wrap items-center gap-3">

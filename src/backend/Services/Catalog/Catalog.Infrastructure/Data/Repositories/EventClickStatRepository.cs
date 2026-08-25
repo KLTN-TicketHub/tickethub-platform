@@ -75,5 +75,14 @@ namespace Catalog.Infrastructure.Data.Repositories
 
             return rows.Select(r => (r.CategoryId, r.CategoryName, r.ViewCount, r.PurchaseIntentCount, r.ActiveEventCount)).ToList();
         }
+
+        public async Task<long> GetTotalViewsByOrganizerAsync(Guid organizerId, CancellationToken cancellation = default)
+        {
+            long? total = await _dbContext.Set<EventClickStat>()
+                .Where(s => s.Event!.OrganizerId == organizerId && s.ClickType == EventClickType.ViewDetail)
+                .SumAsync(s => (long?)s.ClickCount, cancellation);
+
+            return total ?? 0;
+        }
     }
 }

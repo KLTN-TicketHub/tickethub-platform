@@ -41,9 +41,6 @@
           <div class="w-14 h-14 rounded-[1.25rem] bg-[#0A0F0D] border border-white/10 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-inner" :class="stat.color">
             <component :is="stat.icon" weight="duotone" />
           </div>
-          <span class="text-[12px] font-black bg-primary/10 border border-primary/20 text-primary px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-sm">
-            <PhTrendUp weight="bold" /> {{ stat.trend }}%
-          </span>
         </div>
         <div class="relative z-10">
           <div class="text-white/40 text-[12px] font-bold uppercase tracking-widest mb-1.5">{{ stat.label }}</div>
@@ -266,6 +263,8 @@ import { addToast } from '../stores/adminStore'
 import { getErrorMessage } from '../utils/apiError'
 import BaseButton from '../components/ui/BaseButton.vue'
 import { getOrganizerEvents, getEventStatuses, updateOrganizerAvatar } from '../services/organizer.service'
+import { getOrganizerOrderSummary } from '../services/order.service'
+import { getOrganizerInsights } from '../services/insights.service'
 import {
   PhSuitcase, PhPlus, PhTicket, PhTrendUp, PhCurrencyCircleDollar,
   PhEye, PhCalendarBlank, PhPencilSimple, PhMagnifyingGlass, PhMapPin,
@@ -285,6 +284,9 @@ const totalCount = ref(0)
 const pageSize = 12
 const avatarInputRef = ref(null)
 const isUploadingAvatar = ref(false)
+const totalTicketsSold = ref(0)
+const totalRevenue = ref(0)
+const totalViews = ref(0)
 
 const defaultAvatarUrl = computed(() => {
   const name = store.user?.name || 'Organizer'
@@ -347,7 +349,36 @@ onMounted(async () => {
   }
   
   await fetchData()
+  fetchSummaryStats()
 })
+
+const fetchSummaryStats = async () => {
+  try {
+    const res = await getOrganizerOrderSummary()
+    if (res && res.success && res.data) {
+      totalTicketsSold.value = res.data.totalTicketsSold || 0
+      totalRevenue.value = res.data.totalRevenue || 0
+    }
+  } catch (err) {
+    console.error('Error fetching organizer order summary:', err)
+  }
+
+  try {
+    const res = await getOrganizerInsights({ range: '30d' })
+    if (res && res.success && res.data) {
+      totalViews.value = res.data.totalViews || 0
+    }
+  } catch (err) {
+    console.error('Error fetching organizer insights:', err)
+  }
+}
+
+// Rút gọn số lớn thành dạng 12.3K / 4.5M cho các thẻ thống kê
+const formatCompactNumber = (num) => {
+  if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M'
+  if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K'
+  return num.toString()
+}
 
 const fetchData = async () => {
   isLoading.value = true
@@ -386,10 +417,10 @@ const fetchData = async () => {
 // Stats computed dynamically
 const computedStats = computed(() => {
   return [
-    { label: 'Tổng sự kiện', value: totalCount.value.toString(), icon: markRaw(PhTicket), trend: '12', color: 'text-primary' },
-    { label: 'Vé đã bán', value: '450', icon: markRaw(PhTrendUp), trend: '8', color: 'text-info' },
-    { label: 'Doanh thu', value: '67.5M', icon: markRaw(PhCurrencyCircleDollar), trend: '15', color: 'text-warning' },
-    { label: 'Lượt xem', value: '2.4K', icon: markRaw(PhEye), trend: '24', color: 'text-[#f43f5e]' },
+    { label: 'Tổng sự kiện', value: totalCount.value.toString(), icon: markRaw(PhTicket), color: 'text-primary' },
+    { label: 'Vé đã bán', value: formatCompactNumber(totalTicketsSold.value), icon: markRaw(PhTrendUp), color: 'text-info' },
+    { label: 'Doanh thu', value: formatCompactNumber(totalRevenue.value), icon: markRaw(PhCurrencyCircleDollar), color: 'text-warning' },
+    { label: 'Lượt xem', value: formatCompactNumber(totalViews.value), icon: markRaw(PhEye), color: 'text-[#f43f5e]' },
   ]
 })
 

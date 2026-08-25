@@ -261,5 +261,34 @@ namespace Ordering.Infrastructure.Services
                 throw new BusinessRuleException($"Lỗi xử lý hệ thống: {ex.Message}");
             }
         }
+
+        public async Task<OrganizerOrderSummaryDto> GetOrganizerSummaryAsync(
+            Guid organizerId,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                List<Guid> eventIds = await _dbContext.EventSnapshots
+                    .Where(e => e.OrganizerId == organizerId)
+                    .Select(e => e.EventId)
+                    .ToListAsync(cancellationToken);
+
+                List<Order> paidOrders = await _dbContext.Orders
+                    .Where(o => eventIds.Contains(o.EventId) && (o.Status == OrderStatus.Paid || o.Status == OrderStatus.Completed))
+                    .Include(o => o.OrderItems)
+                    .ToListAsync(cancellationToken);
+
+                return new OrganizerOrderSummaryDto
+                {
+                    TotalRevenue = paidOrders.Sum(o => o.TotalPrice),
+                    TotalTicketsSold = paidOrders.SelectMany(o => o.OrderItems).Sum(item => item.Quantity)
+                };
+            }
+            catch (Exception ex) when (ex is not BaseCustomException)
+            {
+                _logger.LogError(ex, "[ReportService] Error retrieving organizer summary for OrganizerId={OrganizerId}", organizerId);
+                throw new BusinessRuleException($"Lỗi xử lý hệ thống: {ex.Message}");
+            }
+        }
     }
 }

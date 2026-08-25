@@ -3,9 +3,11 @@ using AI.Infrastructure.Interfaces.IServices;
 using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Domain.Exceptions;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace AI.Infrastructure.Services
 {
@@ -16,10 +18,13 @@ namespace AI.Infrastructure.Services
         private const string SystemPrompt =
             "Bạn là trợ lý phân tích dữ liệu cho một nền tảng bán vé sự kiện trực tuyến. " +
             "Nhiệm vụ của bạn là đọc các số liệu đã được tính toán sẵn (không tự tính toán lại số liệu) " +
-            "và đưa ra tối đa 4 gợi ý hướng phát triển ngắn gọn, thực tế cho Organizer (đơn vị tổ chức sự kiện). " +
+            "và đưa ra 2 đến 4 gợi ý hướng phát triển ngắn gọn, thực tế cho Organizer (đơn vị tổ chức sự kiện). " +
             "Luôn trả lời bằng tiếng Việt, giọng văn lịch sự. " +
             "Bắt buộc trả về ĐÚNG định dạng JSON sau, không kèm theo bất kỳ text nào khác ngoài JSON: " +
-            "{\"summary\": string, \"suggestions\": [{\"category\": string, \"title\": string, \"detail\": string, \"basedOn\": string}]}.";
+            "{\"summary\": string, \"suggestions\": [{\"category\": string, \"title\": string, \"detail\": string, \"basedOn\": string}]}. " +
+            "Trường \"summary\" CHỈ là 1-2 câu tóm tắt tổng quan, TUYỆT ĐỐI không liệt kê các gợi ý trong đó. " +
+            "Mỗi gợi ý PHẢI là một phần tử riêng trong mảng \"suggestions\" (không được gộp nhiều gợi ý vào chung 1 chuỗi text, kể cả dưới dạng đánh số). " +
+            "Mảng \"suggestions\" không được để trống.";
 
         private readonly ICatalogAiClient _catalogAiClient;
         private readonly ILlmClient _llmClient;
@@ -166,6 +171,9 @@ namespace AI.Infrastructure.Services
             }
         }
 
+        private static readonly Regex ListAnchorRegex = new Regex(@"(?:Suggestions|Gợi ý)\s*:\s*", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex ListItemSplitRegex = new Regex(@"\d+\)\s*", RegexOptions.Compiled);
+
         private static AiSuggestionResultDto ParseSuggestionResult(string rawResponse)
         {
             try
@@ -176,8 +184,16 @@ namespace AI.Infrastructure.Services
                     jsonText,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                if (parsed != null && parsed.Suggestions.Count > 0)
-                    return parsed;
+                if (parsed != null)
+                {
+                    // Model đôi khi trả JSON hợp lệ nhưng gộp hết gợi ý dạng đánh số vào chung "summary"
+                    // thay vì tách thành mảng "suggestions" như yêu cầu — cố gắng tách lại thay vì bỏ qua.
+                    if (parsed.Suggestions.Count == 0)
+                        TrySalvageSuggestionsFromSummary(parsed);
+
+                    if (parsed.Suggestions.Count > 0)
+                        return parsed;
+                }
             }
             catch (JsonException)
             {
@@ -197,6 +213,35 @@ namespace AI.Infrastructure.Services
                     }
                 }
             };
+        }
+
+        private static void TrySalvageSuggestionsFromSummary(AiSuggestionResultDto result)
+        {
+            if (string.IsNullOrWhiteSpace(result.Summary) || !ListItemSplitRegex.IsMatch(result.Summary))
+                return;
+
+            string text = result.Summary;
+            Match anchorMatch = ListAnchorRegex.Match(text);
+
+            string prose = anchorMatch.Success ? text[..anchorMatch.Index].Trim() : string.Empty;
+            string listText = anchorMatch.Success ? text[(anchorMatch.Index + anchorMatch.Length)..] : text;
+
+            List<string> items = ListItemSplitRegex.Split(listText)
+                .Select(s => s.Trim().Trim('.', ';', ' '))
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .ToList();
+
+            if (items.Count < 2)
+                return;
+
+            result.Summary = string.IsNullOrWhiteSpace(prose) ? "Gợi ý từ AI dựa trên dữ liệu hiện tại." : prose;
+            result.Suggestions = items.Select((item, idx) => new SuggestionItemDto
+            {
+                Category = "AI",
+                Title = $"Gợi ý {idx + 1}",
+                Detail = item,
+                BasedOn = "ai-summary"
+            }).ToList();
         }
 
         private static string ExtractJsonPayload(string rawResponse)

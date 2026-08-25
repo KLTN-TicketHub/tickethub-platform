@@ -108,6 +108,20 @@ namespace Ordering.API.Controllers.V1
             }));
         }
 
+        [HttpGet("reports/organizer/summary")]
+        public async Task<IActionResult> GetOrganizerSummary(CancellationToken cancellationToken)
+        {
+            string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                throw new BuildingBlocks.Domain.Exceptions.UnauthorizedAccessException("Không xác định được danh tính người dùng.");
+            }
+
+            var summary = await _reportService.GetOrganizerSummaryAsync(userId, cancellationToken);
+
+            return Ok(new ApiResponse<OrganizerOrderSummaryDto>(true, "Lấy tổng quan đơn hàng của ban tổ chức thành công.", summary));
+        }
+
         [HttpGet("reports/events/{eventId}")]
         public async Task<IActionResult> GetEventReport(Guid eventId, CancellationToken cancellationToken)
         {

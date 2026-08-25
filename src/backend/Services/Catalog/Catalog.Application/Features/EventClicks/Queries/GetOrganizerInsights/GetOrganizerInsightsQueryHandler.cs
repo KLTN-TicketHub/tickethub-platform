@@ -38,8 +38,11 @@ namespace Catalog.Application.Features.EventClicks.Queries.GetOrganizerInsights
             List<(Guid EventId, string EventTitle, long ViewCount, long PurchaseIntentCount)> topEventRows =
                 await _unitOfWork.EventClickStatRepository.GetTopEventsByOrganizerAsync(organizerId, from, to, TopEventsCount, cancellation);
 
+            long totalViews = await _unitOfWork.EventClickStatRepository.GetTotalViewsByOrganizerAsync(organizerId, cancellation);
+
             return new OrganizerInsightsDto
             {
+                TotalViews = totalViews,
                 Trend = BuildTrendPoints(trendRows, from, to),
                 TopEvents = topEventRows.Select(r => new TopEventClickStatDto
                 {
