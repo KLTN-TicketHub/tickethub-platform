@@ -2,65 +2,34 @@
   <div class="flex flex-col gap-24 pb-20 overflow-hidden">
 
     <!-- HERO SECTION -->
-    <section v-if="heroEvents.length > 0" class="relative min-h-[75vh] w-full pt-10">
+    <section v-if="heroEvents.length > 0" class="max-w-[1440px] mx-auto px-6 md:px-10 pt-10">
       <div
-        v-for="(ev, i) in heroEvents"
-        :key="ev.id"
-        class="absolute inset-0 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]"
-        :class="[i === slide ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none']"
+        class="relative w-full h-[60vh] lg:h-[70vh] rounded-[2rem] overflow-hidden group cursor-pointer shadow-2xl"
+        @click="goToEvent(heroEvents[slide])"
       >
-        <div class="max-w-[1440px] mx-auto px-6 md:px-10 h-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div class="lg:col-span-6 relative z-20 space-y-8 transform transition-all duration-1000 delay-200" :class="[i === slide ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0']">
-            <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-primary/30 text-primary uppercase tracking-[0.25em] text-[10px] font-bold">
-              <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-              Sự kiện nổi bật
-            </div>
-
-            <h1 class="text-5xl md:text-7xl font-black font-heading text-white leading-[0.95] tracking-tighter drop-shadow-lg line-clamp-3">
-              {{ ev.title }}
-            </h1>
-
-            <div class="flex flex-wrap items-center gap-8 pt-4">
-              <div class="flex flex-col">
-                <span class="text-[11px] text-white/40 font-bold uppercase tracking-widest mb-1">Giá vé từ</span>
-                <span class="text-3xl font-heading font-black text-white">{{ formatPrice(ev.minPrice) }}</span>
-              </div>
-              <div class="flex items-center gap-4">
-                <BaseButton variant="primary" size="lg" class="!px-10 !rounded-full shadow-[0_0_30px_rgba(0,200,83,0.3)] hover:scale-105 active:scale-95 transition-transform" @click="goToEvent(ev)">
-                  Đặt vé ngay
-                </BaseButton>
-                <BaseButton variant="ghost" size="lg" class="!rounded-full border border-white/20 hover:bg-white/10" @click="goToEvent(ev)">
-                  Chi tiết
-                </BaseButton>
-              </div>
-            </div>
-          </div>
-
-          <div class="lg:col-span-6 h-[45vh] lg:h-[70vh] relative rounded-[2rem] overflow-hidden group shadow-2xl transform transition-all duration-[1.5s]" :class="[i === slide ? 'translate-x-0 opacity-100' : 'translate-x-20 opacity-0']">
-            <img :src="ev.coverImageUrl" :alt="ev.title" class="w-full h-full object-cover transition-transform duration-[20s] ease-linear scale-105" :class="[i === slide ? 'scale-110' : '']" />
-            <div class="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-80 lg:hidden"></div>
-            <div class="absolute inset-0 border border-white/10 rounded-[2rem] pointer-events-none mix-blend-overlay"></div>
-          </div>
+        <div
+          v-for="(ev, i) in heroEvents"
+          :key="ev.id"
+          class="absolute inset-0 transition-opacity duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]"
+          :class="[i === slide ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none']"
+        >
+          <img :src="ev.coverImageUrl" :alt="ev.title" class="w-full h-full object-cover transition-transform duration-[8s] ease-linear" :class="[i === slide ? 'scale-105' : 'scale-100']" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
         </div>
-      </div>
 
-      <div v-if="heroEvents.length > 1" class="max-w-[1440px] mx-auto px-6 md:px-10 absolute bottom-10 left-0 right-0 z-30 flex items-center justify-between pointer-events-none">
-        <div class="pointer-events-auto flex gap-3">
+        <div class="absolute bottom-7 left-7 z-20 px-5 py-3 rounded-2xl bg-black/50 backdrop-blur-md border border-white/10">
+          <div class="text-[11px] text-white/50 font-bold uppercase tracking-widest">Giá vé từ</div>
+          <div class="text-2xl font-heading font-black text-white">{{ formatPrice(heroEvents[slide]?.minPrice) }}</div>
+        </div>
+
+        <div v-if="heroEvents.length > 1" class="absolute bottom-7 right-7 z-20 flex gap-2">
           <div
             v-for="(_, i) in heroEvents"
             :key="i"
-            class="h-1 rounded-full transition-all duration-700 cursor-pointer"
-            :class="[i === slide ? 'w-16 bg-primary' : 'w-4 bg-white/20']"
-            @click="goSlide(i)"
+            class="h-1.5 rounded-full transition-all duration-700 cursor-pointer"
+            :class="[i === slide ? 'w-8 bg-primary' : 'w-3 bg-white/30 hover:bg-white/50']"
+            @click.stop="goSlide(i)"
           />
-        </div>
-        <div class="pointer-events-auto flex items-center gap-4">
-          <button class="w-12 h-12 rounded-full border border-white/20 text-white flex items-center justify-center hover:bg-white/10 active:scale-90 transition-all" @click="goSlide(slide - 1)">
-            <PhArrowLeft weight="bold" />
-          </button>
-          <button class="w-12 h-12 rounded-full border border-white/20 text-white flex items-center justify-center hover:bg-white/10 active:scale-90 transition-all" @click="goSlide(slide + 1)">
-            <PhArrowRight weight="bold" />
-          </button>
         </div>
       </div>
     </section>
@@ -132,8 +101,7 @@ import { useRouter } from 'vue-router'
 import { getPublicEvents, getPublicEventCategories, getTrendingEvents } from '../services/eventService'
 import { selectEvent } from '../stores/eventStore'
 import SearchEventCard from '../components/SearchEventCard.vue'
-import BaseButton from '../components/ui/BaseButton.vue'
-import { PhArrowLeft, PhArrowRight, PhFire, PhMapPin } from '@phosphor-icons/vue'
+import { PhArrowRight, PhFire, PhMapPin } from '@phosphor-icons/vue'
 
 const router = useRouter()
 

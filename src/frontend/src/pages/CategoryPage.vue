@@ -1,12 +1,5 @@
 <template>
   <div class="py-8 max-w-[1440px] mx-auto px-6 md:px-10">
-    <CategoryHero
-      :title="categoryData.title"
-      :subtitle="categoryData.subtitle"
-      :icon="categoryData.icon"
-      :bgGradient="categoryData.bgGradient"
-    />
-
     <CategoryFilter
       v-model="activeFilter"
       v-model:city="city"
@@ -74,7 +67,6 @@ import { getPublicEvents, getPublicEventCategories } from '../services/eventServ
 import { getProvinces } from '../services/location.service'
 import { store } from '../stores/eventStore'
 import { getErrorMessage } from '../utils/apiError'
-import CategoryHero from '../components/category/CategoryHero.vue'
 import CategoryFilter from '../components/category/CategoryFilter.vue'
 import CategoryEventGrid from '../components/category/CategoryEventGrid.vue'
 import { PhCaretLeft, PhCaretRight } from '@phosphor-icons/vue'
@@ -96,51 +88,6 @@ const pageNumber = ref(1)
 const totalPages = ref(1)
 const hasPreviousPage = ref(false)
 const hasNextPage = ref(false)
-
-// Presentational copy per category (không phải dữ liệu sự kiện, chỉ là nội dung tĩnh hiển thị hero)
-const categoryConfigs = {
-  concerts: {
-    title: 'Nhạc & Concert',
-    subtitle: 'Hòa mình vào không gian âm nhạc sống động với những nghệ sĩ hàng đầu.',
-    icon: '🎵',
-    bgGradient: 'linear-gradient(135deg, #1A0A15 0%, #4A0E35 50%, #1A0A15 100%)'
-  },
-  arts: {
-    title: 'Sân Khấu & Nghệ Thuật',
-    subtitle: 'Khám phá những tác phẩm kịch nghệ và triển lãm nghệ thuật đặc sắc.',
-    icon: '🎭',
-    bgGradient: 'linear-gradient(135deg, #0A1525 0%, #1A3A6A 50%, #0A1525 100%)'
-  },
-  sports: {
-    title: 'Thể Thao',
-    subtitle: 'Cháy hết mình với những trận cầu đỉnh cao và sự kiện thể thao kịch tính.',
-    icon: '🏆',
-    bgGradient: 'linear-gradient(135deg, #0A2515 0%, #155530 50%, #0A2515 100%)'
-  },
-  experiences: {
-    title: 'Trải Nghiệm',
-    subtitle: 'Những chuyến đi và hoạt động trải nghiệm thực tế đầy thú vị.',
-    icon: '🧭',
-    bgGradient: 'linear-gradient(135deg, #251005 0%, #6A2505 50%, #251005 100%)'
-  },
-  workshops: {
-    title: 'Hội Thảo & Khóa Học',
-    subtitle: 'Nâng cao kỹ năng và kiến thức với những chuyên gia hàng đầu.',
-    icon: '📚',
-    bgGradient: 'linear-gradient(135deg, #051A25 0%, #104A6A 50%, #051A25 100%)'
-  },
-  others: {
-    title: 'Khác',
-    subtitle: 'Khám phá những sự kiện đa dạng và độc đáo khác.',
-    icon: '✨',
-    bgGradient: 'linear-gradient(135deg, #1A1A1A 0%, #333333 50%, #1A1A1A 100%)'
-  }
-}
-
-const categoryData = computed(() => {
-  const type = route.params.type || 'others'
-  return categoryConfigs[type] || categoryConfigs.others
-})
 
 // Danh mục thật khớp với slug trên URL (BE trả về slug tự sinh từ tên danh mục)
 const currentCategory = computed(() => {
