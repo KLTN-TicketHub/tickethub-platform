@@ -137,7 +137,7 @@ const activeMenuItems = computed(() => {
 })
 
 const isRouteActive = (path) => {
-  if (path.endsWith('/dashboard') || path === '/' || path === '/admin' || path === '/moderator') {
+  if (path.endsWith('/dashboard') || path === '/' || path === '/admin' || path === '/moderator' || path === '/organizer') {
     return route.path === path
   }
   return route.path.startsWith(path)

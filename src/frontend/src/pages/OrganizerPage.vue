@@ -166,6 +166,12 @@
                       <span class="w-2 h-2 rounded-full bg-info animate-pulse"></span>
                       Đang bán vé
                     </div>
+                    <div v-if="isEventUpcoming(event)" class="px-3 py-1 bg-warning/10 border border-warning/20 rounded-full text-warning text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
+                      Sắp tới
+                    </div>
+                    <div v-if="isEventEnded(event)" class="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/40 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
+                      Đã qua
+                    </div>
                   </div>
                 </div>
                 
@@ -489,6 +495,24 @@ const isEventSelling = (event) => {
   const open = new Date(event.saleOpenAt);
   const close = new Date(event.saleCloseAt);
   return now >= open && now <= close;
+}
+
+// Check if event has not started yet
+const isEventUpcoming = (event) => {
+  if (!event.startAt) return false;
+  return new Date() < new Date(event.startAt);
+}
+
+// Check if event has already finished (or its estimated end has passed)
+const isEventEnded = (event) => {
+  if (!event.startAt) return false;
+  const now = new Date();
+  if (event.endAt) {
+    return now > new Date(event.endAt);
+  }
+  const start = new Date(event.startAt);
+  const estimatedEnd = new Date(start.getTime() + 4 * 60 * 60 * 1000);
+  return now > estimatedEnd;
 }
 
 // Format Date: e.g. "00:00, Thứ 6, 15 tháng 05 2026"
