@@ -58,7 +58,7 @@ import StaffLoginPage from '../pages/staff/StaffLoginPage.vue'
 const routes = [
   { path: '/', name: 'home', component: HomePage },
   { path: '/search', name: 'search', component: SearchPage },
-  { path: '/:type(concerts|arts|sports|experiences|workshops|others)', name: 'category', component: CategoryPage },
+  { path: '/:type([a-z0-9-]+)', name: 'category', component: CategoryPage },
   { path: '/event/:id', name: 'event-detail', component: EventDetailPage },
   { path: '/my-tickets', name: 'my-tickets', component: MyTicketsPage },
   { path: '/notifications', name: 'notifications', component: NotificationsPage },

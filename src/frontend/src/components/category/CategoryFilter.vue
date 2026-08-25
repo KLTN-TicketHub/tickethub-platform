@@ -24,11 +24,10 @@
         <BaseSelect
           :modelValue="city"
           @update:modelValue="$emit('update:city', $event)"
+          :options="cityOptions"
+          placeholder="Mọi địa điểm"
           class="w-[180px] flex-shrink-0"
-        >
-          <option value="">Mọi địa điểm</option>
-          <option v-for="c in availableCities" :key="c.code" :value="c.name">{{ c.name }}</option>
-        </BaseSelect>
+        />
       </div>
     </div>
 
@@ -69,6 +68,10 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'update:city'])
+
+const cityOptions = computed(() =>
+  props.availableCities.map(c => ({ value: c.name, label: c.name }))
+)
 
 const hasActiveFilters = computed(() =>
   props.modelValue !== 'Tất cả' || !!props.city

@@ -194,13 +194,13 @@ const isScrolled = ref(false)
 
 const CITIES = ['Toàn quốc', 'Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng', 'Đà Lạt']
 
-// Icon không có trong dữ liệu category từ BE nên map cứng theo slug ở FE
-const NAV_ICON_BY_SLUG = {
-  concerts: markRaw(PhMicrophoneStage),
-  arts: markRaw(PhMaskHappy),
-  sports: markRaw(PhTrophy),
-  workshops: markRaw(PhBooks),
-}
+// Icon không có trong dữ liệu category từ BE, gán theo vị trí hiển thị (không phụ thuộc tên/slug cụ thể)
+const NAV_ICONS_BY_POSITION = [
+  markRaw(PhMicrophoneStage),
+  markRaw(PhMaskHappy),
+  markRaw(PhTrophy),
+  markRaw(PhBooks),
+]
 
 // Dùng khi chưa tải xong hoặc API lỗi, tránh header mất nav
 const FALLBACK_NAV_LINKS = [
@@ -218,11 +218,10 @@ const loadNavCategories = async () => {
     const categories = res?.data?.data ?? res?.data ?? (Array.isArray(res) ? res : [])
 
     const links = categories
-      .filter(c => NAV_ICON_BY_SLUG[c.slug])
       .sort((a, b) => a.displayOrder - b.displayOrder)
       .slice(0, 4)
-      .map(c => ({
-        icon: NAV_ICON_BY_SLUG[c.slug],
+      .map((c, idx) => ({
+        icon: NAV_ICONS_BY_POSITION[idx],
         label: c.categoryName,
         path: `/${c.slug}`
       }))
