@@ -14,9 +14,10 @@ namespace Ordering.Infrastructure.Sagas
             InstanceState(x => x.CurrentState);
 
             Event(() => CheckoutStarted, x => x.CorrelateById(c => c.Message.OrderId));
-            Event(() => PaymentLinkGenerated, x => x.CorrelateById(c => c.Message.OrderId));
-            Event(() => PaymentCompleted, x => x.CorrelateById(c => c.Message.OrderId));
-            Event(() => PaymentFailed, x => x.CorrelateById(c => c.Message.OrderId));
+
+            Event(() => PaymentLinkGenerated, x => x.CorrelateById(c => c.Message.OrderId).OnMissingInstance(m => m.Fault()));
+            Event(() => PaymentCompleted, x => x.CorrelateById(c => c.Message.OrderId).OnMissingInstance(m => m.Fault()));
+            Event(() => PaymentFailed, x => x.CorrelateById(c => c.Message.OrderId).OnMissingInstance(m => m.Fault()));
 
             Schedule(() => PaymentTimeout, x => x.TimeoutTokenId, s =>
             {

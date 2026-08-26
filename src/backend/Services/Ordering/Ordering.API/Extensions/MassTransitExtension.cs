@@ -28,7 +28,14 @@ namespace Ordering.API.Extensions
                 x.AddConsumer<EventCancelledConsumer>();
                 x.AddConsumer<FinalizeOrderRefundConsumer>();
 
-                x.AddSagaStateMachine<OrderBookingStateMachine, OrderBookingState>()
+                x.AddSagaStateMachine<OrderBookingStateMachine, OrderBookingState>(saga =>
+                    {
+                        saga.UseMessageRetry(r => r.Intervals(
+                            TimeSpan.FromMilliseconds(100),
+                            TimeSpan.FromMilliseconds(300),
+                            TimeSpan.FromMilliseconds(800),
+                            TimeSpan.FromMilliseconds(1500)));
+                    })
                     .EntityFrameworkRepository(r =>
                     {
                         r.ConcurrencyMode = ConcurrencyMode.Optimistic;
