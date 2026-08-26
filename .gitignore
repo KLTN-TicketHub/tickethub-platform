@@ -13,3 +13,6 @@ README-CodeGraph.md
 # Local AI assistant notes (not shared with team)
 CLAUDE.md
 .claude/docs/
+
+# Local dev tooling (not shared with team)
+src/backend/tools/DataSeeder/
