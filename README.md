@@ -15,20 +15,9 @@
 - **Cache & Seat Lock**: Redis (TTL-based seat holding).
 - **Shared code**: [BuildingBlocks](src/backend/BuildingBlocks) (API, Application, Contracts, Domain, Infrastructure) shared across services.
 
-```
-API Gateway (YARP)
-   │  HTTP
-   ├── Identity Service      ── SQL Server
-   ├── Catalog Service       ── SQL Server + Redis
-   ├── Inventory Service     ── SQL Server + Redis   (seat lock, SignalR)
-   ├── Ordering Service      ── SQL Server + Redis
-   ├── Payment Service       ── SQL Server + Redis
-   ├── Finance Service       ── SQL Server + Redis
-   ├── Notification Service  ── SQL Server + Redis
-   └── AI Service            ── SQL Server + Redis   (gRPC → Catalog, Ordering)
+![Architecture diagram](docs/architecture.png)
 
-All services communicate asynchronously via RabbitMQ (MassTransit, outbox/inbox pattern).
-```
+All services sit behind the API Gateway (YARP) over HTTP, each with its own SQL Server (+ Redis where noted), the AI service reaches Catalog/Ordering via gRPC, and all services communicate asynchronously via RabbitMQ (MassTransit, outbox/inbox pattern).
 
 ## Microservices (`src/backend/Services`)
 
@@ -105,10 +94,6 @@ npm run dev
 ```
 
 The app runs at the address printed by Vite (default `http://localhost:5173`).
-
-## Coding style
-
-Coding conventions (naming, folder structure, CQRS handler patterns, FluentValidation, AutoMapper, EF Fluent API, controllers...) are fully defined in [CLAUDE.md](CLAUDE.md) — mandatory across the entire backend.
 
 ## License
 
