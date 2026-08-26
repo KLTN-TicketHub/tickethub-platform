@@ -15,7 +15,7 @@
 - **Cache & Seat Lock**: Redis (TTL-based seat holding).
 - **Shared code**: [BuildingBlocks](src/backend/BuildingBlocks) (API, Application, Contracts, Domain, Infrastructure) shared across services.
 
-![Architecture diagram](docs/architecture.png)
+<img src="docs/architecture.png" alt="Architecture diagram" width="900" />
 
 All services sit behind the API Gateway (YARP) over HTTP, each with its own SQL Server (+ Redis where noted), the AI service reaches Catalog/Ordering via gRPC, and all services communicate asynchronously via RabbitMQ (MassTransit, outbox/inbox pattern).
 
